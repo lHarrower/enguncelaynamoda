@@ -1,6 +1,7 @@
 // supabase/functions/ai-analysis/index.ts
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 import { corsHeaders } from '../_shared/cors.ts';
 
 // A simple map to translate Cloudinary tags to our internal categories.
@@ -24,75 +25,105 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { imageUrl } = await req.json();
-    if (!imageUrl) {
-      throw new Error('imageUrl is required in the request body.');
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error('Supabase environment variables are not set.');
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Parse request body
+    const { imageUrl, itemId } = await req.json();
+    if (!imageUrl || !itemId) { 
+      throw new Error('imageUrl and itemId are required.'); 
     }
 
-    // Retrieve the Cloudinary URL from secure environment variables.
-    // This URL contains the API Key and Secret, e.g., cloudinary://KEY:SECRET@CLOUD_NAME
+    // Check if we already have cached AI analysis for this item
+    const { data: existingItem, error: fetchError } = await supabase
+      .from('wardrobeItems')
+      .select('ai_cache')
+      .eq('id', itemId)
+      .single();
+      
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      throw new Error(`Database error: ${fetchError.message}`);
+    }
+    
+    // If we have cached data, skip Cloudinary API call
+    if (existingItem?.ai_cache) {
+      return new Response(JSON.stringify({ success: true, itemId, cached: true }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
+
+    // Get Cloudinary credentials
     const cloudinaryUrl = Deno.env.get('CLOUDINARY_URL');
     const cloudName = Deno.env.get('CLOUDINARY_CLOUD_NAME');
-    if (!cloudinaryUrl || !cloudName) {
-      throw new Error('Cloudinary environment variables are not set.');
+    if (!cloudinaryUrl || !cloudName) { 
+      throw new Error('Cloudinary environment variables are not set.'); 
     }
 
-    // Prepare the data to be sent to Cloudinary.
-    // We request auto-tagging via AWS Rekognition and color analysis.
+    // Call Cloudinary API
     const formData = new FormData();
     formData.append('file', imageUrl);
-    formData.append('upload_preset', 'aynamoda_preset'); // An upload preset created in Cloudinary
+    formData.append('upload_preset', 'aynamoda_preset');
     formData.append('detection', 'aws_rek_tagging');
     formData.append('colors', 'true');
 
-    // Call the Cloudinary Upload API
     const cloudinaryResponse = await fetch(
       `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-      {
-        method: 'POST',
-        body: formData,
-      }
+      { method: 'POST', body: formData }
     );
-    
+
     if (!cloudinaryResponse.ok) {
-        const errorData = await cloudinaryResponse.json();
-        throw new Error(`Cloudinary API error: ${errorData.error.message}`);
+      const errorData = await cloudinaryResponse.json();
+      throw new Error(`Cloudinary API error: ${errorData.error.message}`);
     }
 
     const analysisResult = await cloudinaryResponse.json();
     
-    // --- Process the Analysis Result ---
-    // Extract tags detected by AWS Rekognition, converting to lowercase for consistency
-    const detectedTags = analysisResult.info.detection.aws_rek_tagging.data.map((t: any) => t.tag.toLowerCase());
+    // Process the analysis result
+    const detectedTags = analysisResult.info?.detection?.aws_rek_tagging?.data?.map((t: any) => t.tag.toLowerCase()) || [];
     
     let mainCategory = 'Uncategorized';
     let subCategory = 'Uncategorized';
 
-    // Find the first matching tag and assign our internal categories
     for (const tag of detectedTags) {
-        if (TAG_TO_CATEGORY_MAP[tag]) {
-            mainCategory = TAG_TO_CATEGORY_MAP[tag].main;
-            subCategory = TAG_TO_CATEGORY_MAP[tag].sub;
-            break; // Exit the loop after the first match is found
-        }
+      if (TAG_TO_CATEGORY_MAP[tag]) {
+        mainCategory = TAG_TO_CATEGORY_MAP[tag].main;
+        subCategory = TAG_TO_CATEGORY_MAP[tag].sub;
+        break;
+      }
     }
     
-    // Extract the dominant colors (as hex codes)
-    const dominantColors = analysisResult.colors.map((color: any) => color[0]);
+    const dominantColors = analysisResult.colors?.map((color: any) => color[0]) || [];
 
-    // Prepare the final payload to be sent back to the client
-    const responsePayload = {
-      mainCategory,
-      subCategory,
-      dominantColors,
-      rawTags: detectedTags, // Including raw tags can be useful for debugging
-    };
+    // Update the wardrobe item with AI analysis results and cache
+    const { error: updateError } = await supabase
+      .from('wardrobeItems')
+      .update({
+        ai_cache: analysisResult, // Store complete Cloudinary response
+        mainCategory,
+        subCategory,
+        dominantColors,
+        // Don't update user overrides if they exist
+        is_user_edited: false
+      })
+      .eq('id', itemId);
+      
+    if (updateError) {
+      throw new Error(`Failed to update wardrobe item: ${updateError.message}`);
+    }
 
-    return new Response(JSON.stringify(responsePayload), {
+    return new Response(JSON.stringify({ success: true, itemId }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
-
+    
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
