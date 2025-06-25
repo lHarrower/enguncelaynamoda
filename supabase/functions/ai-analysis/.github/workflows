@@ -3,22 +3,27 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { corsHeaders } from '../_shared/cors.ts';
 
-// A simple map to translate Cloudinary tags to our internal categories.
-const TAG_TO_CATEGORY_MAP: Record<string, { main: string; sub: string }> = {
-  // Sub-categories
+// Cloudinary'den gelen etiketleri kendi kategorilerimize çeviren basit bir harita
+const TAG_TO_CATEGORY_MAP = {
+  // Alt Kategoriler
   't-shirt': { main: 'Tops', sub: 'T-shirt' },
   'shirt': { main: 'Tops', sub: 'Shirt' },
   'blouse': { main: 'Tops', sub: 'Blouse' },
   'sweater': { main: 'Tops', sub: 'Sweater' },
+  'sweatshirt': { main: 'Tops', sub: 'Sweatshirt' },
+  'hoodie': { main: 'Tops', sub: 'Hoodie' },
+  'tank top': { main: 'Tops', sub: 'Tank Top' },
   'jeans': { main: 'Bottoms', sub: 'Jeans' },
   'pants': { main: 'Bottoms', sub: 'Pants' },
+  'shorts': { main: 'Bottoms', sub: 'Shorts' },
   'skirt': { main: 'Bottoms', sub: 'Skirt' },
   'dress': { main: 'Dresses', sub: 'Dress' },
-  // ... this list can be enriched over time.
+  'jumpsuit': { main: 'Dresses', sub: 'Jumpsuit' },
+  // ... bu liste zenginleştirilebilir
 };
 
-serve(async (req: Request) => {
-  // Handle CORS preflight requests
+serve(async (req) => {
+  // Bu fonksiyonun bir parçası olarak CORS (Cross-Origin Resource Sharing) başlıklarını ekliyoruz
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -26,28 +31,27 @@ serve(async (req: Request) => {
   try {
     const { imageUrl } = await req.json();
     if (!imageUrl) {
-      throw new Error('imageUrl is required in the request body.');
+      throw new Error('imageUrl is required');
     }
 
-    // Retrieve the Cloudinary URL from secure environment variables.
-    // This URL contains the API Key and Secret, e.g., cloudinary://KEY:SECRET@CLOUD_NAME
+    // Güvenli ortam değişkenlerinden Cloudinary URL'sini alıyoruz.
+    // Bu URL, API Key ve Secret'ı içerir. Örn: cloudinary://KEY:SECRET@CLOUD_NAME
     const cloudinaryUrl = Deno.env.get('CLOUDINARY_URL');
-    const cloudName = Deno.env.get('CLOUDINARY_CLOUD_NAME');
-    if (!cloudinaryUrl || !cloudName) {
-      throw new Error('Cloudinary environment variables are not set.');
+    if (!cloudinaryUrl) {
+      throw new Error('CLOUDINARY_URL is not set');
     }
 
-    // Prepare the data to be sent to Cloudinary.
-    // We request auto-tagging via AWS Rekognition and color analysis.
+    // Cloudinary'ye göndereceğimiz veriyi hazırlıyoruz.
+    // AWS Rekognition eklentisini ve renk analizini kullanmasını istiyoruz.
     const formData = new FormData();
     formData.append('file', imageUrl);
-    formData.append('upload_preset', 'aynamoda_preset'); // An upload preset created in Cloudinary
+    formData.append('upload_preset', 'aynamoda_preset'); // Cloudinary'de oluşturulacak bir upload preset'i
     formData.append('detection', 'aws_rek_tagging');
     formData.append('colors', 'true');
 
-    // Call the Cloudinary Upload API
+    // Cloudinary API'sini çağırıyoruz
     const cloudinaryResponse = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+      `https://api.cloudinary.com/v1_1/${Deno.env.get('CLOUDINARY_CLOUD_NAME')}/image/upload`,
       {
         method: 'POST',
         body: formData,
@@ -61,31 +65,29 @@ serve(async (req: Request) => {
 
     const analysisResult = await cloudinaryResponse.json();
     
-    // --- Process the Analysis Result ---
-    // Extract tags detected by AWS Rekognition, converting to lowercase for consistency
-    const detectedTags = analysisResult.info.detection.aws_rek_tagging.data.map((t: any) => t.tag.toLowerCase());
+    // --- Analiz Sonucunu İşleme ---
+    const detectedTags = analysisResult.info.detection.aws_rek_tagging.data.map(t => t.tag.toLowerCase());
     
     let mainCategory = 'Uncategorized';
     let subCategory = 'Uncategorized';
 
-    // Find the first matching tag and assign our internal categories
+    // Eşleşen ilk etiketi bul ve kategorileri ata
     for (const tag of detectedTags) {
         if (TAG_TO_CATEGORY_MAP[tag]) {
             mainCategory = TAG_TO_CATEGORY_MAP[tag].main;
             subCategory = TAG_TO_CATEGORY_MAP[tag].sub;
-            break; // Exit the loop after the first match is found
+            break; // İlk eşleşmeyi bulduktan sonra döngüden çık
         }
     }
     
-    // Extract the dominant colors (as hex codes)
-    const dominantColors = analysisResult.colors.map((color: any) => color[0]);
+    // Baskın Renkleri al (hex kodları olarak)
+    const dominantColors = analysisResult.colors.map(color => color[0]);
 
-    // Prepare the final payload to be sent back to the client
     const responsePayload = {
       mainCategory,
       subCategory,
       dominantColors,
-      rawTags: detectedTags, // Including raw tags can be useful for debugging
+      rawTags: detectedTags, // Ham veriyi de görmek faydalı olabilir
     };
 
     return new Response(JSON.stringify(responsePayload), {
@@ -93,7 +95,7 @@ serve(async (req: Request) => {
       status: 200,
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
