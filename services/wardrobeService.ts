@@ -1,8 +1,6 @@
-// Wardrobe Service - Supabase Integration with Image Upload
-import supabase from '../config/supabaseClient';
+// Wardrobe Service - Supabase Integration
+import { supabase } from '../config/supabaseClient';
 
-// We can define the type for a new clothing item, which won't have an id or created_at yet.
-// Supabase will generate these automatically.
 export interface NewClothingItem {
   image_uri: string;
   processed_image_uri: string;
@@ -15,129 +13,103 @@ export interface NewClothingItem {
   // user_id will be handled by RLS (Row Level Security) in Supabase
 }
 
+export interface WardrobeItem {
+  id: string;
+  userId: string;
+  imageUri: string;
+  processedImageUri?: string;
+  category: string;
+  subcategory?: string;
+  colors: string[];
+  brand?: string;
+  size?: string;
+  purchaseDate?: Date;
+  purchasePrice?: number;
+  tags: string[];
+  notes?: string;
+  usageCount: number;
+  lastWorn?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 /**
- * Helper function to upload an image to Supabase Storage and get its public URL
- * @param fileUri - The local file URI (file:// path)
- * @returns The public URL of the uploaded image
+ * Gets all wardrobe items for a user.
+ * @param userId - The user ID to get wardrobe items for.
+ * @returns Array of wardrobe items.
  */
-const uploadImageAndGetUrl = async (fileUri: string): Promise<string> => {
-  console.log('[WardrobeService] Starting image upload for:', fileUri);
-  
+export const getWardrobeItems = async (userId: string): Promise<WardrobeItem[]> => {
+  console.log('[WardrobeService] Getting wardrobe items for user:', userId);
+
   try {
-    // Generate a unique filename with timestamp
-    const timestamp = Date.now();
-    const fileName = `wardrobe_item_${timestamp}.jpg`;
-    
-    console.log('[WardrobeService] Creating FormData for upload with filename:', fileName);
-    
-    // Create FormData object for React Native upload
-    const formData = new FormData();
-    formData.append('file', {
-      uri: fileUri,
-      name: 'photo.jpg',
-      type: 'image/jpeg'
-    } as any);
-    
-    console.log('[WardrobeService] FormData created, uploading to Supabase Storage...');
-    
-    // Upload to Supabase Storage using FormData
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('wardrobe-photos')
-      .upload(fileName, formData, {
-        contentType: 'image/jpeg',
-        upsert: false
-      });
-    
-    if (uploadError) {
-      console.error('[WardrobeService] Upload error:', uploadError);
-      throw uploadError;
+    const { data, error } = await supabase
+      .from('wardrobe_items')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('[WardrobeService] Supabase select error:', error);
+      throw error;
     }
-    
-    console.log('[WardrobeService] Upload successful, path:', uploadData.path);
-    
-    // Get the public URL for the uploaded file
-    const { data: urlData } = supabase.storage
-      .from('wardrobe-photos')
-      .getPublicUrl(uploadData.path);
-    
-    console.log('[WardrobeService] Public URL generated:', urlData.publicUrl);
-    
-    return urlData.publicUrl;
-    
+
+    // Transform database format to interface format
+    const wardrobeItems: WardrobeItem[] = (data || []).map(item => ({
+      id: item.id,
+      userId: item.user_id,
+      imageUri: item.image_uri,
+      processedImageUri: item.processed_image_uri,
+      category: item.category,
+      subcategory: item.subcategory,
+      colors: item.colors || [],
+      brand: item.brand,
+      size: item.size,
+      purchaseDate: item.purchase_date ? new Date(item.purchase_date) : undefined,
+      purchasePrice: item.purchase_price,
+      tags: item.tags || [],
+      notes: item.notes,
+      usageCount: item.usage_count || 0,
+      lastWorn: item.last_worn ? new Date(item.last_worn) : undefined,
+      createdAt: new Date(item.created_at),
+      updatedAt: new Date(item.updated_at),
+    }));
+
+    console.log('[WardrobeService] Successfully retrieved items:', wardrobeItems.length);
+    return wardrobeItems;
+
   } catch (error) {
-    console.error('[WardrobeService] Image upload failed:', error);
-    throw new Error(`Failed to upload image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    const message = error instanceof Error ? error.message : 'An unknown error occurred.';
+    console.error(`[WardrobeService] Failed to get wardrobe items: ${message}`);
+    throw new Error(`Failed to get wardrobe items: ${message}`);
   }
 };
 
 /**
  * Saves a new clothing item to the Supabase database.
- * @param item - The clothing item data.
+ * @param item - The clothing item data, which should already contain the public URLs for the images.
  * @returns The data of the newly created item from the database.
  */
 export const saveClothingItem = async (item: NewClothingItem) => {
-  console.log('[WardrobeService] saveClothingItem function received data:', item);
-  
+  console.log('[WardrobeService] Attempting to save item:', item);
+
   try {
-    console.log('[WardrobeService] Starting image upload process...');
-    
-    // Upload the main image and get its public URL
-    const uploadedImageUrl = await uploadImageAndGetUrl(item.image_uri);
-    console.log('[WardrobeService] Image uploaded successfully, URL:', uploadedImageUrl);
-    
-    // For now, we'll use the same uploaded image for processed_image_uri
-    // In a real app, you might process the image differently or upload a separate processed version
-    const processedImageUrl = uploadedImageUrl;
-    
-    console.log('[WardrobeService] Attempting to insert into Supabase database...');
-    console.log('[WardrobeService] Using table name: wardrobeItems');
-    
-    // Create the item object with real public URLs (all snake_case keys)
-    const itemToSave = {
-      ...item, // Keep all other item properties (already in snake_case)
-      image_uri: uploadedImageUrl, // Use the real uploaded image URL
-      processed_image_uri: processedImageUrl // Use the real processed image URL
-    };
-    
-    console.log('[WardrobeService] Item to save with snake_case keys:', itemToSave);
-    console.log('[WardrobeService] Item keys:', Object.keys(itemToSave));
-    
     const { data, error } = await supabase
-      .from('wardrobeItems') // FIXED: Changed from 'wardrobe_items' to 'wardrobeItems'
-      .insert([itemToSave])
+      .from('wardrobeItems')
+      .insert([item])
       .select()
-      .single(); // .single() is used to return a single object instead of an array
+      .single();
 
     if (error) {
-      console.error('[WardrobeService] Supabase database error FULL DETAILS:');
-      console.error('[WardrobeService] Error object:', error);
-      console.error('[WardrobeService] Error message:', error.message);
-      console.error('[WardrobeService] Error details:', error.details);
-      console.error('[WardrobeService] Error hint:', error.hint);
-      console.error('[WardrobeService] Error code:', error.code);
-      
-      // Throw the Supabase error for the calling function to handle
+      console.error('[WardrobeService] Supabase insert error:', error);
       throw error;
     }
 
-    console.log('[WardrobeService] Successfully inserted. Full response data:', data);
-    console.log('[WardrobeService] Successfully inserted. Document ID:', data?.id);
+    console.log('[WardrobeService] Successfully inserted item:', data);
     return data;
 
   } catch (error) {
-    console.error('[WardrobeService] CATCH BLOCK - Full error details:');
-    console.error('[WardrobeService] Error type:', typeof error);
-    console.error('[WardrobeService] Error object:', error);
-    
-    if (error && typeof error === 'object') {
-      console.error('[WardrobeService] Error message:', (error as any).message);
-      console.error('[WardrobeService] Error details:', (error as any).details);
-      console.error('[WardrobeService] Error hint:', (error as any).hint);
-      console.error('[WardrobeService] Error code:', (error as any).code);
-    }
-
-    // Re-throw the error with a more descriptive message
     const message = error instanceof Error ? error.message : 'An unknown error occurred.';
+    console.error(`[WardrobeService] Failed to save clothing item: ${message}`);
     throw new Error(`Failed to save clothing item: ${message}`);
   }
 }; 

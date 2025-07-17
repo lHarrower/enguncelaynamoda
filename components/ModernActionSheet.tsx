@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Colors from '../constants/Colors';
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
@@ -35,7 +36,7 @@ export default function ModernActionSheet({
   visible,
   title,
   subtitle,
-  options,
+  options = [],
   onClose,
   showCancel = true,
 }: ModernActionSheetProps) {
@@ -129,7 +130,7 @@ export default function ModernActionSheet({
           {...panResponder.panHandlers}
         >
           {/* Drag Indicator */}
-          <View style={styles.dragIndicator} />
+          <View style={styles.handle} />
           
           {/* Header */}
           {(title || subtitle) && (
@@ -141,7 +142,7 @@ export default function ModernActionSheet({
           
           {/* Options */}
           <ScrollView style={styles.optionsContainer} showsVerticalScrollIndicator={false}>
-            {options.map((option, index) => (
+            { (options || []).map((option, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
@@ -155,7 +156,7 @@ export default function ModernActionSheet({
                 <View style={styles.optionContent}>
                   {option.icon && (
                     <View style={[
-                      styles.iconContainer,
+                      styles.optionIcon,
                       option.style === 'destructive' && styles.destructiveIconContainer,
                       option.style === 'primary' && styles.primaryIconContainer,
                     ]}>
@@ -171,7 +172,7 @@ export default function ModernActionSheet({
                   )}
                   <View style={styles.textContainer}>
                     <Text style={[
-                      styles.optionTitle,
+                      styles.optionText,
                       option.style === 'destructive' && styles.destructiveText,
                       option.style === 'primary' && styles.primaryText,
                     ]}>
@@ -195,7 +196,7 @@ export default function ModernActionSheet({
                 onPress={onClose}
                 activeOpacity={0.7}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -208,6 +209,7 @@ export default function ModernActionSheet({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
+    backgroundColor: 'rgba(28, 34, 48, 0.85)',
     justifyContent: 'flex-end',
   },
   backdrop: {
@@ -218,44 +220,49 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   container: {
-    backgroundColor: '#FDFCFB',
+    backgroundColor: Colors.light.card,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: screenHeight * 0.8,
-    shadowColor: '#7A6B56',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.15,
+    paddingTop: 20,
+    paddingBottom: 34,
+    maxHeight: '80%',
+    borderTopWidth: 1,
+    borderTopColor: Colors.dark.border,
+    shadowColor: Colors.dark.background,
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 0.3,
     shadowRadius: 16,
-    elevation: 10,
+    elevation: 20,
   },
-  dragIndicator: {
-    width: 36,
+  handle: {
+    width: 40,
     height: 4,
-    backgroundColor: '#D4C4B8',
+    backgroundColor: Colors.dark.border,
     borderRadius: 2,
     alignSelf: 'center',
-    marginTop: 12,
-    marginBottom: 8,
+    marginBottom: 20,
+    opacity: 0.6,
   },
   header: {
-    paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0E6E3',
+    borderBottomColor: Colors.dark.border,
   },
   title: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#7A6B56',
+    fontFamily: 'PlayfairDisplay_700Bold',
+    color: Colors.light.onSurface,
     textAlign: 'center',
-    letterSpacing: -0.5,
+    marginBottom: 4,
+    letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 14,
-    color: '#B8918F',
+    color: Colors.light.onSurface,
     textAlign: 'center',
-    marginTop: 4,
-    letterSpacing: -0.2,
+    opacity: 0.7,
+    fontFamily: 'Karla_400Regular',
   },
   optionsContainer: {
     paddingHorizontal: 16,
@@ -264,15 +271,27 @@ const styles = StyleSheet.create({
   option: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingVertical: 16,
     paddingHorizontal: 16,
-    marginVertical: 2,
-    borderRadius: 16,
-    backgroundColor: 'transparent',
+    marginBottom: 8,
+    borderRadius: 12,
+    backgroundColor: Colors.dark.background,
+    borderWidth: 1,
+    borderColor: Colors.dark.border,
+    shadowColor: Colors.dark.background,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   destructiveOption: {
-    backgroundColor: '#FFE8E8',
+    backgroundColor: Colors.dark.highlight,
+    borderColor: Colors.dark.highlight,
+    shadowColor: Colors.dark.highlight,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   primaryOption: {
     backgroundColor: '#F0E6E3',
@@ -282,57 +301,58 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F2EFE9',
+  optionIcon: {
+    marginRight: 12,
+    width: 24,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
   },
   destructiveIconContainer: {
     backgroundColor: '#FFE8E8',
   },
   primaryIconContainer: {
-    backgroundColor: '#F0E6E3',
+    backgroundColor: Colors.light.card,
   },
   textContainer: {
     flex: 1,
   },
-  optionTitle: {
+  optionText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#7A6B56',
-    letterSpacing: -0.2,
+    color: Colors.dark.text,
+    fontFamily: 'Karla_700Bold',
+    flex: 1,
+    letterSpacing: 0.3,
   },
   destructiveText: {
-    color: '#D32F2F',
+    color: Colors.dark.text,
   },
   primaryText: {
-    color: '#B8918F',
+    color: Colors.light.tint,
   },
   optionSubtitle: {
     fontSize: 13,
-    color: '#B8918F',
+    color: Colors.light.text_secondary,
     marginTop: 2,
     letterSpacing: -0.1,
   },
   cancelContainer: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#F0E6E3',
+    borderTopColor: Colors.light.border,
   },
   cancelButton: {
+    marginTop: 16,
+    marginHorizontal: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: Colors.dark.border,
+    borderRadius: 12,
     paddingVertical: 16,
-    backgroundColor: '#F2EFE9',
-    borderRadius: 16,
     alignItems: 'center',
   },
-  cancelButtonText: {
+  cancelText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#9AA493',
-    letterSpacing: -0.2,
+    color: Colors.light.onSurface,
+    fontFamily: 'Karla_700Bold',
+    letterSpacing: 0.3,
   },
 }); 

@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "name": "Code Quality Analyzer",
+  "description": "Monitors source code files for changes and analyzes modified code for potential improvements including code smells, design patterns, and best practices. Generates suggestions for improving code quality while maintaining existing functionality.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered",
+    "patterns": [
+      "app/**/*.tsx",
+      "app/**/*.ts",
+      "components/**/*.tsx",
+      "components/**/*.ts",
+      "services/**/*.ts",
+      "hooks/**/*.ts",
+      "context/**/*.tsx",
+      "utils/**/*.ts",
+      "constants/**/*.ts",
+      "theme/**/*.ts",
+      "config/**/*.ts"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze the modified code in the changed files for potential improvements. Focus on:\n\n1. **Code Smells & Anti-patterns**: Identify any code smells, anti-patterns, or violations of clean code principles\n2. **React Native Best Practices**: Check for proper React Native patterns, performance optimizations, and mobile-specific considerations\n3. **TypeScript Usage**: Evaluate type safety, proper typing, and TypeScript best practices\n4. **Design Patterns**: Suggest appropriate design patterns that could improve code structure\n5. **Performance**: Identify potential performance bottlenecks and optimization opportunities\n6. **Maintainability**: Assess code readability, modularity, and ease of maintenance\n7. **Consistency**: Check adherence to the project's established patterns and conventions\n\nFor each suggestion, provide:\n- Clear explanation of the issue or improvement opportunity\n- Specific code examples showing the current approach and recommended changes\n- Rationale for why the change would improve code quality\n- Impact assessment (readability, performance, maintainability)\n\nConsider the AynaModa project context:\n- React Native with Expo SDK 53 and TypeScript\n- Digital Zen Garden design philosophy\n- Component-based architecture with Context API\n- File-based routing with expo-router\n\nMaintain the existing functionality while suggesting improvements that align with modern React Native development practices and the project's architectural patterns."
+  }
+}

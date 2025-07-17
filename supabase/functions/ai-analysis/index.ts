@@ -129,10 +129,10 @@ serve(async (req: Request) => {
     // Parse and validate request body
     const { imageUrl, itemId } = await req.json();
     
-    if (!imageUrl || !itemId) {
+    if (!imageUrl || !itemId) { 
       throw new Error('Missing required parameters: imageUrl and itemId');
     }
-    
+
     // SECURITY: Validate imageUrl against SSRF attacks
     if (!validateImageUrl(imageUrl, supabaseUrl)) {
       throw new Error('Invalid or unauthorized image URL');
@@ -170,7 +170,7 @@ serve(async (req: Request) => {
         status: 200,
       });
     }
-    
+
     // Validate Cloudinary configuration
     const cloudName = Deno.env.get('CLOUDINARY_CLOUD_NAME')!;
     if (!cloudName) {
@@ -178,7 +178,7 @@ serve(async (req: Request) => {
     }
     
     console.log(`[AI Analysis] Calling Cloudinary API for item ${itemId}`);
-    
+
     // Prepare Cloudinary API request
     const formData = new FormData();
     formData.append('file', imageUrl);
@@ -189,7 +189,7 @@ serve(async (req: Request) => {
     // Call Cloudinary API with timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-    
+
     const cloudinaryResponse = await fetch(
       `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
       { 
@@ -200,13 +200,13 @@ serve(async (req: Request) => {
     );
     
     clearTimeout(timeoutId);
-    
+
     if (!cloudinaryResponse.ok) {
       const errorData = await cloudinaryResponse.json().catch(() => ({}));
       console.error('[AI Analysis] Cloudinary error:', errorData);
       throw new Error(`AI analysis service error: ${errorData.error?.message || 'Unknown error'}`);
     }
-    
+
     const analysisResult = await cloudinaryResponse.json();
     console.log(`[AI Analysis] Cloudinary analysis completed for item ${itemId}`);
     
@@ -217,7 +217,7 @@ serve(async (req: Request) => {
     
     let aiMainCategory = 'Uncategorized';
     let aiSubCategory = 'Uncategorized';
-    
+
     // Match detected tags to our category mapping
     for (const tag of detectedTags) {
       if (TAG_TO_CATEGORY_MAP[tag]) {
@@ -235,7 +235,7 @@ serve(async (req: Request) => {
       colors: aiDominantColors.length,
       tags: detectedTags.length
     });
-    
+
     // CRITICAL: Update ONLY the AI-specific columns
     const { error: updateError } = await supabase
       .from('wardrobeItems')
@@ -253,7 +253,7 @@ serve(async (req: Request) => {
       console.error('[AI Analysis] Database update failed:', updateError);
       throw new Error(`Failed to save AI analysis: ${updateError.message}`);
     }
-    
+
     console.log(`[AI Analysis] Successfully saved AI analysis for item ${itemId}`);
     
     return new Response(JSON.stringify({ 

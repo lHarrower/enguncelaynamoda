@@ -9,6 +9,7 @@ import {
   Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Colors from '../constants/Colors';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -32,7 +33,7 @@ export default function CustomModal({
   visible, 
   title, 
   message, 
-  buttons, 
+  buttons = [], 
   onClose,
   type = 'default'
 }: CustomModalProps) {
@@ -93,11 +94,11 @@ export default function CustomModal({
 
   const getTypeColor = () => {
     switch (type) {
-      case 'success': return '#9AA493';
+      case 'success': return Colors.light.highlight;
       case 'warning': return '#D2691E';
       case 'error': return '#D32F2F';
-      case 'info': return '#B8918F';
-      default: return '#B8918F';
+      case 'info': return Colors.light.tint;
+      default: return Colors.light.tint;
     }
   };
 
@@ -140,10 +141,10 @@ export default function CustomModal({
           
           {/* Buttons */}
           <View style={styles.modalButtons}>
-            {buttons.length <= 2 ? (
+            { (buttons || []).length <= 2 ? (
               // Horizontal layout for 1-2 buttons
               <View style={styles.horizontalButtons}>
-                {buttons.map((button, index) => (
+                { (buttons || []).map((button, index) => (
                   <TouchableOpacity
                     key={index}
                     style={[
@@ -166,7 +167,7 @@ export default function CustomModal({
                       />
                     )}
                     <Text style={[
-                      styles.modernButtonText,
+                      styles.buttonText,
                       button.style === 'primary' && styles.primaryButtonText,
                       button.style === 'destructive' && styles.destructiveButtonText,
                       button.style === 'cancel' && styles.cancelButtonText
@@ -179,7 +180,7 @@ export default function CustomModal({
             ) : (
               // Vertical layout for 3+ buttons
               <View style={styles.verticalButtons}>
-                {buttons.map((button, index) => (
+                { (buttons || []).map((button, index) => (
                   <TouchableOpacity
                     key={index}
                     style={[
@@ -188,7 +189,7 @@ export default function CustomModal({
                       button.style === 'primary' && styles.primaryButton,
                       button.style === 'destructive' && styles.destructiveButton,
                       button.style === 'cancel' && styles.cancelButton,
-                      index < buttons.length - 1 && styles.verticalButtonMargin
+                      index < (buttons || []).length - 1 && styles.verticalButtonMargin
                     ]}
                     onPress={button.onPress || onClose}
                     activeOpacity={0.8}
@@ -203,7 +204,7 @@ export default function CustomModal({
                       />
                     )}
                     <Text style={[
-                      styles.modernButtonText,
+                      styles.buttonText,
                       button.style === 'primary' && styles.primaryButtonText,
                       button.style === 'destructive' && styles.destructiveButtonText,
                       button.style === 'cancel' && styles.cancelButtonText
@@ -224,42 +225,50 @@ export default function CustomModal({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(122, 107, 86, 0.6)', // Matte taupe overlay
+    backgroundColor: 'rgba(28, 34, 48, 0.85)', // Ink Blue overlay with higher opacity
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
   },
   modalContainer: {
-    backgroundColor: '#FDFCFB', // Soft off-white
-    borderRadius: 24,
+    backgroundColor: Colors.light.card, // Ivory Grey for contrast
+    borderRadius: 20, // Luxury rounded corners
     width: '100%',
     maxWidth: 360,
-    shadowColor: '#7A6B56',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.25,
-    shadowRadius: 24,
-    elevation: 15,
+    shadowColor: Colors.dark.background, // Ink Blue shadow
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.4,
+    shadowRadius: 32,
+    elevation: 20,
+    borderWidth: 1,
+    borderColor: Colors.dark.border, // Deep Aubergine border
   },
   modalHeader: {
     padding: 24,
     paddingBottom: 20,
     alignItems: 'center',
     borderBottomWidth: 1,
+    borderBottomColor: Colors.dark.border,
   },
   iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
+    shadowColor: Colors.dark.background,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   modalTitle: {
     fontSize: 22,
-    fontWeight: '700',
-    color: '#7A6B56', // Matte taupe
+    fontFamily: 'PlayfairDisplay_700Bold', // Serif for luxury
+    color: Colors.light.onSurface, // Ink Blue on Ivory Grey
     textAlign: 'center',
-    letterSpacing: -0.5,
+    letterSpacing: 0.5,
   },
   modalBody: {
     paddingHorizontal: 24,
@@ -268,9 +277,11 @@ const styles = StyleSheet.create({
   modalMessage: {
     fontSize: 16,
     lineHeight: 24,
-    color: '#B8918F', // Matte rose
+    color: Colors.light.onSurface, // Ink Blue
     textAlign: 'center',
-    letterSpacing: -0.2,
+    letterSpacing: 0.2,
+    fontFamily: 'Karla_400Regular',
+    opacity: 0.8,
   },
   modalButtons: {
     padding: 24,
@@ -278,6 +289,7 @@ const styles = StyleSheet.create({
   },
   horizontalButtons: {
     flexDirection: 'row',
+    gap: 12,
   },
   verticalButtons: {
     flexDirection: 'column',
@@ -285,14 +297,19 @@ const styles = StyleSheet.create({
   modernButton: {
     paddingVertical: 16,
     paddingHorizontal: 20,
-    borderRadius: 16,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    backgroundColor: '#F2EFE9', // Matte cream
+    backgroundColor: Colors.dark.background, // Ink Blue
     borderWidth: 1,
-    borderColor: '#E8DDD4',
+    borderColor: Colors.dark.border,
     minHeight: 52,
+    shadowColor: Colors.dark.background,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   verticalButton: {
     width: '100%',
@@ -301,33 +318,43 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   primaryButton: {
-    backgroundColor: '#B8918F', // Matte rose
-    borderColor: '#B8918F',
+    backgroundColor: Colors.dark.tint, // Bronze Gold
+    borderColor: Colors.dark.tint,
+    shadowColor: Colors.dark.tint,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   destructiveButton: {
-    backgroundColor: '#D32F2F',
-    borderColor: '#D32F2F',
+    backgroundColor: Colors.dark.highlight, // Deep Aubergine
+    borderColor: Colors.dark.highlight,
+    shadowColor: Colors.dark.highlight,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   cancelButton: {
     backgroundColor: 'transparent',
-    borderColor: '#D4C4B8',
+    borderColor: Colors.dark.border,
   },
   buttonIcon: {
     marginRight: 8,
   },
-  modernButtonText: {
+  buttonText: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#B8918F',
-    letterSpacing: -0.2,
+    fontFamily: 'Karla_700Bold',
+    color: Colors.dark.text, // Warm Ivory
+    letterSpacing: 0.3,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: Colors.dark.text, // Warm Ivory
   },
   destructiveButtonText: {
-    color: '#FFFFFF',
+    color: Colors.dark.text, // Warm Ivory
   },
   cancelButtonText: {
-    color: '#9AA493', // Matte sage
+    color: Colors.light.onSurface, // Ink Blue
   },
 }); 

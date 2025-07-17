@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import Colors from '../../../constants/Colors';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -248,7 +249,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
                       Clear selection
                     </Text>
                   </TouchableOpacity>
-                  {availableSubcategories.map((subcat) => (
+                  {(availableSubcategories || []).map((subcat) => (
                     <TouchableOpacity
                       key={subcat}
                       style={styles.dropdownItem}
@@ -514,32 +515,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: Colors.light.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.card,
   },
   dropdownText: {
     fontSize: 16,
-    color: '#333333',
+    color: Colors.light.text,
   },
   placeholder: {
-    color: '#999999',
+    color: Colors.light.text_secondary,
   },
   dropdownList: {
     position: 'absolute',
     top: '100%',
     left: 0,
     right: 0,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.light.card,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: Colors.light.border,
     maxHeight: 200,
     zIndex: 1000,
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: Colors.light.text,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -548,14 +549,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: Colors.light.border,
   },
   dropdownItemText: {
     fontSize: 16,
-    color: '#333333',
+    color: Colors.light.text,
   },
   clearOption: {
-    color: '#999999',
+    color: Colors.light.text_secondary,
     fontStyle: 'italic',
   },
   colorGrid: {
@@ -571,16 +572,16 @@ const styles = StyleSheet.create({
     margin: 4,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#FFFFFF',
+    borderColor: Colors.light.border,
+    backgroundColor: Colors.light.card,
     position: 'relative',
   },
   colorTagSelected: {
-    backgroundColor: '#B8918F',
-    borderColor: '#B8918F',
+    backgroundColor: Colors.light.tint,
+    borderColor: Colors.light.tint,
   },
   colorTagSuggested: {
-    borderColor: '#9AA493',
+    borderColor: Colors.light.highlight,
     borderWidth: 2,
   },
   colorDot: {
@@ -591,14 +592,14 @@ const styles = StyleSheet.create({
   },
   whiteBorder: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: Colors.light.border,
   },
   colorTagText: {
     fontSize: 14,
-    color: '#333333',
+    color: Colors.light.text,
   },
   colorTagTextSelected: {
-    color: '#FFFFFF',
+    color: Colors.light.card,
   },
   suggestedBadge: {
     position: 'absolute',

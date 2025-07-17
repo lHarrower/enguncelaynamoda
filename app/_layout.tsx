@@ -1,112 +1,147 @@
-import { Stack, Tabs } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { Pressable } from 'react-native';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import PermissionManager from '../components/PermissionManager';
+// Suppress known non-critical warnings in development - MUST BE FIRST
+try {
+  require('../utils/consoleSuppress');
+} catch (error) {
+  console.warn('Console suppress utility not available:', error);
+}
 
-function TabLayout() {
-  const insets = useSafeAreaInsets();
+// File: app/_layout.tsx (Correct and Final Version)
+import { AuthProvider } from '../context/AuthContext';
+import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import { Slot, SplashScreen } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import * as NavigationBar from 'expo-navigation-bar';
+import { useEffect, useState, useCallback } from 'react';
+import { Platform, View, Text } from 'react-native';
+import { useFonts, Inter_300Light, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { PlayfairDisplay_400Regular, PlayfairDisplay_700Bold } from '@expo-google-fonts/playfair-display';
+import { Karla_400Regular } from '@expo-google-fonts/karla';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { PerformanceOptimizationService } from '../services/performanceOptimizationService';
+import UltraPremiumLoadingScreen from '../components/ultra/UltraPremiumLoadingScreen';
+import ErrorBoundary from '../components/common/ErrorBoundary';
+
+// Notification handler temporarily disabled to avoid native module errors
+// Will be re-enabled once ExpoPushTokenManager is properly configured
+const notificationHandler = null;
+
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
+
+// This inner component can safely use the useTheme hook because it's inside ThemeProvider.
+function ThemedRootLayout() {
+  const { isDark, colors } = useTheme();
+  const [isReady, setIsReady] = useState(false);
+  const [initProgress, setInitProgress] = useState(0);
   
+  const [fontsLoaded, fontError] = useFonts({
+    Inter_300Light,
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    PlayfairDisplay_400Regular,
+    PlayfairDisplay_700Bold,
+    Karla_400Regular,
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        setInitProgress(10);
+        
+        // Initialize performance optimization service
+        await PerformanceOptimizationService.initialize().catch(error => {
+          console.warn('Failed to initialize performance optimization service:', error);
+        });
+        setInitProgress(40);
+
+        // Initialize notification handler for deep linking (optional)
+        if (notificationHandler) {
+          try {
+            await notificationHandler.initialize();
+          } catch (error) {
+            console.warn('Failed to initialize notification handler (this is optional):', error);
+            // Continue without notification handler - app will still work
+          }
+        }
+        setInitProgress(70);
+
+        // Style the native navigation bar only on Android based on the theme
+        if (Platform.OS === 'android') {
+          try {
+            NavigationBar.setButtonStyleAsync(isDark ? 'light' : 'dark');
+          } catch (error) {
+            console.warn('Failed to set navigation bar style:', error);
+          }
+        }
+        setInitProgress(90);
+
+        // Add a small delay for smooth transition
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setInitProgress(100);
+
+        // Mark app as ready
+        setTimeout(() => setIsReady(true), 300);
+      } catch (error) {
+        console.error('Failed to initialize app:', error);
+        // Still mark as ready to prevent infinite loading
+        setIsReady(true);
+      }
+    };
+
+    if (fontsLoaded || fontError) {
+      initializeApp();
+    }
+  }, [isDark, colors, fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return (
+      <UltraPremiumLoadingScreen 
+        message="Loading premium fonts..."
+        showProgress={false}
+      />
+    );
+  }
+
+  if (!isReady) {
+    return (
+      <UltraPremiumLoadingScreen 
+        message="Preparing your style sanctuary..."
+        showProgress={true}
+        progress={initProgress}
+      />
+    );
+  }
+
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: '#B8918F', // Matte rose
-        tabBarInactiveTintColor: '#B5A3BC', // Matte lavender
-        tabBarStyle: {
-          backgroundColor: '#FDFCFB', // Soft off-white
-          borderTopColor: '#F0E6E3', // Matte pink background
-          borderTopWidth: 1,
-          paddingTop: 8,
-          paddingBottom: Math.max(insets.bottom, 8), // Ensure space above phone buttons
-          height: 70 + Math.max(insets.bottom - 8, 0), // Adjust height based on safe area
-        },
-        tabBarItemStyle: {
-          paddingVertical: 4,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
-          marginTop: 4,
-        },
-        tabBarIconStyle: {
-          marginTop: 4,
-        },
-        tabBarHideOnKeyboard: true, // Better UX
-        tabBarAllowFontScaling: false, // Consistent sizing
-        tabBarButton: (props) => (
-          <Pressable
-            onPress={props.onPress}
-            onLongPress={props.onLongPress}
-            testID={props.testID}
-            accessibilityLabel={props.accessibilityLabel}
-            accessibilityRole={props.accessibilityRole}
-            accessibilityState={props.accessibilityState}
-            style={[props.style, { opacity: 1 }]} // No press effect
-            android_ripple={null}
-          >
-            {props.children}
-          </Pressable>
-        ),
-      }}
-        >
-          <Tabs.Screen
-            name="index"
-            options={{
-              title: 'Home',
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="home" size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="wardrobe"
-            options={{
-              title: 'Wardrobe',
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="shirt" size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="discover"
-            options={{
-              title: 'Discover',
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="search" size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="favorites"
-            options={{
-              title: 'Favorites',
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="heart" size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="profile"
-            options={{
-              title: 'Profile',
-              tabBarIcon: ({ color, size }) => (
-                <Ionicons name="person" size={size} color={color} />
-              ),
-            }}
-          />
-        </Tabs>
+    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <Slot />
+    </View>
   );
 }
 
+// This is the main root layout that sets up all providers in the correct order.
 export default function RootLayout() {
   return (
-    <SafeAreaProvider>
-      <StatusBar style="auto" />
-      <PermissionManager>
-        <TabLayout />
-      </PermissionManager>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ThemeProvider>
+          <AuthProvider>
+            <ErrorBoundary>
+              <ThemedRootLayout />
+            </ErrorBoundary>
+          </AuthProvider>
+        </ThemeProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
-} 
+}
