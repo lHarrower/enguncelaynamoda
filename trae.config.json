@@ -1,0 +1,17 @@
+{
+  "mode": "solo",
+  "offline": {
+    "enabled": true,
+    "localAI": true
+  },
+  "sync": {
+    "enabled": false,
+    "teamFeatures": false,
+    "cloudStorage": false
+  },
+  "devTools": {
+    "autoCorrect": true,
+    "codeCompanion": true,
+    "styleGuide": "minimal"
+  }
+}

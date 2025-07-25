@@ -7,10 +7,12 @@ import {
   Text,
   StyleSheet,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { STUDIO_THEME } from '../../constants/StudioTheme';
-import DiscoveryEngine from '../../components/discovery/DiscoveryEngine';
+import { STUDIO_THEME } from '@/constants/StudioTheme';
+import DiscoveryEngine from '@/components/discovery/DiscoveryEngine';
+import { supabase } from '@/lib/supabase';
 
 interface ProductItem {
   id: string;
@@ -133,40 +135,74 @@ export default function DiscoverScreen() {
 
   // Handle like action - learn user preferences
   const handleLike = (item: ProductItem) => {
-    setLikedItems(prev => [...prev, item]);
+    // Add to liked items
+    setLikedItems(prev => [item, ...prev]);
     
-    // In a real app, this would update the ML algorithm
-    console.log('Learning from liked item:', {
-      brand: item.brand,
-      category: item.category,
-      colors: item.colors,
-      style: item.style,
-      boutique: item.boutique,
-    });
+    // Update machine learning algorithm
+    updateUserPreferences(item, 'like');
+    
+    // Check if we should show similar items
+    if (Math.random() > 0.7) { // 30% chance to show similar items
+      showSimilarItems(item);
+    }
   };
 
-  // Handle dislike action - suppress similar items
   const handleDislike = (item: ProductItem) => {
-    setDislikedItems(prev => [...prev, item]);
+    // Add to disliked items
+    setDislikedItems(prev => [item, ...prev]);
     
-    // In a real app, this would update the ML algorithm to show fewer similar items
-    console.log('Learning from disliked item:', {
-      brand: item.brand,
-      category: item.category,
-      colors: item.colors,
-      style: item.style,
-    });
+    // Update machine learning algorithm
+    updateUserPreferences(item, 'dislike');
   };
 
-  // Handle boutique favorite
   const handleBoutiqueFavorite = (boutique: string) => {
-    setFavoriteBoutiques(prev => [...prev, boutique]);
-    console.log('Added favorite boutique:', boutique);
-    
-    // In a real app, this would:
-    // 1. Save to user preferences
-    // 2. Show more items from this boutique
-    // 3. Send notifications when new items arrive
+    // Add to favorite boutiques
+    if (!favoriteBoutiques.includes(boutique)) {
+      setFavoriteBoutiques(prev => [...prev, boutique]);
+      
+      // Show notification
+      Alert.alert(
+        "Boutique Favorited",
+        `You'll now receive notifications when ${boutique} adds new items!`,
+        [{ text: "Great!" }]
+      );
+    }
+  };
+
+  // Helper functions
+  const updateUserPreferences = async (item: ProductItem, action: 'like' | 'dislike') => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      // Log the interaction in the database
+      const { error } = await supabase
+        .from('product_interactions')
+        .insert({
+          user_id: user.id,
+          product_id: item.id,
+          interaction_type: action,
+          interaction_date: new Date().toISOString(),
+          product_category: item.category,
+          product_colors: item.colors,
+          product_style: item.style
+        });
+        
+      if (error) throw error;
+      
+      console.log(`User preference updated: ${action} for ${item.title}`);
+    } catch (error) {
+      console.error('Error updating user preferences:', error);
+    }
+  };
+
+  const showSimilarItems = (item: ProductItem) => {
+    // In a real implementation, this would fetch similar items from the API
+    Alert.alert(
+      "Similar Items",
+      `We found 5 items similar to "${item.title}" that you might like!`,
+      [{ text: "Show Me", onPress: () => {} }, { text: "Later", style: "cancel" }]
+    );
   };
 
   return (

@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "aynamoda",
+    "slug": "aynamoda",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.guiprohuso.aynamoda",
+      "statusBar": {
+        "translucent": true
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-web-browser",
+      "expo-font"
+    ],
+    "scheme": "aynamoda",
+    "experiments": {
+      "typedRoutes": true
+    },
+    "linking": {
+      "prefixes": ["aynamoda://", "https://aynamoda.app"],
+      "config": {
+        "screens": {
+          "(app)": {
+            "screens": {
+              "ayna-mirror": "ayna-mirror",
+              "index": ""
+            }
+          },
+          "ayna-mirror": "ayna-mirror",
+          "ayna-mirror-settings": "ayna-mirror/settings",
+          "onboarding": "onboarding"
+        }
+      }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3b04f89d-193b-4a40-a5a7-6af7007e0c54"
+      }
+    }
+  }
+}
