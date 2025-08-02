@@ -7,9 +7,9 @@ import {
   StatusBar,
   Alert,
 } from 'react-native';
-import { EDITORIAL_THEME } from '../../constants/EditorialTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { SwipeableCardStack } from './SwipeableCardStack';
-import { dailyStylePicks } from '../../data/editorialContent';
+import { dailyStylePicks } from '@/data/editorialContent';
 
 export const DiscoverScreen: React.FC = () => {
   const handleSwipeLeft = (item: any) => {
@@ -63,25 +63,22 @@ export const DiscoverScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: EDITORIAL_THEME.colors.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   header: {
-    paddingHorizontal: EDITORIAL_THEME.layout.containerPadding,
+    paddingHorizontal: DesignSystem.spacing.xl,
     paddingTop: 20,
     paddingBottom: 16,
     alignItems: 'center',
   },
   title: {
-    fontSize: EDITORIAL_THEME.typography.serif.sizes['4xl'],
-    fontFamily: EDITORIAL_THEME.typography.serif.family,
-    color: EDITORIAL_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.hero,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 8,
-    lineHeight: 44,
   },
   subtitle: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   content: {
@@ -90,9 +87,8 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   instructions: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: 40,
     paddingHorizontal: 40,
@@ -117,19 +113,18 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   saveHint: {
-    backgroundColor: EDITORIAL_THEME.colors.lilac[50],
-    borderColor: EDITORIAL_THEME.colors.lilac[200],
+    backgroundColor: DesignSystem.colors.sage[50],
+    borderColor: DesignSystem.colors.sage[300],
   },
   cartHint: {
-    backgroundColor: EDITORIAL_THEME.colors.gold[50],
-    borderColor: EDITORIAL_THEME.colors.gold[200],
+    backgroundColor: DesignSystem.colors.gold[100],
+    borderColor: DesignSystem.colors.gold[300],
   },
   hintEmoji: {
     fontSize: 20,
   },
   hintText: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.sm,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
   },
 });

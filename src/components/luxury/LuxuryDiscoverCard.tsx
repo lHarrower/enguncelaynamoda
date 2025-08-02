@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, Dimensions } from 'react-native';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
@@ -40,9 +40,9 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    borderRadius: APP_THEME_V2.radius.organic,
-    backgroundColor: APP_THEME_V2.semantic.surface,
-    ...APP_THEME_V2.elevation.lift,
+    borderRadius: DesignSystem.radius.lg,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    ...DesignSystem.elevation.medium,
     overflow: 'hidden',
     justifyContent: 'flex-end',
   },
@@ -56,34 +56,31 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: APP_THEME_V2.spacing.md,
+    padding: DesignSystem.spacing.md,
     backgroundColor: 'rgba(0,0,0,0.3)',
-    borderBottomLeftRadius: APP_THEME_V2.radius.organic,
-    borderBottomRightRadius: APP_THEME_V2.radius.organic,
+    borderBottomLeftRadius: DesignSystem.radius.lg,
+    borderBottomRightRadius: DesignSystem.radius.lg,
   },
   infoContainer: {
     // Content is aligned via the overlay's padding
   },
   brandText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
-    color: APP_THEME_V2.colors.whisperWhite,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.inverse,
     textTransform: 'uppercase',
     letterSpacing: 1,
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   nameText: {
-    ...APP_THEME_V2.typography.scale.h3,
-    fontFamily: APP_THEME_V2.typography.fonts.display,
+    ...DesignSystem.typography.h3,
     color: '#FFFFFF',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   priceText: {
-    ...APP_THEME_V2.typography.scale.body1,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.body1,
     color: '#FFFFFF',
     fontWeight: '600',
   },
 });
 
-export default LuxuryDiscoverCard; 
+export default LuxuryDiscoverCard;

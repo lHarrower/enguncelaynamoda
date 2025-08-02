@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
-import { DIMENSIONS, SPACING } from '../../constants/AppConstants';
+import { useTheme } from '@/context/ThemeContext';
+import { DIMENSIONS, SPACING } from '@/constants/AppConstants';
 
 interface UserStats {
   wardrobeItems: number;
@@ -150,4 +150,4 @@ export const StatsCard: React.FC<StatsCardProps> = ({ stats, onStatPress }) => {
       </View>
     </View>
   );
-}; 
+};

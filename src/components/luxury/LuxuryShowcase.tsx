@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import LinenCanvas from './LinenCanvas';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import LinenCanvas from '@/components/luxury/LinenCanvas';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const LuxuryShowcase: React.FC = () => {
   return (
@@ -28,27 +28,27 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: APP_THEME_V2.spacing.xl,
+    padding: DesignSystem.spacing.xl,
   },
   title: {
-    ...APP_THEME_V2.typography.scale.hero,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.hero,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   subtitle: {
-    ...APP_THEME_V2.typography.scale.h2,
-    color: APP_THEME_V2.colors.sageGreen[500],
+    ...DesignSystem.typography.h2,
+    color: DesignSystem.colors.sage[500],
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   description: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fonts.body,
     textAlign: 'center',
     maxWidth: 300,
   },
 });
 
-export default LuxuryShowcase; 
+export default LuxuryShowcase;

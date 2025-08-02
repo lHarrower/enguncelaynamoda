@@ -26,7 +26,7 @@ import {
   ORIGINAL_TYPOGRAPHY,
   ORIGINAL_SPACING,
   ORIGINAL_BORDER_RADIUS,
-} from '../auth/originalLoginStyles';
+} from '@/components/auth/originalLoginStyles';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 

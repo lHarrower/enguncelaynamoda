@@ -10,7 +10,7 @@ import Animated, {
   runOnJS,
   withTiming,
 } from 'react-native-reanimated';
-import StyleMatchCard from './StyleMatchCard';
+import StyleMatchCard from '@/components/home/StyleMatchCard';
 
 interface SwipeableCardProps {
   item: any;
@@ -101,4 +101,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SwipeableCard; 
+export default SwipeableCard;

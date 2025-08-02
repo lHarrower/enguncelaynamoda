@@ -9,8 +9,8 @@ import {
   NotificationPreferences, 
   EngagementHistory, 
   UserPreferences 
-} from '../types/aynaMirror';
-import { errorHandlingService } from './errorHandlingService';
+} from '@/types/aynaMirror';
+import { errorHandlingService } from '@/services/errorHandlingService';
 
 // Configure notification behavior
 Notifications.setNotificationHandler({

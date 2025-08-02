@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import PastelBackground from '../../components/common/PastelBackground';
+import { APP_THEME_V2 } from '@/constants/AppThemeV2';
+import PastelBackground from '@/components/common/PastelBackground';
 
 type SettingsRowProps = {
   icon: any;
@@ -208,4 +208,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8DEF2',
     marginLeft: 76,
   },
-}); 
+});

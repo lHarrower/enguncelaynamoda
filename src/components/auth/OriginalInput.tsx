@@ -22,21 +22,10 @@ import {
   ORIGINAL_DIMENSIONS,
   ACCESSIBILITY_LABELS,
   ORIGINAL_ANIMATIONS,
-} from './originalLoginStyles';
+} from '@/components/auth/originalLoginStyles';
+import { InputComponentProps, DEFAULT_PROPS } from '@/types/componentProps';
 
-export interface OriginalInputProps extends Omit<TextInputProps, 'style'> {
-  /** Icon name from Ionicons to display on the left */
-  leftIcon?: keyof typeof Ionicons.glyphMap;
-  
-  /** Whether this is a password input with toggle visibility */
-  isPassword?: boolean;
-  
-  /** Error message to display below the input */
-  error?: string;
-  
-  /** Label for the input field */
-  label?: string;
-  
+export interface OriginalInputProps extends Omit<InputComponentProps, 'variant' | 'size'> {
   /** Custom container style */
   containerStyle?: ViewStyle;
   
@@ -45,20 +34,33 @@ export interface OriginalInputProps extends Omit<TextInputProps, 'style'> {
   
   /** Callback when focus state changes */
   onFocusChange?: (focused: boolean) => void;
+  
+  /** Original theme variant */
+  variant?: 'default' | 'focused' | 'error';
 }
 
 export const OriginalInput = forwardRef<TextInput, OriginalInputProps>(
   (
     {
       leftIcon,
-      isPassword = false,
+      isPassword = DEFAULT_PROPS.disabled,
       error,
       label,
+      hint,
+      required = DEFAULT_PROPS.required,
       containerStyle,
       focused: controlledFocused,
       onFocusChange,
       onFocus,
       onBlur,
+      style,
+      inputStyle,
+      labelStyle,
+      errorStyle,
+      testID,
+      accessibilityLabel,
+      disabled = DEFAULT_PROPS.disabled,
+      variant = 'default',
       ...textInputProps
     },
     ref

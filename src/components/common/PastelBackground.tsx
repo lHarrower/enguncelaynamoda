@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 
@@ -10,9 +10,9 @@ const PastelBackground = ({ children }: { children: React.ReactNode }) => {
     <View style={styles.container}>
       <LinearGradient
         colors={[
-          APP_THEME_V2.colors.linen.light,
-          APP_THEME_V2.colors.sageGreen[50],
-          APP_THEME_V2.colors.liquidGold[50],
+          DesignSystem.colors.sage[50],
+          DesignSystem.colors.sage[100],
+          DesignSystem.colors.sage[75],
         ]}
         style={styles.gradient}
       />
@@ -28,7 +28,7 @@ const PastelBackground = ({ children }: { children: React.ReactNode }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: APP_THEME_V2.semantic.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   gradient: {
     ...StyleSheet.absoluteFillObject,
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     width: width * 1.5,
     height: width * 1.5,
     borderRadius: width * 0.75,
-    backgroundColor: APP_THEME_V2.colors.sageGreen[100],
+    backgroundColor: DesignSystem.colors.sage[100],
     top: -height * 0.2,
     right: -width * 0.5,
     opacity: 0.1,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     width: width,
     height: width,
     borderRadius: width * 0.5,
-    backgroundColor: APP_THEME_V2.colors.liquidGold[100],
+    backgroundColor: DesignSystem.colors.sage[200],
     bottom: -height * 0.1,
     left: -width * 0.3,
     opacity: 0.15,
@@ -74,4 +74,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default PastelBackground; 
+export default PastelBackground;

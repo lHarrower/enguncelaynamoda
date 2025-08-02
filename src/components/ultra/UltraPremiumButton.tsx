@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   View,
 } from 'react-native';
-import { ULTRA_PREMIUM_THEME } from '../../constants/UltraPremiumTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -70,24 +70,24 @@ const UltraPremiumButton: React.FC<UltraPremiumButtonProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: iconPosition === 'right' ? 'row-reverse' : 'row',
-      borderRadius: ULTRA_PREMIUM_THEME.radius.sm,
+      borderRadius: DesignSystem.radius.sm,
     };
 
     // Size variations
     const sizeStyles: Record<string, ViewStyle> = {
       small: {
-        paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.md,
-        paddingVertical: ULTRA_PREMIUM_THEME.spacing.sm,
+        paddingHorizontal: DesignSystem.spacing.md,
+        paddingVertical: DesignSystem.spacing.sm,
         minHeight: 36,
       },
       medium: {
-        paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
-        paddingVertical: ULTRA_PREMIUM_THEME.spacing.md,
+        paddingHorizontal: DesignSystem.spacing.lg,
+        paddingVertical: DesignSystem.spacing.md,
         minHeight: 44,
       },
       large: {
-        paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.xl,
-        paddingVertical: ULTRA_PREMIUM_THEME.spacing.lg,
+        paddingHorizontal: DesignSystem.spacing.xl,
+        paddingVertical: DesignSystem.spacing.lg,
         minHeight: 52,
       },
     };
@@ -95,21 +95,21 @@ const UltraPremiumButton: React.FC<UltraPremiumButtonProps> = ({
     // Variant styles
     const variantStyles: Record<string, ViewStyle> = {
       primary: {
-        backgroundColor: ULTRA_PREMIUM_THEME.semantic.interactive.primary,
-        ...ULTRA_PREMIUM_THEME.elevation.subtle,
+        backgroundColor: DesignSystem.colors.primary[500],
+        ...DesignSystem.elevation.subtle,
       },
       secondary: {
         backgroundColor: 'transparent',
         borderWidth: 1,
-        borderColor: ULTRA_PREMIUM_THEME.semantic.border.primary,
+        borderColor: DesignSystem.colors.primary[500],
       },
       ghost: {
         backgroundColor: 'transparent',
       },
       minimal: {
-        backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
+        backgroundColor: DesignSystem.colors.neutral[100],
         borderWidth: 1,
-        borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+        borderColor: DesignSystem.colors.neutral[300],
       },
     };
 
@@ -123,7 +123,7 @@ const UltraPremiumButton: React.FC<UltraPremiumButtonProps> = ({
   };
 
   const getTextStyle = (): TextStyle => {
-    const baseTextStyle = ULTRA_PREMIUM_THEME.typography.scale.button;
+    const baseTextStyle = DesignSystem.typography.scale.button;
 
     const sizeTextStyles: Record<string, Partial<TextStyle>> = {
       small: { fontSize: 12, letterSpacing: 0.6 },
@@ -132,10 +132,10 @@ const UltraPremiumButton: React.FC<UltraPremiumButtonProps> = ({
     };
 
     const variantTextStyles: Record<string, TextStyle> = {
-      primary: { color: ULTRA_PREMIUM_THEME.semantic.text.inverse },
-      secondary: { color: ULTRA_PREMIUM_THEME.semantic.text.primary },
-      ghost: { color: ULTRA_PREMIUM_THEME.semantic.text.secondary },
-      minimal: { color: ULTRA_PREMIUM_THEME.semantic.text.primary },
+      primary: { color: DesignSystem.colors.neutral[50] },
+  secondary: { color: DesignSystem.colors.neutral[900] },
+  ghost: { color: DesignSystem.colors.neutral[600] },
+  minimal: { color: DesignSystem.colors.neutral[900] },
     };
 
     return {
@@ -157,10 +157,10 @@ const UltraPremiumButton: React.FC<UltraPremiumButtonProps> = ({
 
   const getIconColor = (): string => {
     const variantIconColors: Record<string, string> = {
-      primary: ULTRA_PREMIUM_THEME.semantic.text.inverse,
-      secondary: ULTRA_PREMIUM_THEME.semantic.text.primary,
-      ghost: ULTRA_PREMIUM_THEME.semantic.text.secondary,
-      minimal: ULTRA_PREMIUM_THEME.semantic.text.primary,
+      primary: DesignSystem.colors.neutral[50],
+    secondary: DesignSystem.colors.neutral[900],
+    ghost: DesignSystem.colors.neutral[600],
+    minimal: DesignSystem.colors.neutral[900],
     };
     return variantIconColors[variant];
   };
@@ -219,10 +219,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconLeft: {
-    marginRight: ULTRA_PREMIUM_THEME.spacing.sm,
+    marginRight: DesignSystem.spacing.sm,
   },
   iconRight: {
-    marginLeft: ULTRA_PREMIUM_THEME.spacing.sm,
+    marginLeft: DesignSystem.spacing.sm,
   },
 });
 

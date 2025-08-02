@@ -10,9 +10,9 @@ import {
   Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { STUDIO_THEME } from '@/constants/StudioTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import DiscoveryEngine from '@/components/discovery/DiscoveryEngine';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/config/supabaseClient';
 
 interface ProductItem {
   id: string;
@@ -207,7 +207,7 @@ export default function DiscoverScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={STUDIO_THEME.colors.foundation.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor={DesignSystem.colors.background.primary} />
       
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
@@ -232,22 +232,22 @@ export default function DiscoverScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: STUDIO_THEME.colors.foundation.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   header: {
-    paddingHorizontal: STUDIO_THEME.spacing.xl,
-    marginBottom: STUDIO_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    marginBottom: DesignSystem.spacing.lg,
     alignItems: 'center',
   },
   headerTitle: {
-    ...STUDIO_THEME.typography.scale.hero,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.hero,
+    color: DesignSystem.colors.text.primary,
     fontSize: 32,
     marginBottom: 8,
   },
   headerSubtitle: {
-    ...STUDIO_THEME.typography.scale.body,
-    color: STUDIO_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   discoveryEngine: {

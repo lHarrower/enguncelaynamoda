@@ -21,7 +21,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { ARTISTRY_THEME } from '../../constants/ArtistryTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
@@ -47,7 +47,7 @@ interface BentoGalleryProps {
 const BentoGallery: React.FC<BentoGalleryProps> = ({
   items,
   columns = 2,
-  spacing = ARTISTRY_THEME.spacing.flow,
+  spacing = DesignSystem.spacing.md,
   style,
 }) => {
   // Single animation value for the entire gallery
@@ -75,7 +75,7 @@ const BentoGallery: React.FC<BentoGalleryProps> = ({
 
   const getItemWidth = (span: number) => {
     const totalSpacing = (columns - 1) * spacing;
-    const availableWidth = width - (ARTISTRY_THEME.spacing.dance * 2) - totalSpacing;
+    const availableWidth = width - (DesignSystem.spacing.lg * 2) - totalSpacing;
     return span === 2 ? availableWidth : availableWidth / columns;
   };
 
@@ -129,7 +129,7 @@ const BentoGallery: React.FC<BentoGalleryProps> = ({
             <Ionicons
               name={item.content.icon}
               size={32}
-              color={ARTISTRY_THEME.semantic.text.accent}
+              color={DesignSystem.colors.text.accent}
               style={styles.textIcon}
             />
           )}
@@ -167,8 +167,8 @@ const BentoGallery: React.FC<BentoGalleryProps> = ({
               size={16}
               color={
                 item.content.trend > 0
-                  ? ARTISTRY_THEME.semantic.interactive.secondary
-                  : ARTISTRY_THEME.semantic.interactive.tertiary
+                  ? DesignSystem.colors.sage[500]
+            : DesignSystem.colors.sage[300]
               }
             />
             <Text style={styles.metricTrendText}>
@@ -195,7 +195,7 @@ const BentoGallery: React.FC<BentoGalleryProps> = ({
     >
       <LinearGradient
         colors={item.content.gradient || [
-          ARTISTRY_THEME.colors.liquidGold.glow,
+          DesignSystem.colors.sage[400],
           'transparent',
         ]}
         style={styles.interactiveGradient}
@@ -205,7 +205,7 @@ const BentoGallery: React.FC<BentoGalleryProps> = ({
             <Ionicons
               name={item.content.icon}
               size={40}
-              color={ARTISTRY_THEME.semantic.text.poetry}
+              color={DesignSystem.colors.text.primary}
               style={styles.interactiveIcon}
             />
           )}
@@ -337,17 +337,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    padding: ARTISTRY_THEME.spacing.dance,
+    padding: DesignSystem.spacing.lg,
   },
   row: {
     flexDirection: 'row',
-    marginBottom: ARTISTRY_THEME.spacing.flow,
-    gap: ARTISTRY_THEME.spacing.flow,
+    marginBottom: DesignSystem.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   bentoItem: {
-    borderRadius: ARTISTRY_THEME.radius.flow,
+    borderRadius: DesignSystem.radius.md,
     overflow: 'hidden',
-    ...ARTISTRY_THEME.components.panel.default,
+    ...DesignSystem.elevation.soft,
   },
   
   // Image Item Styles
@@ -360,17 +360,17 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: ARTISTRY_THEME.spacing.gentle,
+    padding: DesignSystem.spacing.md,
   },
   imageTitle: {
-    ...ARTISTRY_THEME.typography.scale.statement,
-    color: ARTISTRY_THEME.semantic.text.poetry,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
     fontSize: 18,
-    marginBottom: ARTISTRY_THEME.spacing.whisper,
+    marginBottom: DesignSystem.spacing.xs,
   },
   imageSubtitle: {
-    ...ARTISTRY_THEME.typography.scale.elegant,
-    color: ARTISTRY_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.body,
+    color: DesignSystem.colors.text.tertiary,
     fontSize: 14,
   },
   
@@ -387,20 +387,20 @@ const styles = StyleSheet.create({
   },
   textContent: {
     alignItems: 'center',
-    padding: ARTISTRY_THEME.spacing.gentle,
+    padding: DesignSystem.spacing.md,
   },
   textIcon: {
-    marginBottom: ARTISTRY_THEME.spacing.gentle,
+    marginBottom: DesignSystem.spacing.md,
   },
   textTitle: {
-    ...ARTISTRY_THEME.typography.scale.whisper,
-    color: ARTISTRY_THEME.semantic.text.accent,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.accent,
     textAlign: 'center',
-    marginBottom: ARTISTRY_THEME.spacing.whisper,
+    marginBottom: DesignSystem.spacing.xs,
   },
   textMessage: {
-    ...ARTISTRY_THEME.typography.scale.elegant,
-    color: ARTISTRY_THEME.semantic.text.primary,
+    ...DesignSystem.typography.body,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     fontSize: 14,
   },
@@ -409,32 +409,32 @@ const styles = StyleSheet.create({
   metricItem: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: ARTISTRY_THEME.semantic.canvas.primary,
+    backgroundColor: DesignSystem.colors.background.secondary,
   },
   metricContent: {
     alignItems: 'center',
   },
   metricValue: {
-    ...ARTISTRY_THEME.typography.scale.statement,
-    color: ARTISTRY_THEME.semantic.text.accent,
+    ...DesignSystem.typography.h1,
+    color: DesignSystem.colors.text.accent,
     fontSize: 32,
     fontWeight: '300',
-    marginBottom: ARTISTRY_THEME.spacing.whisper,
+    marginBottom: DesignSystem.spacing.xs,
   },
   metricLabel: {
-    ...ARTISTRY_THEME.typography.scale.floating,
-    color: ARTISTRY_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   metricTrend: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: ARTISTRY_THEME.spacing.whisper,
+    marginTop: DesignSystem.spacing.xs,
   },
   metricTrendText: {
-    ...ARTISTRY_THEME.typography.scale.floating,
-    color: ARTISTRY_THEME.semantic.text.secondary,
-    marginLeft: ARTISTRY_THEME.spacing.breath,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
+    marginLeft: DesignSystem.spacing.xs,
   },
   
   // Interactive Item Styles
@@ -447,25 +447,25 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: ARTISTRY_THEME.radius.flow,
+    borderRadius: DesignSystem.radius.md,
   },
   interactiveContent: {
     alignItems: 'center',
-    padding: ARTISTRY_THEME.spacing.gentle,
+    padding: DesignSystem.spacing.md,
   },
   interactiveIcon: {
-    marginBottom: ARTISTRY_THEME.spacing.gentle,
+    marginBottom: DesignSystem.spacing.md,
   },
   interactiveTitle: {
-    ...ARTISTRY_THEME.typography.scale.statement,
-    color: ARTISTRY_THEME.semantic.text.poetry,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     fontSize: 18,
-    marginBottom: ARTISTRY_THEME.spacing.whisper,
+    marginBottom: DesignSystem.spacing.xs,
   },
   interactiveSubtitle: {
-    ...ARTISTRY_THEME.typography.scale.elegant,
-    color: ARTISTRY_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.body,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
     fontSize: 14,
   },
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
   kineticItem: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: ARTISTRY_THEME.semantic.canvas.secondary,
+    backgroundColor: DesignSystem.colors.background.tertiary,
   },
   kineticContent: {
     alignItems: 'center',
@@ -483,18 +483,18 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: ARTISTRY_THEME.semantic.atmosphere.goldShimmer,
+    backgroundColor: DesignSystem.colors.sage[500],
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: ARTISTRY_THEME.spacing.gentle,
+    marginBottom: DesignSystem.spacing.md,
   },
   kineticText: {
     fontSize: 24,
-    color: ARTISTRY_THEME.semantic.text.accent,
+    color: DesignSystem.colors.text.accent,
   },
   kineticTitle: {
-    ...ARTISTRY_THEME.typography.scale.floating,
-    color: ARTISTRY_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
 });

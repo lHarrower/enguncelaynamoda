@@ -16,7 +16,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -181,7 +181,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
               width: waveSize, 
               height: waveSize,
               borderRadius: waveSize / 2,
-              backgroundColor: APP_THEME_V2.colors.liquidGold[400],
+              backgroundColor: DesignSystem.colors.sage[400],
             },
             wave1AnimatedStyle
           ]} 
@@ -193,7 +193,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
               width: waveSize, 
               height: waveSize,
               borderRadius: waveSize / 2,
-              backgroundColor: APP_THEME_V2.colors.liquidGold[300],
+              backgroundColor: DesignSystem.colors.sage[300],
             },
             wave2AnimatedStyle
           ]} 
@@ -205,7 +205,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
               width: waveSize, 
               height: waveSize,
               borderRadius: waveSize / 2,
-              backgroundColor: APP_THEME_V2.colors.liquidGold[200],
+              backgroundColor: DesignSystem.colors.sage[200],
             },
             wave3AnimatedStyle
           ]} 
@@ -230,7 +230,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
           <Ionicons
             name={isLiked ? 'heart' : 'heart-outline'}
             size={size}
-            color={isLiked ? APP_THEME_V2.colors.liquidGold[500] : APP_THEME_V2.colors.inkGray[500]}
+            color={isLiked ? DesignSystem.colors.sage[500] : DesignSystem.colors.text.tertiary}
           />
         </Animated.View>
       </TouchableOpacity>
@@ -258,9 +258,9 @@ const styles = StyleSheet.create({
   button: {
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: APP_THEME_V2.radius.circle,
+    borderRadius: DesignSystem.radius.full,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    ...APP_THEME_V2.elevation.whisper,
+    ...DesignSystem.elevation.soft,
     zIndex: 1,
   },
-}); 
+});

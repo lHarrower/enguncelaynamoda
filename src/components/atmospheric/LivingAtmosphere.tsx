@@ -12,7 +12,7 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ATMOSPHERIC_THEME } from '../../constants/AtmosphericTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,15 +40,40 @@ const LivingAtmosphere: React.FC<LivingAtmosphereProps> = ({
   const getJewelColors = () => {
     switch (variant) {
       case 'emerald':
-        return ATMOSPHERIC_THEME.colors.emerald;
+        return {
+          deep: DesignSystem.colors.sage[600],
+          medium: DesignSystem.colors.sage[500],
+          glow: DesignSystem.colors.sage[400],
+          shimmer: DesignSystem.colors.sage[300]
+        };
       case 'sapphire':
-        return ATMOSPHERIC_THEME.colors.sapphire;
+        return {
+          deep: DesignSystem.colors.sage[700],
+          medium: DesignSystem.colors.sage[600],
+          glow: DesignSystem.colors.sage[500],
+          shimmer: DesignSystem.colors.sage[400]
+        };
       case 'ruby':
-        return ATMOSPHERIC_THEME.colors.ruby;
+        return {
+          deep: DesignSystem.colors.sage[800],
+          medium: DesignSystem.colors.sage[700],
+          glow: DesignSystem.colors.sage[600],
+          shimmer: DesignSystem.colors.sage[500]
+        };
       case 'amethyst':
-        return ATMOSPHERIC_THEME.colors.amethyst;
+        return {
+          deep: DesignSystem.colors.sage[500],
+          medium: DesignSystem.colors.sage[400],
+          glow: DesignSystem.colors.sage[300],
+          shimmer: DesignSystem.colors.sage[200]
+        };
       default:
-        return ATMOSPHERIC_THEME.colors.emerald;
+        return {
+          deep: DesignSystem.colors.sage[600],
+          medium: DesignSystem.colors.sage[500],
+          glow: DesignSystem.colors.sage[400],
+          shimmer: DesignSystem.colors.sage[300]
+        };
     }
   };
 
@@ -246,7 +271,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: ATMOSPHERIC_THEME.semantic.canvas.void,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   gradientLayer: {
     position: 'absolute',

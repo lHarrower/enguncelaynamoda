@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '../../../constants/Colors';
+import Colors from '@/constants/Colors';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -674,4 +674,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ItemDetailsForm; 
+export default ItemDetailsForm;

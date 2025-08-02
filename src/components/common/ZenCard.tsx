@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '../../theme/DesignSystem';
 
 interface ZenCardProps {
   children: React.ReactNode;
@@ -98,28 +98,27 @@ export default function ZenCard({
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    padding: APP_THEME_V2.spacing.lg,
+    borderRadius: DesignSystem.borderRadius.lg,
+    padding: DesignSystem.spacing.lg,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.moonlightSilver,
+    borderColor: DesignSystem.colors.sage[200],
   },
-  
   // Variants
   surface: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
-    ...APP_THEME_V2.elevation.whisper,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    ...DesignSystem.elevation.soft,
   },
   elevated: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
-    ...APP_THEME_V2.elevation.lift,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    ...DesignSystem.elevation.medium,
   },
   subtle: {
-    backgroundColor: APP_THEME_V2.colors.linen.light,
-    ...APP_THEME_V2.elevation.whisper,
-    borderColor: APP_THEME_V2.colors.linen.dark,
+    backgroundColor: DesignSystem.colors.sage[50],
+    ...DesignSystem.elevation.soft,
+    borderColor: DesignSystem.colors.sage[300],
   },
   
-  // Glass variant
+  // Glass variant styles
   glassContainer: {
     backgroundColor: 'transparent',
     padding: 0,
@@ -128,19 +127,19 @@ const styles = StyleSheet.create({
   },
   blurView: {
     flex: 1,
-    borderRadius: APP_THEME_V2.radius.organic,
+    borderRadius: DesignSystem.borderRadius.lg,
   },
   glassOverlay: {
     flex: 1,
-    padding: APP_THEME_V2.spacing.lg,
+    padding: DesignSystem.spacing.lg,
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: APP_THEME_V2.radius.organic,
+    borderRadius: DesignSystem.borderRadius.lg,
   },
   glass: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',
     borderColor: 'rgba(255, 255, 255, 0.3)',
-    ...APP_THEME_V2.elevation.float,
+    ...DesignSystem.elevation.high,
   },
 });

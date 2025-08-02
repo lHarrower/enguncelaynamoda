@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { TouchableOpacity, Text, StyleSheet, Animated, ViewStyle, TextStyle } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface UndoNotificationProps {
   isVisible: boolean;
@@ -66,20 +66,20 @@ const styles = StyleSheet.create({
     bottom: 100, // Positioned above the tab bar
     alignSelf: 'center',
     backgroundColor: 'rgba(44, 44, 46, 0.95)',
-    borderRadius: APP_THEME_V2.radius.liquid,
-    paddingVertical: APP_THEME_V2.spacing.md,
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    ...APP_THEME_V2.elevation.float,
+    borderRadius: DesignSystem.borderRadius.xl,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    ...DesignSystem.elevation.high,
   } as ViewStyle,
   button: {
-    // The container already has all the styles from the theme
+    // No additional styles needed for the button
   },
   text: {
-    ...APP_THEME_V2.typography.scale.button,
+    ...DesignSystem.typography.button,
     fontSize: 14,
-    color: APP_THEME_V2.colors.whisperWhite,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    color: DesignSystem.colors.text.inverse,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   } as TextStyle,
 });
 
-export default UndoNotification; 
+export default UndoNotification;

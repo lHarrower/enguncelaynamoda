@@ -20,7 +20,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
-import { STUDIO_THEME } from '../../constants/StudioTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
@@ -185,7 +185,7 @@ const MiniDiscoveryEngine: React.FC<MiniDiscoveryEngineProps> = ({
   if (!currentItem) {
     return (
       <View style={[styles.container, styles.emptyContainer, style]}>
-        <Ionicons name="heart-circle" size={48} color={STUDIO_THEME.colors.accent.jade} />
+        <Ionicons name="heart-circle" size={48} color={DesignSystem.colors.sage[500]} />
         <Text style={styles.emptyTitle}>Perfect matches found!</Text>
         <Text style={styles.emptySubtitle}>Check Discover for more</Text>
       </View>
@@ -225,7 +225,7 @@ const MiniDiscoveryEngine: React.FC<MiniDiscoveryEngineProps> = ({
             {/* Like Indicator */}
             <Animated.View style={[styles.likeIndicator, likeIndicatorStyle]}>
               <View style={styles.likeLabel}>
-                <Ionicons name="heart" size={24} color={STUDIO_THEME.colors.semantic.success} />
+                <Ionicons name="heart" size={24} color={DesignSystem.colors.success[500]} />
                 <Text style={styles.indicatorText}>LOVE</Text>
               </View>
             </Animated.View>
@@ -233,7 +233,7 @@ const MiniDiscoveryEngine: React.FC<MiniDiscoveryEngineProps> = ({
             {/* Dislike Indicator */}
             <Animated.View style={[styles.dislikeIndicator, dislikeIndicatorStyle]}>
               <View style={styles.dislikeLabel}>
-                <Ionicons name="close" size={24} color={STUDIO_THEME.colors.semantic.error} />
+                <Ionicons name="close" size={24} color={DesignSystem.colors.error[500]} />
                 <Text style={styles.indicatorText}>PASS</Text>
               </View>
             </Animated.View>
@@ -280,7 +280,7 @@ const MiniDiscoveryEngine: React.FC<MiniDiscoveryEngineProps> = ({
             });
           }}
         >
-          <Ionicons name="close" size={24} color={STUDIO_THEME.colors.semantic.error} />
+          <Ionicons name="close" size={24} color={DesignSystem.colors.error[500]} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -291,7 +291,7 @@ const MiniDiscoveryEngine: React.FC<MiniDiscoveryEngineProps> = ({
             });
           }}
         >
-          <Ionicons name="heart" size={24} color={STUDIO_THEME.colors.semantic.success} />
+          <Ionicons name="heart" size={24} color={DesignSystem.colors.success[500]} />
         </TouchableOpacity>
       </View>
 
@@ -299,7 +299,7 @@ const MiniDiscoveryEngine: React.FC<MiniDiscoveryEngineProps> = ({
       {showUndo && (
         <Animated.View style={[styles.undoContainer, undoStyle]}>
           <TouchableOpacity style={styles.undoButton} onPress={handleUndo}>
-            <Ionicons name="arrow-undo" size={16} color={STUDIO_THEME.colors.text.inverse} />
+            <Ionicons name="arrow-undo" size={16} color={DesignSystem.colors.text.inverse} />
             <Text style={styles.undoText}>Undo</Text>
           </TouchableOpacity>
         </Animated.View>
@@ -326,22 +326,22 @@ const MiniDiscoveryEngine: React.FC<MiniDiscoveryEngineProps> = ({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    paddingVertical: STUDIO_THEME.spacing.lg,
+    paddingVertical: DesignSystem.spacing.lg,
   },
   
   // Header
   header: {
     alignItems: 'center',
-    marginBottom: STUDIO_THEME.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   headerTitle: {
-    ...STUDIO_THEME.typography.scale.h3,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 4,
   },
   headerSubtitle: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.accent.jade,
+    ...DesignSystem.typography.small,
+    color: DesignSystem.colors.sage[500],
     fontWeight: '600',
   },
   
@@ -350,15 +350,15 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    marginBottom: STUDIO_THEME.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   card: {
     position: 'absolute',
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    borderRadius: STUDIO_THEME.radius.lg,
-    backgroundColor: STUDIO_THEME.colors.foundation.elevated,
-    ...STUDIO_THEME.shadows.medium,
+    borderRadius: DesignSystem.borderRadius.lg,
+    backgroundColor: DesignSystem.colors.background.elevated,
+    ...DesignSystem.elevation.medium,
     overflow: 'hidden',
   },
   nextCard: {
@@ -399,8 +399,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   indicatorText: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.inverse,
     fontWeight: '700',
     marginTop: 2,
     fontSize: 10,
@@ -411,15 +411,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 16,
     left: 16,
-    backgroundColor: STUDIO_THEME.colors.semantic.error,
+    backgroundColor: DesignSystem.colors.error[500],
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
     zIndex: 5,
   },
   discountText: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.inverse,
     fontWeight: '700',
     fontSize: 10,
   },
@@ -435,13 +435,13 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   brandName: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.accent.gold,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.sage[400],
     marginBottom: 2,
   },
   productTitle: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.bodyMedium,
+    color: DesignSystem.colors.text.inverse,
     fontSize: 16,
     marginBottom: 6,
   },
@@ -450,15 +450,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   currentPrice: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.bodyMedium,
+    color: DesignSystem.colors.text.inverse,
     fontSize: 18,
     fontWeight: '600',
     marginRight: 8,
   },
   originalPrice: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.small,
+    color: DesignSystem.colors.text.inverse,
     textDecorationLine: 'line-through',
     opacity: 0.7,
   },
@@ -466,20 +466,20 @@ const styles = StyleSheet.create({
   // Action Buttons
   actionButtons: {
     flexDirection: 'row',
-    gap: STUDIO_THEME.spacing.xl,
-    marginBottom: STUDIO_THEME.spacing.lg,
+    gap: DesignSystem.spacing.xl,
+    marginBottom: DesignSystem.spacing.lg,
   },
   actionButton: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: STUDIO_THEME.colors.foundation.elevated,
+    backgroundColor: DesignSystem.colors.background.elevated,
     alignItems: 'center',
     justifyContent: 'center',
-    ...STUDIO_THEME.shadows.soft,
+    ...DesignSystem.elevation.soft,
   },
   likeButton: {
-    backgroundColor: STUDIO_THEME.colors.accent.jadeLight,
+    backgroundColor: DesignSystem.colors.sage[200],
   },
   
   // Undo Button
@@ -491,15 +491,15 @@ const styles = StyleSheet.create({
   undoButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: STUDIO_THEME.colors.text.primary,
+    backgroundColor: DesignSystem.colors.text.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    ...STUDIO_THEME.shadows.soft,
+    ...DesignSystem.elevation.soft,
   },
   undoText: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.small,
+    color: DesignSystem.colors.text.inverse,
     marginLeft: 6,
     fontWeight: '600',
   },
@@ -512,18 +512,18 @@ const styles = StyleSheet.create({
   progressBar: {
     width: CARD_WIDTH * 0.6,
     height: 3,
-    backgroundColor: STUDIO_THEME.colors.foundation.tertiary,
+    backgroundColor: DesignSystem.colors.background.tertiary,
     borderRadius: 2,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: STUDIO_THEME.colors.accent.jade,
+    backgroundColor: DesignSystem.colors.sage[500],
     borderRadius: 2,
   },
   progressText: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.text.tertiary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.tertiary,
   },
   
   // Empty State
@@ -532,14 +532,14 @@ const styles = StyleSheet.create({
     height: CARD_HEIGHT + 100,
   },
   emptyTitle: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.bodyMedium,
+    color: DesignSystem.colors.text.primary,
     marginTop: 12,
     marginBottom: 4,
   },
   emptySubtitle: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.secondary,
+    ...DesignSystem.typography.small,
+    color: DesignSystem.colors.text.secondary,
   },
 });
 

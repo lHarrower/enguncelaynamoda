@@ -1,5 +1,5 @@
 // User Preferences Service - AYNA Mirror Settings Management
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
 import * as Location from 'expo-location';
 import { 
   UserPreferences,
@@ -9,7 +9,7 @@ import {
   StyleProfile,
   ConfidenceNoteStyle,
   UserPreferencesRecord
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 
 /**
  * UserPreferencesService - Manages user settings and preferences for AYNA Mirror

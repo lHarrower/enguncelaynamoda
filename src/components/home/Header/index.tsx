@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../../context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import Animated, { FadeInDown, FadeInRight, SlideInLeft } from 'react-native-reanimated';
 
 interface HeaderProps {
@@ -196,4 +196,4 @@ const styles = StyleSheet.create({
   );
 };
 
-export default Header; 
+export default Header;

@@ -1,5 +1,5 @@
 // AYNA Mirror Service - Core Daily Ritual Orchestrator
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
 import { 
   DailyRecommendations,
   OutfitRecommendation,
@@ -9,12 +9,12 @@ import {
   OutfitFeedback,
   UserPreferences,
   WardrobeItem
-} from '../types/aynaMirror';
-import { EnhancedWardrobeService, enhancedWardrobeService } from './enhancedWardrobeService';
-import { IntelligenceService } from './intelligenceService';
-import { WeatherService } from './weatherService';
-import { errorHandlingService } from './errorHandlingService';
-import { PerformanceOptimizationService } from './performanceOptimizationService';
+} from '@/types/aynaMirror';
+import { EnhancedWardrobeService, enhancedWardrobeService } from '@/services/enhancedWardrobeService';
+import { IntelligenceService } from '@/services/intelligenceService';
+import { WeatherService } from '@/services/weatherService';
+import { errorHandlingService } from '@/services/errorHandlingService';
+import { PerformanceOptimizationService } from '@/services/performanceOptimizationService';
 
 /**
  * AYNA Mirror Service - The heart of the confidence-building daily ritual

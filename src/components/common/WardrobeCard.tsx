@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, StyleProp, ViewStyle, Dimensions } from 'react-native';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '../../theme/DesignSystem';
 
 const { width } = Dimensions.get('window');
 
@@ -29,21 +29,21 @@ const WardrobeCard: React.FC<WardrobeCardProps> = ({ item, onPress, style }) => 
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
-    borderRadius: APP_THEME_V2.radius.organic,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderRadius: DesignSystem.borderRadius.lg,
     padding: 8,
     overflow: 'hidden',
     position: 'relative',
     aspectRatio: 0.75,
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.elevation.medium,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.moonlightSilver,
+    borderColor: DesignSystem.colors.sage[200],
   },
   image: {
     width: '100%',
     height: '100%',
-    borderRadius: APP_THEME_V2.radius.md,
-    backgroundColor: APP_THEME_V2.colors.cloudGray,
+    borderRadius: DesignSystem.borderRadius.md,
+    backgroundColor: DesignSystem.colors.sage[100],
   },
   overlay: {
     position: 'absolute',
@@ -53,16 +53,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: APP_THEME_V2.radius.md,
+    borderRadius: DesignSystem.borderRadius.md,
   },
   categoryText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.colors.whisperWhite,
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.inverse,
     fontSize: 14,
     textAlign: 'center',
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
   },
 });
 
-export default WardrobeCard; 
+export default WardrobeCard;

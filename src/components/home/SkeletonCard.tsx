@@ -8,7 +8,7 @@ import Animated, {
   withTiming, 
   interpolate 
 } from 'react-native-reanimated';
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 
 const SkeletonCard: React.FC = () => {
   const { colors } = useTheme();
@@ -258,4 +258,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SkeletonCard; 
+export default SkeletonCard;

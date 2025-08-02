@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../../context/ThemeContext'; // Import useTheme
+import { useTheme } from '@/context/ThemeContext'; // Import useTheme
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -458,4 +458,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PhotoProcessingLoader; 
+export default PhotoProcessingLoader;

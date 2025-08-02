@@ -9,4 +9,4 @@ export { default as PremiumTabBar } from './PremiumTabBar';
 export { default as PremiumLoadingScreen } from './PremiumLoadingScreen';
 
 // Re-export the premium theme system
-export { PREMIUM_THEME } from '../../constants/PremiumThemeSystem';
+export { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';

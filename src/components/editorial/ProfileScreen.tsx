@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { EDITORIAL_THEME } from '../../constants/EditorialTheme';
+import { DesignSystem } from '../../theme/DesignSystem';
 
 export const ProfileScreen: React.FC = () => {
   const profileOptions = [
@@ -41,7 +41,7 @@ export const ProfileScreen: React.FC = () => {
                   <Ionicons
                     name={option.icon}
                     size={20}
-                    color={EDITORIAL_THEME.colors.lilac[600]}
+                    color={DesignSystem.colors.lilac[600]}
                   />
                 </View>
                 <Text style={styles.optionLabel}>{option.label}</Text>
@@ -49,7 +49,7 @@ export const ProfileScreen: React.FC = () => {
               <Ionicons
                 name="chevron-forward"
                 size={20}
-                color={EDITORIAL_THEME.colors.grey[400]}
+                color={DesignSystem.colors.text.tertiary}
               />
             </TouchableOpacity>
           ))}
@@ -62,7 +62,7 @@ export const ProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: EDITORIAL_THEME.colors.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollView: {
     flex: 1,
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
-    paddingHorizontal: EDITORIAL_THEME.layout.containerPadding,
+    paddingHorizontal: DesignSystem.spacing.lg,
     paddingTop: 20,
     paddingBottom: 40,
     alignItems: 'center',
@@ -80,29 +80,29 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: EDITORIAL_THEME.colors.lilac[100],
+    backgroundColor: DesignSystem.colors.lilac[100],
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
   },
   avatarText: {
-    fontSize: EDITORIAL_THEME.typography.serif.sizes['2xl'],
-    fontFamily: EDITORIAL_THEME.typography.serif.family,
-    color: EDITORIAL_THEME.colors.lilac[600],
+    fontSize: DesignSystem.typography.scale.h2.fontSize,
+    fontFamily: DesignSystem.typography.serif.family,
+    color: DesignSystem.colors.lilac[600],
   },
   name: {
-    fontSize: EDITORIAL_THEME.typography.serif.sizes['3xl'],
-    fontFamily: EDITORIAL_THEME.typography.serif.family,
-    color: EDITORIAL_THEME.colors.text.primary,
+    fontSize: DesignSystem.typography.scale.h1.fontSize,
+    fontFamily: DesignSystem.typography.serif.family,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    fontSize: DesignSystem.typography.scale.body1.fontSize,
+    fontFamily: DesignSystem.typography.sans.family,
+    color: DesignSystem.colors.text.secondary,
   },
   optionsContainer: {
-    paddingHorizontal: EDITORIAL_THEME.layout.containerPadding,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   optionItem: {
     flexDirection: 'row',
@@ -110,10 +110,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 16,
     paddingHorizontal: 20,
-    backgroundColor: EDITORIAL_THEME.colors.white,
-    borderRadius: EDITORIAL_THEME.borderRadius.lg,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderRadius: DesignSystem.radius.lg,
     marginBottom: 12,
-    ...EDITORIAL_THEME.shadows.soft,
+    ...DesignSystem.elevation.small,
   },
   optionLeft: {
     flexDirection: 'row',
@@ -123,14 +123,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: EDITORIAL_THEME.colors.lilac[50],
+    backgroundColor: DesignSystem.colors.lilac[50],
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
   },
   optionLabel: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: 'Inter_400Regular',
-    color: EDITORIAL_THEME.colors.text.primary,
+    fontSize: DesignSystem.typography.scale.body1.fontSize,
+    fontFamily: DesignSystem.typography.sans.family,
+    color: DesignSystem.colors.text.primary,
   },
 });

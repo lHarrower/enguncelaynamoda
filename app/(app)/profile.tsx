@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, StatusBar 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { ULTRA_PREMIUM_THEME } from '../../constants/UltraPremiumTheme';
-import UltraPremiumButton from '../../components/ultra/UltraPremiumButton';
-import { useAuth } from '../../context/AuthContext';
+import { DesignSystem } from '@/theme/DesignSystem';
+import StandardButton from '@/components/shared/StandardButton';
+import { useAuth } from '@/context/AuthContext';
 import Animated, { 
   useSharedValue, 
   useAnimatedScrollHandler,
@@ -58,7 +58,7 @@ const ProfileOption = ({
             <Ionicons 
               name={icon} 
               size={18} 
-              color={danger ? ULTRA_PREMIUM_THEME.semantic.status.error : ULTRA_PREMIUM_THEME.semantic.text.secondary} 
+              color={danger ? DesignSystem.colors.error[500] : DesignSystem.colors.text.secondary} 
             />
           </View>
           <View style={styles.optionText}>
@@ -70,7 +70,7 @@ const ProfileOption = ({
           <Ionicons 
             name="chevron-forward" 
             size={16} 
-            color={ULTRA_PREMIUM_THEME.semantic.text.quaternary} 
+            color={DesignSystem.colors.text.quaternary} 
           />
         )}
       </TouchableOpacity>
@@ -138,7 +138,7 @@ export default function ProfileScreen() {
           <Ionicons 
             name={isEditing ? "checkmark" : "pencil"} 
             size={18} 
-            color={ULTRA_PREMIUM_THEME.semantic.text.primary} 
+            color={DesignSystem.colors.text.primary} 
           />
         </TouchableOpacity>
       </View>
@@ -155,7 +155,7 @@ export default function ProfileScreen() {
           />
           {isEditing && (
             <TouchableOpacity style={styles.avatarEditButton}>
-              <Ionicons name="camera" size={16} color={ULTRA_PREMIUM_THEME.semantic.text.inverse} />
+              <Ionicons name="camera" size={16} color={DesignSystem.colors.text.inverse} />
             </TouchableOpacity>
           )}
         </View>
@@ -195,7 +195,7 @@ export default function ProfileScreen() {
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + ULTRA_PREMIUM_THEME.spacing.massive }
+          { paddingBottom: insets.bottom + DesignSystem.spacing.massive }
         ]}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -294,7 +294,7 @@ export default function ProfileScreen() {
 
         {/* Sign Out */}
         <View style={styles.signOutSection}>
-          <UltraPremiumButton
+          <StandardButton
             title="Sign Out"
             onPress={handleSignOut}
             variant="ghost"
@@ -311,7 +311,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.background.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollView: {
     flex: 1,
@@ -325,53 +325,53 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.background.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
     borderBottomWidth: 1,
-    borderBottomColor: ULTRA_PREMIUM_THEME.semantic.border.tertiary,
+    borderBottomColor: DesignSystem.colors.border.tertiary,
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
     paddingTop: 60,
-    paddingBottom: ULTRA_PREMIUM_THEME.spacing.md,
+    paddingBottom: DesignSystem.spacing.md,
   },
   headerTitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.h2,
-    color: ULTRA_PREMIUM_THEME.semantic.text.primary,
+    ...DesignSystem.typography.h2,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '400',
   },
   headerButton: {
     width: 40,
     height: 40,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.round,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
+    borderRadius: DesignSystem.radius.round,
+    backgroundColor: DesignSystem.colors.surface.secondary,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.border.secondary,
   },
   profileHeader: {
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
     paddingTop: 100,
-    paddingBottom: ULTRA_PREMIUM_THEME.spacing.xxxl,
+    paddingBottom: DesignSystem.spacing.xxxl,
   },
   avatarSection: {
     alignItems: 'center',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   avatarContainer: {
     position: 'relative',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   avatar: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
+    backgroundColor: DesignSystem.colors.surface.secondary,
     borderWidth: 3,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.border.secondary,
   },
   avatarEditButton: {
     position: 'absolute',
@@ -380,30 +380,30 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.interactive.primary,
+    backgroundColor: DesignSystem.colors.interactive.primary,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.background.primary,
-    ...ULTRA_PREMIUM_THEME.elevation.soft,
+    borderColor: DesignSystem.colors.background.primary,
+    ...DesignSystem.elevation.soft,
   },
   userInfo: {
     alignItems: 'center',
   },
   userName: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.h1,
-    color: ULTRA_PREMIUM_THEME.semantic.text.primary,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xs,
+    ...DesignSystem.typography.h1,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.xs,
     fontWeight: '400',
   },
   userTitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body1,
-    color: ULTRA_PREMIUM_THEME.semantic.text.secondary,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xs,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.xs,
   },
   userLocation: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.semantic.text.tertiary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.tertiary,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
@@ -411,57 +411,57 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.lg,
-    padding: ULTRA_PREMIUM_THEME.spacing.lg,
+    backgroundColor: DesignSystem.colors.surface.secondary,
+    borderRadius: DesignSystem.radius.lg,
+    padding: DesignSystem.spacing.lg,
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.border.secondary,
   },
   statItem: {
     alignItems: 'center',
     flex: 1,
   },
   statValue: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.h2,
-    color: ULTRA_PREMIUM_THEME.semantic.text.primary,
+    ...DesignSystem.typography.h2,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '300',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   statLabel: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.semantic.text.tertiary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.tertiary,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   statDivider: {
     width: 1,
     height: 40,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
-    marginHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
+    backgroundColor: DesignSystem.colors.border.secondary,
+    marginHorizontal: DesignSystem.spacing.lg,
   },
   section: {
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.xl,
   },
   sectionTitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.overline,
-    color: ULTRA_PREMIUM_THEME.semantic.text.tertiary,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.md,
-    paddingLeft: ULTRA_PREMIUM_THEME.spacing.xs,
+    ...DesignSystem.typography.overline,
+    color: DesignSystem.colors.text.tertiary,
+    marginBottom: DesignSystem.spacing.md,
+    paddingLeft: DesignSystem.spacing.xs,
   },
   profileCard: {
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.primary,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.lg,
+    backgroundColor: DesignSystem.colors.surface.primary,
+    borderRadius: DesignSystem.radius.lg,
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.border.secondary,
     overflow: 'hidden',
   },
   optionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
-    paddingVertical: ULTRA_PREMIUM_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.lg,
     minHeight: 64,
   },
   optionLeft: {
@@ -472,13 +472,13 @@ const styles = StyleSheet.create({
   optionIcon: {
     width: 44,
     height: 44,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.lg,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
+    borderRadius: DesignSystem.radius.lg,
+    backgroundColor: DesignSystem.colors.surface.secondary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: ULTRA_PREMIUM_THEME.spacing.md,
+    marginRight: DesignSystem.spacing.md,
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.border.secondary,
   },
   optionIconDanger: {
     backgroundColor: 'rgba(198, 40, 40, 0.1)',
@@ -488,26 +488,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   optionTitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body1,
-    color: ULTRA_PREMIUM_THEME.semantic.text.primary,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '400',
     marginBottom: 2,
   },
   optionTitleDanger: {
-    color: ULTRA_PREMIUM_THEME.semantic.status.error,
+    color: DesignSystem.colors.error[500],
   },
   optionSubtitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.semantic.text.tertiary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.tertiary,
   },
   divider: {
     height: 1,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.border.tertiary,
-    marginLeft: ULTRA_PREMIUM_THEME.spacing.lg + 44 + ULTRA_PREMIUM_THEME.spacing.md,
+    backgroundColor: DesignSystem.colors.border.tertiary,
+    marginLeft: DesignSystem.spacing.lg + 44 + DesignSystem.spacing.md,
   },
   signOutSection: {
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
-    marginTop: ULTRA_PREMIUM_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    marginTop: DesignSystem.spacing.lg,
   },
 });
 

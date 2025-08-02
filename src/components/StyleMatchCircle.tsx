@@ -10,9 +10,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '../context/ThemeContext';
-import { TYPOGRAPHY, SPACING, SHADOWS } from '../constants/AppConstants';
-import { DIGITAL_ATELIER_PALETTE } from '../constants/Colors';
+import { useTheme } from '@/context/ThemeContext';
+import { TYPOGRAPHY, SPACING, SHADOWS } from '@/constants/AppConstants';
+import { DIGITAL_ATELIER_PALETTE } from '@/constants/Colors';
 
 interface StyleMatchCircleProps {
   percentage: number;
@@ -255,4 +255,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StyleMatchCircle; 
+export default StyleMatchCircle;

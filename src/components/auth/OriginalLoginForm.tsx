@@ -14,14 +14,14 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
-import { OriginalInput } from './OriginalInput';
+import { OriginalInput } from '@/components/auth/OriginalInput';
 import {
   originalLoginStyles,
   TURKISH_TEXT,
   VALIDATION_MESSAGES,
   ORIGINAL_COLORS,
   ACCESSIBILITY_LABELS,
-} from './originalLoginStyles';
+} from '@/components/auth/originalLoginStyles';
 
 export interface OriginalLoginFormProps {
   /** Callback when login is attempted */

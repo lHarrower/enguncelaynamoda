@@ -3,23 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
-  Dimensions,
   StatusBar,
+  Dimensions,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { STUDIO_THEME } from '@/constants/StudioTheme'; // CORRECTED PATH
-import { Ionicons } from '@expo/vector-icons';
+import { DesignSystem } from '@/theme/DesignSystem';
 import * as Haptics from 'expo-haptics';
 
-// Import studio components using correct relative paths for sibling files
+// Import components
+import { StudioHeader } from '@/components/shared/StudioHeader';
+import { SectionHeader } from '@/components/shared/SectionHeader';
+import { OutfitCarousel } from '@/components/shared/OutfitCarousel';
 import BentoBoxGallery from './BentoBoxGallery';
 import PremiumOutfitCard from './PremiumOutfitCard';
-// Import other components using the alias for clarity and stability
-import MiniDiscoveryEngine from '@/components/home/MiniDiscoveryEngine'; // CORRECTED PATH
+import MiniDiscoveryEngine from '@/components/home/MiniDiscoveryEngine';
 
 const { width, height } = Dimensions.get('window');
 
@@ -36,7 +34,6 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
   onNavigateToMirror,
   onNavigateToProfile,
 }) => {
-  const insets = useSafeAreaInsets();
   const [likedOutfits, setLikedOutfits] = useState<Set<string>>(new Set());
   const [messageOfTheDay, setMessageOfTheDay] = useState('');
 
@@ -125,8 +122,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
       content: {
         emoji: '✨',
         gradient: [
-          STUDIO_THEME.colors.accent.jadeLight,
-          STUDIO_THEME.colors.accent.goldLight,
+          DesignSystem.colors.sage[200],
+          DesignSystem.colors.amber[200],
         ],
       },
     },
@@ -232,48 +229,29 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor={STUDIO_THEME.colors.foundation.primary} />
+      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
       
-      <ScrollView
+      <ScrollView 
         style={styles.scrollView}
-        contentContainerStyle={[
-          styles.contentContainer,
-          { paddingBottom: insets.bottom + 40 }
-        ]}
+        contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
-          <View style={styles.headerContent}>
-            <View>
-              <Text style={styles.greeting}>Good morning</Text>
-              <Text style={styles.userName}>Sarah</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.profileButton}
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                onNavigateToProfile?.();
-              }}
-            >
-              <Ionicons
-                name="person-circle-outline"
-                size={32}
-                color={STUDIO_THEME.colors.accent.jade}
-              />
-            </TouchableOpacity>
-          </View>
-          
-          {/* Message of the Day */}
-          {messageOfTheDay && (
-            <View style={styles.messageOfTheDay}>
-              <Text style={styles.messageText}>{messageOfTheDay}</Text>
-            </View>
-          )}
-        </View>
+        <StudioHeader
+          userName="Ayna"
+          messageOfTheDay={messageOfTheDay}
+          onProfilePress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            onNavigateToProfile?.();
+          }}
+        />
 
-        {/* Mini Discovery Engine - Personalized Micro-Ritual */}
         <View style={styles.section}>
+          <SectionHeader
+            title="Style Discovery"
+            subtitle="AI-powered recommendations"
+            showArrow={false}
+          />
+          
           <MiniDiscoveryEngine
             items={personalizedItems}
             onLike={(item) => {
@@ -289,25 +267,15 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
           />
         </View>
 
-        {/* Today's Outfits Section */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Today's Outfits</Text>
-            <TouchableOpacity
-              onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                // Navigate to all outfits
-              }}
-            >
-              <Text style={styles.sectionAction}>See all</Text>
-            </TouchableOpacity>
-          </View>
+          <SectionHeader
+            title="Today's Curated"
+            subtitle="Handpicked for your style"
+            actionText="See All"
+            onActionPress={onNavigateToDiscover}
+          />
           
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.outfitsContainer}
-          >
+          <OutfitCarousel>
             {todaysOutfits.map((outfit, index) => (
               <PremiumOutfitCard
                 key={outfit.id}
@@ -316,24 +284,19 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
                 isLiked={likedOutfits.has(outfit.id)}
                 onPress={() => handleOutfitPress(outfit.id)}
                 onLike={() => handleLikeOutfit(outfit.id)}
-                style={[
-                  styles.outfitCard,
-                  index === 0 && styles.firstOutfitCard,
-                  index === todaysOutfits.length - 1 && styles.lastOutfitCard,
-                ]}
+                style={styles.outfitCard}
               />
             ))}
-          </ScrollView>
+          </OutfitCarousel>
         </View>
 
-        {/* Your Style Universe Section */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Your Style Universe</Text>
-            <Text style={styles.sectionSubtitle}>
-              Personalized insights and recommendations
-            </Text>
-          </View>
+          <SectionHeader
+            title="Your Style Journey"
+            subtitle="Explore your fashion evolution"
+            actionText="Open Wardrobe"
+            onActionPress={onNavigateToWardrobe}
+          />
           
           <BentoBoxGallery
             items={bentoItems}
@@ -349,95 +312,22 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: STUDIO_THEME.colors.foundation.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollView: {
     flex: 1,
   },
   contentContainer: {
-    flexGrow: 1,
+    paddingBottom: DesignSystem.spacing.massive,
   },
-  
-  // Header Styles
-  header: {
-    paddingHorizontal: STUDIO_THEME.spacing.xl,
-    marginBottom: STUDIO_THEME.spacing.xxxl,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  greeting: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.secondary,
-    marginBottom: 4,
-  },
-  userName: {
-    ...STUDIO_THEME.typography.scale.hero,
-    color: STUDIO_THEME.colors.text.primary,
-    fontSize: 32,
-  },
-  profileButton: {
-    padding: 4,
-  },
-  
-  // Message of the Day
-  messageOfTheDay: {
-    marginTop: STUDIO_THEME.spacing.lg,
-    paddingHorizontal: STUDIO_THEME.spacing.md,
-    paddingVertical: STUDIO_THEME.spacing.md,
-    backgroundColor: STUDIO_THEME.colors.accent.jadeGlow,
-    borderRadius: STUDIO_THEME.radius.md,
-    borderLeftWidth: 3,
-    borderLeftColor: STUDIO_THEME.colors.accent.jade,
-  },
-  messageText: {
-    ...STUDIO_THEME.typography.scale.elegant,
-    color: STUDIO_THEME.colors.text.primary,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  
-  // Section Styles
   section: {
-    marginBottom: STUDIO_THEME.spacing.massive,
-  },
-  sectionHeader: {
-    paddingHorizontal: STUDIO_THEME.spacing.xl,
-    marginBottom: STUDIO_THEME.spacing.lg,
-  },
-  sectionTitle: {
-    ...STUDIO_THEME.typography.scale.h2,
-    color: STUDIO_THEME.colors.text.primary,
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.secondary,
-  },
-  sectionAction: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.accent.jade,
-  },
-  
-  // Outfits Section
-  outfitsContainer: {
-    paddingLeft: STUDIO_THEME.spacing.xl,
+    marginBottom: DesignSystem.spacing.massive,
   },
   outfitCard: {
-    marginRight: STUDIO_THEME.spacing.lg,
+    marginRight: DesignSystem.spacing.lg,
   },
-  firstOutfitCard: {
-    marginLeft: 0,
-  },
-  lastOutfitCard: {
-    marginRight: STUDIO_THEME.spacing.xl,
-  },
-  
-  // Bento Gallery
   bentoGallery: {
-    marginTop: -STUDIO_THEME.spacing.xl, // Adjust for gallery's internal padding
+    marginTop: -DesignSystem.spacing.xl,
   },
 });
 

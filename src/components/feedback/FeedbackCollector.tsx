@@ -12,17 +12,25 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { OutfitFeedback, EmotionalResponse, SocialFeedback, ComfortRating, EmotionalState } from '../../types/aynaMirror';
+import { FeedbackComponentProps, ModalComponentProps, DEFAULT_PROPS } from '../../types/componentProps';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-interface FeedbackCollectorProps {
+interface FeedbackCollectorProps extends FeedbackComponentProps, Pick<ModalComponentProps, 'visible' | 'onClose'> {
+  /** Outfit ID to collect feedback for */
   outfitId: string;
+  /** User ID providing the feedback */
   userId: string;
+  /** Callback when feedback is successfully submitted */
   onFeedbackSubmit: (feedback: OutfitFeedback) => Promise<void>;
+  /** Callback when feedback collection is closed */
   onClose: () => void;
+  /** Whether the feedback collector is visible */
   visible: boolean;
+  /** Custom title for the feedback collector */
+  title?: string;
 }
 
 interface FeedbackStep {
@@ -38,6 +46,11 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
   onFeedbackSubmit,
   onClose,
   visible,
+  title = 'How did this outfit make you feel?',
+  style,
+  testID,
+  accessibilityLabel,
+  ...props
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [confidenceRating, setConfidenceRating] = useState<number>(0);
@@ -246,13 +259,13 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
           ]}
         >
           <LinearGradient
-            colors={[APP_THEME_V2.semantic.background, APP_THEME_V2.semantic.surface]}
+            colors={[DesignSystem.colors.background.primary, DesignSystem.colors.background.secondary]}
             style={styles.gradient}
           >
             {/* Header */}
             <View style={styles.header}>
               <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <Ionicons name="close" size={24} color={APP_THEME_V2.semantic.text.primary} />
+                <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>Outfit Feedback</Text>
               <View style={styles.placeholder} />
@@ -365,13 +378,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.secondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.text.primary,
   },
   placeholder: {
     width: 40,
@@ -388,10 +401,10 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.secondary,
   },
   progressDotActive: {
-    backgroundColor: APP_THEME_V2.semantic.accent,
+    backgroundColor: DesignSystem.colors.sage[500],
   },
   content: {
     flex: 1,
@@ -401,14 +414,14 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   stepTitle: {
-    ...APP_THEME_V2.typography.scale.h2,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 8,
   },
   stepSubtitle: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: 32,
   },
@@ -417,9 +430,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: APP_THEME_V2.semantic.background,
+    backgroundColor: DesignSystem.colors.background.primary,
     borderTopWidth: 1,
-    borderTopColor: APP_THEME_V2.semantic.border,
+    borderTopColor: DesignSystem.colors.border.primary,
   },
   navSpacer: {
     flex: 1,
@@ -428,20 +441,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.secondary,
   },
   primaryNavButton: {
-    backgroundColor: APP_THEME_V2.semantic.accent,
+    backgroundColor: DesignSystem.colors.sage[500],
   },
   disabledButton: {
     opacity: 0.5,
   },
   navButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.button.medium,
+    color: DesignSystem.colors.text.primary,
   },
   primaryNavButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.inverse,
+    ...DesignSystem.typography.button.medium,
+    color: DesignSystem.colors.text.inverse,
   },
 });

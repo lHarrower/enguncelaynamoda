@@ -3,8 +3,8 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
-import { WeatherContext, WeatherCondition } from '../types/aynaMirror';
-import { errorHandlingService } from './errorHandlingService';
+import { WeatherContext, WeatherCondition } from '@/types/aynaMirror';
+import { errorHandlingService } from '@/services/errorHandlingService';
 
 /**
  * Weather Service for AYNA Mirror

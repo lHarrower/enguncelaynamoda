@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { FadeInUp, FadeInDown, FadeIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -88,15 +88,15 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
           
           <View style={styles.generatingSteps}>
             <View style={styles.generatingStep}>
-              <Ionicons name="checkmark-circle" size={20} color={APP_THEME_V2.colors.sageGreen[600]} />
+              <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.sage[600]} />
               <Text style={styles.generatingStepText}>Analyzing your style preferences</Text>
             </View>
             <View style={styles.generatingStep}>
-              <Ionicons name="checkmark-circle" size={20} color={APP_THEME_V2.colors.sageGreen[600]} />
+              <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.sage[600]} />
               <Text style={styles.generatingStepText}>Considering weather patterns</Text>
             </View>
             <View style={styles.generatingStep}>
-              <Ionicons name="time" size={20} color={APP_THEME_V2.colors.liquidGold[600]} />
+              <Ionicons name="time" size={20} color={DesignSystem.colors.gold[600]} />
               <Text style={styles.generatingStepText}>Creating confidence notes</Text>
             </View>
           </View>
@@ -113,11 +113,11 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
           <Text style={styles.outfitTitle}>{currentOutfit.title}</Text>
           <View style={styles.outfitMeta}>
             <View style={styles.metaItem}>
-              <Ionicons name="briefcase" size={16} color={APP_THEME_V2.colors.sageGreen[600]} />
+              <Ionicons name="briefcase" size={16} color={DesignSystem.colors.sage[600]} />
               <Text style={styles.metaText}>{currentOutfit.occasion}</Text>
             </View>
             <View style={styles.metaItem}>
-              <Ionicons name="partly-sunny" size={16} color={APP_THEME_V2.colors.liquidGold[600]} />
+              <Ionicons name="partly-sunny" size={16} color={DesignSystem.colors.gold[600]} />
               <Text style={styles.metaText}>{currentOutfit.weatherNote}</Text>
             </View>
           </View>
@@ -151,7 +151,7 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                       'diamond'
                     } 
                     size={20} 
-                    color={APP_THEME_V2.colors.sageGreen[600]} 
+                    color={DesignSystem.colors.sage[600]} 
                   />
                 </View>
                 <Text style={styles.itemText}>{item}</Text>
@@ -171,15 +171,15 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
         {/* Quick Actions */}
         <View style={styles.quickActions}>
           <View style={styles.actionButton}>
-            <Ionicons name="heart" size={20} color={APP_THEME_V2.colors.liquidGold[600]} />
+            <Ionicons name="heart" size={20} color={DesignSystem.colors.gold[600]} />
             <Text style={styles.actionButtonText}>Love This</Text>
           </View>
           <View style={styles.actionButton}>
-            <Ionicons name="bookmark" size={20} color={APP_THEME_V2.colors.sageGreen[600]} />
+            <Ionicons name="bookmark" size={20} color={DesignSystem.colors.sage[600]} />
             <Text style={styles.actionButtonText}>Save</Text>
           </View>
           <View style={styles.actionButton}>
-            <Ionicons name="share" size={20} color={APP_THEME_V2.colors.inkGray[600]} />
+            <Ionicons name="share" size={20} color={DesignSystem.colors.neutral[600]} />
             <Text style={styles.actionButtonText}>Share</Text>
           </View>
         </View>
@@ -190,7 +190,7 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={[APP_THEME_V2.colors.linen.light, APP_THEME_V2.colors.linen.base]}
+        colors={[DesignSystem.colors.background.secondary, DesignSystem.colors.background.primary]}
         style={styles.gradient}
       >
         {isGenerating ? (
@@ -247,8 +247,8 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                     size={24} 
                     color={
                       currentOutfitIndex === 0 
-                        ? APP_THEME_V2.colors.inkGray[400] 
-                        : APP_THEME_V2.colors.sageGreen[600]
+                        ? DesignSystem.colors.neutral[400] 
+                        : DesignSystem.colors.sage[600]
                     } 
                   />
                   <Text style={[
@@ -279,8 +279,8 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                     size={24} 
                     color={
                       currentOutfitIndex === SAMPLE_OUTFITS.length - 1 
-                        ? APP_THEME_V2.colors.inkGray[400] 
-                        : APP_THEME_V2.colors.sageGreen[600]
+                        ? DesignSystem.colors.neutral[400] 
+                        : DesignSystem.colors.sage[600]
                     } 
                   />
                 </Animated.Pressable>
@@ -303,14 +303,14 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                   onPress={onComplete}
                 >
                   <LinearGradient
-                    colors={[APP_THEME_V2.colors.sageGreen[400], APP_THEME_V2.colors.sageGreen[600]]}
+                    colors={[DesignSystem.colors.sage[400], DesignSystem.colors.sage[600]]}
                     style={styles.completeButtonGradient}
                   >
                     <Text style={styles.completeButtonText}>Start Using AYNA Mirror</Text>
                     <Ionicons 
                       name="arrow-forward" 
                       size={20} 
-                      color={APP_THEME_V2.semantic.text.inverse}
+                      color={DesignSystem.colors.text.inverse}
                       style={styles.completeButtonIcon}
                     />
                   </LinearGradient>
@@ -335,215 +335,215 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    paddingTop: APP_THEME_V2.spacing.xl,
-    paddingBottom: APP_THEME_V2.spacing.xxxl,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xxxl,
   },
   generatingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
   },
   generatingContent: {
     width: '100%',
   },
   generatingCard: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    padding: APP_THEME_V2.spacing.xl,
+    borderRadius: DesignSystem.borderRadius.large,
+    padding: DesignSystem.spacing.xl,
     alignItems: 'center',
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.effects.elevation.medium,
   },
   loadingAnimation: {
     flexDirection: 'row',
-    gap: APP_THEME_V2.spacing.sm,
-    marginBottom: APP_THEME_V2.spacing.xl,
+    gap: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.xl,
   },
   loadingDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: APP_THEME_V2.colors.sageGreen[500],
+    backgroundColor: DesignSystem.colors.sage[500],
   },
   generatingTitle: {
-    ...APP_THEME_V2.typography.scale.h2,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   generatingSubtitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   generatingSteps: {
-    gap: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.md,
     width: '100%',
   },
   generatingStep: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: APP_THEME_V2.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   generatingStepText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
   },
   header: {
     alignItems: 'center',
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   title: {
-    ...APP_THEME_V2.typography.scale.h1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h1,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   subtitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
   navigationDots: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: APP_THEME_V2.spacing.sm,
-    marginBottom: APP_THEME_V2.spacing.xl,
+    gap: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.xl,
   },
   navigationDot: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: APP_THEME_V2.colors.moonlightSilver,
+    backgroundColor: DesignSystem.colors.neutral[300],
   },
   navigationDotActive: {
-    backgroundColor: APP_THEME_V2.colors.sageGreen[500],
+    backgroundColor: DesignSystem.colors.sage[500],
   },
   outfitCard: {
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   outfitCardContent: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    padding: APP_THEME_V2.spacing.xl,
-    ...APP_THEME_V2.elevation.lift,
+    borderRadius: DesignSystem.borderRadius.large,
+    padding: DesignSystem.spacing.xl,
+    ...DesignSystem.effects.elevation.medium,
   },
   outfitHeader: {
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   outfitTitle: {
-    ...APP_THEME_V2.typography.scale.h2,
-    color: APP_THEME_V2.semantic.text.primary,
-    marginBottom: APP_THEME_V2.spacing.sm,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.sm,
   },
   outfitMeta: {
     flexDirection: 'row',
-    gap: APP_THEME_V2.spacing.lg,
+    gap: DesignSystem.spacing.lg,
   },
   metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: APP_THEME_V2.spacing.xs,
+    gap: DesignSystem.spacing.xs,
   },
   metaText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
   },
   colorPalette: {
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   colorPaletteTitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   colorSwatches: {
     flexDirection: 'row',
-    gap: APP_THEME_V2.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   colorSwatch: {
     width: 32,
     height: 32,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: APP_THEME_V2.colors.whisperWhite,
-    ...APP_THEME_V2.elevation.whisper,
+    borderColor: DesignSystem.colors.background.elevated,
+    ...DesignSystem.effects.elevation.low,
   },
   outfitItems: {
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   outfitItemsTitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   itemsList: {
-    gap: APP_THEME_V2.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   outfitItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: APP_THEME_V2.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   itemIcon: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: APP_THEME_V2.colors.sageGreen[100],
+    backgroundColor: DesignSystem.colors.sage[100],
     alignItems: 'center',
     justifyContent: 'center',
   },
   itemText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
   },
   confidenceNoteSection: {
-    marginBottom: APP_THEME_V2.spacing.lg,
-    padding: APP_THEME_V2.spacing.md,
-    backgroundColor: APP_THEME_V2.colors.sageGreen[50],
-    borderRadius: APP_THEME_V2.radius.md,
+    marginBottom: DesignSystem.spacing.lg,
+    padding: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.sage[50],
+    borderRadius: DesignSystem.borderRadius.medium,
   },
   confidenceNoteTitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.colors.sageGreen[700],
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.sage[700],
     fontWeight: '600',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   confidenceNoteText: {
-    ...APP_THEME_V2.typography.scale.whisper,
-    color: APP_THEME_V2.colors.sageGreen[800],
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.sage[800],
     lineHeight: 22,
   },
   quickActions: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingTop: APP_THEME_V2.spacing.md,
+    paddingTop: DesignSystem.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: APP_THEME_V2.colors.moonlightSilver,
+    borderTopColor: DesignSystem.colors.neutral[300],
   },
   actionButton: {
     alignItems: 'center',
-    gap: APP_THEME_V2.spacing.xs,
+    gap: DesignSystem.spacing.xs,
   },
   actionButtonText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
   },
   outfitNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   navButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: APP_THEME_V2.spacing.xs,
-    paddingVertical: APP_THEME_V2.spacing.sm,
-    paddingHorizontal: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.xs,
+    paddingVertical: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
   },
   navButtonDisabled: {
     opacity: 0.4,
@@ -552,24 +552,24 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   navButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.colors.sageGreen[600],
+    ...DesignSystem.typography.button.medium,
+    color: DesignSystem.colors.sage[600],
   },
   navButtonTextDisabled: {
-    color: APP_THEME_V2.colors.inkGray[400],
+    color: DesignSystem.colors.neutral[400],
   },
   completeSection: {
     alignItems: 'center',
   },
   completeText: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   completeButton: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.lift,
+    borderRadius: DesignSystem.borderRadius.large,
+    ...DesignSystem.effects.elevation.medium,
   },
   completeButtonPressed: {
     transform: [{ scale: 0.98 }],
@@ -578,15 +578,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: APP_THEME_V2.spacing.xxxl,
-    paddingVertical: APP_THEME_V2.spacing.lg,
-    borderRadius: APP_THEME_V2.radius.organic,
+    paddingHorizontal: DesignSystem.spacing.xxxl,
+    paddingVertical: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.borderRadius.large,
   },
   completeButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.inverse,
+    ...DesignSystem.typography.button.medium,
+    color: DesignSystem.colors.text.inverse,
   },
   completeButtonIcon: {
-    marginLeft: APP_THEME_V2.spacing.sm,
+    marginLeft: DesignSystem.spacing.sm,
   },
 });

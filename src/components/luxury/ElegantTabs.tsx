@@ -9,7 +9,7 @@ import Animated, {
   Extrapolate,
   runOnJS,
 } from 'react-native-reanimated';
-import { LuxuryMaterials, LuxuryTypography, LuxurySpacing } from '../../theme/AppThemeV2';
+import { LuxuryMaterials, LuxuryTypography, LuxurySpacing } from '@/theme/AppThemeV2';
 
 interface Tab {
   id: string;
@@ -235,4 +235,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ElegantTabs; 
+export default ElegantTabs;

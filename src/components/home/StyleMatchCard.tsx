@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, useWindowDimensions } from 'react-native';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import Animated from 'react-native-reanimated';
 
@@ -25,17 +25,17 @@ const StyleMatchCard: React.FC<StyleMatchCardProps> = ({
   dislikeOpacity 
 }) => {
   const { width: screenWidth } = useWindowDimensions();
-  const cardWidth = screenWidth - (APP_THEME_V2.spacing.xl * 2);
+  const cardWidth = screenWidth - (DesignSystem.spacing.xl * 2);
 
   return (
     <Animated.View style={[styles.cardContainer, { width: cardWidth }, style]}>
       <Image source={{ uri: item.image }} style={styles.image} />
       
       <Animated.View style={[styles.iconOverlay, styles.likeIcon, likeOpacity]}>
-        <Ionicons name="heart" size={48} color={APP_THEME_V2.colors.whisperWhite} />
+        <Ionicons name="heart" size={48} color={DesignSystem.colors.text.inverse} />
       </Animated.View>
       <Animated.View style={[styles.iconOverlay, styles.dislikeIcon, dislikeOpacity]}>
-        <Ionicons name="close-outline" size={60} color={APP_THEME_V2.colors.whisperWhite} />
+        <Ionicons name="close-outline" size={60} color={DesignSystem.colors.text.inverse} />
       </Animated.View>
       
       <View style={styles.textContainer}>
@@ -55,17 +55,17 @@ const StyleMatchCard: React.FC<StyleMatchCardProps> = ({
 const styles = StyleSheet.create({
   cardContainer: {
     height: 240,
-    backgroundColor: APP_THEME_V2.semantic.surface,
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.lift,
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderRadius: DesignSystem.radius.lg,
+    ...DesignSystem.elevation.medium,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.moonlightSilver,
+    borderColor: DesignSystem.colors.sage[100],
   },
   image: {
     width: '100%',
     height: 150,
-    borderTopLeftRadius: APP_THEME_V2.radius.organic,
-    borderTopRightRadius: APP_THEME_V2.radius.organic,
+    borderTopLeftRadius: DesignSystem.radius.lg,
+    borderTopRightRadius: DesignSystem.radius.lg,
   },
   iconOverlay: {
     position: 'absolute',
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
     bottom: 90, // Match text container's space
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: APP_THEME_V2.radius.organic,
+    borderRadius: DesignSystem.radius.lg,
   },
   likeIcon: {
     backgroundColor: 'rgba(92, 138, 92, 0.9)', // Sage green with transparency
@@ -84,48 +84,48 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(44, 44, 46, 0.9)', // Shadow charcoal with transparency
   },
   textContainer: {
-    padding: APP_THEME_V2.spacing.md,
+    padding: DesignSystem.spacing.md,
     height: 90, // Fixed height for consistency
     justifyContent: 'center',
   },
   brandText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.secondary,
-    marginBottom: APP_THEME_V2.spacing.xs,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.xs,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   productText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    marginBottom: DesignSystem.spacing.sm,
+    fontFamily: DesignSystem.typography.fonts.body,
   },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: APP_THEME_V2.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   priceText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fonts.body,
   },
   discountChip: {
-    backgroundColor: APP_THEME_V2.semantic.accent,
-    paddingHorizontal: APP_THEME_V2.spacing.sm,
+    backgroundColor: DesignSystem.colors.sage[500],
+    paddingHorizontal: DesignSystem.spacing.sm,
     paddingVertical: 2,
-    borderRadius: APP_THEME_V2.radius.sm,
+    borderRadius: DesignSystem.radius.sm,
   },
   discountText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.colors.whisperWhite,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.inverse,
     fontWeight: '500',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
 });
 
-export default StyleMatchCard; 
+export default StyleMatchCard;

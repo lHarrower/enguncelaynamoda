@@ -11,7 +11,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ATMOSPHERIC_THEME } from '../../constants/AtmosphericTheme';
+import { DesignSystem } from '../../theme/DesignSystem';
 
 // Import atmospheric components
 import LivingAtmosphere from './LivingAtmosphere';
@@ -36,6 +36,17 @@ const AtmosphericHomeScreen: React.FC<AtmosphericHomeScreenProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const [currentAtmosphere, setCurrentAtmosphere] = useState<'emerald' | 'sapphire' | 'ruby' | 'amethyst'>('emerald');
+
+  // Helper function to get variant colors
+  const getVariantColor = (variant: string) => {
+    const colorMap: Record<string, string> = {
+      emerald: DesignSystem.colors.sage[400],
+      sapphire: DesignSystem.colors.sage[500],
+      ruby: DesignSystem.colors.sage[600],
+      amethyst: DesignSystem.colors.sage[300],
+    };
+    return colorMap[variant] || DesignSystem.colors.sage[400];
+  };
 
   // Cycle through atmospheric variants every 45 seconds
   useEffect(() => {
@@ -94,8 +105,8 @@ const AtmosphericHomeScreen: React.FC<AtmosphericHomeScreenProps> = ({
         mood: 'Radiant Confidence',
         description: 'Embrace your inner glow and let it illuminate your style choices',
         gradient: [
-          ATMOSPHERIC_THEME.colors.gold.glow,
-          ATMOSPHERIC_THEME.colors.emerald.glow,
+          DesignSystem.colors.sage[300],
+          DesignSystem.colors.sage[400],
         ],
       },
     },
@@ -147,8 +158,8 @@ const AtmosphericHomeScreen: React.FC<AtmosphericHomeScreenProps> = ({
       subtitle: '— Rachel Zoe',
       content: {
         gradient: [
-          ATMOSPHERIC_THEME.colors.sapphire.shimmer,
-          ATMOSPHERIC_THEME.colors.amethyst.shimmer,
+          DesignSystem.colors.sage[400],
+          DesignSystem.colors.sage[500],
         ],
         icon: 'sparkles',
       },
@@ -162,8 +173,8 @@ const AtmosphericHomeScreen: React.FC<AtmosphericHomeScreenProps> = ({
       subtitle: 'Virtual styling experience',
       content: {
         gradient: [
-          ATMOSPHERIC_THEME.colors.ruby.glow,
-          ATMOSPHERIC_THEME.colors.gold.glow,
+          DesignSystem.colors.sage[500],
+          DesignSystem.colors.sage[300],
         ],
       },
       onPress: onNavigateToMirror,
@@ -315,7 +326,7 @@ const AtmosphericHomeScreen: React.FC<AtmosphericHomeScreenProps> = ({
                 style={[
                   styles.atmosphereDot,
                   variant === currentAtmosphere && styles.activeAtmosphereDot,
-                  { backgroundColor: ATMOSPHERIC_THEME.colors[variant as keyof typeof ATMOSPHERIC_THEME.colors].glow }
+                  { backgroundColor: getVariantColor(variant) }
                 ]}
               />
             ))}
@@ -345,15 +356,15 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   sanctuaryTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.editorial,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.h1,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 12,
     fontSize: 48,
   },
   sanctuarySubtitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.whisper,
-    color: ATMOSPHERIC_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
     fontSize: 18,
   },
@@ -371,15 +382,15 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   galleryTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.statement,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 12,
     fontSize: 32,
   },
   gallerySubtitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.whisper,
-    color: ATMOSPHERIC_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
     fontSize: 16,
   },
@@ -394,8 +405,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   atmosphereText: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.caption,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     marginBottom: 12,
     opacity: 0.6,
   },

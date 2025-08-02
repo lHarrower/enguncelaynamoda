@@ -8,8 +8,9 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { useTheme } from '../../theme/ThemeProvider';
 import { antiConsumptionService, MonthlyConfidenceMetrics as MonthlyConfidenceMetricsType } from '../../services/antiConsumptionService';
+import { DesignSystem } from '../../theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -26,6 +27,8 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
   year,
   onMetricsLoaded,
 }) => {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [metrics, setMetrics] = useState<MonthlyConfidenceMetricsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,9 +67,9 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
   };
 
   const getConfidenceColor = (rating: number): string => {
-    if (rating >= 4.5) return APP_THEME_V2.colors.success;
-    if (rating >= 3.5) return APP_THEME_V2.colors.warning;
-    return APP_THEME_V2.colors.error;
+    if (rating >= 4.5) return DesignSystem.colors.success[500];
+    if (rating >= 3.5) return DesignSystem.colors.warning[500];
+    return DesignSystem.colors.error[500];
   };
 
   const getImprovementIcon = (improvement: number): string => {
@@ -76,9 +79,9 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
   };
 
   const getImprovementColor = (improvement: number): string => {
-    if (improvement > 0.1) return APP_THEME_V2.colors.success;
-    if (improvement < -0.1) return APP_THEME_V2.colors.error;
-    return APP_THEME_V2.colors.textSecondary;
+    if (improvement > 0.1) return DesignSystem.colors.success[500];
+    if (improvement < -0.1) return DesignSystem.colors.error[500];
+    return DesignSystem.colors.neutral[600];
   };
 
   const formatPercentage = (value: number): string => {
@@ -108,7 +111,7 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
     return (
       <View style={styles.container}>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color={APP_THEME_V2.colors.error} />
+          <Ionicons name="alert-circle-outline" size={48} color={DesignSystem.colors.error[500]} />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={loadMetrics}>
             <Text style={styles.retryButtonText}>Try Again</Text>
@@ -122,7 +125,7 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
     return (
       <View style={styles.container}>
         <View style={styles.noDataContainer}>
-          <Ionicons name="bar-chart-outline" size={48} color={APP_THEME_V2.colors.textSecondary} />
+          <Ionicons name="bar-chart-outline" size={48} color={DesignSystem.colors.neutral[600]} />
           <Text style={styles.noDataTitle}>No Data Available</Text>
           <Text style={styles.noDataText}>
             Start rating your outfits to see your confidence metrics!
@@ -176,25 +179,25 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
       {/* Key Metrics Grid */}
       <View style={styles.metricsGrid}>
         <View style={styles.metricCard}>
-          <Ionicons name="shirt-outline" size={24} color={APP_THEME_V2.colors.primary} />
+          <Ionicons name="shirt-outline" size={24} color={DesignSystem.colors.primary[500]} />
           <Text style={styles.metricValue}>{metrics.totalOutfitsRated}</Text>
           <Text style={styles.metricLabel}>Outfits Rated</Text>
         </View>
 
         <View style={styles.metricCard}>
-          <Ionicons name="pie-chart-outline" size={24} color={APP_THEME_V2.colors.warning} />
+          <Ionicons name="pie-chart-outline" size={24} color={DesignSystem.colors.warning[500]} />
           <Text style={styles.metricValue}>{formatPercentage(metrics.wardrobeUtilization)}</Text>
           <Text style={styles.metricLabel}>Wardrobe Used</Text>
         </View>
 
         <View style={styles.metricCard}>
-          <Ionicons name="leaf-outline" size={24} color={APP_THEME_V2.colors.success} />
+          <Ionicons name="leaf-outline" size={24} color={DesignSystem.colors.success[500]} />
           <Text style={styles.metricValue}>{formatPercentage(metrics.shoppingReductionPercentage)}</Text>
           <Text style={styles.metricLabel}>Shopping Reduced</Text>
         </View>
 
         <View style={styles.metricCard}>
-          <Ionicons name="calculator-outline" size={24} color={APP_THEME_V2.colors.error} />
+          <Ionicons name="calculator-outline" size={24} color={DesignSystem.colors.error[500]} />
           <Text style={styles.metricValue}>{formatCurrency(metrics.costPerWearImprovement)}</Text>
           <Text style={styles.metricLabel}>Cost/Wear Saved</Text>
         </View>
@@ -209,7 +212,7 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
             {metrics.mostConfidentItems.map((item) => (
               <View key={item.id} style={styles.itemCard}>
                 <View style={styles.itemImagePlaceholder}>
-                  <Ionicons name="shirt-outline" size={24} color={APP_THEME_V2.colors.textSecondary} />
+                  <Ionicons name="shirt-outline" size={24} color={DesignSystem.colors.neutral[600]} />
                 </View>
                 <Text style={styles.itemCategory}>{item.category}</Text>
                 <View style={styles.itemColors}>
@@ -235,7 +238,7 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
             {metrics.leastConfidentItems.map((item) => (
               <View key={item.id} style={styles.itemCard}>
                 <View style={styles.itemImagePlaceholder}>
-                  <Ionicons name="shirt-outline" size={24} color={APP_THEME_V2.colors.textSecondary} />
+                  <Ionicons name="shirt-outline" size={24} color={DesignSystem.colors.neutral[600]} />
                 </View>
                 <Text style={styles.itemCategory}>{item.category}</Text>
                 <View style={styles.itemColors}>
@@ -258,7 +261,7 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
         <View style={styles.insightsList}>
           {metrics.confidenceImprovement > 0.2 && (
             <View style={styles.insightItem}>
-              <Ionicons name="trending-up" size={16} color={APP_THEME_V2.colors.success} />
+              <Ionicons name="trending-up" size={16} color={DesignSystem.colors.success[500]} />
               <Text style={styles.insightText}>
                 Your confidence is trending up! You're getting better at choosing outfits that make you feel great.
               </Text>
@@ -267,7 +270,7 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
           
           {metrics.wardrobeUtilization > 80 && (
             <View style={styles.insightItem}>
-              <Ionicons name="star" size={16} color={APP_THEME_V2.colors.warning} />
+              <Ionicons name="star" size={16} color={DesignSystem.colors.warning[500]} />
               <Text style={styles.insightText}>
                 Excellent wardrobe utilization! You're making great use of what you own.
               </Text>
@@ -276,7 +279,7 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
           
           {metrics.shoppingReductionPercentage > 20 && (
             <View style={styles.insightItem}>
-              <Ionicons name="leaf" size={16} color={APP_THEME_V2.colors.success} />
+              <Ionicons name="leaf" size={16} color={DesignSystem.colors.success[500]} />
               <Text style={styles.insightText}>
                 Amazing! You've significantly reduced shopping by loving what you already have.
               </Text>
@@ -285,7 +288,7 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
           
           {metrics.totalOutfitsRated < 10 && (
             <View style={styles.insightItem}>
-              <Ionicons name="information-circle" size={16} color={APP_THEME_V2.colors.primary} />
+              <Ionicons name="information-circle" size={16} color={DesignSystem.colors.primary[500]} />
               <Text style={styles.insightText}>
                 Rate more outfits to get better insights and recommendations!
               </Text>
@@ -297,10 +300,10 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: APP_THEME_V2.colors.background,
+    backgroundColor: colors.background.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -310,7 +313,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   errorContainer: {
@@ -321,13 +324,13 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.error,
+    color: colors.semantic.error,
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: APP_THEME_V2.colors.primary,
+    backgroundColor: colors.primary[500],
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -346,13 +349,13 @@ const styles = StyleSheet.create({
   noDataTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginTop: 16,
     marginBottom: 8,
   },
   noDataText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -363,15 +366,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
   },
   mainMetricContainer: {
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 16,
@@ -393,7 +396,7 @@ const styles = StyleSheet.create({
   },
   scoreLabel: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
   },
   improvementContainer: {
     flexDirection: 'row',
@@ -413,7 +416,7 @@ const styles = StyleSheet.create({
   },
   metricCard: {
     width: '48%',
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -422,13 +425,13 @@ const styles = StyleSheet.create({
   metricValue: {
     fontSize: 24,
     fontWeight: '700',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginTop: 8,
     marginBottom: 4,
   },
   metricLabel: {
     fontSize: 12,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   itemsSection: {
@@ -437,13 +440,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginHorizontal: 20,
     marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     marginHorizontal: 20,
     marginBottom: 16,
   },
@@ -458,7 +461,7 @@ const styles = StyleSheet.create({
   itemImagePlaceholder: {
     width: 80,
     height: 80,
-    backgroundColor: APP_THEME_V2.colors.border,
+    backgroundColor: colors.border.primary,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -467,7 +470,7 @@ const styles = StyleSheet.create({
   itemCategory: {
     fontSize: 12,
     fontWeight: '500',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     textAlign: 'center',
     marginBottom: 4,
   },
@@ -481,7 +484,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginHorizontal: 1,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.border,
+    borderColor: colors.border.primary,
   },
   insightsContainer: {
     marginHorizontal: 20,
@@ -493,14 +496,14 @@ const styles = StyleSheet.create({
   insightItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
   },
   insightText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginLeft: 12,
     flex: 1,
     lineHeight: 20,

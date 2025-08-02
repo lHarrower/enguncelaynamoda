@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ULTRA_PREMIUM_THEME } from '../../constants/UltraPremiumTheme';
+import { DesignSystem } from '../../theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Animated, {
@@ -240,7 +240,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
         {/* Like Indicator */}
         <Animated.View style={[styles.likeIndicator, likeStyle]}>
           <View style={styles.likeLabel}>
-            <Ionicons name="heart" size={32} color={ULTRA_PREMIUM_THEME.semantic.status.success} />
+            <Ionicons name="heart" size={32} color={DesignSystem.colors.success[500]} />
             <Text style={styles.likeText}>LOVE</Text>
           </View>
         </Animated.View>
@@ -248,7 +248,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
         {/* Dislike Indicator */}
         <Animated.View style={[styles.dislikeIndicator, dislikeStyle]}>
           <View style={styles.dislikeLabel}>
-            <Ionicons name="close" size={32} color={ULTRA_PREMIUM_THEME.semantic.status.error} />
+            <Ionicons name="close" size={32} color={DesignSystem.colors.error[500]} />
             <Text style={styles.dislikeText}>PASS</Text>
           </View>
         </Animated.View>
@@ -285,7 +285,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
 
         {/* Long Press Hint */}
         <View style={styles.longPressHint}>
-          <Ionicons name="hand-left-outline" size={16} color={ULTRA_PREMIUM_THEME.semantic.text.inverse} />
+          <Ionicons name="hand-left-outline" size={16} color={DesignSystem.colors.text.inverse} />
           <Text style={styles.hintText}>Hold to explore similar</Text>
         </View>
       </Animated.View>
@@ -297,9 +297,9 @@ const styles = StyleSheet.create({
   card: {
     width: width - 40,
     height: height * 0.75,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.xl,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.primary,
-    ...ULTRA_PREMIUM_THEME.elevation.medium,
+    borderRadius: DesignSystem.radius.xl,
+    backgroundColor: DesignSystem.colors.background.primary,
+    ...DesignSystem.elevation.medium,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -332,14 +332,14 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   likeText: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.inverse,
     fontWeight: '700',
     marginTop: 4,
   },
   dislikeText: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.inverse,
     fontWeight: '700',
     marginTop: 4,
   },
@@ -353,15 +353,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     left: 20,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.status.error,
+    backgroundColor: DesignSystem.colors.error[500],
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     zIndex: 5,
   },
   discountText: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.inverse,
     fontWeight: '700',
   },
   infoGradient: {
@@ -376,13 +376,13 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   brandName: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.colors.champagne[500],
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.gold[500],
     marginBottom: 4,
   },
   productTitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.h3,
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.scale.h3,
+    color: DesignSystem.colors.text.inverse,
     marginBottom: 8,
   },
   priceContainer: {
@@ -391,21 +391,21 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   currentPrice: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body1,
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.inverse,
     fontSize: 20,
     fontWeight: '600',
     marginRight: 8,
   },
   originalPrice: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body2,
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.text.inverse,
     textDecorationLine: 'line-through',
     opacity: 0.7,
   },
   boutiqueName: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body2,
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.text.inverse,
     opacity: 0.8,
   },
   
@@ -422,8 +422,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   hintText: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.inverse,
     marginLeft: 6,
     fontSize: 10,
   },

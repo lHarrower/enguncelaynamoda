@@ -13,7 +13,7 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ARTISTRY_THEME } from '../../constants/ArtistryTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface KineticTypographyProps {
   children: string;
@@ -47,19 +47,19 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
   const getTypographyStyle = () => {
     switch (variant) {
       case 'poetry':
-        return ARTISTRY_THEME.typography.scale.poetry;
+        return DesignSystem.typography.h1;
       case 'gallery':
-        return ARTISTRY_THEME.typography.scale.gallery;
+        return DesignSystem.typography.h2;
       case 'whisper':
-        return ARTISTRY_THEME.typography.scale.whisper;
+        return DesignSystem.typography.caption;
       case 'statement':
-        return ARTISTRY_THEME.typography.scale.statement;
+        return DesignSystem.typography.h1;
       case 'elegant':
-        return ARTISTRY_THEME.typography.scale.elegant;
+        return DesignSystem.typography.body;
       case 'kinetic':
-        return ARTISTRY_THEME.typography.scale.kinetic;
+        return DesignSystem.typography.h3;
       default:
-        return ARTISTRY_THEME.typography.scale.elegant;
+        return DesignSystem.typography.body;
     }
   };
 
@@ -67,19 +67,19 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
   const getTextColor = () => {
     switch (variant) {
       case 'poetry':
-        return ARTISTRY_THEME.semantic.text.poetry;
+        return DesignSystem.colors.text.primary;
       case 'gallery':
-        return ARTISTRY_THEME.semantic.text.primary;
+        return DesignSystem.colors.text.primary;
       case 'whisper':
-        return ARTISTRY_THEME.semantic.text.whisper;
+        return DesignSystem.colors.text.tertiary;
       case 'statement':
-        return ARTISTRY_THEME.semantic.text.primary;
+        return DesignSystem.colors.text.primary;
       case 'elegant':
-        return ARTISTRY_THEME.semantic.text.primary;
+        return DesignSystem.colors.text.primary;
       case 'kinetic':
-        return ARTISTRY_THEME.semantic.text.accent;
+        return DesignSystem.colors.text.accent;
       default:
-        return ARTISTRY_THEME.semantic.text.primary;
+        return DesignSystem.colors.text.primary;
     }
   };
 
@@ -251,7 +251,7 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
                     <LinearGradient
                       colors={[
                         'transparent',
-                        ARTISTRY_THEME.colors.liquidGold.glow,
+                        DesignSystem.colors.sage[400],
                         'transparent',
                       ]}
                       start={{ x: 0, y: 0 }}

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Notifications from 'expo-notifications';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -56,7 +56,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={[APP_THEME_V2.colors.linen.light, APP_THEME_V2.colors.linen.base]}
+        colors={[DesignSystem.colors.background.secondary, DesignSystem.colors.background.primary]}
         style={styles.gradient}
       >
         <View style={styles.content}>
@@ -69,7 +69,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
                 <Ionicons 
                   name="notifications" 
                   size={64} 
-                  color={APP_THEME_V2.colors.sageGreen[600]} 
+                  color={DesignSystem.colors.sage[600]} 
                 />
               </BlurView>
             </View>
@@ -93,7 +93,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
                     <Ionicons 
                       name="time" 
                       size={24} 
-                      color={APP_THEME_V2.colors.sageGreen[600]} 
+                      color={DesignSystem.colors.sage[600]} 
                     />
                   </View>
                   <View style={styles.benefitContent}>
@@ -109,7 +109,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
                     <Ionicons 
                       name="heart" 
                       size={24} 
-                      color={APP_THEME_V2.colors.liquidGold[600]} 
+                      color={DesignSystem.colors.gold[600]} 
                     />
                   </View>
                   <View style={styles.benefitContent}>
@@ -125,7 +125,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
                     <Ionicons 
                       name="flash" 
                       size={24} 
-                      color={APP_THEME_V2.colors.sageGreen[600]} 
+                      color={DesignSystem.colors.sage[600]} 
                     />
                   </View>
                   <View style={styles.benefitContent}>
@@ -141,7 +141,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
                     <Ionicons 
                       name="trending-up" 
                       size={24} 
-                      color={APP_THEME_V2.colors.liquidGold[600]} 
+                      color={DesignSystem.colors.gold[600]} 
                     />
                   </View>
                   <View style={styles.benefitContent}>
@@ -196,13 +196,13 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
                 disabled={isRequesting}
               >
                 <LinearGradient
-                  colors={[APP_THEME_V2.colors.sageGreen[400], APP_THEME_V2.colors.sageGreen[600]]}
+                  colors={[DesignSystem.colors.sage[400], DesignSystem.colors.sage[600]]}
                   style={styles.enableButtonGradient}
                 >
                   <Ionicons 
                     name="notifications" 
                     size={20} 
-                    color={APP_THEME_V2.semantic.text.inverse}
+                    color={DesignSystem.colors.neutral[50]}
                     style={styles.buttonIcon}
                   />
                   <Text style={styles.enableButtonText}>
@@ -241,17 +241,17 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    paddingTop: APP_THEME_V2.spacing.xl,
-    paddingBottom: APP_THEME_V2.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
     justifyContent: 'space-between',
   },
   heroSection: {
     alignItems: 'center',
-    marginTop: APP_THEME_V2.spacing.xl,
+    marginTop: DesignSystem.spacing.xl,
   },
   iconContainer: {
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   iconBlur: {
     width: 120,
@@ -259,38 +259,38 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.elevation.lift,
   },
   title: {
-    ...APP_THEME_V2.typography.scale.h1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.scale.h1,
+    color: DesignSystem.colors.neutral[900],
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   subtitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.neutral[600],
     textAlign: 'center',
     lineHeight: 24,
   },
   benefitsSection: {
     flex: 1,
     justifyContent: 'center',
-    marginVertical: APP_THEME_V2.spacing.xl,
+    marginVertical: DesignSystem.spacing.xl,
   },
   benefitsCard: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    padding: APP_THEME_V2.spacing.xl,
-    ...APP_THEME_V2.elevation.whisper,
+    borderRadius: DesignSystem.radius.organic,
+    padding: DesignSystem.spacing.xl,
+    ...DesignSystem.elevation.whisper,
   },
   benefitsTitle: {
-    ...APP_THEME_V2.typography.scale.h2,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.neutral[900],
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   benefitsList: {
-    gap: APP_THEME_V2.spacing.lg,
+    gap: DesignSystem.spacing.lg,
   },
   benefitItem: {
     flexDirection: 'row',
@@ -300,75 +300,75 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: APP_THEME_V2.colors.whisperWhite,
+    backgroundColor: DesignSystem.colors.neutral[50],
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: APP_THEME_V2.spacing.md,
-    ...APP_THEME_V2.elevation.whisper,
+    marginRight: DesignSystem.spacing.md,
+    ...DesignSystem.elevation.whisper,
   },
   benefitContent: {
     flex: 1,
   },
   benefitTitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.neutral[900],
     fontWeight: '600',
-    marginBottom: APP_THEME_V2.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   benefitDescription: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.neutral[600],
     lineHeight: 20,
   },
   scheduleSection: {
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   scheduleCard: {
-    borderRadius: APP_THEME_V2.radius.md,
-    padding: APP_THEME_V2.spacing.lg,
+    borderRadius: DesignSystem.radius.md,
+    padding: DesignSystem.spacing.lg,
   },
   scheduleTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.scale.h3,
+    color: DesignSystem.colors.neutral[900],
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   scheduleTimeline: {
-    gap: APP_THEME_V2.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   timelineItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: APP_THEME_V2.spacing.xs,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   timelineTime: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.colors.sageGreen[600],
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.sage[600],
     fontWeight: '600',
     width: 80,
   },
   timelineEvent: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.neutral[600],
     flex: 1,
   },
   actionSection: {
     alignItems: 'center',
   },
   actionText: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.neutral[600],
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   actionButtons: {
     width: '100%',
-    gap: APP_THEME_V2.spacing.md,
-    marginBottom: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   enableButton: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.lift,
+    borderRadius: DesignSystem.radius.organic,
+    ...DesignSystem.elevation.lift,
   },
   enableButtonPressed: {
     transform: [{ scale: 0.98 }],
@@ -377,32 +377,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    paddingVertical: APP_THEME_V2.spacing.lg,
-    borderRadius: APP_THEME_V2.radius.organic,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingVertical: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.radius.organic,
   },
   buttonIcon: {
-    marginRight: APP_THEME_V2.spacing.sm,
+    marginRight: DesignSystem.spacing.sm,
   },
   enableButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.inverse,
+    ...DesignSystem.typography.scale.button,
+    color: DesignSystem.colors.neutral[50],
   },
   skipButton: {
-    paddingVertical: APP_THEME_V2.spacing.md,
+    paddingVertical: DesignSystem.spacing.md,
     alignItems: 'center',
   },
   skipButtonPressed: {
     opacity: 0.7,
   },
   skipButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.scale.button,
+    color: DesignSystem.colors.neutral[400],
   },
   disclaimerText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.neutral[500],
     textAlign: 'center',
-    marginTop: APP_THEME_V2.spacing.sm,
+    marginTop: DesignSystem.spacing.sm,
   },
 });

@@ -17,8 +17,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { Outfit } from '../../data/sanctuaryModels';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { Outfit } from '@/data/sanctuaryModels';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 // Animation configurations for React Native Reanimated
 const SPRING_CONFIG = {
@@ -62,7 +62,7 @@ export const AynaOutfitCardV2: React.FC<AynaOutfitCardV2Props> = ({
     // Adaptive card width with maximum constraints
     const maxCardWidth = isTablet ? 400 : 350;
     const cardWidth = Math.min(
-      screenWidth - (APP_THEME_V2.spacing.xl * 2), 
+      screenWidth - (DesignSystem.spacing.xl * 2), 
       maxCardWidth
     );
     
@@ -156,9 +156,9 @@ export const AynaOutfitCardV2: React.FC<AynaOutfitCardV2Props> = ({
         {/* Base Layer - Subtle gradient background */}
         <LinearGradient
           colors={[
-            APP_THEME_V2.colors.linen.light,
-            APP_THEME_V2.colors.linen.base,
-            APP_THEME_V2.colors.linen.dark,
+            DesignSystem.colors.sage[50],
+            DesignSystem.colors.sage[100],
+            DesignSystem.colors.sage[200],
           ]}
           style={styles.backgroundGradient}
           start={{ x: 0, y: 0 }}
@@ -184,8 +184,8 @@ export const AynaOutfitCardV2: React.FC<AynaOutfitCardV2Props> = ({
             <View style={styles.imageFallback}>
               <LinearGradient
                 colors={[
-                  APP_THEME_V2.colors.cloudGray,
-                  APP_THEME_V2.colors.moonlightSilver,
+                  DesignSystem.colors.sage[200],
+                  DesignSystem.colors.sage[100],
                 ]}
                 style={styles.fallbackGradient}
               >
@@ -193,7 +193,7 @@ export const AynaOutfitCardV2: React.FC<AynaOutfitCardV2Props> = ({
                   <Ionicons 
                     name="shirt-outline" 
                     size={dimensions.isTablet ? 64 : 48} 
-                    color={APP_THEME_V2.colors.inkGray[400]} 
+                    color={DesignSystem.colors.sage[400]} 
                   />
                   <Text style={styles.fallbackText}>
                     {outfit.items.length} pieces
@@ -219,7 +219,7 @@ export const AynaOutfitCardV2: React.FC<AynaOutfitCardV2Props> = ({
                   <Ionicons
                     name={outfit.isFavorite ? 'heart' : 'heart-outline'}
                     size={dimensions.isTablet ? 24 : 20}
-                    color={outfit.isFavorite ? APP_THEME_V2.colors.liquidGold[500] : APP_THEME_V2.colors.inkGray[600]}
+                    color={outfit.isFavorite ? DesignSystem.colors.gold[500] : DesignSystem.colors.sage[600]}
                   />
                 </TouchableOpacity>
               </BlurView>
@@ -277,8 +277,8 @@ export const AynaOutfitCardV2: React.FC<AynaOutfitCardV2Props> = ({
                   <View style={styles.confidenceBar}>
                     <LinearGradient
                       colors={[
-                        APP_THEME_V2.colors.sageGreen[300],
-                        APP_THEME_V2.colors.liquidGold[400],
+                        DesignSystem.colors.sage[300],
+                        DesignSystem.colors.gold[400],
                       ]}
                       style={[
                         styles.confidenceFill,
@@ -311,14 +311,14 @@ const createStyles = (dimensions: {
   cardContainer: {
     width: dimensions.cardWidth,
     height: dimensions.cardHeight,
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
     alignSelf: 'center',
   },
   card: {
     flex: 1,
-    borderRadius: APP_THEME_V2.radius.organic,
+    borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
-    ...APP_THEME_V2.elevation.float,
+    ...DesignSystem.elevation.high,
   },
   backgroundGradient: {
     position: 'absolute',
@@ -354,18 +354,18 @@ const createStyles = (dimensions: {
     opacity: 0.6,
   },
   fallbackText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.colors.inkGray[500],
-    marginTop: APP_THEME_V2.spacing.sm,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
+    marginTop: DesignSystem.spacing.sm,
     fontSize: dimensions.isTablet ? 14 : 12,
   },
   favoriteContainer: {
     position: 'absolute',
-    top: dimensions.isTablet ? APP_THEME_V2.spacing.xl : APP_THEME_V2.spacing.lg,
-    right: dimensions.isTablet ? APP_THEME_V2.spacing.xl : APP_THEME_V2.spacing.lg,
+    top: dimensions.isTablet ? DesignSystem.spacing.xl : DesignSystem.spacing.lg,
+    right: dimensions.isTablet ? DesignSystem.spacing.xl : DesignSystem.spacing.lg,
   },
   favoriteBlur: {
-    borderRadius: APP_THEME_V2.radius.circle,
+    borderRadius: DesignSystem.radius.full,
     overflow: 'hidden',
   },
   favoriteButton: {
@@ -377,21 +377,21 @@ const createStyles = (dimensions: {
   },
   moodTagContainer: {
     position: 'absolute',
-    top: dimensions.isTablet ? APP_THEME_V2.spacing.xl : APP_THEME_V2.spacing.lg,
-    left: dimensions.isTablet ? APP_THEME_V2.spacing.xl : APP_THEME_V2.spacing.lg,
+    top: dimensions.isTablet ? DesignSystem.spacing.xl : DesignSystem.spacing.lg,
+    left: dimensions.isTablet ? DesignSystem.spacing.xl : DesignSystem.spacing.lg,
   },
   moodTagBlur: {
-    borderRadius: APP_THEME_V2.radius.liquid,
+    borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
   },
   moodTag: {
-    paddingHorizontal: dimensions.isTablet ? APP_THEME_V2.spacing.lg : APP_THEME_V2.spacing.md,
-    paddingVertical: dimensions.isTablet ? APP_THEME_V2.spacing.md : APP_THEME_V2.spacing.sm,
+    paddingHorizontal: dimensions.isTablet ? DesignSystem.spacing.lg : DesignSystem.spacing.md,
+    paddingVertical: dimensions.isTablet ? DesignSystem.spacing.md : DesignSystem.spacing.sm,
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
   },
   moodTagText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.colors.inkGray[700],
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.primary,
     textTransform: 'uppercase',
     fontSize: dimensions.isTablet ? 13 : 12,
   },
@@ -410,27 +410,27 @@ const createStyles = (dimensions: {
     justifyContent: 'flex-end',
   },
   whisperContent: {
-    padding: dimensions.isTablet ? APP_THEME_V2.spacing.xxl : APP_THEME_V2.spacing.xl,
-    paddingBottom: dimensions.isTablet ? APP_THEME_V2.spacing.xxxl : APP_THEME_V2.spacing.xxl,
+    padding: dimensions.isTablet ? DesignSystem.spacing.xxl : DesignSystem.spacing.xl,
+    paddingBottom: dimensions.isTablet ? DesignSystem.spacing.xxxl : DesignSystem.spacing.xxl,
   },
   outfitName: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.colors.inkGray[800],
-    marginBottom: APP_THEME_V2.spacing.sm,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.sm,
     fontSize: dimensions.isTablet ? 22 : 20,
   },
   whisperText: {
-    ...APP_THEME_V2.typography.scale.whisper,
-    color: APP_THEME_V2.colors.inkGray[700],
-    marginBottom: APP_THEME_V2.spacing.lg,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.lg,
     lineHeight: dimensions.isTablet ? 26 : 24,
     fontSize: dimensions.isTablet ? 16 : 15,
   },
   itemsPreview: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: APP_THEME_V2.spacing.md,
-    gap: APP_THEME_V2.spacing.xs,
+    marginBottom: DesignSystem.spacing.md,
+    gap: DesignSystem.spacing.xs,
   },
   itemDot: {
     width: dimensions.isTablet ? 28 : 24,
@@ -450,29 +450,29 @@ const createStyles = (dimensions: {
     alignItems: 'center',
   },
   moreItemsText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.colors.inkGray[600],
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
     fontSize: dimensions.isTablet ? 10 : 9,
   },
   confidenceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: APP_THEME_V2.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   confidenceBar: {
     flex: 1,
     height: dimensions.isTablet ? 4 : 3,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: APP_THEME_V2.radius.xs,
+    borderRadius: DesignSystem.radius.sm,
     overflow: 'hidden',
   },
   confidenceFill: {
     height: '100%',
-    borderRadius: APP_THEME_V2.radius.xs,
+    borderRadius: DesignSystem.radius.sm,
   },
   confidenceText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.colors.inkGray[600],
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
     fontSize: dimensions.isTablet ? 11 : 10,
   },
-}); 
+});

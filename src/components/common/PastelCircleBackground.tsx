@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { APP_THEME_V2 } from '@/constants/AppThemeV2';
 
 const { width } = Dimensions.get('window');
 
@@ -51,4 +51,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PastelCircleBackground; 
+export default PastelCircleBackground;

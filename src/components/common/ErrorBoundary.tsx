@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { ULTRA_PREMIUM_THEME } from '../../constants/UltraPremiumTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 
 interface Props {
@@ -57,7 +57,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               <Ionicons 
                 name="warning-outline" 
                 size={48} 
-                color={ULTRA_PREMIUM_THEME.semantic.status.warning} 
+                color={DesignSystem.colors.gold[500]} 
               />
             </View>
             
@@ -93,55 +93,55 @@ export default class ErrorBoundary extends Component<Props, State> {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.background.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   content: {
     alignItems: 'center',
     maxWidth: 300,
   },
   iconContainer: {
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   title: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.h2,
-    color: ULTRA_PREMIUM_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
     fontWeight: '400',
   },
   subtitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body1,
-    color: ULTRA_PREMIUM_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   errorDetails: {
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.sm,
-    padding: ULTRA_PREMIUM_THEME.spacing.md,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.lg,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderRadius: DesignSystem.borderRadius.sm,
+    padding: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.lg,
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.sage[100],
   },
   errorText: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.semantic.text.tertiary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     fontFamily: 'monospace',
   },
   retryButton: {
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.interactive.primary,
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
-    paddingVertical: ULTRA_PREMIUM_THEME.spacing.md,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.sm,
-    ...ULTRA_PREMIUM_THEME.elevation.subtle,
+    backgroundColor: DesignSystem.colors.sage[500],
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.sm,
+    ...DesignSystem.elevation.soft,
   },
   retryButtonText: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.button,
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.scale.button,
+    color: DesignSystem.colors.text.inverse,
     textAlign: 'center',
   },
 });

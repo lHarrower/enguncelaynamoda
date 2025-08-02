@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '../../theme/DesignSystem';
 
 interface VellumCanvasProps {
   children?: React.ReactNode;
@@ -24,21 +24,21 @@ const VellumCanvas: React.FC<VellumCanvasProps> = ({
     switch (variant) {
       case 'warm':
         return [
-          APP_THEME_V2.colors.whisperWhite,
+          DesignSystem.colors.background.elevated,
           '#FAF9F7', // Slightly warmer
-          APP_THEME_V2.colors.moonlightSilver,
+          DesignSystem.colors.sage[100],
         ];
       case 'cool':
         return [
-          APP_THEME_V2.colors.moonlightSilver,
+          DesignSystem.colors.sage[100],
           '#F6F7F8', // Slightly cooler
-          APP_THEME_V2.colors.whisperWhite,
+          DesignSystem.colors.background.elevated,
         ];
       default:
         return [
-          APP_THEME_V2.colors.whisperWhite,
-          APP_THEME_V2.colors.moonlightSilver,
-          APP_THEME_V2.colors.whisperWhite,
+          DesignSystem.colors.background.elevated,
+          DesignSystem.colors.sage[100],
+          DesignSystem.colors.background.elevated,
         ];
     }
   };
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: APP_THEME_V2.colors.moonlightSilver,
+    backgroundColor: DesignSystem.colors.sage[100],
     opacity: 0.15,
   },
   vignette: {
@@ -106,4 +106,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default VellumCanvas; 
+export default VellumCanvas;

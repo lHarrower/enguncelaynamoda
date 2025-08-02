@@ -1,7 +1,7 @@
 // PASTE THIS ENTIRE CODE BLOCK INTO YOUR AuthContext.tsx FILE
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../config/supabaseClient'; // Make sure this path is correct
+import { supabase } from '@/config/supabaseClient'; // Make sure this path is correct
 import { useRouter, useSegments } from 'expo-router';
 import type { Session, User } from '@supabase/supabase-js';
 import * as WebBrowser from 'expo-web-browser';

@@ -18,7 +18,7 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { STUDIO_THEME } from '../../constants/StudioTheme';
+import { DesignSystem } from '../../theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
@@ -83,7 +83,7 @@ const StudioTabBar: React.FC<BottomTabBarProps> = ({
   useEffect(() => {
     // Update active indicator position
     const targetPosition = state.index / (state.routes.length - 1);
-    activeIndicator.value = withSpring(targetPosition, STUDIO_THEME.animations.transition);
+    activeIndicator.value = withSpring(targetPosition, DesignSystem.animations.spring);
 
     // Update tab animations
     tabAnimations.forEach((animation, index) => {
@@ -91,12 +91,12 @@ const StudioTabBar: React.FC<BottomTabBarProps> = ({
       
       animation.scale.value = withSpring(
         isActive ? 1.1 : 1,
-        STUDIO_THEME.animations.interaction
+        DesignSystem.animations.spring
       );
       
       animation.translateY.value = withSpring(
         isActive ? -2 : 0,
-        STUDIO_THEME.animations.interaction
+        DesignSystem.animations.spring
       );
     });
   }, [state.index]);
@@ -160,8 +160,8 @@ const StudioTabBar: React.FC<BottomTabBarProps> = ({
             size={24}
             color={
               isActive
-                ? STUDIO_THEME.colors.accent.jade
-                : STUDIO_THEME.colors.text.tertiary
+                ? DesignSystem.colors.sage[500]
+                : DesignSystem.colors.text.tertiary
             }
           />
           <Text
@@ -169,8 +169,8 @@ const StudioTabBar: React.FC<BottomTabBarProps> = ({
               styles.tabLabel,
               {
                 color: isActive
-                  ? STUDIO_THEME.colors.accent.jade
-                  : STUDIO_THEME.colors.text.tertiary,
+                  ? DesignSystem.colors.sage[500]
+                  : DesignSystem.colors.text.tertiary,
                 fontWeight: isActive ? '600' : '400',
               },
             ]}
@@ -191,8 +191,8 @@ const StudioTabBar: React.FC<BottomTabBarProps> = ({
       <Animated.View style={[styles.activeIndicator, indicatorStyle]}>
         <LinearGradient
           colors={[
-            STUDIO_THEME.colors.accent.jade,
-            STUDIO_THEME.colors.accent.gold,
+            DesignSystem.colors.sage[500],
+            DesignSystem.colors.amber[500],
           ]}
           style={styles.indicatorGradient}
           start={{ x: 0, y: 0 }}
@@ -218,10 +218,10 @@ const styles = StyleSheet.create({
   },
   background: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: STUDIO_THEME.colors.foundation.elevated,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderTopWidth: 1,
-    borderTopColor: STUDIO_THEME.colors.foundation.tertiary,
-    ...STUDIO_THEME.shadows.soft,
+    borderTopColor: DesignSystem.colors.background.tertiary,
+    ...DesignSystem.elevation.soft,
   },
   activeIndicator: {
     position: 'absolute',
@@ -238,22 +238,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingTop: STUDIO_THEME.spacing.md,
-    paddingBottom: STUDIO_THEME.spacing.sm,
-    paddingHorizontal: STUDIO_THEME.spacing.sm,
+    paddingTop: DesignSystem.spacing.md,
+    paddingBottom: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.sm,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: STUDIO_THEME.spacing.sm,
+    paddingVertical: DesignSystem.spacing.sm,
   },
   tabContent: {
     alignItems: 'center',
     justifyContent: 'center',
   },
   tabLabel: {
-    ...STUDIO_THEME.typography.scale.caption,
+    ...DesignSystem.typography.caption,
     fontSize: 11,
     marginTop: 4,
     textAlign: 'center',

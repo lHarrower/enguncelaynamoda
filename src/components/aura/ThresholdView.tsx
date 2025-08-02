@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, ViewStyle, ScrollView, Dimensions, Easing } from 'react-native';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
 
 interface ThresholdViewProps {
   children: React.ReactNode;
@@ -176,4 +175,4 @@ const ThresholdView: React.FC<ThresholdViewProps> = ({
   );
 };
 
-export default ThresholdView; 
+export default ThresholdView;

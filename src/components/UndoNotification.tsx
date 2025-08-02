@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
-import { useTheme } from '../context/ThemeContext';
-import { TAB_BAR_CONTENT_HEIGHT } from '../constants/Layout';
+import { useTheme } from '@/context/ThemeContext';
+import { TAB_BAR_CONTENT_HEIGHT } from '@/constants/Layout';
 
 export type UndoNotificationProps = {
   visible: boolean;
@@ -81,4 +81,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
   },
-}); 
+});

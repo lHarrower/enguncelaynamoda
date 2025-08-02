@@ -1,7 +1,7 @@
 // Intelligence Service - AI-powered Style Learning and Recommendations
 // Implements personalization algorithms for the AYNA Mirror Daily Ritual
 
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
 import {
   WardrobeItem,
   StyleProfile,
@@ -13,7 +13,7 @@ import {
   CalendarContext,
   EmotionalState,
   Outfit
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 
 // ============================================================================
 // COLOR THEORY CONSTANTS

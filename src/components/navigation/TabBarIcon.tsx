@@ -2,8 +2,8 @@ import React from 'react';
 import { type ComponentProps } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { TAB_ICON_SIZE } from '../../constants/Layout';
-import { useTheme } from '../../context/ThemeContext';
+import { TAB_ICON_SIZE } from '@/constants/Layout';
+import { useTheme } from '@/context/ThemeContext';
 
 type IconProps = Omit<ComponentProps<typeof Ionicons>, 'name'> & {
   name: ComponentProps<typeof Ionicons>['name'];
@@ -88,4 +88,4 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     opacity: 0.8,
   },
-}); 
+});

@@ -13,8 +13,8 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { EDITORIAL_THEME } from '../../constants/EditorialTheme';
-import { DailyStylePick } from '../../data/editorialContent';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { DailyStylePick } from '@/data/editorialContent';
 
 const { width: screenWidth } = Dimensions.get('window');
 const cardWidth = screenWidth * 0.8;
@@ -114,11 +114,11 @@ export const StylePickCard: React.FC<StylePickCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: cardWidth,
-    backgroundColor: EDITORIAL_THEME.colors.white,
-    borderRadius: EDITORIAL_THEME.borderRadius.lg,
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderRadius: DesignSystem.borderRadius.lg,
     overflow: 'hidden',
-    ...EDITORIAL_THEME.shadows.soft,
-    marginBottom: EDITORIAL_THEME.spacing.md,
+    ...DesignSystem.elevation.small,
+    marginBottom: DesignSystem.spacing.md,
   },
   imageContainer: {
     position: 'relative',
@@ -138,19 +138,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     left: 12,
-    backgroundColor: EDITORIAL_THEME.colors.gold[500],
+    backgroundColor: DesignSystem.colors.gold[500],
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: EDITORIAL_THEME.borderRadius.sm,
+    borderRadius: DesignSystem.borderRadius.sm,
   },
   saleText: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.xs,
+    ...DesignSystem.typography.scale.caption,
     fontFamily: 'Inter_600SemiBold',
-    color: EDITORIAL_THEME.colors.white,
+    color: DesignSystem.colors.text.inverse,
     letterSpacing: 0.5,
   },
   content: {
-    padding: EDITORIAL_THEME.spacing.lg,
+    padding: DesignSystem.spacing.lg,
   },
   header: {
     flexDirection: 'row',
@@ -159,30 +159,28 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   brand: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.sm,
+    ...DesignSystem.typography.scale.body2,
     fontFamily: 'Inter_500Medium',
-    color: EDITORIAL_THEME.colors.text.primary,
+    color: DesignSystem.colors.text.primary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   category: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.xs,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.muted,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   title: {
-    fontSize: EDITORIAL_THEME.typography.serif.sizes.xl,
-    fontFamily: EDITORIAL_THEME.typography.serif.family,
-    color: EDITORIAL_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.h2,
+    fontFamily: DesignSystem.typography.serif.family,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 8,
     lineHeight: 28,
   },
   description: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.secondary,
     lineHeight: 22,
     marginBottom: 16,
   },
@@ -192,14 +190,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   price: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.lg,
+    ...DesignSystem.typography.scale.h3,
     fontFamily: 'Inter_600SemiBold',
-    color: EDITORIAL_THEME.colors.text.primary,
+    color: DesignSystem.colors.text.primary,
   },
   originalPrice: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.muted,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.tertiary,
     textDecorationLine: 'line-through',
     marginLeft: 8,
   },
@@ -209,16 +206,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   tag: {
-    backgroundColor: EDITORIAL_THEME.colors.lilac[50],
+    backgroundColor: DesignSystem.colors.sage[50],
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: EDITORIAL_THEME.borderRadius.full,
+    borderRadius: DesignSystem.borderRadius.full,
     borderWidth: 1,
-    borderColor: EDITORIAL_THEME.colors.lilac[200],
+    borderColor: DesignSystem.colors.sage[200],
   },
   tagText: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.xs,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.lilac[700],
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.sage[700],
   },
 });

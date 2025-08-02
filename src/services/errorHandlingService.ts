@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { DailyRecommendations, OutfitRecommendation, WeatherContext, WardrobeItem } from '../types/aynaMirror';
-import { PerformanceOptimizationService } from './performanceOptimizationService';
+import { DailyRecommendations, OutfitRecommendation, WeatherContext, WardrobeItem } from '@/types/aynaMirror';
+import { PerformanceOptimizationService } from '@/services/performanceOptimizationService';
 
 export interface ErrorRecoveryOptions {
   maxRetries: number;

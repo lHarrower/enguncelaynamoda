@@ -3,7 +3,7 @@
 import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ERROR_MESSAGES } from '../constants/AppConstants';
+import { ERROR_MESSAGES } from '@/constants/AppConstants';
 
 // Environment variables
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;

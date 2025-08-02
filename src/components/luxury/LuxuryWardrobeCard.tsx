@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
-const cardWidth = (screenWidth - APP_THEME_V2.spacing.lg * 2 - APP_THEME_V2.spacing.md) / 2;
+const cardWidth = (screenWidth - DesignSystem.spacing.lg * 2 - DesignSystem.spacing.md) / 2;
 
 interface WardrobeItem {
   id: string;
@@ -104,11 +104,11 @@ const LuxuryWardrobeCard: React.FC<LuxuryWardrobeCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: cardWidth,
-    backgroundColor: APP_THEME_V2.semantic.surface,
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.lift,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderRadius: DesignSystem.borderRadius.lg,
+    ...DesignSystem.elevation.high,
     overflow: 'hidden',
-    marginBottom: APP_THEME_V2.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   imageContainer: {
     width: '100%',
@@ -125,52 +125,49 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: APP_THEME_V2.colors.moonlightSilver,
+    backgroundColor: DesignSystem.colors.sage[100],
     opacity: 0.1,
   },
   likeButton: {
     position: 'absolute',
-    top: APP_THEME_V2.spacing.sm,
-    right: APP_THEME_V2.spacing.sm,
+    top: DesignSystem.spacing.sm,
+    right: DesignSystem.spacing.sm,
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.secondary,
     justifyContent: 'center',
     alignItems: 'center',
-    ...APP_THEME_V2.elevation.whisper,
+    ...DesignSystem.elevation.medium,
   },
   likeIcon: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.zenGold,
+    color: DesignSystem.colors.sage[500],
   },
   content: {
-    padding: APP_THEME_V2.spacing.md,
+    padding: DesignSystem.spacing.md,
   },
   itemName: {
-    ...APP_THEME_V2.typography.scale.body1,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
-    color: APP_THEME_V2.semantic.text.primary,
-    marginBottom: APP_THEME_V2.spacing.xs,
+    ...DesignSystem.typography.body.large,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.xs,
   },
   metaContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   category: {
-    ...APP_THEME_V2.typography.scale.caption,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
-    color: APP_THEME_V2.colors.tranquilBlue,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.sage[600],
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     flex: 1,
   },
   brand: {
-    ...APP_THEME_V2.typography.scale.caption,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.secondary,
     fontStyle: 'italic',
   },
   colorContainer: {
@@ -181,16 +178,15 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    marginRight: APP_THEME_V2.spacing.xs,
+    marginRight: DesignSystem.spacing.xs,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.moonlightSilver,
+    borderColor: DesignSystem.colors.sage[200],
   },
   colorText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.secondary,
     textTransform: 'capitalize',
   },
 });
 
-export default LuxuryWardrobeCard; 
+export default LuxuryWardrobeCard;

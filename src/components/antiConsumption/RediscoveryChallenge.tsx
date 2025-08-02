@@ -9,9 +9,10 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import { antiConsumptionService, RediscoveryChallenge as RediscoveryChallengeType } from '../../services/antiConsumptionService';
-import { WardrobeItem } from '../../types';
+import { useTheme } from '@/theme/ThemeProvider';
+import { antiConsumptionService, RediscoveryChallenge as RediscoveryChallengeType } from '@/services/antiConsumptionService';
+import { WardrobeItem } from '@/types';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface RediscoveryChallengeProps {
   userId: string;
@@ -26,6 +27,8 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
   onChallengeComplete,
   onItemWorn,
 }) => {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [challenge, setChallenge] = useState<RediscoveryChallengeType | null>(initialChallenge || null);
   const [loading, setLoading] = useState(!initialChallenge);
   const [error, setError] = useState<string | null>(null);
@@ -108,13 +111,13 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
   const getChallengeColor = (type: RediscoveryChallengeType['challengeType']): string => {
     switch (type) {
       case 'neglected_items':
-        return APP_THEME_V2.colors.primary;
+        return DesignSystem.colors.primary[500];
       case 'color_exploration':
-        return APP_THEME_V2.colors.warning;
+        return DesignSystem.colors.warning[500];
       case 'style_mixing':
-        return APP_THEME_V2.colors.success;
+        return DesignSystem.colors.success[500];
       default:
-        return APP_THEME_V2.colors.primary;
+        return DesignSystem.colors.primary[500];
     }
   };
 
@@ -145,7 +148,7 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
     return (
       <View style={styles.container}>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color={APP_THEME_V2.colors.error} />
+          <Ionicons name="alert-circle-outline" size={48} color={DesignSystem.colors.error[500]} />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={createNewChallenge}>
             <Text style={styles.retryButtonText}>Try Again</Text>
@@ -159,7 +162,7 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
     return (
       <View style={styles.container}>
         <View style={styles.noChallengeContainer}>
-          <Ionicons name="checkmark-circle-outline" size={48} color={APP_THEME_V2.colors.success} />
+          <Ionicons name="checkmark-circle-outline" size={48} color={DesignSystem.colors.success[500]} />
           <Text style={styles.noChallengeTitle}>All Caught Up!</Text>
           <Text style={styles.noChallengeText}>
             You're doing great with your wardrobe utilization. Keep up the good work!
@@ -210,7 +213,7 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
 
       {!isCompleted && (
         <View style={styles.timeContainer}>
-          <Ionicons name="time-outline" size={16} color={APP_THEME_V2.colors.textSecondary} />
+          <Ionicons name="time-outline" size={16} color={DesignSystem.colors.neutral[600]} />
           <Text style={styles.timeText}>
             {daysRemaining} day{daysRemaining !== 1 ? 's' : ''} remaining
           </Text>
@@ -219,7 +222,7 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
 
       {isCompleted && (
         <View style={styles.completedContainer}>
-          <Ionicons name="trophy-outline" size={20} color={APP_THEME_V2.colors.success} />
+          <Ionicons name="trophy-outline" size={20} color={DesignSystem.colors.success[500]} />
           <Text style={styles.completedText}>Challenge Completed!</Text>
           <Text style={styles.rewardText}>{challenge.reward}</Text>
         </View>
@@ -293,10 +296,10 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: APP_THEME_V2.colors.background,
+    backgroundColor: colors.background.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -306,7 +309,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   errorContainer: {
@@ -317,13 +320,13 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.error,
+    color: colors.semantic.error,
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: APP_THEME_V2.colors.primary,
+    backgroundColor: colors.primary[500],
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -342,13 +345,13 @@ const styles = StyleSheet.create({
   noChallengeTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginTop: 16,
     marginBottom: 8,
   },
   noChallengeText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -367,13 +370,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginBottom: 8,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -390,16 +393,16 @@ const styles = StyleSheet.create({
   progressLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
   },
   progressText: {
     fontSize: 16,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
   },
   progressBar: {
     height: 8,
-    backgroundColor: APP_THEME_V2.colors.border,
+    backgroundColor: colors.border.primary,
     borderRadius: 4,
     overflow: 'hidden',
     marginBottom: 8,
@@ -410,7 +413,7 @@ const styles = StyleSheet.create({
   },
   progressPercentage: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   timeContainer: {
@@ -421,11 +424,11 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     marginLeft: 4,
   },
   completedContainer: {
-    backgroundColor: `${APP_THEME_V2.colors.success}20`,
+    backgroundColor: `${colors.semantic.success}20`,
     marginHorizontal: 20,
     padding: 16,
     borderRadius: 12,
@@ -435,13 +438,13 @@ const styles = StyleSheet.create({
   completedText: {
     fontSize: 18,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.success,
+    color: colors.semantic.success,
     marginTop: 8,
     marginBottom: 4,
   },
   rewardText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.success,
+    color: colors.semantic.success,
     textAlign: 'center',
   },
   itemsContainer: {
@@ -451,7 +454,7 @@ const styles = StyleSheet.create({
   itemsTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginBottom: 16,
   },
   itemsGrid: {
@@ -461,7 +464,7 @@ const styles = StyleSheet.create({
   },
   itemCard: {
     width: '48%',
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     marginBottom: 16,
     overflow: 'hidden',
@@ -472,18 +475,18 @@ const styles = StyleSheet.create({
   },
   itemCardCompleted: {
     borderWidth: 2,
-    borderColor: APP_THEME_V2.colors.success,
+    borderColor: colors.semantic.success,
   },
   itemImage: {
     width: '100%',
     height: 120,
-    backgroundColor: APP_THEME_V2.colors.border,
+    backgroundColor: colors.border.primary,
   },
   wornOverlay: {
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: APP_THEME_V2.colors.success,
+    backgroundColor: colors.semantic.success,
     borderRadius: 12,
     padding: 4,
   },
@@ -493,11 +496,11 @@ const styles = StyleSheet.create({
   itemCategory: {
     fontSize: 14,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginBottom: 4,
   },
   itemCategoryWorn: {
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
   },
   itemColors: {
     flexDirection: 'row',
@@ -509,21 +512,21 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginRight: 4,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.border,
+    borderColor: colors.border.primary,
   },
   colorDotWorn: {
     opacity: 0.6,
   },
   itemTags: {
     fontSize: 12,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
   },
   itemTagsWorn: {
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     opacity: 0.6,
   },
   encouragementContainer: {
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     marginHorizontal: 20,
     padding: 16,
     borderRadius: 12,
@@ -531,7 +534,7 @@ const styles = StyleSheet.create({
   },
   encouragementText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     textAlign: 'center',
     lineHeight: 24,
   },

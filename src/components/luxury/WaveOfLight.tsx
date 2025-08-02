@@ -8,7 +8,7 @@ import Animated, {
   withSequence,
   Easing,
 } from 'react-native-reanimated';
-import { LuxuryMaterials, LuxuryMotion } from '../../theme/AppThemeV2';
+import { LuxuryMaterials, LuxuryMotion } from '@/theme/AppThemeV2';
 
 interface WaveOfLightProps {
   isActive: boolean;
@@ -149,4 +149,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WaveOfLight; 
+export default WaveOfLight;

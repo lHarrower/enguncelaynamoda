@@ -1,5 +1,5 @@
 import React from 'react';
-import { EditorialDemoWrapper } from '../components/editorial';
+import { EditorialDemoWrapper } from '@/components/editorial';
 
 /**
  * Editorial Demo Screen

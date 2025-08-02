@@ -1,6 +1,6 @@
 import React from 'react';
 import { router } from 'expo-router';
-import StudioHomeScreen from '../../components/studio/StudioHomeScreen';
+import StudioHomeScreen from '@/components/studio/StudioHomeScreen';
 
 export default function HomeScreen() {
   const handleNavigateToWardrobe = () => {

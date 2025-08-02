@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import { ULTRA_PREMIUM_THEME } from '../../constants/UltraPremiumTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -120,46 +120,46 @@ const UltraPremiumLoadingScreen: React.FC<UltraPremiumLoadingScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.background.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
   content: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.massive,
+    marginBottom: DesignSystem.spacing.xxxl,
   },
   logoBackground: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
+    backgroundColor: DesignSystem.colors.background.elevated,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.sage[100],
   },
   logoCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.text.primary,
+    backgroundColor: DesignSystem.colors.text.primary,
   },
   logoText: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.display,
-    color: ULTRA_PREMIUM_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.hero,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '300',
     letterSpacing: 3,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   logoSubtext: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
@@ -167,10 +167,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingMessage: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body1,
-    color: ULTRA_PREMIUM_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   progressContainer: {
     alignItems: 'center',
@@ -179,29 +179,29 @@ const styles = StyleSheet.create({
   progressTrack: {
     width: '100%',
     height: 2,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    backgroundColor: DesignSystem.colors.sage[100],
     borderRadius: 1,
     overflow: 'hidden',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   progressBar: {
     height: '100%',
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.text.primary,
+    backgroundColor: DesignSystem.colors.text.primary,
     borderRadius: 1,
   },
   progressText: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    color: ULTRA_PREMIUM_THEME.semantic.text.tertiary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
   },
   dotsContainer: {
     flexDirection: 'row',
-    gap: ULTRA_PREMIUM_THEME.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   dot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.text.primary,
+    backgroundColor: DesignSystem.colors.text.primary,
   },
 });
 

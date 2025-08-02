@@ -1,9 +1,9 @@
 // AYNA Mirror Settings Screen - Integrated with expo-router
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
-import AynaMirrorSettingsScreen from '../screens/AynaMirrorSettingsScreen';
+import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/context/ThemeContext';
+import AynaMirrorSettingsScreen from '@/screens/AynaMirrorSettingsScreen';
 import { Redirect, useRouter } from 'expo-router';
 
 export default function AynaMirrorSettingsPage() {

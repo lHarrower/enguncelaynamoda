@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import { ULTRA_PREMIUM_THEME } from '../../constants/UltraPremiumTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { 
   useSharedValue, 
@@ -124,13 +124,13 @@ const UltraPremiumTabBar: React.FC<UltraPremiumTabBarProps> = ({ state, descript
           <Ionicons
             name={tab.icon}
             size={20}
-            color={isActive ? ULTRA_PREMIUM_THEME.semantic.text.primary : ULTRA_PREMIUM_THEME.semantic.text.tertiary}
+            color={isActive ? DesignSystem.colors.text.primary : DesignSystem.colors.text.tertiary}
           />
           <Text
             style={[
               styles.tabLabel,
               {
-                color: isActive ? ULTRA_PREMIUM_THEME.semantic.text.primary : ULTRA_PREMIUM_THEME.semantic.text.tertiary,
+                color: isActive ? DesignSystem.colors.text.primary : DesignSystem.colors.text.tertiary,
               },
             ]}
           >
@@ -161,38 +161,38 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   tabBar: {
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
     borderTopWidth: 1,
-    borderTopColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
-    paddingTop: ULTRA_PREMIUM_THEME.spacing.md,
-    paddingBottom: ULTRA_PREMIUM_THEME.spacing.sm,
+    borderTopColor: DesignSystem.colors.border.secondary,
+    paddingTop: DesignSystem.spacing.md,
+    paddingBottom: DesignSystem.spacing.sm,
   },
   tabsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.sm,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: ULTRA_PREMIUM_THEME.spacing.sm,
+    paddingVertical: DesignSystem.spacing.sm,
   },
   tabContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: ULTRA_PREMIUM_THEME.spacing.xs,
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.sm,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.sm,
+    paddingVertical: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    borderRadius: DesignSystem.radius.sm,
     minWidth: 60,
   },
   tabContentActive: {
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
+    backgroundColor: DesignSystem.colors.background.secondary,
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.border.secondary,
   },
   tabLabel: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.caption,
-    marginTop: ULTRA_PREMIUM_THEME.spacing.xs,
+    ...DesignSystem.typography.scale.caption,
+    marginTop: DesignSystem.spacing.xs,
     fontSize: 10,
     letterSpacing: 0.5,
     textAlign: 'center',

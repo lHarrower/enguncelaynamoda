@@ -20,7 +20,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ARTISTRY_THEME } from '../../constants/ArtistryTheme';
+import { DesignSystem } from '../../theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
@@ -168,7 +168,7 @@ const ArtistryTabBar: React.FC<BottomTabBarProps> = ({
           <Animated.View style={[styles.tabGlow, glowStyle]}>
             <LinearGradient
               colors={[
-                ARTISTRY_THEME.colors.liquidGold.glow,
+                DesignSystem.colors.sage[400],
                 'transparent',
               ]}
               style={styles.glowGradient}
@@ -182,8 +182,8 @@ const ArtistryTabBar: React.FC<BottomTabBarProps> = ({
               size={24}
               color={
                 isActive
-                  ? ARTISTRY_THEME.semantic.text.accent
-                  : ARTISTRY_THEME.semantic.text.whisper
+                  ? DesignSystem.colors.text.accent
+        : DesignSystem.colors.text.tertiary
               }
             />
           </View>
@@ -194,8 +194,8 @@ const ArtistryTabBar: React.FC<BottomTabBarProps> = ({
               styles.tabLabel,
               {
                 color: isActive
-                  ? ARTISTRY_THEME.semantic.text.accent
-                  : ARTISTRY_THEME.semantic.text.whisper,
+                  ? DesignSystem.colors.text.accent
+        : DesignSystem.colors.text.tertiary,
               },
             ]}
           >
@@ -224,7 +224,7 @@ const ArtistryTabBar: React.FC<BottomTabBarProps> = ({
         <LinearGradient
           colors={[
             'transparent',
-            ARTISTRY_THEME.colors.liquidGold.glow,
+            DesignSystem.colors.sage[400],
             'transparent',
           ]}
           start={{ x: 0, y: 0 }}
@@ -251,19 +251,19 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 90,
-    marginHorizontal: ARTISTRY_THEME.spacing.flow,
-    marginBottom: ARTISTRY_THEME.spacing.flow,
-    borderRadius: ARTISTRY_THEME.radius.organic,
+    marginHorizontal: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
-    ...ARTISTRY_THEME.components.panel.default,
+    ...DesignSystem.elevation.soft,
   },
   blur: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: ARTISTRY_THEME.radius.organic,
+    borderRadius: DesignSystem.radius.lg,
   },
   backgroundGradient: {
     flex: 1,
-    borderRadius: ARTISTRY_THEME.radius.organic,
+    borderRadius: DesignSystem.radius.lg,
   },
   activeIndicator: {
     position: 'absolute',
@@ -281,14 +281,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingHorizontal: ARTISTRY_THEME.spacing.gentle,
-    paddingTop: ARTISTRY_THEME.spacing.whisper,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingTop: DesignSystem.spacing.xs,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: ARTISTRY_THEME.spacing.gentle,
+    paddingVertical: DesignSystem.spacing.md,
   },
   tabContent: {
     alignItems: 'center',
@@ -308,10 +308,10 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   iconContainer: {
-    marginBottom: ARTISTRY_THEME.spacing.breath,
+    marginBottom: DesignSystem.spacing.xs,
   },
   tabLabel: {
-    ...ARTISTRY_THEME.typography.scale.floating,
+    ...DesignSystem.typography.caption,
     fontSize: 10,
     textAlign: 'center',
   },
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 1,
-    backgroundColor: ARTISTRY_THEME.colors.ethereal.ghost,
+    backgroundColor: DesignSystem.colors.sage[200],
     opacity: 0.3,
   },
 });

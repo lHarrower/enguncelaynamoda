@@ -15,9 +15,9 @@ import Animated, {
   interpolate,
   Extrapolate,
 } from 'react-native-reanimated';
-import { EDITORIAL_THEME } from '../../constants/EditorialTheme';
-import { StylePickCard } from './StylePickCard';
-import { DailyStylePick } from '../../data/editorialContent';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { StylePickCard } from '@/components/editorial/StylePickCard';
+import { DailyStylePick } from '@/data/editorialContent';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const cardWidth = screenWidth * 0.8;
@@ -220,14 +220,14 @@ const styles = StyleSheet.create({
   },
   leftIndicator: {
     left: 20,
-    backgroundColor: EDITORIAL_THEME.colors.lilac[100],
+    backgroundColor: DesignSystem.colors.sage[100],
     borderWidth: 2,
-    borderColor: EDITORIAL_THEME.colors.lilac[300],
+    borderColor: DesignSystem.colors.sage[300],
   },
   rightIndicator: {
     right: 20,
-    backgroundColor: EDITORIAL_THEME.colors.gold[100],
+    backgroundColor: DesignSystem.colors.gold[100],
     borderWidth: 2,
-    borderColor: EDITORIAL_THEME.colors.gold[300],
+    borderColor: DesignSystem.colors.gold[300],
   },
 });

@@ -1,5 +1,5 @@
-import { WardrobeItem, getWardrobeItems } from './wardrobeService';
-import { supabase } from '../config/supabaseClient';
+import { WardrobeItem, getWardrobeItems } from '@/services/wardrobeService';
+import { supabase } from '@/config/supabaseClient';
 
 export interface ShopYourClosetRecommendation {
   id: string;

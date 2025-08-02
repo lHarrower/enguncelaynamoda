@@ -8,8 +8,9 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import { antiConsumptionService, ShoppingBehaviorData } from '../../services/antiConsumptionService';
+import { useTheme } from '@/theme/ThemeProvider';
+import { antiConsumptionService, ShoppingBehaviorData } from '@/services/antiConsumptionService';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ShoppingBehaviorTrackerProps {
   userId: string;
@@ -20,6 +21,8 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
   userId,
   onBehaviorTracked,
 }) => {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [behaviorData, setBehaviorData] = useState<ShoppingBehaviorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,10 +64,10 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
   };
 
   const getReductionColor = (percentage: number): string => {
-    if (percentage > 50) return APP_THEME_V2.colors.success;
-    if (percentage > 20) return APP_THEME_V2.colors.warning;
-    if (percentage > 0) return APP_THEME_V2.colors.primary;
-    return APP_THEME_V2.colors.error;
+    if (percentage > 50) return DesignSystem.colors.success[500];
+    if (percentage > 20) return DesignSystem.colors.warning[500];
+    if (percentage > 0) return DesignSystem.colors.primary[500];
+    return DesignSystem.colors.error[500];
   };
 
   const getReductionIcon = (percentage: number): string => {
@@ -111,7 +114,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
     return (
       <View style={styles.container}>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color={APP_THEME_V2.colors.error} />
+          <Ionicons name="alert-circle-outline" size={48} color={DesignSystem.colors.error[500]} />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={loadBehaviorData}>
             <Text style={styles.retryButtonText}>Try Again</Text>
@@ -125,7 +128,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
     return (
       <View style={styles.container}>
         <View style={styles.noDataContainer}>
-          <Ionicons name="bag-outline" size={48} color={APP_THEME_V2.colors.textSecondary} />
+          <Ionicons name="bag-outline" size={48} color={DesignSystem.colors.neutral[600]} />
           <Text style={styles.noDataTitle}>No Shopping Data</Text>
           <Text style={styles.noDataText}>
             Start tracking your purchases to see your mindful shopping progress!
@@ -143,7 +146,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View style={styles.iconContainer}>
-          <Ionicons name="leaf-outline" size={24} color={APP_THEME_V2.colors.success} />
+          <Ionicons name="leaf-outline" size={24} color={DesignSystem.colors.success[500]} />
         </View>
         <Text style={styles.title}>Mindful Shopping</Text>
         <Text style={styles.subtitle}>Your sustainable fashion journey</Text>
@@ -203,7 +206,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
       {behaviorData.totalSavings > 0 && (
         <View style={styles.savingsContainer}>
           <View style={styles.savingsHeader}>
-            <Ionicons name="wallet-outline" size={20} color={APP_THEME_V2.colors.success} />
+            <Ionicons name="wallet-outline" size={20} color={DesignSystem.colors.success[500]} />
             <Text style={styles.savingsTitle}>Money Saved</Text>
           </View>
           <Text style={styles.savingsAmount}>{formatCurrency(behaviorData.totalSavings)}</Text>
@@ -219,35 +222,35 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
         <View style={styles.achievementsList}>
           {behaviorData.streakDays >= 7 && (
             <View style={styles.achievementItem}>
-              <Ionicons name="calendar-outline" size={20} color={APP_THEME_V2.colors.primary} />
+              <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.primary[500]} />
               <Text style={styles.achievementText}>7-Day Mindful Streak</Text>
             </View>
           )}
           
           {behaviorData.streakDays >= 30 && (
             <View style={styles.achievementItem}>
-              <Ionicons name="trophy-outline" size={20} color={APP_THEME_V2.colors.warning} />
+              <Ionicons name="trophy-outline" size={20} color={DesignSystem.colors.warning[500]} />
               <Text style={styles.achievementText}>30-Day Champion</Text>
             </View>
           )}
           
           {behaviorData.reductionPercentage > 25 && (
             <View style={styles.achievementItem}>
-              <Ionicons name="leaf" size={20} color={APP_THEME_V2.colors.success} />
+              <Ionicons name="leaf" size={20} color={DesignSystem.colors.success[500]} />
               <Text style={styles.achievementText}>Eco Warrior</Text>
             </View>
           )}
           
           {behaviorData.totalSavings > 100 && (
             <View style={styles.achievementItem}>
-              <Ionicons name="wallet" size={20} color={APP_THEME_V2.colors.error} />
+              <Ionicons name="wallet" size={20} color={DesignSystem.colors.error[500]} />
               <Text style={styles.achievementText}>Money Saver</Text>
             </View>
           )}
           
           {behaviorData.streakDays >= 90 && (
             <View style={styles.achievementItem}>
-              <Ionicons name="star" size={20} color={APP_THEME_V2.colors.warning} />
+              <Ionicons name="star" size={20} color={DesignSystem.colors.warning[500]} />
               <Text style={styles.achievementText}>Lifestyle Master</Text>
             </View>
           )}
@@ -260,7 +263,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
         <View style={styles.insightsList}>
           {behaviorData.reductionPercentage > 20 && (
             <View style={styles.insightItem}>
-              <Ionicons name="trending-down" size={16} color={APP_THEME_V2.colors.success} />
+              <Ionicons name="trending-down" size={16} color={DesignSystem.colors.success[500]} />
               <Text style={styles.insightText}>
                 Excellent progress! You're successfully reducing impulse purchases.
               </Text>
@@ -269,7 +272,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
           
           {behaviorData.streakDays > 14 && (
             <View style={styles.insightItem}>
-              <Ionicons name="checkmark-circle" size={16} color={APP_THEME_V2.colors.primary} />
+              <Ionicons name="checkmark-circle" size={16} color={DesignSystem.colors.primary[500]} />
               <Text style={styles.insightText}>
                 You're building strong mindful shopping habits. Keep it up!
               </Text>
@@ -278,7 +281,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
           
           {behaviorData.monthlyPurchases === 0 && (
             <View style={styles.insightItem}>
-              <Ionicons name="star" size={16} color={APP_THEME_V2.colors.warning} />
+              <Ionicons name="star" size={16} color={DesignSystem.colors.warning[500]} />
               <Text style={styles.insightText}>
                 Perfect month! You found everything you needed in your existing wardrobe.
               </Text>
@@ -287,7 +290,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
           
           {behaviorData.reductionPercentage < 0 && (
             <View style={styles.insightItem}>
-              <Ionicons name="information-circle" size={16} color={APP_THEME_V2.colors.primary} />
+              <Ionicons name="information-circle" size={16} color={DesignSystem.colors.primary[500]} />
               <Text style={styles.insightText}>
                 Consider using the "Shop Your Closet First" feature before making purchases.
               </Text>
@@ -309,11 +312,11 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: APP_THEME_V2.colors.background,
-  },
+const createStyles = (colors: any) => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background.primary,
+    },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -322,7 +325,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   errorContainer: {
@@ -333,13 +336,13 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.error,
+    color: colors.semantic.error,
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: APP_THEME_V2.colors.primary,
+    backgroundColor: colors.primary[500],
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -358,13 +361,13 @@ const styles = StyleSheet.create({
   noDataTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginTop: 16,
     marginBottom: 8,
   },
   noDataText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -376,7 +379,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: `${APP_THEME_V2.colors.success}20`,
+    backgroundColor: `${colors.semantic.success}20`,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -384,15 +387,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
   },
   streakContainer: {
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 16,
@@ -406,21 +409,21 @@ const styles = StyleSheet.create({
   streakDays: {
     fontSize: 48,
     fontWeight: '700',
-    color: APP_THEME_V2.colors.success,
+    color: colors.semantic.success,
     marginBottom: 8,
   },
   streakLabel: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     marginBottom: 4,
   },
   streakMessage: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     textAlign: 'center',
   },
   celebrateButton: {
-    backgroundColor: APP_THEME_V2.colors.success,
+    backgroundColor: colors.semantic.success,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -434,7 +437,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   comparisonContainer: {
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 16,
@@ -443,7 +446,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginBottom: 16,
   },
   comparisonGrid: {
@@ -459,12 +462,12 @@ const styles = StyleSheet.create({
   comparisonValue: {
     fontSize: 32,
     fontWeight: '700',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginBottom: 4,
   },
   comparisonLabel: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
   },
   comparisonArrow: {
     marginHorizontal: 20,
@@ -479,10 +482,10 @@ const styles = StyleSheet.create({
   },
   reductionLabel: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
   },
   savingsContainer: {
-    backgroundColor: `${APP_THEME_V2.colors.success}20`,
+    backgroundColor: `${colors.semantic.success}20`,
     marginHorizontal: 20,
     marginBottom: 20,
     borderRadius: 16,
@@ -497,18 +500,18 @@ const styles = StyleSheet.create({
   savingsTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.success,
+    color: colors.semantic.success,
     marginLeft: 8,
   },
   savingsAmount: {
     fontSize: 32,
     fontWeight: '700',
-    color: APP_THEME_V2.colors.success,
+    color: colors.semantic.success,
     marginBottom: 8,
   },
   savingsDescription: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.success,
+    color: colors.semantic.success,
     textAlign: 'center',
   },
   achievementsContainer: {
@@ -521,7 +524,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   achievementItem: {
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
@@ -533,7 +536,7 @@ const styles = StyleSheet.create({
   achievementText: {
     fontSize: 12,
     fontWeight: '500',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginLeft: 6,
   },
   insightsContainer: {
@@ -546,20 +549,20 @@ const styles = StyleSheet.create({
   insightItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
   },
   insightText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginLeft: 12,
     flex: 1,
     lineHeight: 20,
   },
   lastPurchaseContainer: {
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     marginHorizontal: 20,
     marginBottom: 40,
     borderRadius: 12,
@@ -568,12 +571,12 @@ const styles = StyleSheet.create({
   },
   lastPurchaseLabel: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     marginBottom: 4,
   },
   lastPurchaseDate: {
     fontSize: 16,
     fontWeight: '500',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
   },
 });

@@ -12,9 +12,9 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
-import { EditorialColorSection, ColorTheme, EditorialImage } from './EditorialColorSection';
-import { getCurrentWeekTheme } from '../../data/weeklyColorThemes';
-import { ORIGINAL_COLORS } from '../auth/originalLoginStyles';
+import { EditorialColorSection, ColorTheme, EditorialImage } from '@/components/home/EditorialColorSection';
+import { getCurrentWeekTheme } from '@/data/weeklyColorThemes';
+import { ORIGINAL_COLORS } from '@/components/auth/originalLoginStyles';
 
 export const EditorialShowcase: React.FC = () => {
   const [currentTheme] = useState<ColorTheme>(getCurrentWeekTheme());

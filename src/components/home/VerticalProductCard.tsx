@@ -21,12 +21,13 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/context/ThemeContext';
 import {
   ORIGINAL_COLORS,
   ORIGINAL_TYPOGRAPHY,
   ORIGINAL_SPACING,
   ORIGINAL_BORDER_RADIUS,
-} from '../auth/originalLoginStyles';
+} from '@/components/auth/originalLoginStyles';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 

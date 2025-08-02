@@ -1,7 +1,7 @@
 // Personal Sanctuary - AI Service
 // Provides outfit generation, wardrobe insights, and mood-based styling
 
-import { ClothingItem, Outfit, MoodTag, WardrobeStats, AynaInsight, getColorCompatibility, getCategoryCompatibility } from '../data/sanctuaryModels';
+import { ClothingItem, Outfit, MoodTag, WardrobeStats, AynaInsight, getColorCompatibility, getCategoryCompatibility } from '@/data/sanctuaryModels';
 
 export class AynaAIService {
   private static outfitCounter = 0; // Add counter for unique IDs
@@ -302,4 +302,4 @@ export class AynaAIService {
   }
 }
 
-export default AynaAIService; 
+export default AynaAIService;

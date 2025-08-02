@@ -14,9 +14,9 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { SEMANTIC_TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '../../constants/AppConstants';
+import { SEMANTIC_TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '@/constants/AppConstants';
 
 // Sample data for search/discovery
 const TRENDING_SEARCHES = [
@@ -399,4 +399,4 @@ const styles = StyleSheet.create({
   productPrice: {
     ...SEMANTIC_TYPOGRAPHY.productPrice,
   },
-}); 
+});

@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '../constants/Colors';
+import Colors from '@/constants/Colors';
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
@@ -355,4 +355,4 @@ const styles = StyleSheet.create({
     fontFamily: 'Karla_700Bold',
     letterSpacing: 0.3,
   },
-}); 
+});

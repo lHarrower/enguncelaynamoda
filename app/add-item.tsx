@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function AddItemScreen() {
   const { colors } = useTheme();
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#666666',
   },
-}); 
+});

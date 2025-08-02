@@ -19,12 +19,12 @@ import Animated, {
   withTiming,
   runOnJS,
 } from 'react-native-reanimated';
-import { STUDIO_THEME } from '../../constants/StudioTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
-import SwipeableCard from './SwipeableCard';
-import PremiumOutfitCard from '../studio/PremiumOutfitCard';
+import SwipeableCard from '@/components/discovery/SwipeableCard';
+import PremiumOutfitCard from '@/components/studio/PremiumOutfitCard';
 
 const { width, height } = Dimensions.get('window');
 
@@ -215,7 +215,7 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
   if (!currentItem) {
     return (
       <View style={[styles.container, styles.emptyContainer]}>
-        <Ionicons name="checkmark-circle" size={64} color={STUDIO_THEME.colors.accent.jade} />
+        <Ionicons name="checkmark-circle" size={64} color={DesignSystem.colors.sage[500]} />
         <Text style={styles.emptyTitle}>All caught up!</Text>
         <Text style={styles.emptySubtitle}>Check back later for new discoveries</Text>
       </View>
@@ -258,7 +258,7 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
       {showUndo && (
         <Animated.View style={[styles.undoContainer, undoStyle]}>
           <TouchableOpacity style={styles.undoButton} onPress={handleUndo}>
-            <Ionicons name="arrow-undo" size={20} color={STUDIO_THEME.colors.text.inverse} />
+            <Ionicons name="arrow-undo" size={20} color={DesignSystem.colors.text.inverse} />
             <Text style={styles.undoText}>Undo</Text>
           </TouchableOpacity>
         </Animated.View>
@@ -320,7 +320,7 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
               style={styles.modalCloseButton}
               onPress={() => setShowSimilarModal(false)}
             >
-              <Ionicons name="close" size={24} color={STUDIO_THEME.colors.text.primary} />
+              <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
             </TouchableOpacity>
           </View>
           
@@ -361,7 +361,7 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: STUDIO_THEME.colors.foundation.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollView: {
     flex: 1,
@@ -389,14 +389,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyTitle: {
-    ...STUDIO_THEME.typography.scale.h2,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
     marginTop: 16,
     marginBottom: 8,
   },
   emptySubtitle: {
-    ...STUDIO_THEME.typography.scale.body,
-    color: STUDIO_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   
@@ -411,15 +411,15 @@ const styles = StyleSheet.create({
   undoButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: STUDIO_THEME.colors.text.primary,
+    backgroundColor: DesignSystem.colors.text.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 25,
-    ...STUDIO_THEME.shadows.medium,
+    ...DesignSystem.elevation.medium,
   },
   undoText: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.inverse,
     marginLeft: 8,
   },
   
@@ -429,14 +429,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: STUDIO_THEME.colors.foundation.elevated,
+    backgroundColor: DesignSystem.colors.background.elevated,
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: STUDIO_THEME.colors.foundation.tertiary,
+    borderTopColor: DesignSystem.colors.border.subtle,
   },
   favoritesTitle: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 12,
   },
   favoriteItem: {
@@ -457,14 +457,14 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   notification: {
-    backgroundColor: STUDIO_THEME.colors.foundation.elevated,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 16,
     padding: 16,
-    ...STUDIO_THEME.shadows.strong,
+    ...DesignSystem.elevation.strong,
   },
   notificationText: {
-    ...STUDIO_THEME.typography.scale.body,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 12,
   },
   notificationActions: {
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
   },
   notificationButton: {
     flex: 1,
-    backgroundColor: STUDIO_THEME.colors.accent.jade,
+    backgroundColor: DesignSystem.colors.sage[500],
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -482,23 +482,23 @@ const styles = StyleSheet.create({
   notificationButtonSecondary: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: STUDIO_THEME.colors.accent.jade,
+    borderColor: DesignSystem.colors.sage[500],
   },
   notificationButtonText: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.inverse,
     fontWeight: '600',
   },
   notificationButtonTextSecondary: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.accent.jade,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.sage[500],
     fontWeight: '600',
   },
   
   // Similar Items Modal
   modalContainer: {
     flex: 1,
-    backgroundColor: STUDIO_THEME.colors.foundation.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -506,11 +506,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: STUDIO_THEME.colors.foundation.tertiary,
+    borderBottomColor: DesignSystem.colors.border.subtle,
   },
   modalTitle: {
-    ...STUDIO_THEME.typography.scale.h2,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
   },
   modalCloseButton: {
     padding: 4,
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
   selectedItemContainer: {
     flexDirection: 'row',
     padding: 20,
-    backgroundColor: STUDIO_THEME.colors.foundation.secondary,
+    backgroundColor: DesignSystem.colors.background.secondary,
   },
   selectedItemImage: {
     width: 80,
@@ -531,13 +531,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   selectedItemBrand: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.accent.jade,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.sage[500],
     marginBottom: 4,
   },
   selectedItemTitle: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.primary,
   },
   similarItemsContainer: {
     flex: 1,

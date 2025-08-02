@@ -11,19 +11,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import { AynaOutfitCardV2 } from './AynaOutfitCardV2';
-import { LikeButton } from './LikeButton';
-import { FluidTabNavigator } from '../navigation/FluidTabNavigator';
-import { SAMPLE_SAVED_OUTFITS } from '../../data/sanctuarySampleData';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { AynaOutfitCardV2 } from '@/components/sanctuary/AynaOutfitCardV2';
+import { LikeButton } from '@/components/sanctuary/LikeButton';
+import { FluidTabNavigator } from '@/components/navigation/FluidTabNavigator';
+import { SAMPLE_SAVED_OUTFITS } from '@/data/sanctuarySampleData';
 
 // Demo screens for the FluidTabNavigator
 const DemoScreen1 = () => (
   <View style={styles.demoScreen}>
-    <Text style={[APP_THEME_V2.typography.scale.h1, { color: APP_THEME_V2.colors.inkGray[800] }]}>
+    <Text style={[DesignSystem.typography.heading.h1, { color: DesignSystem.colors.text.primary }]}>
       Sanctuary
     </Text>
-    <Text style={[APP_THEME_V2.typography.scale.whisper, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+    <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.secondary }]}>
       "Your style journey begins with self-discovery"
     </Text>
   </View>
@@ -31,10 +31,10 @@ const DemoScreen1 = () => (
 
 const DemoScreen2 = () => (
   <View style={styles.demoScreen}>
-    <Text style={[APP_THEME_V2.typography.scale.h1, { color: APP_THEME_V2.colors.inkGray[800] }]}>
+    <Text style={[DesignSystem.typography.heading.h1, { color: DesignSystem.colors.text.primary }]}>
       Wardrobe
     </Text>
-    <Text style={[APP_THEME_V2.typography.scale.whisper, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+    <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.secondary }]}>
       "Every piece tells a story of confidence"
     </Text>
   </View>
@@ -42,10 +42,10 @@ const DemoScreen2 = () => (
 
 const DemoScreen3 = () => (
   <View style={styles.demoScreen}>
-    <Text style={[APP_THEME_V2.typography.scale.h1, { color: APP_THEME_V2.colors.inkGray[800] }]}>
+    <Text style={[DesignSystem.typography.heading.h1, { color: DesignSystem.colors.text.primary }]}>
       Favorites
     </Text>
-    <Text style={[APP_THEME_V2.typography.scale.whisper, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+    <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.secondary }]}>
       "Curated moments of pure inspiration"
     </Text>
   </View>
@@ -106,16 +106,16 @@ export const ArtistryShowcase: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Organic Palette</Text>
           <View style={styles.colorGrid}>
-            <View style={[styles.colorSwatch, { backgroundColor: APP_THEME_V2.colors.linen.base }]}>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.background.primary }]}>
               <Text style={styles.colorLabel}>Linen</Text>
             </View>
-            <View style={[styles.colorSwatch, { backgroundColor: APP_THEME_V2.colors.sageGreen[500] }]}>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.sage[500] }]}>
               <Text style={[styles.colorLabel, { color: 'white' }]}>Sage Green</Text>
             </View>
-            <View style={[styles.colorSwatch, { backgroundColor: APP_THEME_V2.colors.liquidGold[500] }]}>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.gold[500] }]}>
               <Text style={[styles.colorLabel, { color: 'white' }]}>Liquid Gold</Text>
             </View>
-            <View style={[styles.colorSwatch, { backgroundColor: APP_THEME_V2.colors.inkGray[800] }]}>
+            <View style={[styles.colorSwatch, { backgroundColor: DesignSystem.colors.neutral[800] }]}>
               <Text style={[styles.colorLabel, { color: 'white' }]}>Ink Gray</Text>
             </View>
           </View>
@@ -125,16 +125,16 @@ export const ArtistryShowcase: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Typography Hierarchy</Text>
           <View style={styles.typographyDemo}>
-            <Text style={[APP_THEME_V2.typography.scale.hero, { color: APP_THEME_V2.colors.inkGray[800] }]}>
+            <Text style={[DesignSystem.typography.display.large, { color: DesignSystem.colors.text.primary }]}>
               Hero Text
             </Text>
-            <Text style={[APP_THEME_V2.typography.scale.h1, { color: APP_THEME_V2.colors.inkGray[800] }]}>
+            <Text style={[DesignSystem.typography.heading.h1, { color: DesignSystem.colors.text.primary }]}>
               Heading 1
             </Text>
-            <Text style={[APP_THEME_V2.typography.scale.body1, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+            <Text style={[DesignSystem.typography.body.medium, { color: DesignSystem.colors.text.secondary }]}>
               Body text with perfect readability and harmonious spacing
             </Text>
-            <Text style={[APP_THEME_V2.typography.scale.whisper, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+            <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.secondary }]}>
               "Whisper text for gentle, poetic moments"
             </Text>
           </View>
@@ -145,22 +145,22 @@ export const ArtistryShowcase: React.FC = () => {
           <Text style={styles.sectionTitle}>Glassmorphism Effects</Text>
           <View style={styles.glassContainer}>
             <BlurView intensity={20} tint="light" style={styles.glassCard}>
-              <View style={[styles.glassCardContent, APP_THEME_V2.glassmorphism.primary]}>
-                <Text style={[APP_THEME_V2.typography.scale.h3, { color: APP_THEME_V2.colors.inkGray[800] }]}>
+              <View style={[styles.glassCardContent, DesignSystem.effects.glassmorphism.subtle]}>
+                <Text style={[DesignSystem.typography.heading.h3, { color: DesignSystem.colors.text.primary }]}>
                   Primary Glass
                 </Text>
-                <Text style={[APP_THEME_V2.typography.scale.body2, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+                <Text style={[DesignSystem.typography.body.medium, { color: DesignSystem.colors.text.secondary }]}>
                   Frosted glass effect with subtle transparency
                 </Text>
               </View>
             </BlurView>
             
             <BlurView intensity={15} tint="light" style={styles.glassCard}>
-              <View style={[styles.glassCardContent, APP_THEME_V2.glassmorphism.gold]}>
-                <Text style={[APP_THEME_V2.typography.scale.h3, { color: APP_THEME_V2.colors.inkGray[800] }]}>
+              <View style={[styles.glassCardContent, DesignSystem.effects.glassmorphism.warm]}>
+                <Text style={[DesignSystem.typography.heading.h3, { color: DesignSystem.colors.text.primary }]}>
                   Liquid Gold Glass
                 </Text>
-                <Text style={[APP_THEME_V2.typography.scale.body2, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+                <Text style={[DesignSystem.typography.body.medium, { color: DesignSystem.colors.text.secondary }]}>
                   Warm, golden glass with premium feel
                 </Text>
               </View>
@@ -172,7 +172,7 @@ export const ArtistryShowcase: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Meaningful Micro-interactions</Text>
           <View style={styles.interactionDemo}>
-            <Text style={[APP_THEME_V2.typography.scale.body1, { color: APP_THEME_V2.colors.inkGray[600], marginBottom: 16 }]}>
+            <Text style={[DesignSystem.typography.body.medium, { color: DesignSystem.colors.text.secondary, marginBottom: 16 }]}>
               Tap the hearts to see the "wave of light" animation
             </Text>
             <View style={styles.likeButtonGrid}>
@@ -191,7 +191,7 @@ export const ArtistryShowcase: React.FC = () => {
         {/* Outfit Card Showcase */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Artistic Outfit Cards</Text>
-          <Text style={[APP_THEME_V2.typography.scale.body2, { color: APP_THEME_V2.colors.inkGray[600], marginBottom: 20 }]}>
+          <Text style={[DesignSystem.typography.body.medium, { color: DesignSystem.colors.text.secondary, marginBottom: 20 }]}>
             Layered depth with glassmorphism overlays and organic animations
           </Text>
           {SAMPLE_SAVED_OUTFITS.slice(0, 2).map((outfit) => (
@@ -208,7 +208,7 @@ export const ArtistryShowcase: React.FC = () => {
         {/* Fluid Navigation Showcase */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Fluid Navigation</Text>
-          <Text style={[APP_THEME_V2.typography.scale.body2, { color: APP_THEME_V2.colors.inkGray[600], marginBottom: 20 }]}>
+          <Text style={[DesignSystem.typography.body.medium, { color: DesignSystem.colors.text.secondary, marginBottom: 20 }]}>
             Cross-fade transitions with zen-like choreography
           </Text>
           <TouchableOpacity
@@ -217,7 +217,7 @@ export const ArtistryShowcase: React.FC = () => {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={[APP_THEME_V2.colors.sageGreen[500], APP_THEME_V2.colors.liquidGold[500]]}
+              colors={[DesignSystem.colors.sage[500], DesignSystem.colors.gold[500]]}
               style={styles.demoButtonGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -232,23 +232,23 @@ export const ArtistryShowcase: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Elevation System</Text>
           <View style={styles.elevationDemo}>
-            <View style={[styles.elevationCard, APP_THEME_V2.elevation.whisper]}>
-              <Text style={[APP_THEME_V2.typography.scale.caption, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+            <View style={[styles.elevationCard, DesignSystem.effects.elevation.low]}>
+              <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.secondary }]}>
                 Whisper
               </Text>
             </View>
-            <View style={[styles.elevationCard, APP_THEME_V2.elevation.lift]}>
-              <Text style={[APP_THEME_V2.typography.scale.caption, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+            <View style={[styles.elevationCard, DesignSystem.effects.elevation.medium]}>
+              <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.secondary }]}>
                 Lift
               </Text>
             </View>
-            <View style={[styles.elevationCard, APP_THEME_V2.elevation.float]}>
-              <Text style={[APP_THEME_V2.typography.scale.caption, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+            <View style={[styles.elevationCard, DesignSystem.effects.elevation.high]}>
+              <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.secondary }]}>
                 Float
               </Text>
             </View>
-            <View style={[styles.elevationCard, APP_THEME_V2.elevation.dramatic]}>
-              <Text style={[APP_THEME_V2.typography.scale.caption, { color: APP_THEME_V2.colors.inkGray[600] }]}>
+            <View style={[styles.elevationCard, DesignSystem.effects.elevation.highest]}>
+              <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.secondary }]}>
                 Dramatic
               </Text>
             </View>
@@ -256,7 +256,7 @@ export const ArtistryShowcase: React.FC = () => {
         </View>
 
         <View style={styles.footer}>
-          <Text style={[APP_THEME_V2.typography.scale.whisper, { color: APP_THEME_V2.colors.inkGray[500] }]}>
+          <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.tertiary }]}>
             "Where technology meets artistry, confidence blooms"
           </Text>
         </View>
@@ -268,99 +268,99 @@ export const ArtistryShowcase: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: APP_THEME_V2.colors.linen.base,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollView: {
     flex: 1,
   },
   header: {
-    padding: APP_THEME_V2.spacing.xl,
+    padding: DesignSystem.spacing.xl,
     alignItems: 'center',
   },
   title: {
-    ...APP_THEME_V2.typography.scale.hero,
-    color: APP_THEME_V2.colors.inkGray[800],
+    ...DesignSystem.typography.display.large,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   subtitle: {
-    ...APP_THEME_V2.typography.scale.whisper,
-    color: APP_THEME_V2.colors.inkGray[600],
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   section: {
-    padding: APP_THEME_V2.spacing.xl,
-    marginBottom: APP_THEME_V2.spacing.md,
+    padding: DesignSystem.spacing.xl,
+    marginBottom: DesignSystem.spacing.md,
   },
   sectionTitle: {
-    ...APP_THEME_V2.typography.scale.h2,
-    color: APP_THEME_V2.colors.inkGray[800],
-    marginBottom: APP_THEME_V2.spacing.lg,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.lg,
   },
   colorGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   colorSwatch: {
     width: 80,
     height: 80,
-    borderRadius: APP_THEME_V2.radius.organic,
+    borderRadius: DesignSystem.borderRadius.large,
     justifyContent: 'center',
     alignItems: 'center',
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.effects.elevation.medium,
   },
   colorLabel: {
-    ...APP_THEME_V2.typography.scale.caption,
+    ...DesignSystem.typography.body.small,
     fontWeight: '600',
   },
   typographyDemo: {
-    gap: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   glassContainer: {
-    gap: APP_THEME_V2.spacing.lg,
+    gap: DesignSystem.spacing.lg,
   },
   glassCard: {
-    borderRadius: APP_THEME_V2.radius.organic,
+    borderRadius: DesignSystem.borderRadius.large,
     overflow: 'hidden',
   },
   glassCardContent: {
-    padding: APP_THEME_V2.spacing.xl,
-    borderRadius: APP_THEME_V2.radius.organic,
+    padding: DesignSystem.spacing.xl,
+    borderRadius: DesignSystem.borderRadius.large,
   },
   interactionDemo: {
     alignItems: 'center',
   },
   likeButtonGrid: {
     flexDirection: 'row',
-    gap: APP_THEME_V2.spacing.xl,
+    gap: DesignSystem.spacing.xl,
   },
   demoButton: {
-    borderRadius: APP_THEME_V2.radius.organic,
+    borderRadius: DesignSystem.borderRadius.large,
     overflow: 'hidden',
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.effects.elevation.medium,
   },
   demoButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: APP_THEME_V2.spacing.lg,
-    gap: APP_THEME_V2.spacing.sm,
+    padding: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.sm,
   },
   demoButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
+    ...DesignSystem.typography.button.medium,
     color: 'white',
   },
   elevationDemo: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: APP_THEME_V2.spacing.lg,
+    gap: DesignSystem.spacing.lg,
   },
   elevationCard: {
     width: 80,
     height: 60,
-    backgroundColor: APP_THEME_V2.colors.whisperWhite,
-    borderRadius: APP_THEME_V2.radius.md,
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderRadius: DesignSystem.borderRadius.medium,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -368,11 +368,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: APP_THEME_V2.spacing.xl,
+    padding: DesignSystem.spacing.xl,
   },
   footer: {
-    padding: APP_THEME_V2.spacing.xl,
+    padding: DesignSystem.spacing.xl,
     alignItems: 'center',
-    marginTop: APP_THEME_V2.spacing.xxxl,
+    marginTop: DesignSystem.spacing.xxxl,
   },
-}); 
+});

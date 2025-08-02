@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
 
 interface FrostedGlassProps {
   children?: React.ReactNode;
@@ -79,4 +78,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FrostedGlass; 
+export default FrostedGlass;

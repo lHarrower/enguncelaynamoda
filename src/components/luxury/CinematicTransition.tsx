@@ -7,7 +7,7 @@ import Animated, {
   withDelay,
   Easing,
 } from 'react-native-reanimated';
-import { LuxuryMotion } from '../../theme/AppThemeV2';
+import { LuxuryMotion } from '@/theme/AppThemeV2';
 
 interface CinematicTransitionProps {
   isVisible: boolean;
@@ -99,4 +99,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CinematicTransition; 
+export default CinematicTransition;

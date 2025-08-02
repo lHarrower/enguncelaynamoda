@@ -1,7 +1,7 @@
 // Personal Sanctuary - Sample Data
 // Sample wardrobe items and saved outfits for development
 
-import { ClothingItem, Outfit, MoodTag } from './sanctuaryModels';
+import { ClothingItem, Outfit, MoodTag } from '@/data/sanctuaryModels';
 
 export const SAMPLE_WARDROBE: ClothingItem[] = [
   {
@@ -201,4 +201,4 @@ export const MOOD_DESCRIPTIONS: Record<MoodTag, string> = {
   'Joyful & Playful': 'Infectious joy that celebrates life',
   'Elegant & Refined': 'Timeless sophistication that never fades',
   'Bold & Adventurous': 'Fearless spirit that breaks boundaries'
-}; 
+};

@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '../../../context/ThemeContext';
-import { LUX_PARISENNE_PALETTE } from '../../../constants/Colors';
+import { useTheme } from '@/context/ThemeContext';
+import { LUX_PARISENNE_PALETTE } from '@/constants/Colors';
 import Animated, { FadeInUp, FadeInDown, ZoomIn, SlideInDown } from 'react-native-reanimated';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-import { APP_THEME_V2 } from '../../../constants/AppThemeV2';
+import { APP_THEME_V2 } from '@/constants/AppThemeV2';
 
 const containerPadding = APP_THEME_V2.spacing.xl; 
 const DISCOVER_CARD_WIDTH = screenWidth - (containerPadding * 2);
@@ -198,4 +198,4 @@ const styles = StyleSheet.create({
   );
 };
 
-export default SaleBanner; 
+export default SaleBanner;

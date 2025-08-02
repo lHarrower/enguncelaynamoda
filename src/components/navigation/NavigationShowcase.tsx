@@ -14,14 +14,14 @@ import {
   Animated,
   Alert,
 } from 'react-native';
-import { FloatingTabBar, DEFAULT_TABS, TabItem } from './FloatingTabBar';
-import { ProductCardShowcase } from '../home/ProductCardShowcase';
-import { EditorialShowcase } from '../home/EditorialShowcase';
+import { FloatingTabBar, DEFAULT_TABS, TabItem } from '@/components/navigation/FloatingTabBar';
+import { ProductCardShowcase } from '@/components/home/ProductCardShowcase';
+import { EditorialShowcase } from '@/components/home/EditorialShowcase';
 import {
   ORIGINAL_COLORS,
   ORIGINAL_TYPOGRAPHY,
   ORIGINAL_SPACING,
-} from '../auth/originalLoginStyles';
+} from '@/components/auth/originalLoginStyles';
 
 // Sample content for different tabs
 const TAB_CONTENT = {

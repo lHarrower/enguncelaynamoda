@@ -20,7 +20,7 @@ import Animated, {
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ATMOSPHERIC_THEME } from '../../constants/AtmosphericTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
@@ -120,15 +120,15 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
           <Animated.View style={[styles.triggerContent, triggerStyle]}>
             <LinearGradient
               colors={[
-                ATMOSPHERIC_THEME.colors.gold.pure,
-                ATMOSPHERIC_THEME.colors.gold.rich,
+                DesignSystem.colors.sage[400],
+                DesignSystem.colors.sage[500],
               ]}
               style={styles.triggerGradient}
             >
               <Ionicons 
                 name="add" 
                 size={20} 
-                color={ATMOSPHERIC_THEME.semantic.canvas.void} 
+                color={DesignSystem.colors.background.primary} 
               />
             </LinearGradient>
           </Animated.View>
@@ -179,8 +179,8 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
                         size={24} 
                         color={
                           currentRoute === item.id 
-                            ? ATMOSPHERIC_THEME.semantic.text.accent
-                            : ATMOSPHERIC_THEME.semantic.text.primary
+                            ? DesignSystem.colors.text.accent
+                            : DesignSystem.colors.text.primary
                         } 
                       />
                     </View>
@@ -201,8 +201,8 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
                     <View style={styles.activeIndicator}>
                       <LinearGradient
                         colors={[
-                          ATMOSPHERIC_THEME.colors.gold.pure,
-                          ATMOSPHERIC_THEME.colors.gold.rich,
+                          DesignSystem.colors.sage[400],
+                          DesignSystem.colors.sage[500],
                         ]}
                         style={styles.activeIndicatorGradient}
                       />
@@ -238,7 +238,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    ...ATMOSPHERIC_THEME.glass.totem,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
   },
   triggerContent: {
     flex: 1,
@@ -277,14 +279,14 @@ const styles = StyleSheet.create({
     marginBottom: 48,
   },
   navigationTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.statement,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 8,
     fontSize: 36,
   },
   navigationSubtitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.whisper,
-    color: ATMOSPHERIC_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
 
@@ -323,18 +325,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   navigationItemTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.body,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.primary,
     fontSize: 18,
     fontWeight: '500',
     marginBottom: 4,
   },
   activeNavigationItemTitle: {
-    color: ATMOSPHERIC_THEME.semantic.text.accent,
+    color: DesignSystem.colors.text.accent,
   },
   navigationItemSubtitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.caption,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     fontSize: 14,
   },
   activeIndicator: {
@@ -356,8 +358,8 @@ const styles = StyleSheet.create({
     paddingVertical: 32,
   },
   closeHint: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.caption,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     opacity: 0.6,
   },
 });

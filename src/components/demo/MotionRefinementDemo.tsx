@@ -11,10 +11,9 @@ import {
   StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import SwipeableCard from '../discovery/SwipeableCard';
-import ElegantTabs from '../luxury/ElegantTabs';
-import { ULTRA_PREMIUM_THEME } from '../../constants/UltraPremiumTheme';
-import { LuxuryMaterials, LuxuryTypography, LuxurySpacing } from '../../theme/AppThemeV2';
+import SwipeableCard from '@/components/discovery/SwipeableCard';
+import ElegantTabs from '@/components/luxury/ElegantTabs';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 
@@ -147,13 +146,13 @@ const MotionRefinementDemo: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={ULTRA_PREMIUM_THEME.colors.obsidian[900]} />
+      <StatusBar barStyle="light-content" backgroundColor={DesignSystem.colors.text.primary} />
       
       {/* Header */}
       <LinearGradient
         colors={[
-          ULTRA_PREMIUM_THEME.colors.obsidian[900],
-          ULTRA_PREMIUM_THEME.colors.obsidian[800],
+          DesignSystem.colors.text.primary,
+          DesignSystem.colors.text.secondary,
         ]}
         style={styles.header}
       >
@@ -179,58 +178,58 @@ const MotionRefinementDemo: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ULTRA_PREMIUM_THEME.colors.obsidian[900],
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   
   header: {
-    paddingHorizontal: 24,
-    paddingVertical: 32,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.xxxl,
     borderBottomWidth: 1,
-    borderBottomColor: ULTRA_PREMIUM_THEME.colors.obsidian[700],
+    borderBottomColor: DesignSystem.colors.sage[600],
   },
   
   headerTitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.h1,
-    color: ULTRA_PREMIUM_THEME.colors.champagne[400],
-    marginBottom: 8,
+    ...DesignSystem.typography.hero,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.xs,
   },
   
   headerSubtitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body2,
-    color: ULTRA_PREMIUM_THEME.colors.champagne[600],
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.secondary,
     opacity: 0.8,
   },
   
   tabsWrapper: {
     flex: 1,
-    backgroundColor: LuxuryMaterials.colors.whisperWhite,
+    backgroundColor: DesignSystem.colors.background.secondary,
   },
   
   tabs: {
-    backgroundColor: LuxuryMaterials.colors.whisperWhite,
+    backgroundColor: DesignSystem.colors.background.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: LuxuryMaterials.colors.lightGray,
+    borderBottomColor: DesignSystem.colors.sage[100],
   },
   
   tabContent: {
-    backgroundColor: LuxuryMaterials.colors.whisperWhite,
+    backgroundColor: DesignSystem.colors.background.secondary,
   },
   
   demoContainer: {
     flex: 1,
-    padding: LuxurySpacing.lg,
+    padding: DesignSystem.spacing.lg,
   },
   
   demoTitle: {
-    ...LuxuryTypography.h2,
-    color: LuxuryMaterials.colors.inkGray,
-    marginBottom: LuxurySpacing.sm,
+    ...DesignSystem.typography.h2,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.sm,
   },
   
   demoDescription: {
-    ...LuxuryTypography.body,
-    color: LuxuryMaterials.colors.charcoal,
-    marginBottom: LuxurySpacing.lg,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.lg,
     lineHeight: 24,
   },
   
@@ -247,46 +246,46 @@ const styles = StyleSheet.create({
   },
   
   physicsExplanation: {
-    backgroundColor: LuxuryMaterials.colors.lightGray,
-    borderRadius: 16,
-    padding: LuxurySpacing.lg,
+    backgroundColor: DesignSystem.colors.sage[100],
+    borderRadius: DesignSystem.radius.lg,
+    padding: DesignSystem.spacing.lg,
   },
   
   physicsTitle: {
-    ...LuxuryTypography.h3,
-    color: LuxuryMaterials.colors.inkGray,
-    marginBottom: LuxurySpacing.md,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.md,
   },
   
   physicsPoint: {
-    ...LuxuryTypography.body,
-    color: LuxuryMaterials.colors.charcoal,
-    marginBottom: LuxurySpacing.sm,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.sm,
     lineHeight: 22,
   },
   
   principlesContainer: {
     flex: 1,
-    gap: LuxurySpacing.md,
+    gap: DesignSystem.spacing.md,
   },
   
   principleCard: {
-    backgroundColor: LuxuryMaterials.colors.lightGray,
-    borderRadius: 12,
-    padding: LuxurySpacing.lg,
+    backgroundColor: DesignSystem.colors.sage[100],
+    borderRadius: DesignSystem.radius.md,
+    padding: DesignSystem.spacing.lg,
     borderLeftWidth: 4,
-    borderLeftColor: LuxuryMaterials.colors.liquidGold,
+    borderLeftColor: DesignSystem.colors.sage[500],
   },
   
   principleTitle: {
-    ...LuxuryTypography.h4,
-    color: LuxuryMaterials.colors.inkGray,
-    marginBottom: LuxurySpacing.sm,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.sm,
   },
   
   principleText: {
-    ...LuxuryTypography.body,
-    color: LuxuryMaterials.colors.charcoal,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.secondary,
     lineHeight: 20,
   },
 });

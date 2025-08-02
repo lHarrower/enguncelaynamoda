@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import { antiConsumptionService, CostPerWearData } from '../../services/antiConsumptionService';
+import { useTheme } from '@/theme/ThemeProvider';
+import { antiConsumptionService, CostPerWearData } from '@/services/antiConsumptionService';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface CostPerWearDisplayProps {
   itemId: string;
@@ -22,6 +23,8 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
   showProjected = true,
   onPress,
 }) => {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [costData, setCostData] = useState<CostPerWearData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,9 +58,9 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
 
   const getCostPerWearColor = (costPerWear: number, purchasePrice: number): string => {
     const ratio = costPerWear / purchasePrice;
-    if (ratio <= 0.1) return APP_THEME_V2.colors.success; // Excellent value
-    if (ratio <= 0.25) return APP_THEME_V2.colors.warning; // Good value
-    return APP_THEME_V2.colors.error; // Poor value
+    if (ratio <= 0.1) return DesignSystem.colors.success[500]; // Excellent value
+    if (ratio <= 0.25) return DesignSystem.colors.warning[500]; // Good value
+    return DesignSystem.colors.error[500]; // Poor value
   };
 
   const getCostPerWearLabel = (costPerWear: number, purchasePrice: number): string => {
@@ -100,7 +103,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
           </Text>
         </View>
         {onPress && (
-          <Ionicons name="chevron-forward" size={16} color={APP_THEME_V2.colors.textSecondary} />
+          <Ionicons name="chevron-forward" size={16} color={DesignSystem.colors.neutral[600]} />
         )}
       </TouchableOpacity>
     );
@@ -114,7 +117,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
     >
       <View style={styles.header}>
         <View style={styles.iconContainer}>
-          <Ionicons name="calculator-outline" size={20} color={APP_THEME_V2.colors.primary} />
+          <Ionicons name="calculator-outline" size={20} color={DesignSystem.colors.primary[500]} />
         </View>
         <Text style={styles.title}>Cost Per Wear</Text>
       </View>
@@ -153,7 +156,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
 
       {costData.totalWears === 0 && (
         <View style={styles.encouragement}>
-          <Ionicons name="shirt-outline" size={16} color={APP_THEME_V2.colors.warning} />
+          <Ionicons name="shirt-outline" size={16} color={DesignSystem.colors.warning[500]} />
           <Text style={styles.encouragementText}>
             Wear this item to improve its value!
           </Text>
@@ -162,7 +165,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
 
       {costData.totalWears > 0 && costData.costPerWear <= costData.purchasePrice * 0.1 && (
         <View style={styles.celebration}>
-          <Ionicons name="trophy-outline" size={16} color={APP_THEME_V2.colors.success} />
+          <Ionicons name="trophy-outline" size={16} color={DesignSystem.colors.success[500]} />
           <Text style={styles.celebrationText}>
             Amazing! You've maximized this item's value.
           </Text>
@@ -172,16 +175,16 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
       {onPress && (
         <View style={styles.actionHint}>
           <Text style={styles.actionHintText}>Tap for more details</Text>
-          <Ionicons name="chevron-forward" size={16} color={APP_THEME_V2.colors.textSecondary} />
+          <Ionicons name="chevron-forward" size={16} color={DesignSystem.colors.neutral[600]} />
         </View>
       )}
     </TouchableOpacity>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     padding: 16,
     marginVertical: 8,
@@ -190,7 +193,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     borderRadius: 8,
     padding: 12,
     marginVertical: 4,
@@ -200,7 +203,7 @@ const styles = StyleSheet.create({
   },
   compactLabel: {
     fontSize: 12,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     marginBottom: 2,
   },
   compactValue: {
@@ -209,12 +212,12 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   errorText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.error,
+    color: colors.semantic.error,
     textAlign: 'center',
   },
   header: {
@@ -226,7 +229,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: `${APP_THEME_V2.colors.primary}20`,
+    backgroundColor: `${colors.primary[500]}20`,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -234,7 +237,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
   },
   mainMetric: {
     alignItems: 'center',
@@ -260,38 +263,38 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
   },
   detailValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
   },
   encouragement: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: `${APP_THEME_V2.colors.warning}20`,
+    backgroundColor: `${colors.semantic.warning}20`,
     padding: 12,
     borderRadius: 8,
     marginTop: 8,
   },
   encouragementText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.warning,
+    color: colors.semantic.warning,
     marginLeft: 8,
     flex: 1,
   },
   celebration: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: `${APP_THEME_V2.colors.success}20`,
+    backgroundColor: `${colors.semantic.success}20`,
     padding: 12,
     borderRadius: 8,
     marginTop: 8,
   },
   celebrationText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.success,
+    color: colors.semantic.success,
     marginLeft: 8,
     flex: 1,
   },
@@ -302,11 +305,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: APP_THEME_V2.colors.border,
+    borderTopColor: colors.border.primary,
   },
   actionHintText: {
     fontSize: 12,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     marginRight: 4,
   },
 });

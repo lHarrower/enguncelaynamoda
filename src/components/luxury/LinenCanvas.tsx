@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle, ColorValue } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface LinenCanvasProps {
   children?: React.ReactNode;
@@ -18,21 +18,21 @@ const LinenCanvas: React.FC<LinenCanvasProps> = ({
     switch (variant) {
       case 'subtle':
         return [
-          APP_THEME_V2.colors.linen.base,
-          APP_THEME_V2.colors.linen.light,
-          APP_THEME_V2.colors.linen.base,
+          DesignSystem.colors.background.secondary,
+          DesignSystem.colors.sage[100],
+          DesignSystem.colors.background.secondary,
         ];
       case 'warm':
         return [
-          APP_THEME_V2.colors.linen.base,
-          `${APP_THEME_V2.colors.liquidGold[200]}10`, // 10% opacity
-          APP_THEME_V2.colors.linen.base,
+          DesignSystem.colors.background.secondary,
+          `${DesignSystem.colors.sage[200]}10`, // 10% opacity
+          DesignSystem.colors.background.secondary,
         ];
       default:
         return [
-          APP_THEME_V2.colors.linen.base,
-          `${APP_THEME_V2.colors.whisperWhite}20`, // 20% opacity
-          APP_THEME_V2.colors.linen.base,
+          DesignSystem.colors.background.secondary,
+          `${DesignSystem.colors.background.primary}20`, // 20% opacity
+          DesignSystem.colors.background.secondary,
         ];
     }
   };
@@ -88,4 +88,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LinenCanvas; 
+export default LinenCanvas;

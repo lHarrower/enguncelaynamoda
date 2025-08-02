@@ -3,10 +3,18 @@ import { View, Text, StyleSheet, TouchableOpacity, ViewStyle, TextStyle } from '
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { TYPOGRAPHY, SPACING, SHADOWS, BORDER_RADIUS } from '../constants/AppConstants';
+import { BaseComponentProps } from '../types/componentProps';
 
-interface ErrorBoundaryProps {
+interface ErrorBoundaryProps extends BaseComponentProps {
   children: React.ReactNode;
+  /** Custom error message to display */
+  fallbackMessage?: string;
+  /** Callback when user attempts to recover from error */
+  onRetry?: () => void;
+  /** Whether to show error details in development */
+  showErrorDetails?: boolean;
 }
+
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
@@ -28,13 +36,26 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   handleReset = () => {
+    const { onRetry } = this.props;
     this.setState({ hasError: false, error: null });
+    onRetry?.();
+  };
+
+  static defaultProps: Partial<ErrorBoundaryProps> = {
+    fallbackMessage: 'Something went wrong. Please try again.',
+    showErrorDetails: __DEV__,
   };
 
   render() {
+    const { fallbackMessage, showErrorDetails, style, testID, accessibilityLabel } = this.props;
+    
     if (this.state.hasError) {
       return (
-        <View style={styles.container}>
+        <View 
+          style={[styles.container, style]} 
+          testID={testID}
+          accessibilityLabel={accessibilityLabel || 'Error screen'}
+        >
           <LinearGradient
             colors={['#FEFEFE', '#FFF8F5']}
             style={StyleSheet.absoluteFillObject}
@@ -49,25 +70,32 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               />
             </View>
             
-            <Text style={styles.title}>Something went wrong</Text>
+            <Text style={styles.title}>Oops!</Text>
             <Text style={styles.message}>
-              We're sorry, but something unexpected happened. Please try again.
+              {fallbackMessage}
             </Text>
             
-            {__DEV__ && this.state.error && (
+            {showErrorDetails && this.state.error && (
               <View style={styles.errorDetails}>
-                <Text style={styles.errorTitle}>Error Details (Debug Mode):</Text>
-                <Text style={styles.errorText}>{this.state.error.message}</Text>
+                <Text style={styles.errorTitle}>Error Details:</Text>
+                <Text style={styles.errorText}>
+                  {this.state.error.message}
+                </Text>
               </View>
             )}
             
-            <TouchableOpacity onPress={this.handleReset} style={styles.button}>
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={this.handleReset}
+              accessibilityLabel="Try again button"
+              accessibilityRole="button"
+            >
               <LinearGradient
-                colors={['#D4AF37', '#C9A961']}
+                colors={['#B8918F', '#A67C7A']}
                 style={styles.buttonGradient}
               >
                 <Ionicons
-                  name="refresh"
+                  name="refresh-outline"
                   size={20}
                   color="#FFFFFF"
                   style={styles.buttonIcon}
@@ -151,4 +179,4 @@ const styles = StyleSheet.create({
     fontWeight: TYPOGRAPHY.sans.weights.semibold as TextStyle['fontWeight'],
     color: '#FFFFFF',
   } as TextStyle,
-}); 
+});

@@ -19,8 +19,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import { QuickAction } from '../../types/aynaMirror';
+import { APP_THEME_V2 } from '@/constants/AppThemeV2';
+import { QuickAction } from '@/types/aynaMirror';
 
 // Animation configurations
 const ORGANIC_SPRING = {

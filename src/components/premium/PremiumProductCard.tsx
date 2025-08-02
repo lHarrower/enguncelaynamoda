@@ -7,7 +7,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import { PREMIUM_THEME } from '../../constants/PremiumThemeSystem';
+import { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { 
@@ -18,7 +18,7 @@ import Animated, {
   withSequence,
   interpolate,
 } from 'react-native-reanimated';
-import PremiumCard from './PremiumCard';
+import PremiumCard from '@/components/premium/PremiumCard';
 
 const { width } = Dimensions.get('window');
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);

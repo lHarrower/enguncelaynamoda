@@ -1,19 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const FilterChip = ({ label, isActive, onPress }: { label: string, isActive: boolean, onPress: () => void }) => {
     
     const animatedContainerStyle = useAnimatedStyle(() => {
         return {
-            backgroundColor: withTiming(isActive ? APP_THEME_V2.semantic.accent : 'rgba(255, 255, 255, 0.5)')
+            backgroundColor: withTiming(isActive ? DesignSystem.colors.sage[500] : 'rgba(255, 255, 255, 0.5)')
         }
     });
 
     const animatedTextStyle = useAnimatedStyle(() => {
         return {
-            color: withTiming(isActive ? APP_THEME_V2.colors.whisperWhite : APP_THEME_V2.semantic.text.secondary)
+            color: withTiming(isActive ? DesignSystem.colors.text.inverse : DesignSystem.colors.text.secondary)
         }
     });
 
@@ -33,14 +33,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
     borderRadius: 22,
     marginRight: 12,
-    ...APP_THEME_V2.elevation.whisper,
+    ...DesignSystem.elevation.soft,
   },
   categoryText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.caption,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: 'bold',
   },
 });
 
 
-export default FilterChip; 
+export default FilterChip;

@@ -8,20 +8,78 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { ClothingItem } from '../../data/sanctuaryModels';
+import { ClothingItem } from '@/data/sanctuaryModels';
+import { WardrobeItem } from '@/types/aynaMirror';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = (SCREEN_WIDTH - 60) / 2; // Account for padding and gap
 
 interface WardrobeItemCardProps {
-  item: ClothingItem;
+  item: ClothingItem | WardrobeItem;
   onPress: () => void;
+  onLongPress?: () => void;
+  showAIIndicator?: boolean;
 }
 
 export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
   item,
-  onPress
+  onPress,
+  onLongPress,
+  showAIIndicator = true
 }) => {
+  
+  // Helper function to get effective item name
+  const getEffectiveName = () => {
+    if ('name' in item && 'aiGeneratedName' in item) {
+      // New WardrobeItem with AI naming
+      const wardrobeItem = item as WardrobeItem;
+      if (wardrobeItem.name && wardrobeItem.nameOverride) {
+        return wardrobeItem.name;
+      }
+      if (wardrobeItem.aiGeneratedName) {
+        return wardrobeItem.aiGeneratedName;
+      }
+      return wardrobeItem.name || 'Unnamed Item';
+    }
+    // Legacy ClothingItem
+    return (item as ClothingItem).name || 'Unnamed Item';
+  };
+  
+  // Helper function to check if name is AI-generated
+  const isAIGenerated = () => {
+    if ('aiGeneratedName' in item && 'nameOverride' in item) {
+      const wardrobeItem = item as WardrobeItem;
+      return !wardrobeItem.nameOverride && !!wardrobeItem.aiGeneratedName;
+    }
+    return false;
+  };
+  
+  // Helper function to get item image URL
+  const getImageUrl = () => {
+    if ('imageUri' in item) {
+      return (item as WardrobeItem).imageUri;
+    }
+    return (item as ClothingItem).imageUrl;
+  };
+  
+  // Helper function to get item colors
+  const getColors = () => {
+    return item.colors || [];
+  };
+  
+  // Helper function to get item brand
+  const getBrand = () => {
+    return item.brand || item.category;
+  };
+  
+  // Helper function to get confidence score
+  const getConfidenceScore = () => {
+    if ('confidenceScore' in item) {
+      return (item as ClothingItem).confidenceScore;
+    }
+    // For WardrobeItem, we might need to calculate from confidenceHistory
+    return 8; // Default confidence
+  };
   const getLastWornStatus = () => {
     if (!item.lastWorn) {
       return { text: 'Never worn', color: '#FF6B6B', bgColor: '#FFE8E8' };
@@ -45,7 +103,7 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
   };
 
   const getConfidenceStars = () => {
-    const stars = Math.floor(item.confidenceScore / 2); // Convert 10-scale to 5-star
+    const stars = Math.floor(getConfidenceScore() / 2); // Convert 10-scale to 5-star
     return [...Array(5)].map((_, index) => (
       <Ionicons
         key={index}
@@ -62,11 +120,19 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
     <TouchableOpacity
       style={styles.card}
       onPress={onPress}
+      onLongPress={onLongPress}
       activeOpacity={0.9}
     >
       {/* Item Image */}
       <View style={styles.imageContainer}>
-        <Image source={{ uri: item.imageUrl }} style={styles.itemImage} />
+        <Image source={{ uri: getImageUrl() }} style={styles.itemImage} />
+        
+        {/* AI Generated Indicator */}
+        {showAIIndicator && isAIGenerated() && (
+          <View style={styles.aiIndicator}>
+            <Ionicons name="sparkles" size={12} color="#FFFFFF" />
+          </View>
+        )}
         
         {/* Last Worn Indicator */}
         <View style={[styles.lastWornBadge, { backgroundColor: lastWornStatus.bgColor }]}>
@@ -76,31 +142,41 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
         </View>
         
         {/* Wear Count */}
-        <View style={styles.wearCountBadge}>
-          <Text style={styles.wearCountText}>{item.wearCount}×</Text>
-        </View>
+        {'wearCount' in item && (
+          <View style={styles.wearCountBadge}>
+            <Text style={styles.wearCountText}>{(item as ClothingItem).wearCount}×</Text>
+          </View>
+        )}
       </View>
 
       {/* Item Info */}
       <View style={styles.itemInfo}>
-        <Text style={styles.itemName} numberOfLines={2}>
-          {item.name}
-        </Text>
+        <View style={styles.nameContainer}>
+          <Text style={styles.itemName} numberOfLines={2}>
+            {getEffectiveName()}
+          </Text>
+          {isAIGenerated() && showAIIndicator && (
+            <View style={styles.aiNameBadge}>
+              <Ionicons name="sparkles" size={8} color="#6366F1" />
+              <Text style={styles.aiNameText}>AI</Text>
+            </View>
+          )}
+        </View>
         
         <Text style={styles.itemBrand} numberOfLines={1}>
-          {item.brand || item.category}
+          {getBrand()}
         </Text>
         
         {/* Colors */}
         <View style={styles.colorsContainer}>
-          {item.colors.slice(0, 3).map((color, index) => (
+          {getColors().slice(0, 3).map((color, index) => (
             <View
               key={index}
               style={[styles.colorDot, { backgroundColor: getColorHex(color) }]}
             />
           ))}
-          {item.colors.length > 3 && (
-            <Text style={styles.moreColors}>+{item.colors.length - 3}</Text>
+          {getColors().length > 3 && (
+            <Text style={styles.moreColors}>+{getColors().length - 3}</Text>
           )}
         </View>
         
@@ -190,12 +266,44 @@ const styles = StyleSheet.create({
   itemInfo: {
     padding: 12,
   },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
   itemName: {
     fontSize: 14,
     fontWeight: '600',
     color: '#1D1D1F',
-    marginBottom: 4,
     lineHeight: 18,
+    flex: 1,
+  },
+  aiIndicator: {
+    position: 'absolute',
+    top: 8,
+    right: 40,
+    backgroundColor: '#6366F1',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  aiNameBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EEF2FF',
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginLeft: 4,
+  },
+  aiNameText: {
+    fontSize: 8,
+    fontWeight: '600',
+    color: '#6366F1',
+    marginLeft: 2,
   },
   itemBrand: {
     fontSize: 12,
@@ -227,4 +335,4 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 1,
   },
-}); 
+});

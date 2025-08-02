@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import ZenCard from './ZenCard';
+import { DesignSystem } from '@/theme/DesignSystem';
+import ZenCard from '@/components/common/ZenCard';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - (APP_THEME_V2.spacing.xl * 3)) / 2;
+const CARD_WIDTH = (width - (DesignSystem.spacing.xl * 3)) / 2;
 
 interface Product {
   id: string;
@@ -113,16 +113,16 @@ const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
     padding: 0,
-    marginBottom: APP_THEME_V2.spacing.md,
-    backgroundColor: APP_THEME_V2.semantic.surface,
-    borderRadius: APP_THEME_V2.radius.organic,
+    marginBottom: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderRadius: DesignSystem.borderRadius.lg,
     overflow: 'hidden',
   },
   imageContainer: {
     height: CARD_WIDTH * 1.3,
-    backgroundColor: APP_THEME_V2.colors.cloudGray,
-    borderTopLeftRadius: APP_THEME_V2.radius.organic,
-    borderTopRightRadius: APP_THEME_V2.radius.organic,
+    backgroundColor: DesignSystem.colors.sage[100],
+    borderTopLeftRadius: DesignSystem.borderRadius.lg,
+    borderTopRightRadius: DesignSystem.borderRadius.lg,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: APP_THEME_V2.colors.cloudGray,
+    backgroundColor: DesignSystem.colors.sage[100],
   },
   imageLoader: {
     position: 'absolute',
@@ -142,46 +142,46 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: APP_THEME_V2.colors.cloudGray,
+    backgroundColor: DesignSystem.colors.sage[100],
   },
   shimmer: {
     flex: 1,
-    backgroundColor: APP_THEME_V2.colors.linen.light,
+    backgroundColor: DesignSystem.colors.sage[50],
     opacity: 0.6,
   },
   likeButton: {
     position: 'absolute',
-    top: APP_THEME_V2.spacing.sm,
-    right: APP_THEME_V2.spacing.sm,
+    top: DesignSystem.spacing.sm,
+    right: DesignSystem.spacing.sm,
     width: 32,
     height: 32,
     borderRadius: 16,
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     alignItems: 'center',
     justifyContent: 'center',
-    ...APP_THEME_V2.elevation.whisper,
+    ...DesignSystem.elevation.soft,
   },
   content: {
-    padding: APP_THEME_V2.spacing.md,
+    padding: DesignSystem.spacing.md,
   },
   brand: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
-    marginBottom: APP_THEME_V2.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   name: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.primary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fonts.body,
     lineHeight: 18,
-    marginBottom: APP_THEME_V2.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   price: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.primary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fonts.body,
     fontWeight: '600',
   },
 });

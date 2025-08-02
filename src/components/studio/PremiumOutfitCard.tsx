@@ -16,7 +16,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { STUDIO_THEME } from '../../constants/StudioTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
@@ -55,7 +55,7 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
   const likeScale = useSharedValue(1);
 
   const getCardDimensions = () => {
-    const spacing = STUDIO_THEME.spacing.xl;
+    const spacing = DesignSystem.spacing.xl;
     const availableWidth = width - (spacing * 2);
     
     switch (size) {
@@ -74,11 +74,11 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
 
   // Handle press animation
   const handlePressIn = () => {
-    scale.value = withSpring(0.98, STUDIO_THEME.animations.interaction);
+    scale.value = withSpring(0.98, DesignSystem.animations.spring);
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1, STUDIO_THEME.animations.interaction);
+    scale.value = withSpring(1, DesignSystem.animations.spring);
   };
 
   const handlePress = () => {
@@ -112,8 +112,9 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
       <TouchableOpacity
         style={[
           styles.card,
-          STUDIO_THEME.components.outfitCard,
           {
+            backgroundColor: DesignSystem.colors.background.elevated,
+            ...DesignSystem.elevation.medium,
             width: dimensions.width,
             height: dimensions.height,
           },
@@ -141,7 +142,7 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
               <Ionicons
                 name={isLiked ? 'heart' : 'heart-outline'}
                 size={20}
-                color={isLiked ? STUDIO_THEME.colors.semantic.error : STUDIO_THEME.colors.text.secondary}
+                color={isLiked ? DesignSystem.colors.error[500] : DesignSystem.colors.text.secondary}
               />
             </Animated.View>
           </TouchableOpacity>
@@ -183,8 +184,8 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
             <View style={styles.confidenceBar}>
               <LinearGradient
                 colors={[
-                  STUDIO_THEME.colors.accent.jade,
-                  STUDIO_THEME.colors.accent.gold,
+                  DesignSystem.colors.sage[500],
+                  DesignSystem.colors.amber[500],
                 ]}
                 style={[
                   styles.confidenceFill,
@@ -205,7 +206,7 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
                   <Ionicons
                     name="happy-outline"
                     size={14}
-                    color={STUDIO_THEME.colors.text.tertiary}
+                    color={DesignSystem.colors.text.tertiary}
                   />
                   <Text style={styles.metaText}>{outfit.mood}</Text>
                 </View>
@@ -215,7 +216,7 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
                   <Ionicons
                     name="leaf-outline"
                     size={14}
-                    color={STUDIO_THEME.colors.text.tertiary}
+                    color={DesignSystem.colors.text.tertiary}
                   />
                   <Text style={styles.metaText}>{outfit.season}</Text>
                 </View>
@@ -230,8 +231,8 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: STUDIO_THEME.colors.foundation.elevated,
-    borderRadius: STUDIO_THEME.radius.lg,
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
   },
   
@@ -254,21 +255,21 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     alignItems: 'center',
     justifyContent: 'center',
-    ...STUDIO_THEME.shadows.soft,
+    ...DesignSystem.elevation.soft,
   },
   confidenceBadge: {
     position: 'absolute',
     top: 12,
     left: 12,
-    backgroundColor: STUDIO_THEME.colors.accent.jade,
+    backgroundColor: DesignSystem.colors.sage[500],
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
-    ...STUDIO_THEME.shadows.soft,
+    ...DesignSystem.elevation.soft,
   },
   confidenceText: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.inverse,
     fontSize: 11,
     fontWeight: '600',
   },
@@ -276,20 +277,20 @@ const styles = StyleSheet.create({
   // Content Section
   contentContainer: {
     flex: 1,
-    padding: STUDIO_THEME.spacing.md,
+    padding: DesignSystem.spacing.md,
     justifyContent: 'space-between',
   },
   titleSection: {
     marginBottom: 8,
   },
   outfitTitle: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 2,
   },
   outfitSubtitle: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.text.secondary,
   },
   
   // Tags
@@ -299,14 +300,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   tag: {
-    backgroundColor: STUDIO_THEME.colors.accent.jadeGlow,
+    backgroundColor: DesignSystem.colors.sage[100],
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
   },
   tagText: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.accent.jade,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.sage[600],
     fontSize: 10,
   },
   
@@ -316,7 +317,7 @@ const styles = StyleSheet.create({
   },
   confidenceBar: {
     height: 4,
-    backgroundColor: STUDIO_THEME.colors.foundation.tertiary,
+    backgroundColor: DesignSystem.colors.background.tertiary,
     borderRadius: 2,
     marginBottom: 4,
     overflow: 'hidden',
@@ -326,8 +327,8 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   confidenceLabel: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.text.tertiary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     fontSize: 10,
   },
   
@@ -342,8 +343,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   metaText: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.text.tertiary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     fontSize: 10,
   },
 });

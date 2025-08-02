@@ -1,13 +1,13 @@
 // Suppress known non-critical warnings in development - MUST BE FIRST
 try {
-  require('../utils/consoleSuppress');
+  require('@/utils/consoleSuppress');
 } catch (error) {
   console.warn('Console suppress utility not available:', error);
 }
 
 // File: app/_layout.tsx (Correct and Final Version)
-import { AuthProvider } from '../context/AuthContext';
-import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import { AuthProvider } from '@/context/AuthContext';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import { Slot, SplashScreen } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -17,9 +17,9 @@ import { useFonts, Inter_300Light, Inter_400Regular, Inter_500Medium, Inter_600S
 import { PlayfairDisplay_400Regular, PlayfairDisplay_700Bold } from '@expo-google-fonts/playfair-display';
 import { Karla_400Regular } from '@expo-google-fonts/karla';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { PerformanceOptimizationService } from '../services/performanceOptimizationService';
-import UltraPremiumLoadingScreen from '../components/ultra/UltraPremiumLoadingScreen';
-import ErrorBoundary from '../components/common/ErrorBoundary';
+import { PerformanceOptimizationService } from '@/services/performanceOptimizationService';
+import UltraPremiumLoadingScreen from '@/components/ultra/UltraPremiumLoadingScreen';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 
 // Notification handler temporarily disabled to avoid native module errors
 // Will be re-enabled once ExpoPushTokenManager is properly configured

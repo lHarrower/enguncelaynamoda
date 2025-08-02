@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { APP_THEME_V2 } from '@/constants/AppThemeV2';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 
 interface StylePreferenceQuestionnaire {

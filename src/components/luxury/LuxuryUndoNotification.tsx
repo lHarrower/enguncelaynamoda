@@ -8,7 +8,7 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface LuxuryUndoNotificationProps {
   isVisible: boolean;
@@ -77,19 +77,18 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   button: {
-    backgroundColor: APP_THEME_V2.colors.charcoalGray,
-    paddingVertical: APP_THEME_V2.spacing.md,
-    paddingHorizontal: APP_THEME_V2.spacing.lg,
-    borderRadius: APP_THEME_V2.radius.round,
-    ...APP_THEME_V2.elevation.lift,
+    backgroundColor: DesignSystem.colors.charcoal[800],
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.radius.full,
+    ...DesignSystem.elevation.medium,
     flexDirection: 'row',
     alignItems: 'center',
   },
   text: {
-    ...APP_THEME_V2.typography.scale.body1,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
-    color: APP_THEME_V2.colors.whisperWhite,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.background.elevated,
   },
 });
 
-export default LuxuryUndoNotification; 
+export default LuxuryUndoNotification;

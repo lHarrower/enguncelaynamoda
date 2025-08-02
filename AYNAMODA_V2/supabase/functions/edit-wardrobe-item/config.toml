@@ -1,5 +1,0 @@
-[functions.edit-wardrobe-item]
-enabled = true
-verify_jwt = true
-import_map = "./deno.json"
-entrypoint = "./index.ts" 

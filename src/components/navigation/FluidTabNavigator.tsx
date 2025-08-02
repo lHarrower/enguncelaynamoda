@@ -17,7 +17,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -185,7 +185,7 @@ export const FluidTabNavigator: React.FC<FluidTabNavigatorProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: APP_THEME_V2.colors.linen.base,
+    backgroundColor: DesignSystem.colors.linen.base,
   },
   screenContainer: {
     flex: 1,
@@ -204,45 +204,45 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     position: 'relative',
-    backgroundColor: APP_THEME_V2.colors.whisperWhite,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderTopWidth: 1,
-    borderTopColor: APP_THEME_V2.colors.moonlightSilver,
-    paddingBottom: APP_THEME_V2.spacing.sm,
-    ...APP_THEME_V2.elevation.whisper,
+    borderTopColor: DesignSystem.colors.sage[200],
+    paddingBottom: DesignSystem.spacing.sm,
+    ...DesignSystem.elevation.soft,
   },
   tabIndicator: {
     position: 'absolute',
     top: 0,
     width: 40,
     height: 3,
-    backgroundColor: APP_THEME_V2.colors.liquidGold[500],
-    borderRadius: APP_THEME_V2.radius.xs,
+    backgroundColor: DesignSystem.colors.sage[500],
+    borderRadius: DesignSystem.radius.xs,
   },
   tabButtonsContainer: {
     flexDirection: 'row',
-    paddingTop: APP_THEME_V2.spacing.md,
+    paddingTop: DesignSystem.spacing.md,
   },
   tabButton: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: APP_THEME_V2.spacing.sm,
+    paddingVertical: DesignSystem.spacing.sm,
   },
   tabContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: APP_THEME_V2.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.sm,
   },
   activeTabContent: {
     // Additional styling for active tab if needed
   },
   tabLabel: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.colors.inkGray[400],
-    marginTop: APP_THEME_V2.spacing.xs,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.inkGray[400],
+    marginTop: DesignSystem.spacing.xs,
     textAlign: 'center',
   },
   activeTabLabel: {
-    color: APP_THEME_V2.colors.liquidGold[600],
+    color: DesignSystem.colors.sage[600],
     fontWeight: '600',
   },
-}); 
+});

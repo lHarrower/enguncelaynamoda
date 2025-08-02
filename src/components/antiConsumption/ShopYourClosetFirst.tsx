@@ -9,9 +9,10 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import { antiConsumptionService, ShopYourClosetRecommendation } from '../../services/antiConsumptionService';
-import { WardrobeItem } from '../../types';
+import { useTheme } from '@/theme/ThemeProvider';
+import { antiConsumptionService, ShopYourClosetRecommendation } from '@/services/antiConsumptionService';
+import { WardrobeItem } from '@/types';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ShopYourClosetFirstProps {
   userId: string;
@@ -30,6 +31,8 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
   style = '',
   onRecommendationGenerated,
 }) => {
+  const { colors: themeColors } = useTheme();
+  const styles = createStyles(themeColors);
   const [recommendation, setRecommendation] = useState<ShopYourClosetRecommendation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +94,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
     return (
       <View style={styles.container}>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color={APP_THEME_V2.colors.error} />
+          <Ionicons name="alert-circle-outline" size={48} color={DesignSystem.colors.error[500]} />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={generateRecommendation}>
             <Text style={styles.retryButtonText}>Try Again</Text>
@@ -105,7 +108,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
     return (
       <View style={styles.container}>
         <View style={styles.noItemsContainer}>
-          <Ionicons name="shirt-outline" size={48} color={APP_THEME_V2.colors.textSecondary} />
+          <Ionicons name="shirt-outline" size={48} color={DesignSystem.colors.neutral[600]} />
           <Text style={styles.noItemsTitle}>No Similar Items Found</Text>
           <Text style={styles.noItemsText}>
             You don't have similar items in your closet yet. This might be a good addition to your wardrobe!
@@ -119,7 +122,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View style={styles.iconContainer}>
-          <Ionicons name="leaf-outline" size={24} color={APP_THEME_V2.colors.primary} />
+          <Ionicons name="leaf-outline" size={24} color={DesignSystem.colors.primary[500]} />
         </View>
         <Text style={styles.title}>Shop Your Closet First</Text>
         <Text style={styles.subtitle}>
@@ -149,7 +152,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
       <View style={styles.reasoningContainer}>
         {recommendation.reasoning.map((reason, index) => (
           <View key={index} style={styles.reasoningItem}>
-            <Ionicons name="checkmark-circle" size={16} color={APP_THEME_V2.colors.success} />
+            <Ionicons name="checkmark-circle" size={16} color={DesignSystem.colors.success[500]} />
             <Text style={styles.reasoningText}>{reason}</Text>
           </View>
         ))}
@@ -200,10 +203,10 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: APP_THEME_V2.colors.background,
+    backgroundColor: colors.background.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -213,7 +216,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   errorContainer: {
@@ -224,13 +227,13 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.error,
+    color: colors.semantic.error,
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: APP_THEME_V2.colors.primary,
+    backgroundColor: colors.primary[500],
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -249,13 +252,13 @@ const styles = StyleSheet.create({
   noItemsTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginTop: 16,
     marginBottom: 8,
   },
   noItemsText: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -267,7 +270,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: `${APP_THEME_V2.colors.primary}20`,
+    backgroundColor: `${colors.primary[500]}20`,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -275,29 +278,29 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   targetItemContainer: {
     margin: 20,
     padding: 16,
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
   },
   targetItemLabel: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     marginBottom: 4,
   },
   targetItemDescription: {
     fontSize: 18,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
   },
   confidenceContainer: {
     marginHorizontal: 20,
@@ -305,19 +308,19 @@ const styles = StyleSheet.create({
   },
   confidenceBar: {
     height: 8,
-    backgroundColor: APP_THEME_V2.colors.border,
+    backgroundColor: colors.border.primary,
     borderRadius: 4,
     overflow: 'hidden',
     marginBottom: 8,
   },
   confidenceFill: {
     height: '100%',
-    backgroundColor: APP_THEME_V2.colors.success,
+    backgroundColor: colors.semantic.success,
     borderRadius: 4,
   },
   confidenceText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     textAlign: 'center',
   },
   reasoningContainer: {
@@ -331,7 +334,7 @@ const styles = StyleSheet.create({
   },
   reasoningText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginLeft: 8,
     flex: 1,
   },
@@ -342,7 +345,7 @@ const styles = StyleSheet.create({
   itemsTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginBottom: 16,
   },
   itemsGrid: {
@@ -352,7 +355,7 @@ const styles = StyleSheet.create({
   },
   itemCard: {
     width: '48%',
-    backgroundColor: APP_THEME_V2.colors.surface,
+    backgroundColor: colors.background.secondary,
     borderRadius: 12,
     marginBottom: 16,
     overflow: 'hidden',
@@ -360,7 +363,7 @@ const styles = StyleSheet.create({
   itemImage: {
     width: '100%',
     height: 120,
-    backgroundColor: APP_THEME_V2.colors.border,
+    backgroundColor: colors.border.primary,
   },
   itemInfo: {
     padding: 12,
@@ -368,7 +371,7 @@ const styles = StyleSheet.create({
   itemCategory: {
     fontSize: 14,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.textPrimary,
+    color: colors.text.primary,
     marginBottom: 4,
   },
   itemColors: {
@@ -381,18 +384,18 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginRight: 4,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.border,
+    borderColor: colors.border.primary,
   },
   itemTags: {
     fontSize: 12,
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
   },
   actionContainer: {
     padding: 20,
     paddingBottom: 40,
   },
   primaryButton: {
-    backgroundColor: APP_THEME_V2.colors.primary,
+    backgroundColor: colors.primary[500],
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -408,13 +411,13 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.border,
+    borderColor: colors.border.primary,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
   },
   secondaryButtonText: {
-    color: APP_THEME_V2.colors.textSecondary,
+    color: colors.text.secondary,
     fontSize: 16,
     fontWeight: '500',
   },

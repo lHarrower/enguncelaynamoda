@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import { SocialFeedback } from '../../types/aynaMirror';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { SocialFeedback } from '@/types/aynaMirror';
 
 interface SocialFeedbackStepProps {
   socialFeedback?: SocialFeedback;
@@ -149,8 +149,8 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
             ]}
             activeOpacity={0.7}
           >
-            <View style={[styles.occasionIcon, { backgroundColor: APP_THEME_V2.semantic.accent + '20' }]}>
-              <Ionicons name="add-outline" size={20} color={APP_THEME_V2.semantic.accent} />
+            <View style={[styles.occasionIcon, { backgroundColor: DesignSystem.colors.sage[500] + '20' }]}>
+          <Ionicons name="add-outline" size={20} color={DesignSystem.colors.sage[500]} />
             </View>
             <Text style={styles.occasionLabel}>Other</Text>
           </TouchableOpacity>
@@ -163,7 +163,7 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
               placeholder="Enter custom occasion..."
               value={occasion}
               onChangeText={onOccasionChange}
-              placeholderTextColor={APP_THEME_V2.semantic.text.tertiary}
+              placeholderTextColor={DesignSystem.colors.text.tertiary}
             />
           </View>
         )}
@@ -186,7 +186,7 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
             style={[styles.counterButton, complimentsCount === 0 && styles.counterButtonDisabled]}
             disabled={complimentsCount === 0}
           >
-            <Ionicons name="remove" size={24} color={APP_THEME_V2.semantic.text.primary} />
+            <Ionicons name="remove" size={24} color={DesignSystem.colors.text.primary} />
           </TouchableOpacity>
           
           <View style={styles.counterDisplay}>
@@ -198,7 +198,7 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
             onPress={() => handleComplimentChange(true)}
             style={styles.counterButton}
           >
-            <Ionicons name="add" size={24} color={APP_THEME_V2.semantic.text.primary} />
+            <Ionicons name="add" size={24} color={DesignSystem.colors.text.primary} />
           </TouchableOpacity>
         </Animated.View>
 
@@ -247,7 +247,7 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
           onChangeText={setSocialContext}
           multiline
           numberOfLines={3}
-          placeholderTextColor={APP_THEME_V2.semantic.text.tertiary}
+          placeholderTextColor={DesignSystem.colors.text.tertiary}
         />
       </View>
 
@@ -281,14 +281,14 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 4,
   },
   sectionSubtitle: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: 20,
     fontStyle: 'italic',
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   occasionButton: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   },
   occasionButtonSelected: {
     borderWidth: 2,
-    backgroundColor: APP_THEME_V2.semantic.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   occasionIcon: {
     width: 32,
@@ -322,8 +322,8 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   occasionLabel: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     fontWeight: '500',
   },
@@ -331,18 +331,18 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   customOccasionInput: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.primary,
   },
   complimentCounter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 16,
     paddingVertical: 20,
     marginBottom: 16,
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: APP_THEME_V2.semantic.background,
+    backgroundColor: DesignSystem.colors.background.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -363,18 +363,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 32,
   },
   counterNumber: {
-    ...APP_THEME_V2.typography.scale.hero,
-    color: APP_THEME_V2.semantic.accent,
+    ...DesignSystem.typography.hero,
+    color: DesignSystem.colors.sage[500],
     fontWeight: '700',
   },
   counterLabel: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
     marginTop: -4,
   },
   complimentMessage: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   reactionButton: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 12,
@@ -396,55 +396,55 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   reactionButtonSelected: {
-    borderColor: APP_THEME_V2.semantic.accent,
-    backgroundColor: APP_THEME_V2.semantic.accent + '10',
+    borderColor: DesignSystem.colors.sage[500],
+    backgroundColor: DesignSystem.colors.sage[500] + '10',
   },
   reactionEmoji: {
     fontSize: 24,
     marginBottom: 6,
   },
   reactionLabel: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 2,
   },
   reactionLabelSelected: {
-    color: APP_THEME_V2.semantic.accent,
+    color: DesignSystem.colors.sage[500],
   },
   reactionDescription: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
     fontStyle: 'italic',
   },
   contextInput: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.primary,
     textAlignVertical: 'top',
     minHeight: 80,
   },
   summaryContainer: {
-    backgroundColor: APP_THEME_V2.semantic.accent + '10',
+    backgroundColor: DesignSystem.colors.sage[500] + '10',
     borderRadius: 16,
     paddingVertical: 20,
     paddingHorizontal: 24,
     marginBottom: 20,
   },
   summaryTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.accent,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.sage[500],
     textAlign: 'center',
     marginBottom: 12,
   },
   summaryItem: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 4,
   },
 });

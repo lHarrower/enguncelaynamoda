@@ -5,7 +5,7 @@
  * Turkish content and premium styling narratives.
  */
 
-import { ExperienceStory } from '../components/home/ExperienceStoryBlock';
+import { ExperienceStory } from '@/components/home/ExperienceStoryBlock';
 
 export const EXPERIENCE_STORIES: ExperienceStory[] = [
   {

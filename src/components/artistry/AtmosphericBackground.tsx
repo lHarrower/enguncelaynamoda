@@ -12,7 +12,7 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ARTISTRY_THEME } from '../../constants/ArtistryTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,33 +40,33 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
     switch (variant) {
       case 'emerald':
         return {
-          primary: ARTISTRY_THEME.colors.emerald.deep,
-          secondary: ARTISTRY_THEME.colors.emerald.rich,
-          glow: ARTISTRY_THEME.colors.emerald.glow,
+          primary: DesignSystem.colors.sage[800],
+          secondary: DesignSystem.colors.sage[600],
+          glow: DesignSystem.colors.sage[400],
         };
       case 'sapphire':
         return {
-          primary: ARTISTRY_THEME.colors.sapphire.deep,
-          secondary: ARTISTRY_THEME.colors.sapphire.rich,
-          glow: ARTISTRY_THEME.colors.sapphire.glow,
+          primary: DesignSystem.colors.sage[900],
+          secondary: DesignSystem.colors.sage[700],
+          glow: DesignSystem.colors.sage[500],
         };
       case 'ruby':
         return {
-          primary: ARTISTRY_THEME.colors.ruby.deep,
-          secondary: ARTISTRY_THEME.colors.ruby.rich,
-          glow: ARTISTRY_THEME.colors.ruby.glow,
+          primary: DesignSystem.colors.sage[800],
+          secondary: DesignSystem.colors.sage[600],
+          glow: DesignSystem.colors.sage[400],
         };
       case 'gold':
         return {
-          primary: ARTISTRY_THEME.colors.liquidGold[800],
-          secondary: ARTISTRY_THEME.colors.liquidGold[600],
-          glow: ARTISTRY_THEME.colors.liquidGold.glow,
+          primary: DesignSystem.colors.sage[700],
+          secondary: DesignSystem.colors.sage[500],
+          glow: DesignSystem.colors.sage[300],
         };
       default:
         return {
-          primary: ARTISTRY_THEME.colors.emerald.deep,
-          secondary: ARTISTRY_THEME.colors.emerald.rich,
-          glow: ARTISTRY_THEME.colors.emerald.glow,
+          primary: DesignSystem.colors.sage[800],
+          secondary: DesignSystem.colors.sage[600],
+          glow: DesignSystem.colors.sage[400],
         };
     }
   };
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: ARTISTRY_THEME.semantic.canvas.void,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   gradientLayer: {
     position: 'absolute',

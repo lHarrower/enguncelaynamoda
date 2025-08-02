@@ -251,7 +251,7 @@ export const LuxuryTheme = {
 } as const;
 
 // Re-export legacy luxury design tokens for backward compatibility
-export { LuxuryMaterials, LuxuryMotion, LuxuryShadows, LuxuryLayout, LuxurySpacing, LuxuryTypography } from '../constants/LuxuryTheme';
+export { LuxuryMaterials, LuxuryMotion, LuxuryShadows, LuxuryLayout, LuxurySpacing, LuxuryTypography } from '@/constants/LuxuryTheme';
 
 // TYPE EXPORTS
 export type LuxuryThemeType = typeof LuxuryTheme;

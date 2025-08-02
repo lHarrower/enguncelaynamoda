@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import { supabase, ENV } from '../config/supabaseClient';
-import { useAuth } from '../context/AuthContext';
+import { supabase, ENV } from '@/config/supabaseClient';
+import { useAuth } from '@/context/AuthContext';
 import { 
   API_CONFIG, 
   IMAGE_CONFIG, 
   ERROR_MESSAGES,
   SUCCESS_MESSAGES 
-} from '../constants/AppConstants';
+} from '@/constants/AppConstants';
 import { Ionicons } from '@expo/vector-icons';
 
 // Interface for UI callbacks that the hook will use
@@ -291,4 +291,4 @@ export const useImageUploader = (callbacks: UICallbacks) => {
     handleCameraUpload: pickImageWithCameraAsync,
     handleGalleryUpload: pickImageWithGalleryAsync,
   };
-}; 
+};

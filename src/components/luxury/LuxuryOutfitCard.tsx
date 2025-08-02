@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { View, Text, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import { Outfit } from '../../data/sanctuaryModels';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { Outfit } from '@/data/sanctuaryModels';
 import { BlurView } from 'expo-blur'; // Bu paketi eklemeniz gerekebilir: npx expo install expo-blur
 
 interface LuxuryOutfitCardProps {
@@ -29,11 +29,11 @@ export const LuxuryOutfitCard = ({ outfit, onPress }: LuxuryOutfitCardProps) => 
 
 const styles = StyleSheet.create({
   container: {
-    ...APP_THEME_V2.elevation.lift,
-    borderRadius: 24,
+    ...DesignSystem.elevation.medium,
+    borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
-    marginHorizontal: APP_THEME_V2.spacing.lg,
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.xl,
   },
   image: {
     width: '100%',
@@ -41,36 +41,34 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   glassmorphismContainer: {
-    padding: APP_THEME_V2.spacing.lg,
+    padding: DesignSystem.spacing.lg,
     borderTopWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   moodTag: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.colors.linen.base,
-    backgroundColor: APP_THEME_V2.colors.liquidGold[500],
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.inverse,
+    backgroundColor: DesignSystem.colors.sage[500],
     alignSelf: 'flex-start',
-    paddingHorizontal: APP_THEME_V2.spacing.md,
-    paddingVertical: APP_THEME_V2.spacing.xs,
-    borderRadius: 12,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.xs,
+    borderRadius: DesignSystem.radius.md,
     overflow: 'hidden',
-    marginBottom: APP_THEME_V2.spacing.md,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    marginBottom: DesignSystem.spacing.md,
     fontWeight: '600',
   },
   whisper: {
-    ...APP_THEME_V2.typography.scale.h3,
+    ...DesignSystem.typography.h3,
     fontSize: 20,
-    color: APP_THEME_V2.colors.linen.base,
+    color: DesignSystem.colors.text.inverse,
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
   },
   itemCount: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.colors.linen.base,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.inverse,
     opacity: 0.8,
-    marginTop: APP_THEME_V2.spacing.sm,
+    marginTop: DesignSystem.spacing.sm,
   },
 });

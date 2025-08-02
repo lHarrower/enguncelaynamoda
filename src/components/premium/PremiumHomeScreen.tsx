@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PREMIUM_THEME } from '../../constants/PremiumThemeSystem';
+import { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';
 import PremiumButton from './PremiumButton';
 import PremiumCard from './PremiumCard';
 import { BlurView } from 'expo-blur';

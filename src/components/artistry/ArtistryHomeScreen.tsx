@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { ARTISTRY_THEME } from '../../constants/ArtistryTheme';
+import { DesignSystem } from '../../theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 
 // Import artistry components
@@ -121,8 +121,8 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
         mood: 'Radiant Confidence',
         description: 'Embrace your inner glow',
         gradient: [
-          ARTISTRY_THEME.colors.liquidGold.glow,
-          ARTISTRY_THEME.colors.confidence.glow,
+          DesignSystem.colors.sage[400],
+        DesignSystem.colors.sage[500],
         ],
       },
     },
@@ -140,9 +140,9 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       content: {
         icon: 'sparkles',
         gradient: [
-          ARTISTRY_THEME.colors.liquidGold.glow,
+          DesignSystem.colors.sage[400],
           'transparent',
-          ARTISTRY_THEME.colors.emerald.glow,
+          DesignSystem.colors.sage[500],
         ],
       },
       onPress: () => {
@@ -205,7 +205,7 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       content: {
         icon: 'shirt-outline',
         gradient: [
-          ARTISTRY_THEME.colors.sapphire.glow,
+          DesignSystem.colors.sage[600],
           'transparent',
         ],
       },
@@ -221,7 +221,7 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       content: {
         icon: 'glasses-outline',
         gradient: [
-          ARTISTRY_THEME.colors.ruby.glow,
+          DesignSystem.colors.sage[700],
           'transparent',
         ],
       },
@@ -247,7 +247,7 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       content: {
         icon: 'person-outline',
         gradient: [
-          ARTISTRY_THEME.colors.liquidGold.glow,
+          DesignSystem.colors.sage[400],
           'transparent',
         ],
       },
@@ -270,12 +270,12 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
         style={styles.container}
         contentContainerStyle={[
           styles.contentContainer,
-          { paddingBottom: insets.bottom + ARTISTRY_THEME.spacing.cosmic }
+          { paddingBottom: insets.bottom + DesignSystem.spacing.xxl }
         ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Floating Header */}
-        <View style={[styles.header, { paddingTop: insets.top + ARTISTRY_THEME.spacing.flow }]}>
+        <View style={[styles.header, { paddingTop: insets.top + DesignSystem.spacing.lg }]}>
           <PoetryText animation="glide" delay={0}>
             AYNAMODA
           </PoetryText>
@@ -285,14 +285,14 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
               <Ionicons 
                 name="search-outline" 
                 size={20} 
-                color={ARTISTRY_THEME.semantic.text.whisper} 
+                color={DesignSystem.colors.text.tertiary} 
               />
             </TouchableOpacity>
             <TouchableOpacity style={styles.headerButton}>
               <Ionicons 
                 name="notifications-outline" 
                 size={20} 
-                color={ARTISTRY_THEME.semantic.text.whisper} 
+                color={DesignSystem.colors.text.tertiary} 
               />
             </TouchableOpacity>
           </View>
@@ -345,7 +345,7 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
         <BentoGallery
           items={bentoItems}
           columns={2}
-          spacing={ARTISTRY_THEME.spacing.flow}
+          spacing={DesignSystem.spacing.md}
           style={styles.gallery}
         />
 
@@ -373,18 +373,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: ARTISTRY_THEME.spacing.dance,
-    marginBottom: ARTISTRY_THEME.spacing.float,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   headerActions: {
     flexDirection: 'row',
-    gap: ARTISTRY_THEME.spacing.gentle,
+    gap: DesignSystem.spacing.md,
   },
   headerButton: {
     width: 40,
     height: 40,
-    borderRadius: ARTISTRY_THEME.radius.gentle,
-    ...ARTISTRY_THEME.components.panel.default,
+    borderRadius: DesignSystem.radius.md,
+    ...DesignSystem.elevation.soft,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -392,26 +392,26 @@ const styles = StyleSheet.create({
   // Hero Section Styles
   heroSection: {
     alignItems: 'center',
-    paddingHorizontal: ARTISTRY_THEME.spacing.dance,
-    marginBottom: ARTISTRY_THEME.spacing.soar,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.xxl,
   },
   heroTitle: {
     textAlign: 'center',
-    marginBottom: ARTISTRY_THEME.spacing.gentle,
+    marginBottom: DesignSystem.spacing.md,
   },
   heroSubtitle: {
     textAlign: 'center',
-    marginBottom: ARTISTRY_THEME.spacing.float,
+    marginBottom: DesignSystem.spacing.lg,
   },
   totem: {
-    marginTop: ARTISTRY_THEME.spacing.dance,
+    marginTop: DesignSystem.spacing.lg,
   },
   
   // Gallery Styles
   galleryHeader: {
     alignItems: 'center',
-    paddingHorizontal: ARTISTRY_THEME.spacing.dance,
-    marginBottom: ARTISTRY_THEME.spacing.dance,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   gallery: {
     flex: 1,
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
   // Atmosphere Indicator
   atmosphereIndicator: {
     alignItems: 'center',
-    paddingVertical: ARTISTRY_THEME.spacing.dance,
+    paddingVertical: DesignSystem.spacing.lg,
   },
   
   // Loading Styles
@@ -428,11 +428,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: ARTISTRY_THEME.semantic.canvas.void,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   loadingText: {
-    ...ARTISTRY_THEME.typography.scale.elegant,
-    color: ARTISTRY_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.body,
+    color: DesignSystem.colors.text.tertiary,
   },
 });
 

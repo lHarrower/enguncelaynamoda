@@ -14,12 +14,13 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
-import { VerticalProductCard, ProductCardData } from './VerticalProductCard';
+import { VerticalProductCard, ProductCardData } from '@/components/home/VerticalProductCard';
 import {
   ORIGINAL_COLORS,
   ORIGINAL_TYPOGRAPHY,
   ORIGINAL_SPACING,
-} from '../auth/originalLoginStyles';
+  ORIGINAL_BORDER_RADIUS,
+} from '@/components/auth/originalLoginStyles';
 
 const { width: screenWidth } = Dimensions.get('window');
 

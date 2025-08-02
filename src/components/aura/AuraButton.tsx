@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '../../theme/DesignSystem';
 
 interface AuraButtonProps {
   title: string;
@@ -205,9 +205,9 @@ const AuraButton: React.FC<AuraButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: APP_THEME_V2.radius.organic,
+    borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.elevation.medium,
   },
   fullWidth: {
     width: '100%',
@@ -215,8 +215,8 @@ const styles = StyleSheet.create({
   secondary: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: APP_THEME_V2.semantic.accent,
-    ...APP_THEME_V2.elevation.whisper,
+    borderColor: DesignSystem.colors.sage[500],
+    ...DesignSystem.elevation.soft,
   },
   ghost: {
     backgroundColor: 'transparent',
@@ -243,8 +243,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: APP_THEME_V2.colors.zenGold + '30',
+    backgroundColor: DesignSystem.colors.gold[500] + '30',
   },
 });
 
-export default AuraButton; 
+export default AuraButton;

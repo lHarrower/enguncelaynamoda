@@ -1,11 +1,14 @@
 // app/(app)/_layout.tsx
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Redirect, Tabs } from 'expo-router';
 import { useAuth } from '@/context/AuthContext'; // CORRECTED PATH
 import { STUDIO_THEME } from '@/constants/StudioTheme'; // CORRECTED PATH
 import { View, Text } from 'react-native';
 import StudioTabBar from '@/components/studio/StudioTabBar'; // CORRECTED PATH
+import { featureIntegrationCoordinator } from '@/services/featureIntegrationCoordinator';
+import { performanceOptimizationService } from '@/services/performanceOptimizationService';
+import { transitionPolishingService } from '@/services/transitionPolishingService';
 
 export default function AppLayout() {
   // Add error boundary for useAuth
@@ -32,6 +35,33 @@ export default function AppLayout() {
   }
   
   const { session, loading } = authState;
+
+  // Initialize feature integration when user is authenticated
+  useEffect(() => {
+    if (session && !loading) {
+      initializeAppServices();
+    }
+  }, [session, loading]);
+
+  const initializeAppServices = async () => {
+    try {
+      console.log('🚀 Initializing app services...');
+      
+      // Initialize performance monitoring
+      await performanceOptimizationService.startMonitoring();
+      
+      // Initialize feature integration coordinator
+      await featureIntegrationCoordinator.initialize();
+      
+      // Check integration health
+      const health = await featureIntegrationCoordinator.checkIntegrationHealth();
+      console.log('🏥 App Health Status:', health.overall);
+      
+      console.log('✅ App services initialized successfully');
+    } catch (error) {
+      console.error('❌ Failed to initialize app services:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -60,6 +90,8 @@ export default function AppLayout() {
       tabBar={(props) => <StudioTabBar {...props} />}
       screenOptions={{
         headerShown: false,
+        animation: 'slide_from_right',
+        animationDuration: 250,
       }}
     >
       <Tabs.Screen name="index" />

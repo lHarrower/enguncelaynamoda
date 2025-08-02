@@ -15,19 +15,19 @@ import Animated, {
   interpolate,
   Extrapolate,
 } from 'react-native-reanimated';
-import { EDITORIAL_THEME } from '../../constants/EditorialTheme';
-import { FloatingNavBar } from './FloatingNavBar';
-import { WeeklyColorCard } from './WeeklyColorCard';
-import { StylePickCard } from './StylePickCard';
-import { EditorialStoryCard } from './EditorialStoryCard';
-import { DiscoverScreen } from './DiscoverScreen';
-import { WardrobeScreen } from './WardrobeScreen';
-import { ProfileScreen } from './ProfileScreen';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { FloatingNavBar } from '@/components/editorial/FloatingNavBar';
+import { WeeklyColorCard } from '@/components/editorial/WeeklyColorCard';
+import { StylePickCard } from '@/components/editorial/StylePickCard';
+import { EditorialStoryCard } from '@/components/editorial/EditorialStoryCard';
+import { DiscoverScreen } from '@/components/editorial/DiscoverScreen';
+import { WardrobeScreen } from '@/components/editorial/WardrobeScreen';
+import { ProfileScreen } from '@/components/editorial/ProfileScreen';
 import {
   weeklyColorStories,
   dailyStylePicks,
   editorialStories,
-} from '../../data/editorialContent';
+} from '@/data/editorialContent';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -171,7 +171,7 @@ export const EditorialHomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: EDITORIAL_THEME.colors.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollView: {
     flex: 1,
@@ -180,59 +180,59 @@ const styles = StyleSheet.create({
     paddingBottom: 120,
   },
   header: {
-    paddingHorizontal: EDITORIAL_THEME.layout.containerPadding,
+    paddingHorizontal: DesignSystem.spacing.lg,
     paddingTop: 20,
-    paddingBottom: EDITORIAL_THEME.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   greeting: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    fontSize: DesignSystem.typography.body.fontSize,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    color: DesignSystem.colors.text.secondary,
     marginBottom: 4,
   },
   headerTitle: {
-    fontSize: EDITORIAL_THEME.typography.serif.sizes['4xl'],
-    fontFamily: EDITORIAL_THEME.typography.serif.family,
-    color: EDITORIAL_THEME.colors.text.primary,
+    fontSize: DesignSystem.typography.h1.fontSize,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 8,
     lineHeight: 44,
   },
   headerSubtitle: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    fontSize: DesignSystem.typography.body.fontSize,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    color: DesignSystem.colors.text.secondary,
     lineHeight: 24,
     maxWidth: '80%',
   },
   section: {
-    marginBottom: EDITORIAL_THEME.layout.sectionSpacing,
+    marginBottom: DesignSystem.spacing.xxl,
   },
   sectionHeader: {
-    paddingHorizontal: EDITORIAL_THEME.layout.containerPadding,
-    marginBottom: EDITORIAL_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   sectionTitle: {
-    fontSize: EDITORIAL_THEME.typography.serif.sizes['2xl'],
-    fontFamily: EDITORIAL_THEME.typography.serif.family,
-    color: EDITORIAL_THEME.colors.text.primary,
+    fontSize: DesignSystem.typography.h2.fontSize,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 4,
     lineHeight: 32,
   },
   sectionSubtitle: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    fontSize: DesignSystem.typography.body.fontSize,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    color: DesignSystem.colors.text.secondary,
     lineHeight: 22,
   },
   horizontalScroll: {
-    paddingLeft: EDITORIAL_THEME.layout.containerPadding,
-    paddingRight: EDITORIAL_THEME.layout.containerPadding,
+    paddingLeft: DesignSystem.spacing.lg,
+    paddingRight: DesignSystem.spacing.lg,
   },
   verticalCards: {
     alignItems: 'center',
   },
   cardContainer: {
-    marginRight: EDITORIAL_THEME.spacing.md,
+    marginRight: DesignSystem.spacing.md,
   },
   bottomSpacing: {
     height: 100,

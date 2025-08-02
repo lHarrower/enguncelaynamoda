@@ -3,7 +3,7 @@ import { Alert, Platform } from 'react-native';
 import * as Camera from 'expo-camera';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
-import CustomModal from './CustomModal';
+import CustomModal from '@/components/CustomModal';
 
 interface PermissionManagerProps {
   children: React.ReactNode;
@@ -253,4 +253,4 @@ export default function PermissionManager({ children }: PermissionManagerProps) 
       />
     </>
   );
-} 
+}

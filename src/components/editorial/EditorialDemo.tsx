@@ -10,10 +10,10 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { EDITORIAL_THEME } from '../../constants/EditorialTheme';
-import { EditorialHomeScreen } from './EditorialHomeScreen';
-import { SwipeableCardStack } from './SwipeableCardStack';
-import { dailyStylePicks } from '../../data/editorialContent';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { EditorialHomeScreen } from '@/components/editorial/EditorialHomeScreen';
+import { SwipeableCardStack } from '@/components/editorial/SwipeableCardStack';
+import { dailyStylePicks } from '@/data/editorialContent';
 
 type DemoMode = 'home' | 'swipe';
 
@@ -44,7 +44,7 @@ export const EditorialDemo: React.FC = () => {
           <Ionicons
             name="arrow-back"
             size={24}
-            color={EDITORIAL_THEME.colors.text.primary}
+            color={DesignSystem.colors.text.primary}
           />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Swipe to Discover</Text>
@@ -68,7 +68,7 @@ export const EditorialDemo: React.FC = () => {
               <Ionicons
                 name="bookmark-outline"
                 size={20}
-                color={EDITORIAL_THEME.colors.lilac[600]}
+                color={DesignSystem.colors.sage[600]}
               />
             </View>
             <Text style={styles.hintText}>Save for Later</Text>
@@ -79,7 +79,7 @@ export const EditorialDemo: React.FC = () => {
               <Ionicons
                 name="bag-outline"
                 size={20}
-                color={EDITORIAL_THEME.colors.gold[600]}
+                color={DesignSystem.colors.gold[600]}
               />
             </View>
             <Text style={styles.hintText}>Add to Cart</Text>
@@ -106,7 +106,7 @@ export const EditorialDemoWrapper: React.FC = () => {
             <Ionicons
               name="swap-horizontal"
               size={24}
-              color={EDITORIAL_THEME.colors.white}
+              color={DesignSystem.colors.text.inverse}
             />
           </TouchableOpacity>
         </View>
@@ -127,13 +127,13 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: EDITORIAL_THEME.colors.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: EDITORIAL_THEME.layout.containerPadding,
+    paddingHorizontal: DesignSystem.spacing.xl,
     paddingTop: 20,
     paddingBottom: 16,
   },
@@ -141,9 +141,8 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   headerTitle: {
-    fontSize: EDITORIAL_THEME.typography.serif.sizes.xl,
-    fontFamily: EDITORIAL_THEME.typography.serif.family,
-    color: EDITORIAL_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.h1,
+    color: DesignSystem.colors.text.primary,
   },
   placeholder: {
     width: 40,
@@ -154,9 +153,8 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   instructions: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: 40,
     paddingHorizontal: 40,
@@ -181,17 +179,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   saveHint: {
-    backgroundColor: EDITORIAL_THEME.colors.lilac[50],
-    borderColor: EDITORIAL_THEME.colors.lilac[200],
+    backgroundColor: DesignSystem.colors.sage[50],
+    borderColor: DesignSystem.colors.sage[200],
   },
   cartHint: {
-    backgroundColor: EDITORIAL_THEME.colors.gold[50],
-    borderColor: EDITORIAL_THEME.colors.gold[200],
+    backgroundColor: DesignSystem.colors.gold[100],
+    borderColor: DesignSystem.colors.gold[300],
   },
   hintText: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.sm,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
   },
   floatingButton: {
     position: 'absolute',
@@ -200,10 +197,10 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: EDITORIAL_THEME.colors.lilac[500],
+    backgroundColor: DesignSystem.colors.sage[500],
     justifyContent: 'center',
     alignItems: 'center',
-    ...EDITORIAL_THEME.shadows.medium,
+    ...DesignSystem.elevation.medium,
     zIndex: 1000,
   },
 });

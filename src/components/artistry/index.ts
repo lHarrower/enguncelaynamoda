@@ -16,4 +16,4 @@ export {
 export { default as ArtistryHomeScreen } from './ArtistryHomeScreen';
 
 // Re-export the theme for convenience
-export { ARTISTRY_THEME } from '../../constants/ArtistryTheme';
+export { DesignSystem } from '../../theme/DesignSystem';

@@ -1,9 +1,9 @@
 // Onboarding Service - Handles user onboarding flow and data persistence
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from '../config/supabaseClient';
-import { OnboardingData } from '../components/onboarding/OnboardingFlow';
-import { StylePreferences } from '../components/onboarding/StylePreferenceQuestionnaire';
-import notificationService from './notificationService';
+import { supabase } from '@/config/supabaseClient';
+import { OnboardingData } from '@/components/onboarding/OnboardingFlow';
+import { StylePreferences } from '@/components/onboarding/StylePreferenceQuestionnaire';
+import notificationService from '@/services/notificationService';
 
 const ONBOARDING_STORAGE_KEY = 'ayna_onboarding_completed';
 const STYLE_PREFERENCES_STORAGE_KEY = 'ayna_style_preferences';

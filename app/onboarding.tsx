@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
-import { useAuth } from '../context/AuthContext';
-import OnboardingFlow from '../components/onboarding/OnboardingFlow';
+import { useAuth } from '@/context/AuthContext';
+import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import { useRouter } from 'expo-router';
 
 export default function OnboardingScreen() {

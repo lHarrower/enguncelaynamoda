@@ -21,7 +21,7 @@ import Animated, {
   Extrapolate,
 } from 'react-native-reanimated';
 
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { APP_THEME_V2 } from '@/constants/AppThemeV2';
 
 // Animation configurations
 const ORGANIC_SPRING = {

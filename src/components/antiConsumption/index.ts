@@ -1,5 +1,5 @@
-export { ShopYourClosetFirst } from './ShopYourClosetFirst';
-export { CostPerWearDisplay } from './CostPerWearDisplay';
-export { RediscoveryChallenge } from './RediscoveryChallenge';
-export { MonthlyConfidenceMetrics } from './MonthlyConfidenceMetrics';
-export { ShoppingBehaviorTracker } from './ShoppingBehaviorTracker';
+export { ShopYourClosetFirst } from '@/components/antiConsumption/ShopYourClosetFirst';
+export { CostPerWearDisplay } from '@/components/antiConsumption/CostPerWearDisplay';
+export { RediscoveryChallenge } from '@/components/antiConsumption/RediscoveryChallenge';
+export { MonthlyConfidenceMetrics } from '@/components/antiConsumption/MonthlyConfidenceMetrics';
+export { ShoppingBehaviorTracker } from '@/components/antiConsumption/ShoppingBehaviorTracker';

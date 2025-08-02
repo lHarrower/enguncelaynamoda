@@ -10,7 +10,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 
 interface GoldShimmerProps {
   width: number;
@@ -104,4 +104,4 @@ const styles = StyleSheet.create({
   gradient: {
     flex: 1,
   },
-}); 
+});

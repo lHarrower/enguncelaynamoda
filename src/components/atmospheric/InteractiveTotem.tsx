@@ -25,7 +25,7 @@ import Animated, {
 import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { ATMOSPHERIC_THEME } from '../../constants/AtmosphericTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
@@ -199,7 +199,7 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
           <Ionicons 
             name="sparkles" 
             size={32} 
-            color={ATMOSPHERIC_THEME.semantic.text.accent} 
+            color={DesignSystem.colors.text.accent} 
             style={styles.whisperIcon}
           />
           <Text style={styles.whisperTitle}>Confidence Whisper</Text>
@@ -265,9 +265,9 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
             <LinearGradient
               colors={[
                 'transparent',
-                ATMOSPHERIC_THEME.colors.gold.shimmer,
-                ATMOSPHERIC_THEME.colors.gold.glow,
-                ATMOSPHERIC_THEME.colors.gold.shimmer,
+                DesignSystem.colors.sage[300],
+                DesignSystem.colors.sage[400],
+                DesignSystem.colors.sage[300],
                 'transparent',
               ]}
               style={styles.shimmerGradient}
@@ -284,7 +284,7 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
             <Ionicons 
               name="swap-horizontal-outline" 
               size={16} 
-              color={ATMOSPHERIC_THEME.semantic.text.whisper} 
+              color={DesignSystem.colors.text.tertiary} 
             />
             <Text style={styles.hintText}>Swipe to explore facets</Text>
           </View>
@@ -322,7 +322,8 @@ const styles = StyleSheet.create({
     width: TOTEM_SIZE,
     height: TOTEM_SIZE,
     borderRadius: 32,
-    ...ATMOSPHERIC_THEME.glass.totem,
+    ...DesignSystem.elevation.high,
+    backgroundColor: DesignSystem.colors.background.glass,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -356,14 +357,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   outfitTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.statement,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.h1,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 8,
     fontSize: 32,
   },
   outfitSubtitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.whisper,
-    color: ATMOSPHERIC_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.tertiary,
     marginBottom: 16,
   },
   confidenceIndicator: {
@@ -378,19 +379,20 @@ const styles = StyleSheet.create({
   },
   confidenceFill: {
     height: '100%',
-    backgroundColor: ATMOSPHERIC_THEME.colors.gold.pure,
+    backgroundColor: DesignSystem.colors.sage[500],
     borderRadius: 2,
   },
   confidenceText: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.accent,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.accent,
   },
   
   // Whisper Facet Styles
   whisperGlass: {
     flex: 1,
     borderRadius: 32,
-    ...ATMOSPHERIC_THEME.glass.whisper,
+    ...DesignSystem.elevation.soft,
+    backgroundColor: DesignSystem.colors.background.glass,
   },
   whisperContent: {
     flex: 1,
@@ -402,22 +404,22 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   whisperTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.whisper,
-    color: ATMOSPHERIC_THEME.semantic.text.accent,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.accent,
     textAlign: 'center',
     marginBottom: 16,
     fontSize: 18,
   },
   whisperText: {
-    ...ATMOSPHERIC_THEME.typography.scale.body,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.body,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 16,
     lineHeight: 24,
   },
   whisperSignature: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.caption,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   
@@ -445,8 +447,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   componentLabel: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   
@@ -462,15 +464,15 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   moodTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.statement,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.h1,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 12,
     fontSize: 28,
   },
   moodDescription: {
-    ...ATMOSPHERIC_THEME.typography.scale.body,
-    color: ATMOSPHERIC_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.body,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
   
@@ -490,8 +492,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   hintText: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.tertiary,
     marginLeft: 6,
     fontSize: 10,
   },
@@ -506,11 +508,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: ATMOSPHERIC_THEME.semantic.text.whisper,
+    backgroundColor: DesignSystem.colors.text.tertiary,
     opacity: 0.3,
   },
   activeIndicator: {
-    backgroundColor: ATMOSPHERIC_THEME.semantic.text.accent,
+    backgroundColor: DesignSystem.colors.text.accent,
     opacity: 1,
     width: 24,
   },

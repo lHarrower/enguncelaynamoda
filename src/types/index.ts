@@ -1,7 +1,7 @@
 // AYNA Mirror Types - Barrel Export
 // Centralized export for all AYNA Mirror related types
 
-export * from './aynaMirror';
+export * from '@/types/aynaMirror';
 
 // Re-export commonly used types for convenience
 export type {
@@ -15,4 +15,4 @@ export type {
   RecommendationContext,
   UsageStats,
   UtilizationStats
-} from './aynaMirror';
+} from '@/types/aynaMirror';

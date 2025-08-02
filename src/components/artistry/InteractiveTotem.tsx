@@ -21,7 +21,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { ARTISTRY_THEME } from '../../constants/ArtistryTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
@@ -115,7 +115,7 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
               <Ionicons 
                 name="sparkles" 
                 size={16} 
-                color={ARTISTRY_THEME.semantic.interactive.primary} 
+                color={DesignSystem.colors.sage[600]} 
               />
               <Text style={styles.confidenceText}>
                 {facet.content.confidence}% Match
@@ -133,7 +133,7 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
         <Ionicons 
           name="leaf-outline" 
           size={32} 
-          color={ARTISTRY_THEME.semantic.text.accent} 
+          color={DesignSystem.colors.text.accent} 
           style={styles.whisperIcon}
         />
         <Text style={styles.whisperTitle}>{facet.title}</Text>
@@ -209,7 +209,7 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
             <Ionicons 
               name="refresh-outline" 
               size={20} 
-              color={ARTISTRY_THEME.semantic.text.whisper} 
+              color={DesignSystem.colors.text.tertiary} 
             />
             <Text style={styles.hintText}>Tap to explore</Text>
           </View>
@@ -237,13 +237,13 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: ARTISTRY_THEME.spacing.float,
+    paddingVertical: DesignSystem.spacing.lg,
   },
   totem: {
     width: width * 0.8,
     height: width * 0.8,
-    borderRadius: ARTISTRY_THEME.radius.organic,
-    ...ARTISTRY_THEME.components.totem.primary,
+    borderRadius: DesignSystem.radius.lg,
+    ...DesignSystem.elevation.medium,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -253,17 +253,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: ARTISTRY_THEME.semantic.atmosphere.goldShimmer,
-    borderRadius: ARTISTRY_THEME.radius.organic,
+    backgroundColor: DesignSystem.colors.sage[500],
+    borderRadius: DesignSystem.radius.lg,
   },
   facetContainer: {
     flex: 1,
-    borderRadius: ARTISTRY_THEME.radius.organic,
+    borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
   },
   facetContent: {
     flex: 1,
-    borderRadius: ARTISTRY_THEME.radius.organic,
+    borderRadius: DesignSystem.radius.lg,
   },
   
   // Outfit Facet Styles
@@ -272,36 +272,36 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   outfitImageStyle: {
-    borderRadius: ARTISTRY_THEME.radius.organic,
+    borderRadius: DesignSystem.radius.lg,
   },
   outfitGradient: {
-    padding: ARTISTRY_THEME.spacing.dance,
+    padding: DesignSystem.spacing.lg,
   },
   outfitInfo: {
     alignItems: 'flex-start',
   },
   outfitTitle: {
-    ...ARTISTRY_THEME.typography.scale.statement,
-    color: ARTISTRY_THEME.semantic.text.poetry,
-    marginBottom: ARTISTRY_THEME.spacing.whisper,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.xs,
   },
   outfitSubtitle: {
-    ...ARTISTRY_THEME.typography.scale.elegant,
-    color: ARTISTRY_THEME.semantic.text.whisper,
-    marginBottom: ARTISTRY_THEME.spacing.flow,
+    ...DesignSystem.typography.body,
+    color: DesignSystem.colors.text.tertiary,
+    marginBottom: DesignSystem.spacing.md,
   },
   confidenceIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: ARTISTRY_THEME.semantic.atmosphere.goldShimmer,
-    paddingHorizontal: ARTISTRY_THEME.spacing.gentle,
-    paddingVertical: ARTISTRY_THEME.spacing.whisper,
-    borderRadius: ARTISTRY_THEME.radius.whisper,
+    backgroundColor: DesignSystem.colors.sage[500],
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.xs,
+    borderRadius: DesignSystem.radius.xs,
   },
   confidenceText: {
-    ...ARTISTRY_THEME.typography.scale.kinetic,
-    color: ARTISTRY_THEME.semantic.text.accent,
-    marginLeft: ARTISTRY_THEME.spacing.whisper,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.accent,
+    marginLeft: DesignSystem.spacing.xs,
   },
   
   // Whisper Facet Styles
@@ -309,26 +309,26 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: ARTISTRY_THEME.spacing.dance,
+    padding: DesignSystem.spacing.lg,
   },
   whisperIcon: {
-    marginBottom: ARTISTRY_THEME.spacing.flow,
+    marginBottom: DesignSystem.spacing.md,
   },
   whisperTitle: {
-    ...ARTISTRY_THEME.typography.scale.whisper,
-    color: ARTISTRY_THEME.semantic.text.accent,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.accent,
     textAlign: 'center',
-    marginBottom: ARTISTRY_THEME.spacing.flow,
+    marginBottom: DesignSystem.spacing.md,
   },
   whisperText: {
-    ...ARTISTRY_THEME.typography.scale.elegant,
-    color: ARTISTRY_THEME.semantic.text.primary,
+    ...DesignSystem.typography.body,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: ARTISTRY_THEME.spacing.flow,
+    marginBottom: DesignSystem.spacing.md,
   },
   whisperSignature: {
-    ...ARTISTRY_THEME.typography.scale.floating,
-    color: ARTISTRY_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
   
@@ -339,21 +339,21 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-around',
     alignItems: 'center',
-    padding: ARTISTRY_THEME.spacing.flow,
+    padding: DesignSystem.spacing.md,
   },
   componentItem: {
     alignItems: 'center',
-    margin: ARTISTRY_THEME.spacing.whisper,
+    margin: DesignSystem.spacing.xs,
   },
   componentImage: {
     width: 60,
     height: 60,
-    borderRadius: ARTISTRY_THEME.radius.gentle,
-    marginBottom: ARTISTRY_THEME.spacing.whisper,
+    borderRadius: DesignSystem.radius.md,
+    marginBottom: DesignSystem.spacing.xs,
   },
   componentLabel: {
-    ...ARTISTRY_THEME.typography.scale.floating,
-    color: ARTISTRY_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   
@@ -362,63 +362,63 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: ARTISTRY_THEME.radius.organic,
+    borderRadius: DesignSystem.radius.lg,
   },
   moodContent: {
     alignItems: 'center',
-    padding: ARTISTRY_THEME.spacing.dance,
+    padding: DesignSystem.spacing.lg,
   },
   moodEmoji: {
     fontSize: 48,
-    marginBottom: ARTISTRY_THEME.spacing.flow,
+    marginBottom: DesignSystem.spacing.md,
   },
   moodTitle: {
-    ...ARTISTRY_THEME.typography.scale.statement,
-    color: ARTISTRY_THEME.semantic.text.poetry,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: ARTISTRY_THEME.spacing.gentle,
+    marginBottom: DesignSystem.spacing.md,
   },
   moodDescription: {
-    ...ARTISTRY_THEME.typography.scale.elegant,
-    color: ARTISTRY_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.body,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
   
   // Interaction Elements
   interactionHint: {
     position: 'absolute',
-    bottom: ARTISTRY_THEME.spacing.flow,
+    bottom: DesignSystem.spacing.md,
     left: 0,
     right: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: ARTISTRY_THEME.semantic.atmosphere.goldShimmer,
-    marginHorizontal: ARTISTRY_THEME.spacing.dance,
-    paddingVertical: ARTISTRY_THEME.spacing.whisper,
-    borderRadius: ARTISTRY_THEME.radius.whisper,
+    backgroundColor: DesignSystem.colors.sage[500],
+    marginHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.xs,
+    borderRadius: DesignSystem.radius.xs,
   },
   hintText: {
-    ...ARTISTRY_THEME.typography.scale.floating,
-    color: ARTISTRY_THEME.semantic.text.accent,
-    marginLeft: ARTISTRY_THEME.spacing.whisper,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.accent,
+    marginLeft: DesignSystem.spacing.xs,
   },
   
   // Indicators
   indicators: {
     flexDirection: 'row',
-    marginTop: ARTISTRY_THEME.spacing.dance,
-    gap: ARTISTRY_THEME.spacing.gentle,
+    marginTop: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.md,
   },
   indicator: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: ARTISTRY_THEME.semantic.text.whisper,
+    backgroundColor: DesignSystem.colors.text.tertiary,
     opacity: 0.3,
   },
   activeIndicator: {
-    backgroundColor: ARTISTRY_THEME.semantic.interactive.primary,
+    backgroundColor: DesignSystem.colors.sage[600],
     opacity: 1,
   },
 });

@@ -20,6 +20,12 @@ export interface WardrobeItem {
   tags: string[];
   notes?: string;
   
+  // Naming features
+  name?: string;
+  aiGeneratedName?: string;
+  nameOverride: boolean;
+  aiAnalysisData?: AIAnalysisData;
+  
   // Intelligence features
   usageStats: UsageStats;
   styleCompatibility: Record<string, number>;
@@ -60,6 +66,71 @@ export type ItemCategory =
   | 'outerwear' 
   | 'dresses' 
   | 'activewear';
+
+// ============================================================================
+// AI NAMING INTERFACES
+// ============================================================================
+
+export interface AIAnalysisData {
+  detectedTags: string[];
+  dominantColors: string[];
+  confidence: number;
+  visualFeatures: VisualFeatures;
+  namingSuggestions: string[];
+  analysisTimestamp: Date;
+}
+
+export interface VisualFeatures {
+  texture?: string;
+  pattern?: string;
+  style?: string;
+  fit?: string;
+  material?: string;
+  occasion?: string;
+}
+
+export interface NamingPreferences {
+  userId: string;
+  namingStyle: NamingStyle;
+  includeBrand: boolean;
+  includeColor: boolean;
+  includeMaterial: boolean;
+  includeStyle: boolean;
+  preferredLanguage: string;
+  autoAcceptAINames: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type NamingStyle = 'descriptive' | 'creative' | 'minimal' | 'brand_focused';
+
+export interface ItemNamingHistory {
+  id: string;
+  itemId: string;
+  userId: string;
+  aiGeneratedName?: string;
+  userProvidedName?: string;
+  namingConfidence: number;
+  aiTags: string[];
+  visualFeatures: VisualFeatures;
+  createdAt: Date;
+}
+
+export interface NamingRequest {
+  imageUri: string;
+  category?: ItemCategory;
+  subcategory?: string;
+  colors?: string[];
+  brand?: string;
+  userPreferences?: NamingPreferences;
+}
+
+export interface NamingResponse {
+  aiGeneratedName: string;
+  confidence: number;
+  suggestions: string[];
+  analysisData: AIAnalysisData;
+}
 
 // ============================================================================
 // DAILY RECOMMENDATIONS SYSTEM
@@ -280,6 +351,13 @@ export interface WardrobeItemRecord {
   purchase_price?: number;
   tags: string[];
   notes?: string;
+  
+  // Naming fields
+  name?: string;
+  ai_generated_name?: string;
+  name_override: boolean;
+  ai_analysis_data?: any; // JSONB
+  
   usage_count: number;
   last_worn?: string; // ISO date string
   confidence_score: number;

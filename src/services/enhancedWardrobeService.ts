@@ -1,12 +1,15 @@
 // Enhanced Wardrobe Service - AYNA Mirror Intelligence Features
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
 import { 
   WardrobeItem, 
   WardrobeItemRecord, 
   UsageStats, 
   UtilizationStats, 
-  ItemCategory 
-} from '../types/aynaMirror';
+  ItemCategory,
+  NamingRequest,
+  NamingResponse 
+} from '@/types/aynaMirror';
+import { AINameingService } from './aiNamingService';
 
 export interface NewClothingItem {
   image_uri: string;
@@ -20,6 +23,10 @@ export interface NewClothingItem {
   purchase_price?: number;
   tags?: string[];
   notes?: string;
+  name?: string;
+  ai_generated_name?: string;
+  name_override?: boolean;
+  ai_analysis_data?: any;
   // user_id will be handled by RLS (Row Level Security) in Supabase
 }
 
@@ -36,9 +43,10 @@ export class EnhancedWardrobeService {
   /**
    * Saves a new clothing item to the Supabase database with enhanced features.
    * @param item - The clothing item data with intelligence features
+   * @param generateAIName - Whether to generate AI name for the item
    * @returns The data of the newly created item from the database
    */
-  async saveClothingItem(item: NewClothingItem): Promise<WardrobeItemRecord> {
+  async saveClothingItem(item: NewClothingItem, generateAIName: boolean = true): Promise<WardrobeItemRecord> {
     console.log('[EnhancedWardrobeService] Attempting to save item:', item);
 
     try {
@@ -50,6 +58,27 @@ export class EnhancedWardrobeService {
       // Extract colors if not provided
       if (!item.colors || item.colors.length === 0) {
         item.colors = await this.extractItemColors(item.image_uri);
+      }
+
+      // Generate AI name if requested and not provided
+      if (generateAIName && !item.ai_generated_name && !item.name) {
+        try {
+          const namingResponse = await this.generateItemName({
+            imageUri: item.image_uri,
+            category: item.category as ItemCategory,
+            colors: item.colors,
+            brand: item.brand
+          });
+          
+          if (namingResponse) {
+            item.ai_generated_name = namingResponse.aiGeneratedName;
+            item.ai_analysis_data = namingResponse.analysisData;
+            item.name_override = false;
+          }
+        } catch (error) {
+          console.warn('[EnhancedWardrobeService] Failed to generate AI name:', error);
+          // Continue without AI name
+        }
       }
 
       // Suggest tags based on item properties
@@ -244,12 +273,51 @@ export class EnhancedWardrobeService {
    */
   async categorizeItemAutomatically(imageUri: string): Promise<ItemCategory> {
     try {
-      // Placeholder implementation - would integrate with AI service
-      // For now, return a default category
       console.log(`[EnhancedWardrobeService] Auto-categorizing image: ${imageUri}`);
       
-      // TODO: Implement actual AI-powered categorization
-      // This would analyze the image and return the most likely category
+      // Use existing AI analysis function
+      const { data, error } = await supabase.functions.invoke('ai-analysis', {
+        body: { imageUrl: imageUri }
+      });
+
+      if (error) {
+        console.warn('[EnhancedWardrobeService] AI analysis failed:', error);
+        return 'tops'; // Default fallback
+      }
+
+      // Extract category from AI analysis
+      if (data && data.category) {
+        return data.category as ItemCategory;
+      }
+
+      // Try to infer from tags
+      if (data && data.tags && data.tags.length > 0) {
+        const categoryMap: Record<string, ItemCategory> = {
+          'shirt': 'tops',
+          'blouse': 'tops',
+          'sweater': 'tops',
+          'cardigan': 'tops',
+          'pants': 'bottoms',
+          'jeans': 'bottoms',
+          'shorts': 'bottoms',
+          'skirt': 'bottoms',
+          'dress': 'dresses',
+          'shoes': 'shoes',
+          'sneakers': 'shoes',
+          'boots': 'shoes',
+          'jacket': 'outerwear',
+          'coat': 'outerwear',
+          'blazer': 'outerwear'
+        };
+
+        for (const tag of data.tags) {
+          const category = categoryMap[tag.toLowerCase()];
+          if (category) {
+            return category;
+          }
+        }
+      }
+      
       return 'tops'; // Default fallback
     } catch (error) {
       console.error('[EnhancedWardrobeService] Failed to auto-categorize item:', error);
@@ -259,18 +327,36 @@ export class EnhancedWardrobeService {
 
   /**
    * Extracts dominant colors from an item image
-   * TODO: Integrate with image processing service
    */
   async extractItemColors(imageUri: string): Promise<string[]> {
     try {
       console.log(`[EnhancedWardrobeService] Extracting colors from: ${imageUri}`);
       
-      // TODO: Implement actual color extraction using image processing
-      // This would analyze the image and return dominant colors
-      return ['#000000']; // Default fallback
+      // Use existing AI analysis function
+      const { data, error } = await supabase.functions.invoke('ai-analysis', {
+        body: { imageUrl: imageUri }
+      });
+
+      if (error) {
+        console.warn('[EnhancedWardrobeService] AI color analysis failed:', error);
+        return ['black']; // Default fallback
+      }
+
+      // Extract colors from AI analysis
+      if (data && data.colors && data.colors.length > 0) {
+        // Convert color objects to color names
+        return data.colors.map((color: any) => {
+          if (typeof color === 'string') {
+            return color;
+          }
+          return color.name || color.hex || 'black';
+        }).slice(0, 3); // Limit to top 3 colors
+      }
+      
+      return ['black']; // Default fallback
     } catch (error) {
       console.error('[EnhancedWardrobeService] Failed to extract colors:', error);
-      return ['#000000']; // Safe fallback
+      return ['black']; // Safe fallback
     }
   }
 
@@ -361,6 +447,97 @@ export class EnhancedWardrobeService {
     } catch (error) {
       console.error('[EnhancedWardrobeService] Failed to update confidence score:', error);
       throw error;
+    }
+  }
+
+  // ========================================================================
+  // AI NAMING METHODS
+  // ========================================================================
+
+  /**
+   * Generates an AI-powered name for a clothing item
+   */
+  async generateItemName(request: NamingRequest): Promise<NamingResponse | null> {
+    try {
+      const aiService = new AINameingService();
+      return await aiService.generateItemName(request);
+    } catch (error) {
+      console.error('[EnhancedWardrobeService] Failed to generate AI name:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Updates an item's name (either user-provided or AI-generated)
+   */
+  async updateItemName(itemId: string, name: string, isUserOverride: boolean = true): Promise<void> {
+    try {
+      const updateData: any = {
+        name: name,
+        name_override: isUserOverride
+      };
+
+      const { error } = await supabase
+        .from('wardrobeItems')
+        .update(updateData)
+        .eq('id', itemId);
+
+      if (error) {
+        throw new Error(error.message || 'Failed to update item name');
+      }
+
+      console.log(`[EnhancedWardrobeService] Updated name for item: ${itemId}`);
+    } catch (error) {
+      console.error('[EnhancedWardrobeService] Failed to update item name:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Regenerates AI name for an existing item
+   */
+  async regenerateItemName(itemId: string): Promise<string | null> {
+    try {
+      // First get the item details
+      const { data: item, error: fetchError } = await supabase
+        .from('wardrobeItems')
+        .select('image_uri, category, colors, brand')
+        .eq('id', itemId)
+        .single();
+
+      if (fetchError || !item) {
+        throw new Error('Item not found');
+      }
+
+      // Generate new AI name
+      const namingResponse = await this.generateItemName({
+        imageUri: item.image_uri,
+        category: item.category as ItemCategory,
+        colors: item.colors,
+        brand: item.brand
+      });
+
+      if (!namingResponse) {
+        return null;
+      }
+
+      // Update the item with new AI name
+      const { error: updateError } = await supabase
+        .from('wardrobeItems')
+        .update({
+          ai_generated_name: namingResponse.aiGeneratedName,
+          ai_analysis_data: namingResponse.analysisData
+        })
+        .eq('id', itemId);
+
+      if (updateError) {
+        throw new Error(updateError.message || 'Failed to update AI name');
+      }
+
+      return namingResponse.aiGeneratedName;
+    } catch (error) {
+      console.error('[EnhancedWardrobeService] Failed to regenerate AI name:', error);
+      return null;
     }
   }
 

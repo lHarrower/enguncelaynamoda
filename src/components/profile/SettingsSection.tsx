@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
-import { DIMENSIONS, SPACING } from '../../constants/AppConstants';
+import { useTheme } from '@/context/ThemeContext';
+import { DIMENSIONS, SPACING } from '@/constants/AppConstants';
 
 interface SettingsSectionProps {
   title: string;
@@ -187,4 +187,4 @@ export const SwitchItem: React.FC<SwitchItemProps> = ({
       />
     </View>
   );
-}; 
+};

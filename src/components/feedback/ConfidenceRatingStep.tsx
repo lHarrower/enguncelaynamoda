@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ConfidenceRatingStepProps {
   rating: number;
@@ -100,7 +100,7 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
                 <Ionicons
                   name={isSelected ? 'star' : 'star-outline'}
                   size={40}
-                  color={isSelected ? APP_THEME_V2.semantic.secondary : APP_THEME_V2.semantic.text.tertiary}
+                  color={isSelected ? DesignSystem.colors.secondary[500] : DesignSystem.colors.neutral[400]}
                 />
               </Animated.View>
             </TouchableOpacity>
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   feedbackContainer: {
     alignItems: 'center',
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.neutral[50],
     borderRadius: 16,
     paddingVertical: 20,
     paddingHorizontal: 24,
@@ -190,40 +190,40 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   ratingLabel: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.scale.h3,
+    color: DesignSystem.colors.neutral[900],
     marginBottom: 4,
     textAlign: 'center',
   },
   ratingDescription: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.neutral[600],
     textAlign: 'center',
     fontStyle: 'italic',
   },
   affirmationContainer: {
-    backgroundColor: APP_THEME_V2.semantic.accent + '20',
+    backgroundColor: DesignSystem.colors.primary[500] + '20',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 20,
     marginBottom: 16,
   },
   affirmationText: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.accent,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.primary[500],
     textAlign: 'center',
     fontWeight: '600',
   },
   encouragementContainer: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.neutral[50],
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 20,
     marginBottom: 16,
   },
   encouragementText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.neutral[600],
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -231,8 +231,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   instructionsText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.neutral[400],
     textAlign: 'center',
     fontStyle: 'italic',
   },

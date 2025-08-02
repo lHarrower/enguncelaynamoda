@@ -21,7 +21,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { ATMOSPHERIC_THEME } from '../../constants/AtmosphericTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
@@ -175,8 +175,8 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
     >
       <LinearGradient
         colors={item.content.gradient || [
-          ATMOSPHERIC_THEME.colors.emerald.shimmer,
-          ATMOSPHERIC_THEME.colors.sapphire.shimmer,
+          DesignSystem.colors.sage[300],
+        DesignSystem.colors.sage[400],
         ]}
         style={styles.typographyGradient}
       >
@@ -189,7 +189,7 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
             <Ionicons
               name={item.content.icon}
               size={32}
-              color={ATMOSPHERIC_THEME.semantic.text.accent}
+              color={DesignSystem.colors.text.accent}
               style={styles.typographyIcon}
             />
           )}
@@ -225,8 +225,8 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
               size={16}
               color={
                 item.content.trend > 0
-                  ? ATMOSPHERIC_THEME.colors.emerald.medium
-                  : ATMOSPHERIC_THEME.colors.ruby.medium
+                  ? DesignSystem.colors.success[500]
+          : DesignSystem.colors.error[500]
               }
             />
             <Text style={styles.metricTrendText}>
@@ -260,7 +260,7 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
             <Ionicons
               name={item.content.icon}
               size={28}
-              color={ATMOSPHERIC_THEME.semantic.text.accent}
+              color={DesignSystem.colors.text.accent}
               style={styles.glassIcon}
             />
           )}
@@ -416,7 +416,9 @@ const styles = StyleSheet.create({
   
   // Hero Item Styles
   heroItem: {
-    ...ATMOSPHERIC_THEME.glass.totem,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   heroBackground: {
     flex: 1,
@@ -433,14 +435,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   heroTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.editorial,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.h1,
+    color: DesignSystem.colors.text.primary,
     fontSize: 42,
     marginBottom: 8,
   },
   heroSubtitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.whisper,
-    color: ATMOSPHERIC_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     fontSize: 16,
   },
   
@@ -460,14 +462,14 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   floatingTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.body,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
     marginBottom: 4,
   },
   floatingSubtitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.caption,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
   },
   
   // Typography Item Styles
@@ -486,15 +488,15 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   editorialHeadline: {
-    ...ATMOSPHERIC_THEME.typography.scale.statement,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     fontSize: 28,
     marginBottom: 8,
   },
   editorialSubheadline: {
-    ...ATMOSPHERIC_THEME.typography.scale.whisper,
-    color: ATMOSPHERIC_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
     fontSize: 14,
   },
@@ -512,15 +514,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   metricValue: {
-    ...ATMOSPHERIC_THEME.typography.scale.statement,
-    color: ATMOSPHERIC_THEME.semantic.text.accent,
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.accent,
     fontSize: 36,
     fontWeight: '300',
     marginBottom: 8,
   },
   metricLabel: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   metricTrend: {
@@ -529,8 +531,8 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   metricTrendText: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.caption,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     marginLeft: 4,
   },
   
@@ -549,15 +551,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   glassTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.body,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     fontWeight: '500',
     marginBottom: 6,
   },
   glassSubtitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.caption,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
   
@@ -573,15 +575,15 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   gradientTitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.body,
-    color: ATMOSPHERIC_THEME.semantic.text.primary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     fontWeight: '600',
     marginBottom: 6,
   },
   gradientSubtitle: {
-    ...ATMOSPHERIC_THEME.typography.scale.caption,
-    color: ATMOSPHERIC_THEME.semantic.text.whisper,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
 });

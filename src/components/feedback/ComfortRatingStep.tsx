@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { ComfortRating } from '../../types/aynaMirror';
 
 interface ComfortRatingStepProps {
@@ -114,7 +114,7 @@ export const ComfortRatingStep: React.FC<ComfortRatingStepProps> = ({
               <Ionicons
                 name={isSelected ? 'star' : 'star-outline'}
                 size={28}
-                color={isSelected ? color : APP_THEME_V2.semantic.text.tertiary}
+                color={isSelected ? color : DesignSystem.colors.neutral[400]}
               />
             </TouchableOpacity>
           );
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   categoryContainer: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.neutral[50],
     borderRadius: 16,
     padding: 20,
     marginBottom: 20,
@@ -227,14 +227,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   categoryTitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.neutral[900],
     fontWeight: '600',
     marginBottom: 2,
   },
   categorySubtitle: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.neutral[600],
   },
   starsContainer: {
     flexDirection: 'row',
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   descriptionText: {
-    ...APP_THEME_V2.typography.scale.body2,
+    ...DesignSystem.typography.scale.body2,
     fontWeight: '500',
     textAlign: 'center',
   },
@@ -270,14 +270,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   overallTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
+    ...DesignSystem.typography.scale.h3,
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 4,
   },
   overallSubtitle: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.neutral[600],
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -286,8 +286,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   instructionsText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.neutral[400],
     textAlign: 'center',
     fontStyle: 'italic',
   },

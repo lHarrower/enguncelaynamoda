@@ -19,7 +19,7 @@ try {
   // Silently handle DateTimePicker not being available in Expo Go
   DateTimePicker = null;
 }
-import { APP_THEME_V2 } from '../constants/AppThemeV2';
+import { DesignSystem } from '../theme/DesignSystem';
 import { userPreferencesService } from '../services/userPreferencesService';
 import { 
   UserPreferences, 
@@ -170,7 +170,7 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color={APP_THEME_V2.semantic.text.primary} />
+          <Ionicons name="arrow-back" size={24} color={DesignSystem.colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>AYNA Mirror Settings</Text>
       </View>
@@ -189,7 +189,7 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
             onPress={() => setShowTimePicker(true)}
           >
             <Text style={styles.timeText}>{formatTime(notificationTime)}</Text>
-            <Ionicons name="time-outline" size={20} color={APP_THEME_V2.semantic.accent} />
+            <Ionicons name="time-outline" size={20} color={DesignSystem.colors.sage[500]} />
           </TouchableOpacity>
         </View>
 
@@ -242,7 +242,7 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
               <Ionicons 
                 name="checkmark-circle" 
                 size={24} 
-                color={APP_THEME_V2.semantic.accent} 
+                color={DesignSystem.colors.sage[500]} 
               />
             )}
           </TouchableOpacity>
@@ -266,10 +266,10 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
               setPrivacySettings(prev => ({ ...prev, shareUsageData: value }))
             }
             trackColor={{ 
-              false: APP_THEME_V2.colors.cloudGray, 
-              true: APP_THEME_V2.semantic.accent 
+              false: DesignSystem.colors.sage[200],
+                true: DesignSystem.colors.sage[500] 
             }}
-            thumbColor={APP_THEME_V2.colors.whisperWhite}
+            thumbColor={DesignSystem.colors.background.elevated}
           />
         </View>
 
@@ -342,7 +342,7 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: APP_THEME_V2.semantic.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   contentContainer: {
     paddingBottom: 100,
@@ -353,8 +353,8 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: APP_THEME_V2.semantic.text.secondary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
   header: {
     flexDirection: 'row',
@@ -362,9 +362,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 60,
     paddingBottom: 20,
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderBottomWidth: 1,
-    borderBottomColor: APP_THEME_V2.semantic.border,
+    borderBottomColor: DesignSystem.colors.sage[200],
   },
   backButton: {
     marginRight: 16,
@@ -373,29 +373,29 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: APP_THEME_V2.semantic.text.primary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
   section: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.elevated,
     marginHorizontal: 20,
     marginTop: 20,
     borderRadius: 16,
     padding: 20,
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.elevation.medium,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: APP_THEME_V2.semantic.text.primary,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 8,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
   sectionDescription: {
     fontSize: 14,
-    color: APP_THEME_V2.semantic.text.secondary,
+    color: DesignSystem.colors.text.secondary,
     marginBottom: 16,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
   settingItem: {
     flexDirection: 'row',
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: APP_THEME_V2.colors.moonlightSilver,
+    borderBottomColor: DesignSystem.colors.sage[100],
   },
   settingInfo: {
     flex: 1,
@@ -412,40 +412,40 @@ const styles = StyleSheet.create({
   settingLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: APP_THEME_V2.semantic.text.primary,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 4,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
   settingDescription: {
     fontSize: 14,
-    color: APP_THEME_V2.semantic.text.secondary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
   timeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: APP_THEME_V2.colors.cloudGray,
+    backgroundColor: DesignSystem.colors.sage[200],
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
   },
   timeText: {
     fontSize: 16,
-    color: APP_THEME_V2.semantic.text.primary,
+    color: DesignSystem.colors.text.primary,
     marginRight: 8,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
   detectButton: {
-    backgroundColor: APP_THEME_V2.semantic.accent,
+    backgroundColor: DesignSystem.colors.sage[500],
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
   },
   detectButtonText: {
     fontSize: 14,
-    color: APP_THEME_V2.colors.whisperWhite,
+    color: DesignSystem.colors.background.elevated,
     fontWeight: '500',
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
   optionItem: {
     flexDirection: 'row',
@@ -455,13 +455,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginVertical: 4,
     borderRadius: 12,
-    backgroundColor: APP_THEME_V2.colors.cloudGray,
+    backgroundColor: DesignSystem.colors.sage[200],
     borderWidth: 2,
     borderColor: 'transparent',
   },
   optionItemSelected: {
-    backgroundColor: APP_THEME_V2.colors.linen.light,
-    borderColor: APP_THEME_V2.semantic.accent,
+    backgroundColor: DesignSystem.colors.sage[50],
+    borderColor: DesignSystem.colors.sage[500],
   },
   optionContent: {
     flex: 1,
@@ -469,29 +469,29 @@ const styles = StyleSheet.create({
   optionLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: APP_THEME_V2.semantic.text.primary,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 4,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
   optionLabelSelected: {
-    color: APP_THEME_V2.semantic.accent,
+    color: DesignSystem.colors.sage[500],
   },
   optionDescription: {
     fontSize: 14,
-    color: APP_THEME_V2.semantic.text.secondary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
   optionDescriptionSelected: {
-    color: APP_THEME_V2.semantic.text.primary,
+    color: DesignSystem.colors.text.primary,
   },
   saveButton: {
-    backgroundColor: APP_THEME_V2.semantic.accent,
+    backgroundColor: DesignSystem.colors.sage[500],
     marginHorizontal: 20,
     marginTop: 30,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.elevation.medium,
   },
   saveButtonDisabled: {
     opacity: 0.6,
@@ -499,7 +499,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: APP_THEME_V2.colors.whisperWhite,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    color: DesignSystem.colors.background.elevated,
+    fontFamily: DesignSystem.typography.body.fontFamily,
   },
 });

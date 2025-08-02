@@ -19,7 +19,7 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { STUDIO_THEME } from '../../constants/StudioTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
@@ -52,7 +52,7 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
 
   useEffect(() => {
     // Fast, joyful entrance animation
-    galleryAnimation.value = withSpring(1, STUDIO_THEME.animations.entrance);
+    galleryAnimation.value = withSpring(1, DesignSystem.animations.spring);
   }, []);
 
   const getItemHeight = (size: string) => {
@@ -69,9 +69,9 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
   };
 
   const getItemWidth = (span: number) => {
-    const spacing = STUDIO_THEME.spacing.lg;
+    const spacing = DesignSystem.spacing.lg;
     const totalSpacing = (columns - 1) * spacing;
-    const availableWidth = width - (STUDIO_THEME.spacing.xl * 2) - totalSpacing;
+    const availableWidth = width - (DesignSystem.spacing.xl * 2) - totalSpacing;
     return span === 2 ? availableWidth : availableWidth / columns;
   };
 
@@ -80,7 +80,7 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
     <TouchableOpacity
       style={[
         styles.bentoItem,
-        STUDIO_THEME.components.outfitCard,
+        DesignSystem.components.card,
         {
           width: getItemWidth(item.span),
           height: getItemHeight(item.size),
@@ -139,10 +139,10 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
     >
       <LinearGradient
         colors={item.content.gradient || [
-          STUDIO_THEME.colors.accent.jadeLight,
-          STUDIO_THEME.colors.accent.goldLight,
+          DesignSystem.colors.sage[200],
+          DesignSystem.colors.amber[200],
         ]}
-        style={[styles.moodGradient, { borderRadius: STUDIO_THEME.radius.lg }]}
+        style={[styles.moodGradient, { borderRadius: DesignSystem.borderRadius.lg }]}
       >
         <View style={styles.moodContent}>
           <Text style={styles.moodEmoji}>{item.content.emoji}</Text>
@@ -160,8 +160,9 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
     <TouchableOpacity
       style={[
         styles.bentoItem,
-        STUDIO_THEME.components.bentoItem,
         {
+          backgroundColor: DesignSystem.colors.background.elevated,
+          ...DesignSystem.elevation.medium,
           width: getItemWidth(item.span),
           height: getItemHeight(item.size),
         },
@@ -178,7 +179,7 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
             <Ionicons
               name={item.content.icon}
               size={24}
-              color={STUDIO_THEME.colors.accent.jade}
+              color={DesignSystem.colors.sage[500]}
             />
           </View>
         )}
@@ -198,8 +199,9 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
     <TouchableOpacity
       style={[
         styles.bentoItem,
-        STUDIO_THEME.components.bentoItem,
         {
+          backgroundColor: DesignSystem.colors.background.elevated,
+          ...DesignSystem.elevation.medium,
           width: getItemWidth(item.span),
           height: getItemHeight(item.size),
         },
@@ -220,8 +222,8 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
               size={16}
               color={
                 item.content.trend > 0
-                  ? STUDIO_THEME.colors.semantic.success
-                  : STUDIO_THEME.colors.semantic.error
+                  ? DesignSystem.colors.success[500]
+                  : DesignSystem.colors.error[500]
               }
             />
             <Text style={styles.metricTrendText}>
@@ -241,8 +243,8 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
         {
           width: getItemWidth(item.span),
           height: getItemHeight(item.size),
-          backgroundColor: STUDIO_THEME.colors.accent.jade,
-          ...STUDIO_THEME.shadows.medium,
+          backgroundColor: DesignSystem.colors.sage[500],
+          ...DesignSystem.elevation.medium,
         },
       ]}
       onPress={() => {
@@ -256,7 +258,7 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
           <Ionicons
             name={item.content.icon}
             size={28}
-            color={STUDIO_THEME.colors.text.inverse}
+            color={DesignSystem.colors.text.inverse}
             style={styles.actionIcon}
           />
         )}
@@ -286,7 +288,7 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
     >
       <Image
         source={{ uri: item.content.image }}
-        style={[styles.imageContent, { borderRadius: STUDIO_THEME.radius.lg }]}
+        style={[styles.imageContent, { borderRadius: DesignSystem.borderRadius.lg }]}
         resizeMode="cover"
       />
       {(item.title || item.subtitle) && (
@@ -394,18 +396,18 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: STUDIO_THEME.colors.foundation.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   contentContainer: {
-    padding: STUDIO_THEME.spacing.xl,
+    padding: DesignSystem.spacing.xl,
   },
   row: {
     flexDirection: 'row',
-    marginBottom: STUDIO_THEME.spacing.lg,
-    gap: STUDIO_THEME.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.lg,
   },
   bentoItem: {
-    borderRadius: STUDIO_THEME.radius.lg,
+    borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
   },
   
@@ -413,22 +415,22 @@ const styles = StyleSheet.create({
   outfitImage: {
     width: '100%',
     height: '60%',
-    borderTopLeftRadius: STUDIO_THEME.radius.lg,
-    borderTopRightRadius: STUDIO_THEME.radius.lg,
+    borderTopLeftRadius: DesignSystem.borderRadius.lg,
+    borderTopRightRadius: DesignSystem.borderRadius.lg,
   },
   outfitContent: {
     flex: 1,
-    padding: STUDIO_THEME.spacing.md,
+    padding: DesignSystem.spacing.md,
     justifyContent: 'space-between',
   },
   outfitTitle: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 4,
   },
   outfitSubtitle: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.secondary,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.secondary,
     marginBottom: 8,
   },
   confidenceContainer: {
@@ -436,19 +438,19 @@ const styles = StyleSheet.create({
   },
   confidenceBar: {
     height: 3,
-    backgroundColor: STUDIO_THEME.colors.foundation.tertiary,
+    backgroundColor: DesignSystem.colors.background.tertiary,
     borderRadius: 2,
     marginBottom: 4,
     overflow: 'hidden',
   },
   confidenceFill: {
     height: '100%',
-    backgroundColor: STUDIO_THEME.colors.accent.jade,
+    backgroundColor: DesignSystem.colors.sage[500],
     borderRadius: 2,
   },
   confidenceText: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.text.tertiary,
+    ...DesignSystem.typography.caption.small,
+    color: DesignSystem.colors.text.tertiary,
   },
   
   // Mood Item Styles
@@ -459,51 +461,51 @@ const styles = StyleSheet.create({
   },
   moodContent: {
     alignItems: 'center',
-    padding: STUDIO_THEME.spacing.md,
+    padding: DesignSystem.spacing.md,
   },
   moodEmoji: {
     fontSize: 32,
     marginBottom: 8,
   },
   moodTitle: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 4,
   },
   moodSubtitle: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.secondary,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   
   // Insight Item Styles
   insightContent: {
     flex: 1,
-    padding: STUDIO_THEME.spacing.md,
+    padding: DesignSystem.spacing.md,
   },
   insightIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: STUDIO_THEME.colors.accent.jadeGlow,
+    backgroundColor: DesignSystem.colors.sage[100],
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
   insightTitle: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.primary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 4,
   },
   insightSubtitle: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.secondary,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.secondary,
     marginBottom: 8,
   },
   insightDescription: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.tertiary,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.tertiary,
     lineHeight: 18,
   },
   
@@ -512,18 +514,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: STUDIO_THEME.spacing.md,
+    padding: DesignSystem.spacing.md,
   },
   metricValue: {
-    ...STUDIO_THEME.typography.scale.hero,
-    color: STUDIO_THEME.colors.accent.jade,
+    ...DesignSystem.typography.heading.large,
+    color: DesignSystem.colors.sage[500],
     fontSize: 32,
     fontWeight: '700',
     marginBottom: 4,
   },
   metricLabel: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.secondary,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: 8,
   },
@@ -532,8 +534,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   metricTrendText: {
-    ...STUDIO_THEME.typography.scale.caption,
-    color: STUDIO_THEME.colors.text.tertiary,
+    ...DesignSystem.typography.caption.small,
+    color: DesignSystem.colors.text.tertiary,
     marginLeft: 4,
   },
   
@@ -542,20 +544,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: STUDIO_THEME.spacing.md,
+    padding: DesignSystem.spacing.md,
   },
   actionIcon: {
     marginBottom: 8,
   },
   actionTitle: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.inverse,
     textAlign: 'center',
     marginBottom: 4,
   },
   actionSubtitle: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.inverse,
     textAlign: 'center',
     opacity: 0.9,
   },
@@ -571,18 +573,18 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: STUDIO_THEME.spacing.md,
-    borderBottomLeftRadius: STUDIO_THEME.radius.lg,
-    borderBottomRightRadius: STUDIO_THEME.radius.lg,
+    padding: DesignSystem.spacing.md,
+    borderBottomLeftRadius: DesignSystem.borderRadius.lg,
+    borderBottomRightRadius: DesignSystem.borderRadius.lg,
   },
   imageTitle: {
-    ...STUDIO_THEME.typography.scale.bodyMedium,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.inverse,
     marginBottom: 2,
   },
   imageSubtitle: {
-    ...STUDIO_THEME.typography.scale.small,
-    color: STUDIO_THEME.colors.text.inverse,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.inverse,
     opacity: 0.9,
   },
 });

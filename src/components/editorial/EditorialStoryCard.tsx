@@ -13,8 +13,8 @@ import Animated, {
   withSpring,
   interpolate,
 } from 'react-native-reanimated';
-import { EDITORIAL_THEME } from '../../constants/EditorialTheme';
-import { EditorialStory } from '../../data/editorialContent';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { EditorialStory } from '@/data/editorialContent';
 
 const { width: screenWidth } = Dimensions.get('window');
 const cardWidth = screenWidth * 0.8;
@@ -27,15 +27,15 @@ interface EditorialStoryCardProps {
 const getCategoryColor = (category: EditorialStory['category']) => {
   switch (category) {
     case 'trend':
-      return EDITORIAL_THEME.colors.lilac[500];
+      return DesignSystem.colors.sage[500];
     case 'styling':
-      return EDITORIAL_THEME.colors.gold[500];
+      return DesignSystem.colors.gold[500];
     case 'interview':
-      return EDITORIAL_THEME.colors.grey[600];
+      return DesignSystem.colors.neutral[600];
     case 'guide':
-      return EDITORIAL_THEME.colors.lilac[600];
+      return DesignSystem.colors.sage[600];
     default:
-      return EDITORIAL_THEME.colors.grey[500];
+      return DesignSystem.colors.neutral[500];
   }
 };
 
@@ -106,11 +106,11 @@ export const EditorialStoryCard: React.FC<EditorialStoryCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: cardWidth,
-    backgroundColor: EDITORIAL_THEME.colors.white,
-    borderRadius: EDITORIAL_THEME.borderRadius.lg,
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
-    ...EDITORIAL_THEME.shadows.soft,
-    marginBottom: EDITORIAL_THEME.spacing.md,
+    ...DesignSystem.elevation.soft,
+    marginBottom: DesignSystem.spacing.md,
   },
   imageContainer: {
     position: 'relative',
@@ -133,39 +133,36 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     left: 12,
-    backgroundColor: EDITORIAL_THEME.colors.white,
+    backgroundColor: DesignSystem.colors.background.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: EDITORIAL_THEME.borderRadius.full,
-    ...EDITORIAL_THEME.shadows.soft,
+    borderRadius: DesignSystem.radius.full,
+    ...DesignSystem.elevation.soft,
   },
   categoryText: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.xs,
-    fontFamily: 'Inter_600SemiBold',
+    ...DesignSystem.typography.scale.caption,
+    fontWeight: '600',
     letterSpacing: 0.5,
   },
   content: {
-    padding: EDITORIAL_THEME.spacing.lg,
+    padding: DesignSystem.spacing.lg,
   },
   subtitle: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.sm,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.text.secondary,
     marginBottom: 4,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   title: {
-    fontSize: EDITORIAL_THEME.typography.serif.sizes['2xl'],
-    fontFamily: EDITORIAL_THEME.typography.serif.family,
-    color: EDITORIAL_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 12,
     lineHeight: 32,
   },
   excerpt: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.secondary,
     lineHeight: 24,
     marginBottom: 16,
   },
@@ -175,13 +172,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   author: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.sm,
-    fontFamily: 'Inter_500Medium',
-    color: EDITORIAL_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.body2,
+    fontWeight: '500',
+    color: DesignSystem.colors.text.primary,
   },
   readTime: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.sm,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.muted,
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.text.tertiary,
   },
 });

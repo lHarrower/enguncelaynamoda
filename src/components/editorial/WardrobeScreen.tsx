@@ -7,7 +7,7 @@ import {
   StatusBar,
   ScrollView,
 } from 'react-native';
-import { EDITORIAL_THEME } from '../../constants/EditorialTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 export const WardrobeScreen: React.FC = () => {
   return (
@@ -35,7 +35,7 @@ export const WardrobeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: EDITORIAL_THEME.colors.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollView: {
     flex: 1,
@@ -44,22 +44,20 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
-    paddingHorizontal: EDITORIAL_THEME.layout.containerPadding,
+    paddingHorizontal: DesignSystem.spacing.xl,
     paddingTop: 20,
     paddingBottom: 40,
     alignItems: 'center',
   },
   title: {
-    fontSize: EDITORIAL_THEME.typography.serif.sizes['4xl'],
-    fontFamily: EDITORIAL_THEME.typography.serif.family,
-    color: EDITORIAL_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.hero,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 8,
     lineHeight: 44,
   },
   subtitle: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   emptyState: {
@@ -73,16 +71,14 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   emptyTitle: {
-    fontSize: EDITORIAL_THEME.typography.serif.sizes['2xl'],
-    fontFamily: EDITORIAL_THEME.typography.serif.family,
-    color: EDITORIAL_THEME.colors.text.primary,
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 12,
     textAlign: 'center',
   },
   emptyDescription: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.base,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.text.secondary,
+    ...DesignSystem.typography.scale.body1,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },

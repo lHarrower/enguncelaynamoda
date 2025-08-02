@@ -5,7 +5,7 @@ import {
   ViewStyle,
   TouchableOpacity,
 } from 'react-native';
-import { PREMIUM_THEME } from '../../constants/PremiumThemeSystem';
+import { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 

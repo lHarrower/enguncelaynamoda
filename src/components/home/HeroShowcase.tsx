@@ -5,7 +5,7 @@ import Animated, {
   useAnimatedStyle,
   interpolate,
 } from 'react-native-reanimated';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { APP_THEME_V2 } from '@/constants/AppThemeV2';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
@@ -116,4 +116,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default HeroShowcase; 
+export default HeroShowcase;

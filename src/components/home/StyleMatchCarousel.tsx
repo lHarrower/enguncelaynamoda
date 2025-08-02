@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import { styleMatchData as initialData } from '../../data/styleMatchData';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { styleMatchData as initialData } from '@/data/styleMatchData';
 import Animated, { useAnimatedStyle, withSpring, FadeOut, Layout } from 'react-native-reanimated';
-import SwipeableCard from './SwipeableCard';
+import SwipeableCard from '@/components/home/SwipeableCard';
 
 interface StyleMatchItem {
   id: string;
@@ -83,29 +83,28 @@ const AnimatedStackItem = ({ isCurrent, ...props }: { isCurrent: boolean; item: 
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    marginBottom: APP_THEME_V2.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    marginBottom: DesignSystem.spacing.md,
   },
   title: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.text.primary,
   },
   seeAll: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.accent,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.sage[500],
   },
   deckContainer: {
     height: 260,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: APP_THEME_V2.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   animatedCard: {
     position: 'absolute',
@@ -114,16 +113,15 @@ const styles = StyleSheet.create({
     height: 260,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: APP_THEME_V2.semantic.surface,
-    borderRadius: APP_THEME_V2.radius.organic,
-    marginHorizontal: APP_THEME_V2.spacing.xl,
-    ...APP_THEME_V2.elevation.whisper,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderRadius: DesignSystem.borderRadius.lg,
+    marginHorizontal: DesignSystem.spacing.xl,
+    ...DesignSystem.elevation.medium,
   },
   emptyText: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.body.large,
+    color: DesignSystem.colors.text.secondary,
   },
 });
 
-export default StyleMatchCarousel; 
+export default StyleMatchCarousel;

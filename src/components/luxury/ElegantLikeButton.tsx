@@ -8,8 +8,8 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { LuxuryMaterials, LuxuryMotion, LuxurySpacing } from '../../theme/AppThemeV2';
-import WaveOfLight from './WaveOfLight';
+import { LuxuryMaterials, LuxuryMotion, LuxurySpacing } from '@/theme/AppThemeV2';
+import WaveOfLight from '@/components/luxury/WaveOfLight';
 
 interface ElegantLikeButtonProps {
   isLiked: boolean;
@@ -119,4 +119,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ElegantLikeButton; 
+export default ElegantLikeButton;

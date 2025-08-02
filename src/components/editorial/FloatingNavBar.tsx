@@ -13,7 +13,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
-import { EDITORIAL_THEME } from '../../constants/EditorialTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -76,8 +76,8 @@ export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({
                 size={20}
                 color={
                   activeTab === item.id
-                    ? EDITORIAL_THEME.colors.lilac[600]
-                    : EDITORIAL_THEME.colors.grey[500]
+                    ? DesignSystem.colors.sage[600]
+                    : DesignSystem.colors.text.tertiary
                 }
               />
               <Text
@@ -106,10 +106,10 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   blurContainer: {
-    borderRadius: EDITORIAL_THEME.borderRadius.full,
+    borderRadius: DesignSystem.borderRadius.full,
     overflow: 'hidden',
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    ...EDITORIAL_THEME.shadows.medium,
+    ...DesignSystem.elevation.medium,
   },
   navContent: {
     flexDirection: 'row',
@@ -124,20 +124,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: EDITORIAL_THEME.borderRadius.lg,
+    borderRadius: DesignSystem.borderRadius.lg,
     minWidth: 60,
   },
   activeNavItem: {
-    backgroundColor: EDITORIAL_THEME.colors.lilac[50],
+    backgroundColor: DesignSystem.colors.sage[50],
   },
   navLabel: {
-    fontSize: EDITORIAL_THEME.typography.sans.sizes.xs,
-    fontFamily: EDITORIAL_THEME.typography.sans.family,
-    color: EDITORIAL_THEME.colors.grey[500],
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     marginTop: 2,
   },
   activeNavLabel: {
-    color: EDITORIAL_THEME.colors.lilac[600],
+    color: DesignSystem.colors.sage[600],
     fontFamily: 'Inter_400Regular',
   },
   indicator: {
@@ -145,7 +144,7 @@ const styles = StyleSheet.create({
     bottom: 4,
     width: 40,
     height: 3,
-    backgroundColor: EDITORIAL_THEME.colors.lilac[500],
-    borderRadius: EDITORIAL_THEME.borderRadius.full,
+    backgroundColor: DesignSystem.colors.sage[500],
+    borderRadius: DesignSystem.borderRadius.full,
   },
 });

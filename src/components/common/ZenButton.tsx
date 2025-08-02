@@ -3,7 +3,7 @@ import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ZenButtonProps {
   title: string;
@@ -33,15 +33,15 @@ export default function ZenButton({
 
   const handlePressIn = () => {
     if (!disabled) {
-      scale.value = withTiming(0.97, { duration: APP_THEME_V2.animation.zen.tension });
-      opacity.value = withTiming(0.9, { duration: APP_THEME_V2.animation.zen.tension });
+      scale.value = withTiming(0.97, { duration: 150 });
+      opacity.value = withTiming(0.9, { duration: 150 });
     }
   };
 
   const handlePressOut = () => {
     if (!disabled) {
-      scale.value = withTiming(1, { duration: APP_THEME_V2.animation.zen.tension });
-      opacity.value = withTiming(1, { duration: APP_THEME_V2.animation.zen.tension });
+      scale.value = withTiming(1, { duration: 150 });
+      opacity.value = withTiming(1, { duration: 150 });
     }
   };
 
@@ -153,60 +153,60 @@ export default function ZenButton({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: APP_THEME_V2.radius.organic,
+    borderRadius: DesignSystem.borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
     overflow: 'hidden',
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.elevation.medium,
   },
   gradient: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    paddingHorizontal: APP_THEME_V2.spacing.lg,
-    paddingVertical: APP_THEME_V2.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
   },
   
   // Sizes
   small: {
-    paddingHorizontal: APP_THEME_V2.spacing.md,
-    paddingVertical: APP_THEME_V2.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
     minHeight: 36,
   },
   medium: {
-    paddingHorizontal: APP_THEME_V2.spacing.lg,
-    paddingVertical: APP_THEME_V2.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
     minHeight: 44,
   },
   large: {
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    paddingVertical: APP_THEME_V2.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingVertical: DesignSystem.spacing.lg,
     minHeight: 52,
   },
   
   // Variants
   secondary: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.background.secondary,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.moonlightSilver,
+    borderColor: DesignSystem.colors.sage[200],
   },
   ghost: {
     backgroundColor: 'transparent',
-    ...APP_THEME_V2.elevation.whisper,
+    ...DesignSystem.elevation.soft,
   },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: APP_THEME_V2.semantic.accent,
+    borderColor: DesignSystem.colors.sage[500],
   },
   
   // States
   disabled: {
-    backgroundColor: APP_THEME_V2.colors.cloudGray,
+    backgroundColor: DesignSystem.colors.sage[100],
     opacity: 0.6,
-    ...APP_THEME_V2.elevation.whisper,
+    ...DesignSystem.elevation.soft,
   },
   fullWidth: {
     width: '100%',
@@ -215,41 +215,41 @@ const styles = StyleSheet.create({
   // Text styles
   text: {
     textAlign: 'center',
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    fontFamily: DesignSystem.typography.fonts.body,
     letterSpacing: 0.3,
   },
   smallText: {
-    ...APP_THEME_V2.typography.scale.caption,
+    ...DesignSystem.typography.scale.caption,
     fontWeight: '600',
   },
   mediumText: {
-    ...APP_THEME_V2.typography.scale.body2,
+    ...DesignSystem.typography.scale.body2,
     fontWeight: '600',
   },
   largeText: {
-    ...APP_THEME_V2.typography.scale.body1,
+    ...DesignSystem.typography.scale.body1,
     fontWeight: '600',
   },
   
-  // Text variants
+  // Text colors
   primaryText: {
-    color: APP_THEME_V2.colors.whisperWhite,
+    color: DesignSystem.colors.text.inverse,
   },
   secondaryText: {
-    color: APP_THEME_V2.semantic.text.primary,
+    color: DesignSystem.colors.text.primary,
   },
   ghostText: {
-    color: APP_THEME_V2.semantic.text.secondary,
+    color: DesignSystem.colors.text.secondary,
   },
   outlineText: {
-    color: APP_THEME_V2.semantic.accent,
+    color: DesignSystem.colors.sage[500],
   },
   
-  // Icons
+  // Icon spacing
   iconLeft: {
-    marginRight: APP_THEME_V2.spacing.sm,
+    marginRight: DesignSystem.spacing.sm,
   },
   iconRight: {
-    marginLeft: APP_THEME_V2.spacing.sm,
+    marginLeft: DesignSystem.spacing.sm,
   },
 });

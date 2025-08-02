@@ -12,12 +12,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
-import { AynaOutfitCard } from './AynaOutfitCard';
-import { LikeButton } from './LikeButton';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
-import { Outfit, MoodTag } from '../../data/sanctuaryModels';
-import AynaAIService from '../../services/sanctuaryService';
-import { SAMPLE_WARDROBE } from '../../data/sanctuarySampleData';
+import { AynaOutfitCard } from '@/components/sanctuary/AynaOutfitCard';
+import { LikeButton } from '@/components/sanctuary/LikeButton';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { Outfit, MoodTag } from '@/data/sanctuaryModels';
+import AynaAIService from '@/services/sanctuaryService';
+import { SAMPLE_WARDROBE } from '@/data/sanctuarySampleData';
 
 const MOODS: { tag: MoodTag; icon: string; description: string }[] = [
   { 
@@ -332,125 +332,125 @@ export const MainRitualScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: APP_THEME_V2.colors.linen.base,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollView: {
     flex: 1,
   },
   header: {
-    padding: APP_THEME_V2.spacing.xl,
+    padding: DesignSystem.spacing.xl,
     alignItems: 'center',
   },
   title: {
-    ...APP_THEME_V2.typography.scale.hero,
-    color: APP_THEME_V2.colors.inkGray[800],
+    ...DesignSystem.typography.hero,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   subtitle: {
-    ...APP_THEME_V2.typography.scale.whisper,
-    color: APP_THEME_V2.colors.inkGray[600],
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   moodSection: {
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    marginBottom: APP_THEME_V2.spacing.xxxl,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    marginBottom: DesignSystem.spacing.xxxl,
   },
   sectionTitle: {
-    ...APP_THEME_V2.typography.scale.h2,
-    color: APP_THEME_V2.colors.inkGray[800],
+    ...DesignSystem.typography.h2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   sectionSubtitle: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.colors.inkGray[600],
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   moodGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: APP_THEME_V2.spacing.lg,
+    gap: DesignSystem.spacing.lg,
     justifyContent: 'center',
   },
   moodCard: {
     width: '45%',
-    backgroundColor: APP_THEME_V2.colors.whisperWhite,
-    borderRadius: APP_THEME_V2.radius.organic,
-    padding: APP_THEME_V2.spacing.lg,
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderRadius: DesignSystem.radius.lg,
+    padding: DesignSystem.spacing.lg,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
-    ...APP_THEME_V2.elevation.whisper,
+    ...DesignSystem.elevation.soft,
   },
   selectedMoodCard: {
-    backgroundColor: APP_THEME_V2.colors.sageGreen[500],
-    borderColor: APP_THEME_V2.colors.sageGreen[600],
-    ...APP_THEME_V2.elevation.lift,
+    backgroundColor: DesignSystem.colors.sage[500],
+    borderColor: DesignSystem.colors.sage[600],
+    ...DesignSystem.elevation.medium,
   },
   moodIconContainer: {
-    marginBottom: APP_THEME_V2.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   moodText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.colors.inkGray[800],
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   selectedMoodText: {
-    color: APP_THEME_V2.colors.whisperWhite,
+    color: DesignSystem.colors.text.inverse,
   },
   moodDescription: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.colors.inkGray[600],
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 16,
   },
   selectedMoodDescription: {
-    color: APP_THEME_V2.colors.whisperWhite,
+    color: DesignSystem.colors.text.inverse,
   },
   loadingContainer: {
-    padding: APP_THEME_V2.spacing.xxxl,
+    padding: DesignSystem.spacing.xxxl,
     alignItems: 'center',
   },
   loadingText: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.colors.inkGray[600],
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   outfitsSection: {
-    paddingHorizontal: APP_THEME_V2.spacing.md,
-    marginBottom: APP_THEME_V2.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.xl,
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: APP_THEME_V2.spacing.xxxl,
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
+    paddingVertical: DesignSystem.spacing.xxxl,
+    paddingHorizontal: DesignSystem.spacing.xl,
   },
   emptyIcon: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: APP_THEME_V2.colors.cloudGray,
+    backgroundColor: DesignSystem.colors.sage[100],
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   emptyTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.colors.inkGray[700],
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   emptySubtitle: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.colors.inkGray[500],
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
   bottomSpacer: {
-    height: APP_THEME_V2.spacing.xl,
+    height: DesignSystem.spacing.xl,
   },
-}); 
+});

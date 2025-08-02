@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as ImagePicker from 'expo-image-picker';
 import * as Camera from 'expo-camera';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -86,7 +86,7 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={[APP_THEME_V2.colors.linen.light, APP_THEME_V2.colors.linen.base]}
+        colors={[DesignSystem.colors.linen.light, DesignSystem.colors.linen.base]}
         style={styles.gradient}
       >
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -143,7 +143,7 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
                     <Ionicons 
                       name="camera" 
                       size={32} 
-                      color={APP_THEME_V2.colors.sageGreen[600]} 
+                      color={DesignSystem.colors.sageGreen[600]} 
                     />
                     <Text style={styles.actionButtonTitle}>Take Photo</Text>
                     <Text style={styles.actionButtonSubtitle}>
@@ -163,7 +163,7 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
                     <Ionicons 
                       name="images" 
                       size={32} 
-                      color={APP_THEME_V2.colors.liquidGold[600]} 
+                      color={DesignSystem.colors.liquidGold[600]} 
                     />
                     <Text style={styles.actionButtonTitle}>Choose from Gallery</Text>
                     <Text style={styles.actionButtonSubtitle}>
@@ -244,140 +244,140 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    paddingTop: APP_THEME_V2.spacing.xl,
-    paddingBottom: APP_THEME_V2.spacing.xxxl,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xxxl,
   },
   header: {
     alignItems: 'center',
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   title: {
-    ...APP_THEME_V2.typography.scale.h1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.h1,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   subtitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
   },
   progressSection: {
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   progressCard: {
-    ...APP_THEME_V2.glassmorphism.subtle,
-    borderRadius: APP_THEME_V2.radius.organic,
-    padding: APP_THEME_V2.spacing.lg,
-    ...APP_THEME_V2.elevation.whisper,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: DesignSystem.radius.lg,
+    padding: DesignSystem.spacing.lg,
+    ...DesignSystem.elevation.soft,
   },
   progressTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.text.primary,
-    marginBottom: APP_THEME_V2.spacing.sm,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.sm,
   },
   progressText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
-    marginBottom: APP_THEME_V2.spacing.md,
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.md,
   },
   progressBar: {
     height: 8,
-    backgroundColor: APP_THEME_V2.colors.moonlightSilver,
-    borderRadius: APP_THEME_V2.radius.sm,
-    marginBottom: APP_THEME_V2.spacing.sm,
+    backgroundColor: DesignSystem.colors.sage[100],
+    borderRadius: DesignSystem.radius.sm,
+    marginBottom: DesignSystem.spacing.sm,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: APP_THEME_V2.colors.sageGreen[500],
-    borderRadius: APP_THEME_V2.radius.sm,
+    backgroundColor: DesignSystem.colors.sageGreen[500],
+    borderRadius: DesignSystem.radius.sm,
   },
   progressCount: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.caption,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
   actionsSection: {
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   actionsTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   actionButtons: {
-    gap: APP_THEME_V2.spacing.md,
-    marginBottom: APP_THEME_V2.spacing.xl,
+    gap: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.xl,
   },
   actionButton: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.whisper,
+    borderRadius: DesignSystem.radius.lg,
+    ...DesignSystem.elevation.soft,
   },
   actionButtonPressed: {
     transform: [{ scale: 0.98 }],
   },
   actionButtonContent: {
-    padding: APP_THEME_V2.spacing.lg,
-    borderRadius: APP_THEME_V2.radius.organic,
+    padding: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.radius.lg,
     alignItems: 'center',
   },
   actionButtonTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.text.primary,
-    marginTop: APP_THEME_V2.spacing.sm,
-    marginBottom: APP_THEME_V2.spacing.xs,
+    ...DesignSystem.typography.h3,
+    color: DesignSystem.colors.text.primary,
+    marginTop: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.xs,
   },
   actionButtonSubtitle: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   tipsSection: {
-    ...APP_THEME_V2.glassmorphism.subtle,
-    borderRadius: APP_THEME_V2.radius.md,
-    padding: APP_THEME_V2.spacing.lg,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: DesignSystem.radius.md,
+    padding: DesignSystem.spacing.lg,
   },
   tipsTitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   tipsList: {
-    gap: APP_THEME_V2.spacing.xs,
+    gap: DesignSystem.spacing.xs,
   },
   tipItem: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.text.secondary,
     lineHeight: 20,
   },
   navigationSection: {
-    marginTop: APP_THEME_V2.spacing.xl,
+    marginTop: DesignSystem.spacing.xl,
   },
   navigationButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   skipButton: {
-    paddingVertical: APP_THEME_V2.spacing.md,
-    paddingHorizontal: APP_THEME_V2.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   skipButtonPressed: {
     opacity: 0.7,
   },
   skipButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.scale.button,
+    color: DesignSystem.colors.text.tertiary,
   },
   continueButton: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.lift,
+    borderRadius: DesignSystem.radius.lg,
+    ...DesignSystem.elevation.medium,
     flex: 1,
   },
   continueButtonDisabled: {
@@ -387,16 +387,16 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   continueButtonGradient: {
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    paddingVertical: APP_THEME_V2.spacing.md,
-    borderRadius: APP_THEME_V2.radius.organic,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingVertical: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.radius.lg,
     alignItems: 'center',
   },
   continueButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.inverse,
+    ...DesignSystem.typography.scale.button,
+    color: DesignSystem.colors.text.inverse,
   },
   continueButtonTextDisabled: {
-    color: APP_THEME_V2.colors.inkGray[600],
+    color: DesignSystem.colors.inkGray[600],
   },
 });

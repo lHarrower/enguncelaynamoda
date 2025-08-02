@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, StatusBar, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, StatusBar, Alert, TextInput, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { ULTRA_PREMIUM_THEME } from '../../constants/UltraPremiumTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
 import Animated, { 
@@ -27,9 +27,24 @@ const categories = ['All', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', '
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-const WardrobeItemCard = ({ item, onPress }: { item: any; onPress: () => void }) => (
-  <TouchableOpacity style={styles.itemCard} onPress={onPress} activeOpacity={0.9}>
+const WardrobeItemCard = ({ item, onPress, onLongPress, isSelected }: { 
+  item: any; 
+  onPress: () => void;
+  onLongPress: () => void;
+  isSelected: boolean;
+}) => (
+  <TouchableOpacity 
+    style={[styles.itemCard, isSelected && styles.selectedItemCard]} 
+    onPress={onPress}
+    onLongPress={onLongPress}
+    activeOpacity={0.9}
+  >
     <Image source={{ uri: item.image }} style={styles.itemImage} />
+    {isSelected && (
+      <View style={styles.selectionOverlay}>
+        <Ionicons name="checkmark-circle" size={24} color={DesignSystem.colors.sage[500]} />
+      </View>
+    )}
     <View style={styles.itemContent}>
       <Text style={styles.itemBrand}>{item.brand}</Text>
       <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
@@ -41,6 +56,8 @@ const WardrobeItemCard = ({ item, onPress }: { item: any; onPress: () => void })
 export default function WardrobeScreen() {
   const insets = useSafeAreaInsets();
   const [activeCategory, setActiveCategory] = useState('All');
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler({
@@ -48,6 +65,50 @@ export default function WardrobeScreen() {
       scrollY.value = event.contentOffset.y;
     },
   });
+
+  // Handle item selection
+  const handleItemLongPress = (itemId: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setSelectedItems(prev => 
+      prev.includes(itemId) 
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const handleItemPress = (item: any) => {
+    if (selectedItems.length > 0) {
+      handleItemLongPress(item.id);
+    } else {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      // Navigate to item details
+      router.push(`/item/${item.id}`);
+    }
+  };
+
+  // Filter items based on search and category
+  const filteredItems = wardrobeItems.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         item.brand.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  // Calculate responsive grid columns
+  const screenWidth = Dimensions.get('window').width;
+  const getItemWidth = () => {
+    const padding = DesignSystem.spacing.lg * 2;
+    const gap = DesignSystem.spacing.md;
+    if (screenWidth > 768) {
+      // 3 columns for tablets
+      return (screenWidth - padding - gap * 2) / 3;
+    } else {
+      // 2 columns for phones
+      return (screenWidth - padding - gap) / 2;
+    }
+  };
+
+  const itemWidth = getItemWidth();
 
   const headerAnimatedStyle = useAnimatedStyle(() => {
     const opacity = interpolate(
@@ -172,16 +233,37 @@ export default function WardrobeScreen() {
       <View style={styles.headerContent}>
         <Text style={styles.headerTitle}>Wardrobe</Text>
         <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="search-outline" size={18} color={ULTRA_PREMIUM_THEME.semantic.text.primary} />
+          <Ionicons name="options-outline" size={18} color={DesignSystem.colors.text.primary} />
         </TouchableOpacity>
       </View>
     </Animated.View>
   );
 
+  const renderSearchBar = () => (
+    <View style={styles.searchContainer}>
+      <View style={styles.searchBar}>
+        <Ionicons name="search-outline" size={20} color={DesignSystem.colors.text.tertiary} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search your wardrobe..."
+          placeholderTextColor={DesignSystem.colors.text.tertiary}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          returnKeyType="search"
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+            <Ionicons name="close-circle" size={20} color={DesignSystem.colors.text.tertiary} />
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
+
   const EmptyState = () => (
     <View style={styles.emptyState}>
       <View style={styles.emptyIconContainer}>
-        <Ionicons name="shirt-outline" size={48} color={ULTRA_PREMIUM_THEME.semantic.text.tertiary} />
+        <Ionicons name="shirt-outline" size={48} color={DesignSystem.colors.text.tertiary} />
       </View>
       <Text style={styles.emptyTitle}>Build Your Wardrobe</Text>
       <Text style={styles.emptySubtitle}>
@@ -207,7 +289,7 @@ export default function WardrobeScreen() {
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + ULTRA_PREMIUM_THEME.spacing.massive }
+          { paddingBottom: insets.bottom + DesignSystem.spacing.massive }
         ]}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -217,7 +299,7 @@ export default function WardrobeScreen() {
         <View style={styles.header}>
           <Text style={styles.title}>My Wardrobe</Text>
           <Text style={styles.subtitle}>
-            {wardrobeItems.length} {wardrobeItems.length === 1 ? 'piece' : 'pieces'}
+            {filteredItems.length} {filteredItems.length === 1 ? 'piece' : 'pieces'}
           </Text>
         </View>
 
@@ -239,17 +321,22 @@ export default function WardrobeScreen() {
           </ScrollView>
         </View>
 
+        {/* Search Bar */}
+        {renderSearchBar()}
+
         {/* Content */}
-        {wardrobeItems.length === 0 ? (
+        {filteredItems.length === 0 ? (
           <EmptyState />
         ) : (
           <View style={styles.itemsSection}>
             <View style={styles.itemsGrid}>
-              {wardrobeItems.map((item) => (
+              {filteredItems.map((item) => (
                 <WardrobeItemCard
                   key={item.id}
                   item={item}
-                  onPress={() => router.push(`/product/${item.id}`)}
+                  onPress={() => handleItemPress(item.id)}
+                  onLongPress={() => handleItemLongPress(item.id)}
+                  isSelected={selectedItems.includes(item.id)}
                 />
               ))}
             </View>
@@ -259,11 +346,11 @@ export default function WardrobeScreen() {
 
       {/* Floating Action Button */}
       <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + ULTRA_PREMIUM_THEME.spacing.xl }]}
+        style={[styles.fab, { bottom: insets.bottom + DesignSystem.spacing.xl }]}
         onPress={handleAddItem}
         activeOpacity={0.9}
       >
-        <Ionicons name="camera" size={24} color={ULTRA_PREMIUM_THEME.semantic.text.inverse} />
+        <Ionicons name="camera" size={24} color={DesignSystem.colors.white} />
       </TouchableOpacity>
     </View>
   );
@@ -272,7 +359,7 @@ export default function WardrobeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.background.primary,
+    backgroundColor: DesignSystem.colors.white,
   },
   scrollView: {
     flex: 1,
@@ -286,57 +373,80 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.background.primary,
+    backgroundColor: DesignSystem.colors.white,
     borderBottomWidth: 1,
-    borderBottomColor: ULTRA_PREMIUM_THEME.semantic.border.tertiary,
+    borderBottomColor: DesignSystem.colors.sage[100],
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
     paddingTop: 60,
-    paddingBottom: ULTRA_PREMIUM_THEME.spacing.md,
+    paddingBottom: DesignSystem.spacing.md,
   },
   headerTitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.h2,
-    color: ULTRA_PREMIUM_THEME.semantic.text.primary,
-    fontWeight: '400',
+    fontSize: DesignSystem.typography.h2.fontSize,
+    fontWeight: DesignSystem.typography.h2.fontWeight,
+    color: DesignSystem.colors.sage[900],
   },
   headerButton: {
     width: 40,
     height: 40,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.round,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
+    borderRadius: DesignSystem.radius.round,
+    backgroundColor: DesignSystem.colors.sage[50],
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.sage[200],
   },
   header: {
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
     paddingTop: 100,
-    paddingBottom: ULTRA_PREMIUM_THEME.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   title: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.display,
-    color: ULTRA_PREMIUM_THEME.semantic.text.primary,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.sm,
+    fontSize: DesignSystem.typography.display.fontSize,
     fontWeight: '300',
+    color: DesignSystem.colors.sage[900],
+    marginBottom: DesignSystem.spacing.sm,
   },
   subtitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body1,
-    color: ULTRA_PREMIUM_THEME.semantic.text.secondary,
+    fontSize: DesignSystem.typography.body1.fontSize,
+    color: DesignSystem.colors.sage[600],
   },
   categoriesSection: {
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   categoriesContainer: {
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
-    gap: ULTRA_PREMIUM_THEME.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.sm,
+  },
+  searchBarContainer: {
+    paddingHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.sage[50],
+    borderRadius: DesignSystem.radius.lg,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+    borderWidth: 1,
+    borderColor: DesignSystem.colors.sage[200],
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: DesignSystem.typography.body1.fontSize,
+    color: DesignSystem.colors.sage[900],
+    marginLeft: DesignSystem.spacing.sm,
+  },
+  clearButton: {
+    padding: DesignSystem.spacing.xs,
   },
   itemsSection: {
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   itemsGrid: {
     flexDirection: 'row',
@@ -345,110 +455,130 @@ const styles = StyleSheet.create({
   },
   itemCard: {
     width: '48%',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.lg,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.primary,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.lg,
+    marginBottom: DesignSystem.spacing.lg,
+    backgroundColor: DesignSystem.colors.white,
+    borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.sage[200],
+  },
+  selectedItemCard: {
+    borderColor: DesignSystem.colors.sage[500],
+    borderWidth: 2,
+  },
+  selectionOverlay: {
+    position: 'absolute',
+    top: DesignSystem.spacing.sm,
+    right: DesignSystem.spacing.sm,
+    backgroundColor: DesignSystem.colors.white,
+    borderRadius: DesignSystem.radius.round,
+    padding: DesignSystem.spacing.xs,
+    zIndex: 1,
   },
   itemImage: {
     width: '100%',
     height: 200,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
+    backgroundColor: DesignSystem.colors.sage[50],
   },
   itemContent: {
-    padding: ULTRA_PREMIUM_THEME.spacing.md,
+    padding: DesignSystem.spacing.md,
   },
   itemBrand: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.overline,
-    color: ULTRA_PREMIUM_THEME.semantic.text.tertiary,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xs,
+    fontSize: DesignSystem.typography.overline.fontSize,
+    fontWeight: DesignSystem.typography.overline.fontWeight,
+    color: DesignSystem.colors.sage[500],
+    marginBottom: DesignSystem.spacing.xs,
+    textTransform: 'uppercase',
   },
   itemName: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body1,
-    color: ULTRA_PREMIUM_THEME.semantic.text.primary,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xs,
+    fontSize: DesignSystem.typography.body1.fontSize,
+    color: DesignSystem.colors.sage[900],
+    marginBottom: DesignSystem.spacing.xs,
     fontWeight: '400',
   },
   itemPrice: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body2,
-    color: ULTRA_PREMIUM_THEME.semantic.text.secondary,
+    fontSize: DesignSystem.typography.body2.fontSize,
+    color: DesignSystem.colors.sage[600],
     fontWeight: '500',
   },
   emptyState: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
-    paddingTop: ULTRA_PREMIUM_THEME.spacing.xxxl,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.xxxl,
   },
   emptyIconContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
+    backgroundColor: DesignSystem.colors.sage[50],
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.sage[200],
   },
   emptyTitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.h2,
-    color: ULTRA_PREMIUM_THEME.semantic.text.primary,
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.sm,
+    fontSize: DesignSystem.typography.h2.fontSize,
+    fontWeight: DesignSystem.typography.h2.fontWeight,
+    color: DesignSystem.colors.sage[900],
+    marginBottom: DesignSystem.spacing.sm,
     textAlign: 'center',
-    fontWeight: '400',
   },
   emptySubtitle: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body1,
-    color: ULTRA_PREMIUM_THEME.semantic.text.secondary,
+    fontSize: DesignSystem.typography.body1.fontSize,
+    color: DesignSystem.colors.sage[600],
     textAlign: 'center',
-    marginBottom: ULTRA_PREMIUM_THEME.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
     lineHeight: 22,
   },
   addFirstButton: {
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.interactive.primary,
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.lg,
-    paddingVertical: ULTRA_PREMIUM_THEME.spacing.md,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.sm,
-    marginTop: ULTRA_PREMIUM_THEME.spacing.md,
+    backgroundColor: DesignSystem.colors.sage[900],
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.radius.sm,
+    marginTop: DesignSystem.spacing.md,
   },
   addFirstButtonText: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.button,
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    fontSize: DesignSystem.typography.button.fontSize,
+    fontWeight: DesignSystem.typography.button.fontWeight,
+    color: DesignSystem.colors.white,
     textAlign: 'center',
   },
   categoryChip: {
-    paddingHorizontal: ULTRA_PREMIUM_THEME.spacing.md,
-    paddingVertical: ULTRA_PREMIUM_THEME.spacing.sm,
-    borderRadius: ULTRA_PREMIUM_THEME.radius.round,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.surface.secondary,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+    borderRadius: DesignSystem.radius.round,
+    backgroundColor: DesignSystem.colors.sage[50],
     borderWidth: 1,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.sage[200],
   },
   activeCategoryChip: {
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.interactive.primary,
-    borderColor: ULTRA_PREMIUM_THEME.semantic.interactive.primary,
+    backgroundColor: DesignSystem.colors.sage[900],
+    borderColor: DesignSystem.colors.sage[900],
   },
   categoryChipText: {
-    ...ULTRA_PREMIUM_THEME.typography.scale.body2,
-    color: ULTRA_PREMIUM_THEME.semantic.text.secondary,
+    fontSize: DesignSystem.typography.body2.fontSize,
+    color: DesignSystem.colors.sage[600],
     fontWeight: '500',
   },
   activeCategoryChipText: {
-    color: ULTRA_PREMIUM_THEME.semantic.text.inverse,
+    color: DesignSystem.colors.white,
   },
   fab: {
     position: 'absolute',
-    right: ULTRA_PREMIUM_THEME.spacing.lg,
+    right: DesignSystem.spacing.lg,
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: ULTRA_PREMIUM_THEME.semantic.interactive.primary,
+    backgroundColor: DesignSystem.colors.sage[900],
     alignItems: 'center',
     justifyContent: 'center',
-    ...ULTRA_PREMIUM_THEME.elevation.soft,
+    shadowColor: DesignSystem.colors.sage[900],
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
   },
 });
