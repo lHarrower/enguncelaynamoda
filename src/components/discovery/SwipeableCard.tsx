@@ -61,7 +61,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
   const [isLongPressing, setIsLongPressing] = useState(false);
-  const longPressTimer = useRef<NodeJS.Timeout>();
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Arc physics constants
   const ARC_COEFFICIENT = 0.0008; // Controls the depth of the arc
@@ -72,7 +72,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
     onStart: () => {
       // Start long press detection on JS thread
       runOnJS(() => {
-        longPressTimer.current = setTimeout(() => {
+  longPressTimer.current = setTimeout(() => {
           setIsLongPressing(true);
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           onLongPress(item);
@@ -86,6 +86,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
         runOnJS(() => {
           if (longPressTimer.current) {
             clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
             setIsLongPressing(false);
           }
         })();
@@ -106,6 +107,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
       runOnJS(() => {
         if (longPressTimer.current) {
           clearTimeout(longPressTimer.current);
+          longPressTimer.current = null;
         }
         if (isLongPressing) {
           setIsLongPressing(false);

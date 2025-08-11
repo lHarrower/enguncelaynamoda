@@ -9,9 +9,9 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/theme/ThemeProvider';
+import { useSafeTheme } from '@/hooks/useSafeTheme';
 import { antiConsumptionService, ShopYourClosetRecommendation } from '@/services/antiConsumptionService';
-import { WardrobeItem } from '@/types';
+import { WardrobeItem } from '@/services/wardrobeService';
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ShopYourClosetFirstProps {
@@ -31,18 +31,25 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
   style = '',
   onRecommendationGenerated,
 }) => {
-  const { colors: themeColors } = useTheme();
+  const theme = useSafeTheme();
+  const { colors: themeColors } = theme;
   const styles = createStyles(themeColors);
   const [recommendation, setRecommendation] = useState<ShopYourClosetRecommendation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isMounted = React.useRef(true);
 
   useEffect(() => {
+    isMounted.current = true;
     generateRecommendation();
+    return () => {
+      isMounted.current = false;
+    };
   }, [userId, targetItemDescription, category, colors, style]);
 
   const generateRecommendation = async () => {
     try {
+      if (!isMounted.current) return;
       setLoading(true);
       setError(null);
       
@@ -54,12 +61,15 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
         style
       );
       
+      if (!isMounted.current) return;
       setRecommendation(rec);
       onRecommendationGenerated?.(rec);
     } catch (err) {
+      if (!isMounted.current) return;
       setError('Failed to generate recommendations');
       console.error('Error generating shop your closet recommendation:', err);
     } finally {
+      if (!isMounted.current) return;
       setLoading(false);
     }
   };
@@ -94,7 +104,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
     return (
       <View style={styles.container}>
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color={DesignSystem.colors.error[500]} />
+          <Ionicons name="alert-circle-outline" size={48} color={(themeColors as any).semantic?.error || (themeColors as any).error?.[500] || '#ff4d4f'} />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity style={styles.retryButton} onPress={generateRecommendation}>
             <Text style={styles.retryButtonText}>Try Again</Text>
@@ -108,7 +118,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
     return (
       <View style={styles.container}>
         <View style={styles.noItemsContainer}>
-          <Ionicons name="shirt-outline" size={48} color={DesignSystem.colors.neutral[600]} />
+          <Ionicons name="shirt-outline" size={48} color={themeColors.neutral?.[600] || '#666666'} />
           <Text style={styles.noItemsTitle}>No Similar Items Found</Text>
           <Text style={styles.noItemsText}>
             You don't have similar items in your closet yet. This might be a good addition to your wardrobe!
@@ -122,7 +132,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View style={styles.iconContainer}>
-          <Ionicons name="leaf-outline" size={24} color={DesignSystem.colors.primary[500]} />
+          <Ionicons name="leaf-outline" size={24} color={themeColors.primary?.[500] || '#6c5ce7'} />
         </View>
         <Text style={styles.title}>Shop Your Closet First</Text>
         <Text style={styles.subtitle}>
@@ -152,7 +162,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
       <View style={styles.reasoningContainer}>
         {recommendation.reasoning.map((reason, index) => (
           <View key={index} style={styles.reasoningItem}>
-            <Ionicons name="checkmark-circle" size={16} color={DesignSystem.colors.success[500]} />
+            <Ionicons name="checkmark-circle" size={16} color={(themeColors as any).semantic?.success || (themeColors as any).success?.[500] || '#5C8A5C'} />
             <Text style={styles.reasoningText}>{reason}</Text>
           </View>
         ))}
@@ -165,9 +175,11 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
             <TouchableOpacity
               key={item.id}
               style={styles.itemCard}
-              onPress={() => handleItemPress(item)}
+              onPress={() => handleItemPress(item as any)}
             >
-              <Image source={{ uri: item.imageUri }} style={styles.itemImage} />
+              {'imageUri' in item ? (
+                <Image source={{ uri: (item as any).imageUri }} style={styles.itemImage} />
+              ) : null}
               <View style={styles.itemInfo}>
                 <Text style={styles.itemCategory}>{item.category}</Text>
                 <View style={styles.itemColors}>
@@ -178,7 +190,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
                     />
                   ))}
                 </View>
-                {item.tags.length > 0 && (
+                {Array.isArray(item.tags) && item.tags.length > 0 && (
                   <Text style={styles.itemTags}>
                     {item.tags.slice(0, 2).join(', ')}
                   </Text>

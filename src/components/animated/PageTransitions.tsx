@@ -1,7 +1,7 @@
 // Page Transitions - Screen-to-screen animation system
 import React, { useEffect, useRef } from 'react';
 import { Animated, Dimensions, ViewStyle } from 'react-native';
-import { useFadeAnimation, useSlideAnimation } from '@/hooks/useAnimation';
+import { useFadeAnimation, useSlideAnimation, useSpringAnimation } from '@/hooks/useAnimation';
 import { AnimationSystem, TIMING, EASING } from '@/theme/foundations/Animation';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -92,7 +92,7 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
             Animated.timing(slideAnim, {
               toValue: 0,
               duration,
-              easing: EASING.luxury.enter,
+              easing: EASING.enter,
               useNativeDriver: true
             })
           );
@@ -143,7 +143,7 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
             Animated.timing(slideAnim, {
               toValue: -getInitialSlideValue(direction),
               duration,
-              easing: EASING.luxury.exit,
+              easing: EASING.exit,
               useNativeDriver: true
             })
           );
@@ -153,7 +153,7 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
           animations.push(
             Animated.timing(slideAnim, {
               toValue: SCREEN_HEIGHT,
-              duration: TIMING.fast,
+              duration: TIMING.quick,
               easing: EASING.exit,
               useNativeDriver: true
             })
@@ -407,7 +407,7 @@ export const ModalTransition: React.FC<ModalTransitionProps> = ({
           animations.push(
             Animated.timing(slideAnim, {
               toValue: SCREEN_HEIGHT,
-              duration: TIMING.fast,
+              duration: TIMING.quick,
               easing: EASING.exit,
               useNativeDriver: true
             })
@@ -419,7 +419,7 @@ export const ModalTransition: React.FC<ModalTransitionProps> = ({
           animations.push(
             Animated.timing(scaleAnim, {
               toValue: 0.8,
-              duration: TIMING.fast,
+              duration: TIMING.quick,
               easing: EASING.exit,
               useNativeDriver: true
             })

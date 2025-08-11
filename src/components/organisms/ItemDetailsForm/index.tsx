@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { BaseComponentProps } from '@/types/componentProps';
-import { SPACING, UNIFIED_COLORS } from '@/theme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import FormField from '@/components/molecules/FormField';
 import Card from '@/components/molecules/Card';
 import Button from '@/components/atoms/Button';
@@ -126,7 +126,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
   const availableSubcategories = formData.category ? subcategories[formData.category] || [] : [];
 
   return (
-    <Card variant="default" padding="large" style={[styles.container, style]} testID={testID} {...props}>
+    <Card variant="default" padding="large" style={StyleSheet.flatten([styles.container, style])} testID={testID} {...props}>
       <Text variant="headline" weight="bold" style={styles.title}>
         Add Clothing Item
       </Text>
@@ -271,33 +271,32 @@ const styles = StyleSheet.create({
   },
   
   title: {
-    marginBottom: SPACING.margin.large,
+    marginBottom: DesignSystem.spacing.lg,
     textAlign: 'center',
   },
   
   scrollView: {
     flex: 1,
-    marginBottom: SPACING.margin.medium,
+    marginBottom: DesignSystem.spacing.md,
   },
   
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: SPACING.padding.medium,
+    paddingTop: DesignSystem.spacing.md,
     borderTopWidth: 1,
-    borderTopColor: UNIFIED_COLORS.neutral[200],
+  borderTopColor: DesignSystem.colors.neutral[200],
   },
   
   cancelButton: {
     flex: 1,
-    marginRight: SPACING.margin.small,
+    marginRight: DesignSystem.spacing.sm,
   },
   
   submitButton: {
     flex: 1,
-    marginLeft: SPACING.margin.small,
+    marginLeft: DesignSystem.spacing.sm,
   },
 });
 
 export default ItemDetailsForm;
-export type { ItemDetailsFormProps, ClothingItemSubmission };

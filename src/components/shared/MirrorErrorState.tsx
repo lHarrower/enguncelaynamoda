@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   errorText: {
-    ...DesignSystem.typography.body1,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.inkGray[700],
     textAlign: 'center',
     marginVertical: DesignSystem.spacing.lg,

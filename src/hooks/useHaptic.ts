@@ -57,8 +57,8 @@ export const useHaptic = (options: UseHapticOptions = {}): UseHapticReturn => {
   const intensityRef = useRef<number>(intensity);
   
   // Check if haptics should be disabled due to accessibility settings
-  const shouldRespectReducedMotion = respectReducedMotion && 
-    animationContext?.settings.accessibility.reduceMotion;
+  const shouldRespectReducedMotion = !!(respectReducedMotion && 
+    animationContext?.settings?.accessibility?.reduceMotion);
   
   /**
    * Check if haptic should be triggered based on throttling and settings
@@ -148,13 +148,13 @@ export const useHaptic = (options: UseHapticOptions = {}): UseHapticReturn => {
   
   // Update accessibility mode based on animation context
   useEffect(() => {
-    if (animationContext?.settings.accessibility) {
+  if (animationContext?.settings?.accessibility) {
       hapticService.setAccessibilityMode(
-        animationContext.settings.accessibility.highContrast ||
-        animationContext.settings.accessibility.reduceMotion
+    !!(animationContext.settings?.accessibility?.highContrast ||
+    animationContext.settings?.accessibility?.reduceMotion)
       );
     }
-  }, [animationContext?.settings.accessibility]);
+  }, [animationContext?.settings?.accessibility]);
   
   return {
     trigger,

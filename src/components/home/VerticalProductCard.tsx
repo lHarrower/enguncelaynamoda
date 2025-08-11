@@ -15,19 +15,12 @@ import {
   Dimensions,
   StyleSheet,
   Animated,
-  PanGestureHandler,
-  State,
 } from 'react-native';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/context/ThemeContext';
-import {
-  ORIGINAL_COLORS,
-  ORIGINAL_TYPOGRAPHY,
-  ORIGINAL_SPACING,
-  ORIGINAL_BORDER_RADIUS,
-} from '@/components/auth/originalLoginStyles';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -218,7 +211,7 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
                 <Ionicons 
                   name="image-outline" 
                   size={48} 
-                  color={ORIGINAL_COLORS.placeholderText} 
+                  color={DesignSystem.colors.text.secondary} 
                 />
               </View>
             )}
@@ -236,7 +229,7 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
                   <Ionicons
                     name={isLiked ? 'heart' : 'heart-outline'}
                     size={24}
-                    color={isLiked ? '#FF6B6B' : ORIGINAL_COLORS.primaryText}
+                    color={isLiked ? DesignSystem.colors.semantic.error : DesignSystem.colors.text.primary}
                   />
                 </Animated.View>
               </BlurView>
@@ -245,7 +238,7 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
 
           {/* Content Overlay */}
           <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
+            colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)'] as const}
             style={styles.contentOverlay}
           >
             <View style={styles.contentContainer}>
@@ -290,12 +283,12 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
           </LinearGradient>
 
           {/* Frosted Glass CTA */}
-          <BlurView intensity={30} style={styles.ctaContainer}>
+      <BlurView intensity={30} style={styles.ctaContainer}>
             <Text style={styles.ctaText}>Keşfet</Text>
             <Ionicons 
               name="arrow-forward" 
               size={16} 
-              color={ORIGINAL_COLORS.primaryText} 
+        color={DesignSystem.colors.text.primary} 
             />
           </BlurView>
         </TouchableOpacity>
@@ -306,10 +299,10 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    borderRadius: ORIGINAL_BORDER_RADIUS.input * 1.5, // 18px for larger cards
+    borderRadius: DesignSystem.borderRadius.large,
     overflow: 'hidden',
-    backgroundColor: ORIGINAL_COLORS.inputBackground,
-    shadowColor: ORIGINAL_COLORS.shadowColor,
+    backgroundColor: DesignSystem.colors.background.elevated,
+    shadowColor: DesignSystem.colors.shadow.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 16,
@@ -337,7 +330,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: ORIGINAL_COLORS.background,
+    backgroundColor: DesignSystem.colors.background.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -368,14 +361,15 @@ const styles = StyleSheet.create({
   },
   
   contentContainer: {
-    padding: ORIGINAL_SPACING.containerHorizontal,
+    padding: DesignSystem.spacing.large,
     paddingBottom: 80, // Space for CTA
   },
   
   brandText: {
-    ...ORIGINAL_TYPOGRAPHY.secondary,
+  // fontSize comes from typography body.medium
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: 'rgba(255,255,255,0.8)',
-    fontSize: 12,
+  fontSize: 12,
     letterSpacing: 1,
     marginBottom: 4,
   },
@@ -386,13 +380,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     lineHeight: 28,
     marginBottom: 4,
-    fontFamily: ORIGINAL_TYPOGRAPHY.title.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
   },
   
   subtitleText: {
-    ...ORIGINAL_TYPOGRAPHY.secondary,
+  // fontSize comes from typography body.medium
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: 'rgba(255,255,255,0.9)',
-    fontSize: 16,
+  fontSize: 16,
     marginBottom: 12,
   },
   
@@ -407,14 +402,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#FFFFFF',
     marginRight: 8,
-    fontFamily: ORIGINAL_TYPOGRAPHY.title.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
   },
   
   originalPriceText: {
     fontSize: 16,
     color: 'rgba(255,255,255,0.6)',
     textDecorationLine: 'line-through',
-    fontFamily: ORIGINAL_TYPOGRAPHY.secondary.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   
   tagsContainer: {
@@ -433,14 +428,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#FFFFFF',
     fontWeight: '500',
-    fontFamily: ORIGINAL_TYPOGRAPHY.secondary.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   
   ctaContainer: {
     position: 'absolute',
     bottom: 16,
-    left: ORIGINAL_SPACING.containerHorizontal,
-    right: ORIGINAL_SPACING.containerHorizontal,
+    left: DesignSystem.spacing.large,
+    right: DesignSystem.spacing.large,
     height: 48,
     borderRadius: 24,
     flexDirection: 'row',
@@ -452,8 +447,8 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: 16,
     fontWeight: '600',
-    color: ORIGINAL_COLORS.primaryText,
-    fontFamily: ORIGINAL_TYPOGRAPHY.button.fontFamily,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.button,
   },
 });
 

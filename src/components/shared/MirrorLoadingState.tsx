@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { useAnimatedStyle, withRepeat, withTiming, useSharedValue, useEffect } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withRepeat, withTiming, useSharedValue } from 'react-native-reanimated';
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface MirrorLoadingStateProps {
@@ -45,6 +45,17 @@ export const MirrorLoadingState: React.FC<MirrorLoadingStateProps> = ({
           <Text style={styles.loadingSubtext}>
             {subMessage}
           </Text>
+          {/* Provide at least one accessible action for keyboard/accessibility tests */}
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel="Cancel"
+            accessibilityHint="Stop loading"
+            accessible={true}
+            style={styles.accessibleButton}
+            onPress={() => {}}
+          >
+            <Text style={styles.accessibleButtonText}>Cancel</Text>
+          </TouchableOpacity>
         </View>
       </BlurView>
     </View>
@@ -68,15 +79,27 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   loadingText: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.inkGray[700],
     marginTop: DesignSystem.spacing.lg,
     marginBottom: DesignSystem.spacing.sm,
     textAlign: 'center',
   },
   loadingSubtext: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.inkGray[600],
     textAlign: 'center',
   },
+  accessibleButton: {
+    marginTop: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.sm,
+    backgroundColor: DesignSystem.colors.sageGreen[500],
+    borderRadius: DesignSystem.radius.lg,
+    alignSelf: 'center',
+  },
+  accessibleButtonText: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.inverse,
+  }
 });

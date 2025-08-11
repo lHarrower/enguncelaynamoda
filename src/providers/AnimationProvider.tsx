@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { AccessibilityInfo, Platform, AppState, AppStateStatus } from 'react-native';
 import { AnimationSystem } from '@/theme/foundations/Animation';
+import { logInDev } from '@/utils/consoleSuppress';
 
 /**
  * Animation Context Interface
@@ -35,6 +36,14 @@ interface AnimationContextType {
   getEffectiveDuration: (baseDuration: number) => number;
   shouldAnimate: () => boolean;
   getAccessibleAnimation: (animation: any) => any;
+
+  // Back-compat settings shape referenced elsewhere
+  settings?: {
+    accessibility: {
+      reduceMotion: boolean;
+      highContrast?: boolean;
+    }
+  };
 }
 
 /**
@@ -57,13 +66,19 @@ const defaultContext: AnimationContextType = {
   setEnableSoundEffects: () => {},
   getEffectiveDuration: (duration) => duration,
   shouldAnimate: () => true,
-  getAccessibleAnimation: (animation) => animation
+  getAccessibleAnimation: (animation) => animation,
+  settings: {
+    accessibility: {
+      reduceMotion: false,
+      highContrast: false
+    }
+  }
 };
 
 /**
  * Animation Context
  */
-const AnimationContext = createContext<AnimationContextType>(defaultContext);
+export const AnimationContext = createContext<AnimationContextType>(defaultContext);
 
 /**
  * Animation Provider Props
@@ -135,11 +150,11 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({
             // const highContrast = await AccessibilityInfo.isHighContrastEnabled();
             // setIsHighContrastEnabled(highContrast);
           } catch (error) {
-            console.warn('High contrast detection not available:', error);
+            logInDev('High contrast detection not available:', error);
           }
         }
       } catch (error) {
-        console.warn('Error checking accessibility settings:', error);
+        logInDev('Error checking accessibility settings:', error);
       }
     };
     
@@ -263,7 +278,13 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({
     // Animation utilities
     getEffectiveDuration,
     shouldAnimate,
-    getAccessibleAnimation
+    getAccessibleAnimation,
+    settings: {
+      accessibility: {
+        reduceMotion: isReducedMotionEnabled,
+        highContrast: isHighContrastEnabled
+      }
+    }
   };
   
   return (

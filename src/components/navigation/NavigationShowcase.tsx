@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useRef } from 'react';
+import { DesignSystem } from '@/theme/DesignSystem';
 import {
   View,
   ScrollView,
@@ -227,7 +228,7 @@ const styles = StyleSheet.create({
 
   placeholderItem: {
     backgroundColor: ORIGINAL_COLORS.inputBackground,
-    borderRadius: ORIGINAL_BORDER_RADIUS.input,
+  borderRadius: DesignSystem.borderRadius.md,
     padding: 20,
     marginBottom: 12,
     borderWidth: 1,

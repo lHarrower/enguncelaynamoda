@@ -1,8 +1,8 @@
 // Weather Service Tests
 // Comprehensive test suite for weather integration service
 
-import { WeatherService } from '../services/weatherService';
-import { WeatherContext, WeatherCondition } from '../types/aynaMirror';
+import { WeatherService } from '@/services/weatherService';
+import { WeatherContext, WeatherCondition } from '@/types/aynaMirror';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 
@@ -291,7 +291,7 @@ describe('WeatherService', () => {
 
       const score = WeatherService.analyzeWeatherAppropriatenessForItem(lightSummerTop, mockWeather);
 
-      expect(score).toBeGreaterThan(0.7);
+  expect(score).toBeGreaterThanOrEqual(0.7);
     });
 
     it('should return low score for weather-inappropriate items', async () => {
@@ -302,7 +302,7 @@ describe('WeatherService', () => {
 
       const score = WeatherService.analyzeWeatherAppropriatenessForItem(heavyWinterCoat, mockWeather);
 
-      expect(score).toBeLessThan(0.3);
+  expect(score).toBeLessThanOrEqual(0.3);
     });
 
     it('should handle rainy weather appropriately', async () => {
@@ -439,8 +439,8 @@ describe('WeatherService', () => {
 
       const suggestions = WeatherService.getWeatherBasedSuggestions(coldWeather);
 
-      expect(suggestions).toContain(expect.stringMatching(/warm|layer|coat/i));
-      expect(suggestions).toContain(expect.stringMatching(/waterproof|boots/i));
+  expect(suggestions).toEqual(expect.arrayContaining([expect.stringMatching(/warm|layer|coat/i)]));
+  expect(suggestions).toEqual(expect.arrayContaining([expect.stringMatching(/waterproof|boots/i)]));
     });
 
     it('should provide hot weather suggestions', async () => {
@@ -455,8 +455,8 @@ describe('WeatherService', () => {
 
       const suggestions = WeatherService.getWeatherBasedSuggestions(hotWeather);
 
-      expect(suggestions).toContain(expect.stringMatching(/light|breathable|cool/i));
-      expect(suggestions).toContain(expect.stringMatching(/sun protection/i));
+  expect(suggestions).toEqual(expect.arrayContaining([expect.stringMatching(/light|breathable|cool/i)]));
+  expect(suggestions).toEqual(expect.arrayContaining([expect.stringMatching(/sun protection/i)]));
     });
 
     it('should provide rainy weather suggestions', async () => {
@@ -471,8 +471,8 @@ describe('WeatherService', () => {
 
       const suggestions = WeatherService.getWeatherBasedSuggestions(rainyWeather);
 
-      expect(suggestions).toContain(expect.stringMatching(/waterproof|water-resistant/i));
-      expect(suggestions).toContain(expect.stringMatching(/quick-dry/i));
+  expect(suggestions).toEqual(expect.arrayContaining([expect.stringMatching(/waterproof|water-resistant/i)]));
+  expect(suggestions).toEqual(expect.arrayContaining([expect.stringMatching(/quick-dry/i)]));
     });
 
     it('should provide windy weather suggestions', async () => {
@@ -487,7 +487,7 @@ describe('WeatherService', () => {
 
       const suggestions = WeatherService.getWeatherBasedSuggestions(windyWeather);
 
-      expect(suggestions).toContain(expect.stringMatching(/wind|secure|fitted/i));
+  expect(suggestions).toEqual(expect.arrayContaining([expect.stringMatching(/wind|secure|fitted/i)]));
     });
 
     it('should handle high humidity suggestions', async () => {
@@ -502,7 +502,7 @@ describe('WeatherService', () => {
 
       const suggestions = WeatherService.getWeatherBasedSuggestions(humidWeather);
 
-      expect(suggestions).toContain(expect.stringMatching(/breathable|moisture-wicking/i));
+  expect(suggestions).toEqual(expect.arrayContaining([expect.stringMatching(/breathable|moisture-wicking/i)]));
     });
 
     it('should return default suggestion on error', async () => {

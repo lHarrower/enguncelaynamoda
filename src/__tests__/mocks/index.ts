@@ -1,7 +1,8 @@
 // Mock implementations for external services and dependencies
-import { WardrobeItem, WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
-import { User } from '../../types/user';
-import { createMockWardrobeItem, createMockUser } from '../utils/testUtils';
+import { WardrobeItem, ItemCategory } from '@/types';
+import { WardrobeCategory, WardrobeColor } from '@/types/wardrobe';
+import { User } from '@/types';
+import { createMockWardrobeItem, createMockUser } from '@/__tests__/utils/testUtils';
 
 /**
  * Supabase Client Mock

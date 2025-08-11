@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DesignSystem } from '../../theme/DesignSystem';
+import { logInDev } from '../../utils/consoleSuppress';
 
 // Import atmospheric components
 import LivingAtmosphere from './LivingAtmosphere';
@@ -255,7 +256,7 @@ const AtmosphericHomeScreen: React.FC<AtmosphericHomeScreenProps> = ({
   ];
 
   const handleTotemFacetChange = (facetId: string) => {
-    console.log('Totem facet changed:', facetId);
+    logInDev('Totem facet changed:', facetId);
     // Add any additional logic for facet changes
   };
 

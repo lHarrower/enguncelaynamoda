@@ -47,6 +47,8 @@ export interface StandardInputProps extends Omit<InputComponentProps, 'variant'>
   onFocusChange?: (focused: boolean) => void;
   /** Controlled focus state */
   focused?: boolean;
+  /** Haptic feedback intensity for interactions */
+  hapticFeedback?: 'light' | 'medium' | 'heavy' | 'none';
 }
 
 export interface StandardInputRef {
@@ -240,7 +242,7 @@ const StandardInput = forwardRef<StandardInputRef, StandardInputProps>(
           
           <TextInput
             ref={inputRef}
-            style={[getInputStyles(), inputStyle, style]}
+            style={[getInputStyles(), inputStyle]}
             onFocus={handleFocus}
             onBlur={handleBlur}
             editable={!disabled}
@@ -399,26 +401,16 @@ const styles = StyleSheet.create({
     marginRight: DesignSystem.spacing.xs,
   },
   hint: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     marginTop: DesignSystem.spacing.xs,
   },
   error: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.error[500],
     marginTop: DesignSystem.spacing.xs,
   },
 });
-
-// Default props
-StandardInput.defaultProps = {
-  variant: 'default',
-  size: DEFAULT_PROPS.size,
-  required: DEFAULT_PROPS.required,
-  disabled: DEFAULT_PROPS.disabled,
-  hapticFeedback: DEFAULT_PROPS.hapticFeedback,
-  isPassword: false,
-};
 
 StandardInput.displayName = 'StandardInput';
 

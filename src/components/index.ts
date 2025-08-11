@@ -14,7 +14,7 @@ export * from '@/components/organisms';
 export * from '@/components/shared';
 
 // Individual Components
-export { default as ErrorBoundary } from '@/components/ErrorBoundary';
+export { default as ErrorBoundary } from '@/components/error/ErrorBoundary';
 export { default as StyleMatchCircle } from '@/components/StyleMatchCircle';
 export { default as UndoNotification } from '@/components/UndoNotification';
 export { default as ModernLoading } from '@/components/ModernLoading';
@@ -22,7 +22,7 @@ export { default as ModernActionSheet } from '@/components/ModernActionSheet';
 export { default as PermissionManager } from '@/components/PermissionManager';
 export { default as GoldShimmer } from '@/components/GoldShimmer';
 export { default as FloatingActionButton } from '@/components/FloatingActionButton';
-export { default as DebugOverlayRemover } from '@/components/DebugOverlayRemover';
+// export { default as DebugOverlayRemover } from '@/components/DebugOverlayRemover';
 export { default as CustomModal } from '@/components/CustomModal';
 
 // Feature-based component collections

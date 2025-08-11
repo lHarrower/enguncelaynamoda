@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -129,9 +129,9 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
       {/* Background Gradient */}
       <LinearGradient
         colors={[
-          PREMIUM_THEME.semantic.background.primary,
-          PREMIUM_THEME.semantic.background.secondary,
-          PREMIUM_THEME.semantic.background.tertiary,
+          DesignSystem.colors.background.primary,
+          DesignSystem.colors.background.secondary,
+          DesignSystem.colors.background.tertiary,
         ]}
         style={StyleSheet.absoluteFill}
         start={{ x: 0, y: 0 }}
@@ -150,10 +150,10 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
           <View style={styles.logoBackground}>
             <LinearGradient
               colors={[
-                PREMIUM_THEME.colors.champagne[400],
-                PREMIUM_THEME.colors.champagne[500],
-                PREMIUM_THEME.colors.champagne[600],
-              ]}
+              DesignSystem.colors.gold[400],
+              DesignSystem.colors.gold[500],
+              DesignSystem.colors.gold[600],
+            ]}
               style={styles.logoGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -233,25 +233,25 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: PREMIUM_THEME.colors.champagne[300],
-    ...PREMIUM_THEME.elevation.hover,
+  backgroundColor: DesignSystem.colors.gold[300],
+  ...DesignSystem.elevation.soft,
   },
   content: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: PREMIUM_THEME.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: PREMIUM_THEME.spacing.xxxl,
+    marginBottom: DesignSystem.spacing.xxxl,
   },
   logoBackground: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    marginBottom: PREMIUM_THEME.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
     overflow: 'hidden',
-    ...PREMIUM_THEME.elevation.dramatic,
+  ...DesignSystem.elevation.floating,
   },
   logoGradient: {
     flex: 1,
@@ -269,25 +269,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoText: {
-    ...PREMIUM_THEME.typography.scale.display,
-    color: PREMIUM_THEME.semantic.text.primary,
+  ...DesignSystem.typography.heading.h1,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '700',
     letterSpacing: 3,
-    marginBottom: PREMIUM_THEME.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   logoSubtext: {
-    ...PREMIUM_THEME.typography.scale.whisper,
-    color: PREMIUM_THEME.semantic.text.secondary,
+  ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.secondary,
   },
   messageContainer: {
     alignItems: 'center',
-    marginBottom: PREMIUM_THEME.spacing.xxxl,
+    marginBottom: DesignSystem.spacing.xxxl,
   },
   loadingMessage: {
-    ...PREMIUM_THEME.typography.scale.body1,
-    color: PREMIUM_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: PREMIUM_THEME.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   progressContainer: {
     alignItems: 'center',
@@ -296,45 +296,46 @@ const styles = StyleSheet.create({
   progressTrack: {
     width: '100%',
     height: 4,
-    backgroundColor: PREMIUM_THEME.semantic.border.secondary,
+    backgroundColor: DesignSystem.colors.border.secondary,
     borderRadius: 2,
     overflow: 'hidden',
-    marginBottom: PREMIUM_THEME.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   progressBar: {
     height: '100%',
-    backgroundColor: PREMIUM_THEME.colors.champagne[500],
-    borderRadius: 2,
-    ...PREMIUM_THEME.elevation.hover,
+  backgroundColor: DesignSystem.colors.gold[500],
+  borderRadius: 2,
+  ...DesignSystem.elevation.soft,
   },
   progressText: {
-    ...PREMIUM_THEME.typography.scale.caption,
-    color: PREMIUM_THEME.semantic.text.tertiary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
   },
   dotsContainer: {
     flexDirection: 'row',
-    gap: PREMIUM_THEME.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: PREMIUM_THEME.colors.champagne[500],
+  backgroundColor: DesignSystem.colors.gold[500],
     opacity: 0.3,
   },
   quoteContainer: {
     alignItems: 'center',
-    paddingHorizontal: PREMIUM_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   quote: {
-    ...PREMIUM_THEME.typography.scale.poetry,
-    color: PREMIUM_THEME.semantic.text.tertiary,
+  ...DesignSystem.typography.body.large,
+  fontStyle: 'italic',
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
-    marginBottom: PREMIUM_THEME.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   quoteAuthor: {
-    ...PREMIUM_THEME.typography.scale.caption,
-    color: PREMIUM_THEME.semantic.text.tertiary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     opacity: 0.7,
   },
 });

@@ -281,13 +281,13 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 4,
   },
   sectionSubtitle: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: 20,
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   occasionLabel: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     fontWeight: '500',
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    ...DesignSystem.typography.body1,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
   },
   complimentCounter: {
@@ -363,17 +363,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 32,
   },
   counterNumber: {
-    ...DesignSystem.typography.hero,
+  ...DesignSystem.typography.scale.hero,
     color: DesignSystem.colors.sage[500],
     fontWeight: '700',
   },
   counterLabel: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     marginTop: -4,
   },
   complimentMessage: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     fontStyle: 'italic',
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   reactionLabel: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     fontWeight: '600',
     textAlign: 'center',
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.sage[500],
   },
   reactionDescription: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
     fontStyle: 'italic',
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    ...DesignSystem.typography.body1,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     textAlignVertical: 'top',
     minHeight: 80,
@@ -437,13 +437,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   summaryTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.sage[500],
     textAlign: 'center',
     marginBottom: 12,
   },
   summaryItem: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     marginBottom: 4,
   },

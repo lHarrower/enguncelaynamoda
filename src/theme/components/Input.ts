@@ -23,8 +23,8 @@ export const INPUT_VARIANTS = {
     } as ViewStyle,
     
     input: {
-      ...TYPOGRAPHY.scale.body1,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.body.medium,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.primary,
       flex: 1,
     } as TextStyle,
@@ -38,7 +38,7 @@ export const INPUT_VARIANTS = {
     
     // Error state
     error: {
-      borderColor: UNIFIED_COLORS.error,
+      borderColor: UNIFIED_COLORS.error[500],
       borderWidth: 2,
     } as ViewStyle,
     
@@ -64,8 +64,8 @@ export const INPUT_VARIANTS = {
     } as ViewStyle,
     
     input: {
-      ...TYPOGRAPHY.scale.body1,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.body.medium,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.primary,
       flex: 1,
     } as TextStyle,
@@ -79,7 +79,7 @@ export const INPUT_VARIANTS = {
     
     // Error state
     error: {
-      borderColor: UNIFIED_COLORS.error,
+      borderColor: UNIFIED_COLORS.error[500],
       borderWidth: 2,
     } as ViewStyle
   },
@@ -99,8 +99,8 @@ export const INPUT_VARIANTS = {
     } as ViewStyle,
     
     input: {
-      ...TYPOGRAPHY.scale.body2,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.body.small,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.primary,
       flex: 1,
       marginLeft: SPACING.sm,
@@ -126,8 +126,8 @@ export const INPUT_VARIANTS = {
     } as ViewStyle,
     
     input: {
-      ...TYPOGRAPHY.scale.body1,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.body.medium,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.primary,
       flex: 1,
     } as TextStyle,
@@ -140,7 +140,7 @@ export const INPUT_VARIANTS = {
     
     // Error state
     error: {
-      borderBottomColor: UNIFIED_COLORS.error,
+      borderBottomColor: UNIFIED_COLORS.error[500],
       borderBottomWidth: 2,
     } as ViewStyle
   },
@@ -159,8 +159,8 @@ export const INPUT_VARIANTS = {
     } as ViewStyle,
     
     input: {
-      ...TYPOGRAPHY.scale.body1,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.body.medium,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.primary,
       flex: 1,
       textAlignVertical: 'top',
@@ -187,7 +187,7 @@ export const INPUT_SIZES = {
     } as ViewStyle,
     
     input: {
-      ...TYPOGRAPHY.scale.body2,
+      ...TYPOGRAPHY.body.small,
     } as TextStyle
   },
   
@@ -200,7 +200,7 @@ export const INPUT_SIZES = {
     } as ViewStyle,
     
     input: {
-      ...TYPOGRAPHY.scale.body1,
+      ...TYPOGRAPHY.body.medium,
     } as TextStyle
   },
   
@@ -221,28 +221,28 @@ export const INPUT_SIZES = {
 // Label and helper text styles
 export const INPUT_LABELS = {
   label: {
-    ...TYPOGRAPHY.scale.body2,
-    fontFamily: TYPOGRAPHY.fonts.body,
+    ...TYPOGRAPHY.body.small,
+    fontFamily: TYPOGRAPHY.fontFamily.body,
     color: UNIFIED_COLORS.text.secondary,
     fontWeight: '600',
     marginBottom: SPACING.xs,
   } as TextStyle,
   
   required: {
-    color: UNIFIED_COLORS.error,
+    color: UNIFIED_COLORS.error[500],
   } as TextStyle,
   
   helperText: {
-    ...TYPOGRAPHY.scale.caption,
-    fontFamily: TYPOGRAPHY.fonts.body,
+    ...TYPOGRAPHY.caption.medium,
+    fontFamily: TYPOGRAPHY.fontFamily.body,
     color: UNIFIED_COLORS.text.tertiary,
     marginTop: SPACING.xs,
   } as TextStyle,
   
   errorText: {
-    ...TYPOGRAPHY.scale.caption,
-    fontFamily: TYPOGRAPHY.fonts.body,
-    color: UNIFIED_COLORS.error,
+    ...TYPOGRAPHY.caption.medium,
+    fontFamily: TYPOGRAPHY.fontFamily.body,
+    color: UNIFIED_COLORS.error[500],
     marginTop: SPACING.xs,
   } as TextStyle
 } as const;

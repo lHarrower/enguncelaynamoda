@@ -142,7 +142,7 @@ export default function WelcomeGift({ styleDNA, onComplete, onOutfitSelect }: We
       'bold_magnetic': 'Stunning selection! Your bold, magnetic presence is clear. We\'ll show you more striking pieces that command attention and turn heads.'
     };
 
-    return feedbackMap[energyType] || feedbackMap['calm_strength'];
+    return feedbackMap[energyType] || feedbackMap.calm_strength;
   };
 
   const renderIntroPhase = () => (

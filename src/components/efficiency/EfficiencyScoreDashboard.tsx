@@ -12,6 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { efficiencyScoreService, EfficiencyScore } from '@/services/efficiencyScoreService';
 import { useAuth } from '@/hooks/useAuth';
+import { logInDev } from '@/utils/consoleSuppress';
 
 const { width } = Dimensions.get('window');
 
@@ -46,7 +47,7 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
       // Store the score for historical tracking
       await efficiencyScoreService.storeEfficiencyScore(user!.id, score);
     } catch (err) {
-      console.error('Failed to load efficiency score:', err);
+      logInDev('Failed to load efficiency score:', err);
       setError('Failed to load efficiency score');
     } finally {
       setLoading(false);
@@ -59,10 +60,10 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
     return '#F44336'; // Red
   };
 
-  const getScoreGradient = (score: number): string[] => {
-    if (score >= 80) return ['#4CAF50', '#66BB6A'];
-    if (score >= 60) return ['#FF9800', '#FFB74D'];
-    return ['#F44336', '#EF5350'];
+  const getScoreGradient = (score: number): readonly [string, string] => {
+    if (score >= 80) return ['#4CAF50', '#66BB6A'] as const;
+    if (score >= 60) return ['#FF9800', '#FFB74D'] as const;
+    return ['#F44336', '#EF5350'] as const;
   };
 
   const getTrendIcon = (trajectory: string): string => {

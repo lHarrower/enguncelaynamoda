@@ -8,6 +8,7 @@ import { performanceOptimizationService } from './performanceOptimizationService
 import { navigationIntegrationService } from './navigationIntegrationService';
 import { userJourneyTestingService } from './userJourneyTestingService';
 import { notificationService } from './notificationService';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 export interface FeatureState {
   wardrobe: {
@@ -69,15 +70,17 @@ class FeatureIntegrationCoordinator {
   // Initialize the coordinator and sync all features
   async initialize(): Promise<void> {
     if (this.isInitialized) {
-      console.log('🔄 Feature Integration Coordinator already initialized');
+      logInDev('🔄 Feature Integration Coordinator already initialized');
       return;
     }
 
     try {
-      console.log('🚀 Initializing Feature Integration Coordinator...');
+      logInDev('🚀 Initializing Feature Integration Coordinator...');
       
       // Initialize performance monitoring
-      await performanceOptimizationService.startMonitoring();
+      if (typeof (performanceOptimizationService as any).startMonitoring === 'function') {
+        await (performanceOptimizationService as any).startMonitoring();
+      }
       
       // Load user data and sync features
       await this.loadCrossFeatureData();
@@ -88,13 +91,13 @@ class FeatureIntegrationCoordinator {
       
       // Validate integration health
       const health = await this.checkIntegrationHealth();
-      console.log('🏥 Integration Health:', health.overall);
+      logInDev('🏥 Integration Health:', health.overall);
       
       this.isInitialized = true;
-      console.log('✅ Feature Integration Coordinator initialized successfully');
+      logInDev('✅ Feature Integration Coordinator initialized successfully');
       
     } catch (error) {
-      console.error('❌ Failed to initialize Feature Integration Coordinator:', error);
+      errorInDev('❌ Failed to initialize Feature Integration Coordinator:', error);
       throw error;
     }
   }
@@ -112,7 +115,7 @@ class FeatureIntegrationCoordinator {
       // Load data from all features
       const [wardrobeItems, stylePreferences, userProfile] = await Promise.all([
         wardrobeService.getItems().catch(() => []),
-        styleDNAService.getUserStyleProfile().catch(() => null),
+  (styleDNAService as any).getUserStyleProfile?.().catch?.(() => null),
         this.loadUserProfile(userId).catch(() => null)
       ]);
 
@@ -135,7 +138,7 @@ class FeatureIntegrationCoordinator {
       });
 
     } catch (error) {
-      console.error('Failed to load cross-feature data:', error);
+      errorInDev('Failed to load cross-feature data:', error);
       throw error;
     }
   }
@@ -143,7 +146,7 @@ class FeatureIntegrationCoordinator {
   // Sync all features to ensure consistency
   private async syncAllFeatures(): Promise<void> {
     try {
-      console.log('🔄 Syncing all features...');
+      logInDev('🔄 Syncing all features...');
       
       if (!this.crossFeatureData) {
         throw new Error('Cross-feature data not loaded');
@@ -164,10 +167,10 @@ class FeatureIntegrationCoordinator {
       // Sync profile
       await this.syncProfileFeature();
       
-      console.log('✅ All features synced successfully');
+      logInDev('✅ All features synced successfully');
       
     } catch (error) {
-      console.error('Failed to sync features:', error);
+      errorInDev('Failed to sync features:', error);
       throw error;
     }
   }
@@ -192,7 +195,7 @@ class FeatureIntegrationCoordinator {
       this.notifyFeatureListeners('wardrobe', this.featureState.wardrobe);
       
     } catch (error) {
-      console.error('Failed to sync wardrobe feature:', error);
+      errorInDev('Failed to sync wardrobe feature:', error);
       this.featureState.wardrobe.initialized = false;
     }
   }
@@ -211,7 +214,7 @@ class FeatureIntegrationCoordinator {
       this.notifyFeatureListeners('styleAnalysis', this.featureState.styleAnalysis);
       
     } catch (error) {
-      console.error('Failed to sync style analysis feature:', error);
+      errorInDev('Failed to sync style analysis feature:', error);
       this.featureState.styleAnalysis.profileComplete = false;
     }
   }
@@ -231,7 +234,7 @@ class FeatureIntegrationCoordinator {
       this.notifyFeatureListeners('discovery', this.featureState.discovery);
       
     } catch (error) {
-      console.error('Failed to sync discovery feature:', error);
+      errorInDev('Failed to sync discovery feature:', error);
       this.featureState.discovery.initialized = false;
     }
   }
@@ -248,7 +251,7 @@ class FeatureIntegrationCoordinator {
       this.notifyFeatureListeners('aynaMirror', this.featureState.aynaMirror);
       
     } catch (error) {
-      console.error('Failed to sync AYNA Mirror feature:', error);
+      errorInDev('Failed to sync AYNA Mirror feature:', error);
       this.featureState.aynaMirror.available = false;
     }
   }
@@ -267,7 +270,7 @@ class FeatureIntegrationCoordinator {
       this.notifyFeatureListeners('profile', this.featureState.profile);
       
     } catch (error) {
-      console.error('Failed to sync profile feature:', error);
+      errorInDev('Failed to sync profile feature:', error);
       this.featureState.profile.complete = false;
     }
   }
@@ -275,17 +278,17 @@ class FeatureIntegrationCoordinator {
   // Set up listeners for feature updates
   private setupFeatureListeners(): void {
     // Listen for wardrobe updates
-    this.addFeatureListener('wardrobe', (data) => {
+  this.addFeatureListener('wardrobe', (data: unknown) => {
       this.handleWardrobeUpdate(data);
     });
     
     // Listen for style analysis updates
-    this.addFeatureListener('styleAnalysis', (data) => {
+  this.addFeatureListener('styleAnalysis', (data: unknown) => {
       this.handleStyleAnalysisUpdate(data);
     });
     
     // Listen for discovery updates
-    this.addFeatureListener('discovery', (data) => {
+  this.addFeatureListener('discovery', (data: unknown) => {
       this.handleDiscoveryUpdate(data);
     });
   }
@@ -307,7 +310,7 @@ class FeatureIntegrationCoordinator {
       await this.updateDiscoveryFromWardrobe(data.items);
       
     } catch (error) {
-      console.error('Failed to handle wardrobe update:', error);
+      errorInDev('Failed to handle wardrobe update:', error);
     }
   }
 
@@ -324,7 +327,7 @@ class FeatureIntegrationCoordinator {
       this.featureState.discovery.preferences = discoveryPreferences;
       
     } catch (error) {
-      console.error('Failed to handle style analysis update:', error);
+      errorInDev('Failed to handle style analysis update:', error);
     }
   }
 
@@ -340,7 +343,7 @@ class FeatureIntegrationCoordinator {
       }
       
     } catch (error) {
-      console.error('Failed to handle discovery update:', error);
+      errorInDev('Failed to handle discovery update:', error);
     }
   }
 
@@ -353,10 +356,10 @@ class FeatureIntegrationCoordinator {
         brands: this.extractBrandsFromItems(items)
       };
       
-      await styleDNAService.updateStyleProfile(styleData);
+  await (styleDNAService as any).updateStyleProfile?.(styleData);
       
     } catch (error) {
-      console.error('Failed to update style analysis from wardrobe:', error);
+      errorInDev('Failed to update style analysis from wardrobe:', error);
     }
   }
 
@@ -373,7 +376,7 @@ class FeatureIntegrationCoordinator {
       this.featureState.discovery.preferences = preferences;
       
     } catch (error) {
-      console.error('Failed to update discovery from wardrobe:', error);
+      errorInDev('Failed to update discovery from wardrobe:', error);
     }
   }
 
@@ -391,10 +394,10 @@ class FeatureIntegrationCoordinator {
         dislikedCategories: this.extractCategoriesFromItems(dislikedItems.map(i => i.item))
       };
       
-      await styleDNAService.learnFromInteractions(learningData);
+  await (styleDNAService as any).learnFromInteractions?.(learningData);
       
     } catch (error) {
-      console.error('Failed to learn from discovery interactions:', error);
+      errorInDev('Failed to learn from discovery interactions:', error);
     }
   }
 
@@ -489,7 +492,7 @@ class FeatureIntegrationCoordinator {
       };
       
     } catch (error) {
-      console.error('Failed to check integration health:', error);
+      errorInDev('Failed to check integration health:', error);
       return {
         overall: 'critical',
         features: {},
@@ -521,7 +524,7 @@ class FeatureIntegrationCoordinator {
       return hasColorOverlap || hasDiscoveryAlignment || wardrobeColors.length === 0;
       
     } catch (error) {
-      console.error('Failed to validate data consistency:', error);
+      errorInDev('Failed to validate data consistency:', error);
       return false;
     }
   }
@@ -569,7 +572,7 @@ class FeatureIntegrationCoordinator {
       try {
         callback(data);
       } catch (error) {
-        console.error(`Feature listener error for ${feature}:`, error);
+        errorInDev(`Feature listener error for ${feature}:`, error);
       }
     });
   }
@@ -586,7 +589,7 @@ class FeatureIntegrationCoordinator {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Failed to load user profile:', error);
+      errorInDev('Failed to load user profile:', error);
       return null;
     }
   }
@@ -639,19 +642,19 @@ class FeatureIntegrationCoordinator {
 
   // Force resync all features
   async resyncAllFeatures(): Promise<void> {
-    console.log('🔄 Force resyncing all features...');
+    logInDev('🔄 Force resyncing all features...');
     await this.loadCrossFeatureData();
     await this.syncAllFeatures();
-    console.log('✅ Force resync completed');
+    logInDev('✅ Force resync completed');
   }
 
   // Run integration tests
   async runIntegrationTests(): Promise<any> {
-    console.log('🧪 Running integration tests...');
+    logInDev('🧪 Running integration tests...');
     const results = await userJourneyTestingService.runAllJourneyTests();
     const summary = userJourneyTestingService.getTestResultsSummary();
     
-    console.log('📊 Integration test results:', summary);
+    logInDev('📊 Integration test results:', summary);
     return { results, summary };
   }
 }

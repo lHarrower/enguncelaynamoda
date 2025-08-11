@@ -65,19 +65,19 @@ const styles = StyleSheet.create({
     // Content is aligned via the overlay's padding
   },
   brandText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.inverse,
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: DesignSystem.spacing.sm,
   },
   nameText: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: '#FFFFFF',
     marginBottom: DesignSystem.spacing.sm,
   },
   priceText: {
-    ...DesignSystem.typography.body1,
+    ...DesignSystem.typography.body.medium,
     color: '#FFFFFF',
     fontWeight: '600',
   },

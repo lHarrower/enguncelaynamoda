@@ -2,6 +2,7 @@ import { supabase } from '@/config/supabaseClient';
 import { WardrobeItem } from '@/types/aynaMirror';
 import { enhancedWardrobeService } from './enhancedWardrobeService';
 import { antiConsumptionService } from './antiConsumptionService';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 export interface EfficiencyScore {
   overall: number; // 0-100
@@ -102,7 +103,7 @@ class EfficiencyScoreService {
         benchmarks
       };
     } catch (error) {
-      console.error('[EfficiencyScoreService] Failed to calculate efficiency score:', error);
+      errorInDev('[EfficiencyScoreService] Failed to calculate efficiency score:', error);
       throw error;
     }
   }
@@ -325,7 +326,7 @@ class EfficiencyScoreService {
         trajectory
       };
     } catch (error) {
-      console.error('[EfficiencyScoreService] Failed to calculate trends:', error);
+      errorInDev('[EfficiencyScoreService] Failed to calculate trends:', error);
       return {
         monthlyChange: 0,
         yearlyChange: 0,
@@ -379,7 +380,7 @@ class EfficiencyScoreService {
         categoryAverages
       };
     } catch (error) {
-      console.error('[EfficiencyScoreService] Failed to calculate benchmarks:', error);
+      errorInDev('[EfficiencyScoreService] Failed to calculate benchmarks:', error);
       return {
         userPercentile: 50,
         categoryAverages: {
@@ -416,7 +417,7 @@ class EfficiencyScoreService {
 
       if (error) throw error;
     } catch (error) {
-      console.error('[EfficiencyScoreService] Failed to store efficiency score:', error);
+      errorInDev('[EfficiencyScoreService] Failed to store efficiency score:', error);
       throw error;
     }
   }
@@ -435,7 +436,7 @@ class EfficiencyScoreService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('[EfficiencyScoreService] Failed to get efficiency goals:', error);
+      errorInDev('[EfficiencyScoreService] Failed to get efficiency goals:', error);
       return [];
     }
   }
@@ -458,7 +459,7 @@ class EfficiencyScoreService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('[EfficiencyScoreService] Failed to create efficiency goal:', error);
+      errorInDev('[EfficiencyScoreService] Failed to create efficiency goal:', error);
       throw error;
     }
   }
@@ -475,7 +476,7 @@ class EfficiencyScoreService {
       if (error) throw error;
       return (data?.length || 0) / 7; // Average daily activity
     } catch (error) {
-      console.error('[EfficiencyScoreService] Failed to calculate recent activity:', error);
+      errorInDev('[EfficiencyScoreService] Failed to calculate recent activity:', error);
       return 0;
     }
   }
@@ -559,7 +560,9 @@ class EfficiencyScoreService {
   private async calculateCurationMetrics(items: WardrobeItem[]): Promise<EfficiencyMetrics['curation']> {
     // Calculate quality score based on confidence ratings
     const qualityScore = items.reduce((sum, item) => {
-      return sum + (item.confidenceScore || 0.5);
+  const history = (item as any).confidenceHistory as Array<{ rating: number }> | undefined;
+  const avg = history && history.length > 0 ? (history.reduce((s, r) => s + (r.rating || 0), 0) / history.length) / 5 : 0.5;
+  return sum + avg;
     }, 0) / items.length;
 
     // Calculate brand diversity
@@ -588,6 +591,6 @@ class EfficiencyScoreService {
       ? validValues.reduce((sum, v) => sum + v, 0) / validValues.length 
       : 50;
   }
-}}
+}
 
 export const efficiencyScoreService = new EfficiencyScoreService();

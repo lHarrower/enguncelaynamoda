@@ -193,86 +193,86 @@ export const TYPOGRAPHY = {
 export const SEMANTIC_TYPOGRAPHY = {
   // Editorial
   editorialHeadline: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: TYPOGRAPHY.sizes.hero,
-    lineHeight: TYPOGRAPHY.lineHeights.hero,
-    letterSpacing: TYPOGRAPHY.letterSpacing.tight,
+    fontFamily: 'Inter_800ExtraBold',
+    fontSize: 48,
+    lineHeight: 52,
+    letterSpacing: -0.5,
   },
   
   // Product
   productTitle: {
     fontFamily: 'Inter_400Regular',
-    fontSize: TYPOGRAPHY.sizes.body,
-    lineHeight: TYPOGRAPHY.lineHeights.body,
-    letterSpacing: TYPOGRAPHY.letterSpacing.normal,
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: 0,
   },
   productPrice: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: TYPOGRAPHY.sizes.body,
-    lineHeight: TYPOGRAPHY.lineHeights.body,
-    letterSpacing: TYPOGRAPHY.letterSpacing.normal,
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: 0,
   },
   
   // Navigation
   tabLabel: {
     fontFamily: 'Inter_500Medium',
-    fontSize: TYPOGRAPHY.sizes.caption,
-    lineHeight: TYPOGRAPHY.lineHeights.caption,
-    letterSpacing: TYPOGRAPHY.letterSpacing.wider,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 1,
   },
   
   // Buttons
   buttonPrimary: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: TYPOGRAPHY.sizes.button,
-    lineHeight: TYPOGRAPHY.lineHeights.button,
-    letterSpacing: TYPOGRAPHY.letterSpacing.wide,
+    fontSize: 16,
+    lineHeight: 20,
+    letterSpacing: 0.5,
   },
   buttonSecondary: {
     fontFamily: 'Inter_500Medium',
-    fontSize: TYPOGRAPHY.sizes.button,
-    lineHeight: TYPOGRAPHY.lineHeights.button,
-    letterSpacing: TYPOGRAPHY.letterSpacing.normal,
+    fontSize: 16,
+    lineHeight: 20,
+    letterSpacing: 0,
   },
   
   // Forms
   inputLabel: {
     fontFamily: 'Inter_500Medium',
-    fontSize: TYPOGRAPHY.sizes.label,
-    lineHeight: TYPOGRAPHY.lineHeights.label,
-    letterSpacing: TYPOGRAPHY.letterSpacing.normal,
+    fontSize: 14,
+    lineHeight: 18,
+    letterSpacing: 0,
   },
   inputText: {
     fontFamily: 'Inter_400Regular',
-    fontSize: TYPOGRAPHY.sizes.body,
-    lineHeight: TYPOGRAPHY.lineHeights.body,
-    letterSpacing: TYPOGRAPHY.letterSpacing.normal,
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: 0,
   },
   
   // Content
   pageTitle: {
     fontFamily: 'Inter_700Bold',
-    fontSize: TYPOGRAPHY.sizes.title,
-    lineHeight: TYPOGRAPHY.lineHeights.title,
-    letterSpacing: TYPOGRAPHY.letterSpacing.tight,
+    fontSize: 24,
+    lineHeight: 28,
+    letterSpacing: -0.3,
   },
   sectionTitle: {
     fontFamily: 'Inter_600SemiBold',
-    fontSize: TYPOGRAPHY.sizes.heading,
-    lineHeight: TYPOGRAPHY.lineHeights.heading,
-    letterSpacing: TYPOGRAPHY.letterSpacing.normal,
+    fontSize: 20,
+    lineHeight: 24,
+    letterSpacing: 0,
   },
   bodyText: {
     fontFamily: 'Inter_400Regular',
-    fontSize: TYPOGRAPHY.sizes.body,
-    lineHeight: TYPOGRAPHY.lineHeights.body,
-    letterSpacing: TYPOGRAPHY.letterSpacing.normal,
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: 0,
   },
   caption: {
     fontFamily: 'Inter_400Regular',
-    fontSize: TYPOGRAPHY.sizes.caption,
-    lineHeight: TYPOGRAPHY.lineHeights.caption,
-    letterSpacing: TYPOGRAPHY.letterSpacing.normal,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0,
   },
 };
 
@@ -379,4 +379,4 @@ export const LIMITS = {
   MAX_UPLOAD_SIZE_MB: 10,
   MAX_FAVORITES: 50,
   MAX_COLLECTIONS: 10,
-} as const; 
+} as const;

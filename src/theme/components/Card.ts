@@ -76,7 +76,7 @@ export const CARD_VARIANTS = {
     
     // Premium variant with gold background
     premium: {
-      backgroundColor: UNIFIED_COLORS.gold[50],
+      backgroundColor: UNIFIED_COLORS.gold[100],
       borderColor: UNIFIED_COLORS.gold[300],
       ...ELEVATION.floating,
     } as ViewStyle

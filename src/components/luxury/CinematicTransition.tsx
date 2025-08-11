@@ -7,7 +7,7 @@ import Animated, {
   withDelay,
   Easing,
 } from 'react-native-reanimated';
-import { LuxuryMotion } from '@/theme/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface CinematicTransitionProps {
   isVisible: boolean;
@@ -32,7 +32,7 @@ export const CinematicTransition: React.FC<CinematicTransitionProps> = ({
       opacity.value = withDelay(
         delay,
         withTiming(1, {
-          duration: LuxuryMotion.transitions.fadeIn.duration,
+          duration: DesignSystem.motion.duration.smooth,
           easing: Easing.out(Easing.cubic),
         })
       );
@@ -40,7 +40,7 @@ export const CinematicTransition: React.FC<CinematicTransitionProps> = ({
       translateY.value = withDelay(
         delay,
         withTiming(0, {
-          duration: LuxuryMotion.transitions.float.duration,
+          duration: DesignSystem.motion.duration.smooth,
           easing: Easing.out(Easing.cubic),
         })
       );
@@ -48,7 +48,7 @@ export const CinematicTransition: React.FC<CinematicTransitionProps> = ({
       scale.value = withDelay(
         delay,
         withTiming(1, {
-          duration: LuxuryMotion.transitions.float.duration,
+          duration: DesignSystem.motion.duration.smooth,
           easing: Easing.out(Easing.cubic),
         })
       );
@@ -57,22 +57,22 @@ export const CinematicTransition: React.FC<CinematicTransitionProps> = ({
       if (onTransitionComplete) {
         setTimeout(() => {
           onTransitionComplete();
-        }, delay + LuxuryMotion.transitions.float.duration);
+        }, delay + DesignSystem.motion.duration.smooth);
       }
     } else {
       // Cinematic fade-out
       opacity.value = withTiming(0, {
-        duration: LuxuryMotion.transitions.fadeOut.duration,
+        duration: DesignSystem.motion.duration.quick,
         easing: Easing.in(Easing.cubic),
       });
 
       translateY.value = withTiming(-10, {
-        duration: LuxuryMotion.transitions.fadeOut.duration,
+        duration: DesignSystem.motion.duration.quick,
         easing: Easing.in(Easing.cubic),
       });
 
       scale.value = withTiming(0.98, {
-        duration: LuxuryMotion.transitions.fadeOut.duration,
+        duration: DesignSystem.motion.duration.quick,
         easing: Easing.in(Easing.cubic),
       });
     }

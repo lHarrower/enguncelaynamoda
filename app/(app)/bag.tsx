@@ -12,15 +12,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 
-import { useTheme } from '@/context/ThemeContext'; // CORRECTED PATH
+import { useSafeTheme } from '@/hooks/useSafeTheme';
+import { DesignSystemType } from '@/theme/DesignSystem';
 import { SEMANTIC_TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '@/constants/AppConstants'; // CORRECTED PATH
 
-export default function BagScreen() {
-  const { colors, isDark } = useTheme();
+export default function BagPage() {
+  const theme = useSafeTheme();
+  const { colors } = theme;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <StatusBar style="auto" />
       
       {/* Header */}
       <View style={styles.header}>
@@ -44,7 +46,7 @@ export default function BagScreen() {
         </Text>
         
         <TouchableOpacity 
-          style={[styles.shopButton, { backgroundColor: colors.primary }]}
+          style={[styles.shopButton, { backgroundColor: theme.colors.primaryIndexed?.[500] || theme.colors.primary }]}
           activeOpacity={0.8}
         >
           <Text style={[styles.shopButtonText, { color: colors.background }]}>
@@ -95,4 +97,4 @@ const styles = StyleSheet.create({
   shopButtonText: {
     ...SEMANTIC_TYPOGRAPHY.buttonPrimary,
   },
-}); 
+});

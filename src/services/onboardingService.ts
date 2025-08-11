@@ -1,9 +1,16 @@
 // Onboarding Service - Handles user onboarding flow and data persistence
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/config/supabaseClient';
-import { OnboardingData } from '@/components/onboarding/OnboardingFlow';
+// OnboardingFlow doesn't export types; define a local shape for persisted data
+export interface OnboardingData {
+  notificationPermissionGranted: boolean;
+  wardrobeItemsAdded: number;
+  stylePreferences?: any;
+  completedAt: Date;
+}
 import { StylePreferences } from '@/components/onboarding/StylePreferenceQuestionnaire';
 import notificationService from '@/services/notificationService';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 const ONBOARDING_STORAGE_KEY = 'ayna_onboarding_completed';
 const STYLE_PREFERENCES_STORAGE_KEY = 'ayna_style_preferences';
@@ -35,7 +42,7 @@ class OnboardingService {
       const completed = await AsyncStorage.getItem(ONBOARDING_STORAGE_KEY);
       return completed === 'true';
     } catch (error) {
-      console.error('Failed to check onboarding status:', error);
+      errorInDev('Failed to check onboarding status:', error);
       return false;
     }
   }
@@ -63,7 +70,7 @@ class OnboardingService {
         notificationPermissionGranted,
       };
     } catch (error) {
-      console.error('Failed to get onboarding status:', error);
+      errorInDev('Failed to get onboarding status:', error);
       return {
         isCompleted: false,
         notificationPermissionGranted: false,
@@ -97,9 +104,9 @@ class OnboardingService {
         await this.setupDailyNotifications(userId);
       }
 
-      console.log('Onboarding completed successfully');
+      logInDev('Onboarding completed successfully');
     } catch (error) {
-      console.error('Failed to complete onboarding:', error);
+      errorInDev('Failed to complete onboarding:', error);
       throw error;
     }
   }
@@ -126,13 +133,13 @@ class OnboardingService {
         });
 
       if (error) {
-        console.error('Failed to save onboarding data to Supabase:', error);
+        errorInDev('Failed to save onboarding data to Supabase:', error);
         throw error;
       }
 
-      console.log('Onboarding data saved to Supabase successfully');
+      logInDev('Onboarding data saved to Supabase successfully');
     } catch (error) {
-      console.error('Error saving onboarding data to Supabase:', error);
+      errorInDev('Error saving onboarding data to Supabase:', error);
       // Don't throw here - we want onboarding to complete even if Supabase fails
     }
   }
@@ -143,14 +150,14 @@ class OnboardingService {
   private async setupDailyNotifications(userId?: string): Promise<void> {
     try {
       if (!userId) {
-        console.warn('Cannot setup notifications without user ID');
+        logInDev('Cannot setup notifications without user ID');
         return;
       }
 
       // Initialize notification service
       const initialized = await notificationService.initialize();
       if (!initialized) {
-        console.warn('Failed to initialize notification service');
+        logInDev('Failed to initialize notification service');
         return;
       }
 
@@ -164,9 +171,9 @@ class OnboardingService {
       };
 
       await notificationService.scheduleDailyMirrorNotification(userId, defaultPreferences);
-      console.log('Daily notifications set up successfully');
+      logInDev('Daily notifications set up successfully');
     } catch (error) {
-      console.error('Failed to setup daily notifications:', error);
+      errorInDev('Failed to setup daily notifications:', error);
       // Don't throw - onboarding should complete even if notifications fail
     }
   }
@@ -193,13 +200,13 @@ class OnboardingService {
           });
 
         if (error) {
-          console.error('Failed to update style preferences in Supabase:', error);
+          errorInDev('Failed to update style preferences in Supabase:', error);
         }
       }
 
-      console.log('Style preferences updated successfully');
+      logInDev('Style preferences updated successfully');
     } catch (error) {
-      console.error('Failed to update style preferences:', error);
+      errorInDev('Failed to update style preferences:', error);
       throw error;
     }
   }
@@ -212,7 +219,7 @@ class OnboardingService {
       const data = await AsyncStorage.getItem(STYLE_PREFERENCES_STORAGE_KEY);
       return data ? JSON.parse(data) : null;
     } catch (error) {
-      console.error('Failed to get style preferences:', error);
+      errorInDev('Failed to get style preferences:', error);
       return null;
     }
   }
@@ -226,9 +233,9 @@ class OnboardingService {
         AsyncStorage.removeItem(ONBOARDING_STORAGE_KEY),
         AsyncStorage.removeItem(STYLE_PREFERENCES_STORAGE_KEY),
       ]);
-      console.log('Onboarding reset successfully');
+      logInDev('Onboarding reset successfully');
     } catch (error) {
-      console.error('Failed to reset onboarding:', error);
+      errorInDev('Failed to reset onboarding:', error);
       throw error;
     }
   }
@@ -259,12 +266,12 @@ class OnboardingService {
         });
 
       if (error) {
-        console.error('Failed to bootstrap intelligence service:', error);
+        errorInDev('Failed to bootstrap intelligence service:', error);
       } else {
-        console.log('Intelligence service bootstrapped successfully');
+        logInDev('Intelligence service bootstrapped successfully');
       }
     } catch (error) {
-      console.error('Error bootstrapping intelligence service:', error);
+      errorInDev('Error bootstrapping intelligence service:', error);
     }
   }
 
@@ -290,7 +297,7 @@ class OnboardingService {
       const isCompleted = await this.isOnboardingCompleted();
       return !isCompleted;
     } catch (error) {
-      console.error('Failed to check if should show onboarding:', error);
+      errorInDev('Failed to check if should show onboarding:', error);
       return true; // Show onboarding if we can't determine status
     }
   }

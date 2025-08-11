@@ -33,15 +33,15 @@ export const NAVIGATION_VARIANTS = {
     
     // Active tab item
     activeTabItem: {
-      backgroundColor: UNIFIED_COLORS.sage[50],
+      backgroundColor: UNIFIED_COLORS.sage[100],
       borderRadius: BORDER_RADIUS.lg,
       paddingHorizontal: SPACING.md,
     } as ViewStyle,
     
     // Tab label
     tabLabel: {
-      ...TYPOGRAPHY.scale.caption,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.caption.medium,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.tertiary,
       marginTop: SPACING.xs,
       textAlign: 'center',
@@ -77,7 +77,7 @@ export const NAVIGATION_VARIANTS = {
     // Header title
     title: {
       ...TYPOGRAPHY.scale.h2,
-      fontFamily: TYPOGRAPHY.fonts.headline,
+      fontFamily: TYPOGRAPHY.fontFamily.headline,
       color: UNIFIED_COLORS.text.primary,
       flex: 1,
       textAlign: 'center',
@@ -85,8 +85,8 @@ export const NAVIGATION_VARIANTS = {
     
     // Header subtitle
     subtitle: {
-      ...TYPOGRAPHY.scale.body2,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.body.small,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.secondary,
       textAlign: 'center',
       marginTop: SPACING.xs,
@@ -116,7 +116,7 @@ export const NAVIGATION_VARIANTS = {
     
     title: {
       ...TYPOGRAPHY.scale.h3,
-      fontFamily: TYPOGRAPHY.fonts.headline,
+      fontFamily: TYPOGRAPHY.fontFamily.headline,
       color: UNIFIED_COLORS.text.primary,
       flex: 1,
       textAlign: 'center',
@@ -146,15 +146,15 @@ export const NAVIGATION_VARIANTS = {
     
     // Active navigation item
     activeItem: {
-      backgroundColor: UNIFIED_COLORS.sage[50],
+      backgroundColor: UNIFIED_COLORS.sage[100],
       borderLeftWidth: 3,
       borderLeftColor: UNIFIED_COLORS.sage[500],
     } as ViewStyle,
     
     // Navigation item text
     itemText: {
-      ...TYPOGRAPHY.scale.body1,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.body.medium,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.primary,
       marginLeft: SPACING.md,
       flex: 1,
@@ -254,8 +254,8 @@ export const BREADCRUMB = {
   } as ViewStyle,
   
   item: {
-    ...TYPOGRAPHY.scale.body2,
-    fontFamily: TYPOGRAPHY.fonts.body,
+    ...TYPOGRAPHY.body.small,
+    fontFamily: TYPOGRAPHY.fontFamily.body,
     color: UNIFIED_COLORS.text.secondary,
   } as TextStyle,
   
@@ -265,7 +265,7 @@ export const BREADCRUMB = {
   } as TextStyle,
   
   separator: {
-    ...TYPOGRAPHY.scale.body2,
+    ...TYPOGRAPHY.body.small,
     color: UNIFIED_COLORS.text.tertiary,
     marginHorizontal: SPACING.sm,
   } as TextStyle
@@ -296,8 +296,8 @@ export const PAGINATION = {
   } as ViewStyle,
   
   buttonText: {
-    ...TYPOGRAPHY.scale.body2,
-    fontFamily: TYPOGRAPHY.fonts.body,
+    ...TYPOGRAPHY.body.small,
+    fontFamily: TYPOGRAPHY.fontFamily.body,
     color: UNIFIED_COLORS.text.primary,
     fontWeight: '600',
   } as TextStyle,

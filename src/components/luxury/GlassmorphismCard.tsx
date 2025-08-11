@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { LuxuryMaterials, LuxuryShadows, LuxuryLayout } from '../../theme/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface GlassmorphismCardProps {
   children: React.ReactNode;
@@ -16,7 +16,12 @@ export const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({
   variant = 'primary',
   intensity = 25,
 }) => {
-  const glassStyle = LuxuryMaterials.glass[variant];
+  const GLASS_MAP: Record<string, ViewStyle> = {
+    primary: DesignSystem.glassmorphism.medium,
+    subtle: DesignSystem.glassmorphism.light,
+    dark: DesignSystem.glassmorphism.dark,
+  };
+  const glassStyle = GLASS_MAP[variant] as ViewStyle;
 
   return (
     <View style={[styles.container, style]}>
@@ -47,9 +52,9 @@ export const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: LuxuryLayout.card.borderRadius,
+    borderRadius: DesignSystem.layout.card.borderRadius,
     overflow: 'hidden',
-    ...LuxuryShadows.float,
+  ...DesignSystem.elevation.floating,
   },
   
   blurView: {
@@ -58,7 +63,7 @@ const styles = StyleSheet.create({
   
   glassOverlay: {
     flex: 1,
-    borderRadius: LuxuryLayout.card.borderRadius,
+    borderRadius: DesignSystem.layout.card.borderRadius,
     // Inner border to catch light
     borderStyle: 'solid',
   },
@@ -68,14 +73,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     opacity: 0.02,
     // Subtle noise pattern
-    borderRadius: LuxuryLayout.card.borderRadius,
+    borderRadius: DesignSystem.layout.card.borderRadius,
   },
   
   content: {
     flex: 1,
-    padding: LuxuryLayout.card.padding,
+    padding: DesignSystem.layout.card.padding,
     zIndex: 1,
   },
 });
 
-export default GlassmorphismCard; 
+export default GlassmorphismCard;

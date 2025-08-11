@@ -1,5 +1,6 @@
 // Haptic Service - Tactile feedback system with accessibility support
 import { Platform, Vibration } from 'react-native';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 /**
  * Haptic feedback types aligned with AYNAMODA's wellness philosophy
@@ -207,12 +208,12 @@ class HapticService {
       // On iOS, we could check for Haptic Engine availability
       // On Android, vibration is generally available
       
-      console.log('Haptic Service initialized:', {
+      logInDev('Haptic Service initialized:', {
         available: this.isAvailable,
         platform: Platform.OS
       });
     } catch (error) {
-      console.warn('Failed to initialize haptic service:', error);
+      errorInDev('Failed to initialize haptic service:', error);
       this.isAvailable = false;
     }
   }
@@ -260,7 +261,7 @@ class HapticService {
     try {
       const pattern = HAPTIC_PATTERNS[type];
       if (!pattern) {
-        console.warn(`Unknown haptic type: ${type}`);
+        errorInDev(`Unknown haptic type: ${type}`);
         return;
       }
       
@@ -273,7 +274,7 @@ class HapticService {
         await this.triggerAndroidHaptic(pattern, adjustedIntensity);
       }
     } catch (error) {
-      console.warn('Failed to trigger haptic feedback:', error);
+      errorInDev('Failed to trigger haptic feedback:', error);
     }
   }
   
@@ -326,7 +327,7 @@ class HapticService {
       //     HapticFeedback.impact(HapticFeedback.ImpactFeedbackStyle.Light, options);
       // }
     } catch (error) {
-      console.warn('iOS haptic feedback failed:', error);
+      errorInDev('iOS haptic feedback failed:', error);
     }
   }
   
@@ -346,7 +347,7 @@ class HapticService {
         Vibration.vibrate(scaledDuration);
       }
     } catch (error) {
-      console.warn('Android haptic feedback failed:', error);
+      errorInDev('Android haptic feedback failed:', error);
     }
   }
   
@@ -395,7 +396,7 @@ class HapticService {
         await this.triggerAndroidHaptic(pattern, adjustedIntensity);
       }
     } catch (error) {
-      console.warn('Failed to trigger custom haptic:', error);
+      errorInDev('Failed to trigger custom haptic:', error);
     }
   }
   
@@ -439,7 +440,7 @@ class HapticService {
     try {
       Vibration.cancel();
     } catch (error) {
-      console.warn('Failed to stop haptic feedback:', error);
+      errorInDev('Failed to stop haptic feedback:', error);
     }
   }
 }

@@ -1,42 +1,24 @@
 // Enhanced Wardrobe Item Form with AI Naming
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Modal,
   Alert,
-  Divider,
-  Paper,
-  IconButton,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
-} from '@mui/material';
-import {
-  Save,
-  Cancel,
-  AutoAwesome,
-  Image,
-  Edit,
-  Delete,
-  Add
-} from '@mui/icons-material';
-import { LoadingButton } from '@mui/lab';
+  Dimensions,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { supabase } from '@/config/supabaseClient';
 import { WardrobeItem, ItemCategory } from '@/types/aynaMirror';
 import { AINameGenerator } from '../naming/AINameGenerator';
 import { useAINaming } from '@/hooks/useAINaming';
 import { enhancedWardrobeService } from '@/services/enhancedWardrobeService';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 interface WardrobeItemFormProps {
   item?: Partial<WardrobeItem>;
@@ -74,8 +56,8 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
     colors: item?.colors || [],
     brand: item?.brand || '',
     size: item?.size || '',
-    purchaseDate: item?.purchaseDate || '',
-    purchasePrice: item?.purchasePrice || 0,
+  purchaseDate: item?.purchaseDate ? new Date((item as any).purchaseDate).toISOString().slice(0, 10) : '',
+  purchasePrice: typeof item?.purchasePrice === 'number' ? (item?.purchasePrice as number) : 0,
     tags: item?.tags || [],
     notes: item?.notes || '',
     imageUri: item?.imageUri || ''
@@ -95,10 +77,7 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
     }
   }, [isEditing, formData.imageUri, formData.name, formData.aiGeneratedName]);
 
-  const handleInputChange = (field: keyof typeof formData) => (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const value = event.target.value;
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // If user manually enters a name, mark as override
@@ -108,10 +87,8 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
     }
   };
 
-  const handleSelectChange = (field: keyof typeof formData) => (
-    event: any
-  ) => {
-    setFormData(prev => ({ ...prev, [field]: event.target.value }));
+  const handleSelectChange = (field: keyof typeof formData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleAddColor = () => {
@@ -184,8 +161,8 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
         colors: formData.colors,
         brand: formData.brand || undefined,
         size: formData.size || undefined,
-        purchaseDate: formData.purchaseDate || undefined,
-        purchasePrice: formData.purchasePrice || undefined,
+        purchaseDate: formData.purchaseDate ? new Date(formData.purchaseDate) : undefined,
+        purchasePrice: typeof formData.purchasePrice === 'number' ? formData.purchasePrice : parseFloat(String(formData.purchasePrice)) || undefined,
         tags: formData.tags,
         notes: formData.notes || undefined,
         imageUri: formData.imageUri
@@ -193,7 +170,7 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
 
       if (isEditing && item?.id) {
         // Update existing item
-        const { error: updateError } = await enhancedWardrobeService.supabase
+        const { error: updateError } = await supabase
           .from('wardrobe_items')
           .update({
             name: itemData.name,
@@ -204,7 +181,7 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
             colors: itemData.colors,
             brand: itemData.brand,
             size: itemData.size,
-            purchase_date: itemData.purchaseDate,
+            purchase_date: itemData.purchaseDate ? (itemData.purchaseDate as Date).toISOString().slice(0, 10) : undefined,
             purchase_price: itemData.purchasePrice,
             tags: itemData.tags,
             notes: itemData.notes
@@ -226,7 +203,7 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
           colors: itemData.colors!,
           brand: itemData.brand,
           size: itemData.size,
-          purchase_date: itemData.purchaseDate,
+          purchase_date: itemData.purchaseDate ? (itemData.purchaseDate as Date).toISOString().slice(0, 10) : undefined,
           purchase_price: itemData.purchasePrice,
           tags: itemData.tags,
           notes: itemData.notes,
@@ -244,7 +221,7 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
         } as WardrobeItem);
       }
     } catch (err) {
-      console.error('Error saving item:', err);
+      errorInDev('Error saving item:', err);
       setError(err instanceof Error ? err.message : 'Failed to save item');
     } finally {
       setIsSaving(false);
@@ -262,287 +239,238 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
   };
 
   return (
-    <>
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            {isEditing ? 'Edit Item' : 'Add New Item'}
-          </Typography>
+    <ScrollView style={styles.container}>
+      <View style={styles.card}>
+        <Text style={styles.title}>
+          {isEditing ? 'Edit Item' : 'Add New Item'}
+        </Text>
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 3 }}>
-              {error}
-            </Alert>
-          )}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        )}
 
-          <Grid container spacing={3}>
-            {/* Item Image */}
+        {/* Item Image */}
+        {formData.imageUri && (
+          <View style={styles.imageContainer}>
+            <View style={styles.imagePaper}>
+              <Text>Image Preview</Text>
+              {/* Note: Image component would need proper implementation */}
+            </View>
+          </View>
+        )}
+
+        {/* Item Name Section */}
+        <View style={styles.nameSection}>
+          <View style={styles.nameHeader}>
+            <Text style={styles.sectionTitle}>Item Name</Text>
             {formData.imageUri && (
-              <Grid item xs={12} md={4}>
-                <Paper sx={{ p: 2, textAlign: 'center' }}>
-                  <Box
-                    component="img"
-                    src={formData.imageUri}
-                    alt="Item"
-                    sx={{
-                      width: '100%',
-                      maxWidth: 200,
-                      height: 'auto',
-                      borderRadius: 1
-                    }}
-                  />
-                </Paper>
-              </Grid>
+              <TouchableOpacity
+                style={styles.aiButton}
+                onPress={() => setShowAINaming(true)}
+              >
+                <Ionicons name="sparkles" size={20} color={DesignSystem.colors.primary[500]} />
+              </TouchableOpacity>
             )}
+          </View>
 
-            <Grid item xs={12} md={formData.imageUri ? 8 : 12}>
-              {/* Item Name Section */}
-              <Box sx={{ mb: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                  <Typography variant="subtitle1">Item Name</Typography>
-                  {formData.imageUri && (
-                    <Tooltip title="Generate AI Name">
-                      <IconButton
-                        size="small"
-                        onClick={() => setShowAINaming(true)}
-                        color="primary"
-                      >
-                        <AutoAwesome fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </Box>
+          <View style={styles.currentNameContainer}>
+            <Text style={styles.currentNameLabel}>Current Name:</Text>
+            <Text style={styles.currentName}>{getDisplayName()}</Text>
+            {formData.aiGeneratedName && !formData.nameOverride && (
+              <View style={styles.chip}>
+                <Text style={styles.chipText}>AI Generated</Text>
+              </View>
+            )}
+            {formData.nameOverride && (
+              <View style={[styles.chip, styles.chipSecondary]}>
+                <Text style={styles.chipText}>Custom Name</Text>
+              </View>
+            )}
+          </View>
 
-                <Paper sx={{ p: 2, bgcolor: 'grey.50', mb: 2 }}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Current Name:
-                  </Typography>
-                  <Typography variant="h6" color="primary">
-                    {getDisplayName()}
-                  </Typography>
-                  {formData.aiGeneratedName && !formData.nameOverride && (
-                    <Chip
-                      label="AI Generated"
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                      sx={{ mt: 1 }}
-                    />
-                  )}
-                  {formData.nameOverride && (
-                    <Chip
-                      label="Custom Name"
-                      size="small"
-                      color="secondary"
-                      variant="outlined"
-                      sx={{ mt: 1 }}
-                    />
-                  )}
-                </Paper>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Enter a custom name or use AI suggestion"
+            value={formData.name}
+            onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
+          />
+        </View>
 
-                <TextField
-                  fullWidth
-                  label="Custom Name (Optional)"
-                  value={formData.name}
-                  onChange={handleInputChange('name')}
-                  placeholder="Enter a custom name or use AI suggestion"
-                  helperText="Leave empty to use AI-generated name"
-                />
-              </Box>
+        <View style={styles.divider} />
 
-              <Divider sx={{ my: 3 }} />
+        {/* Basic Information */}
+        <View style={styles.formSection}>
+          <View style={styles.row}>
+            <View style={styles.halfWidth}>
+              <Text style={styles.label}>Category</Text>
+              <TouchableOpacity style={styles.picker}>
+                <Text style={styles.pickerText}>
+                  {formData.category ? formData.category.charAt(0).toUpperCase() + formData.category.slice(1) : 'Select Category'}
+                </Text>
+                <Ionicons name="chevron-down" size={20} color={DesignSystem.colors.text.secondary} />
+              </TouchableOpacity>
+            </View>
 
-              {/* Basic Information */}
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Category</InputLabel>
-                    <Select
-                      value={formData.category}
-                      onChange={handleSelectChange('category')}
-                      label="Category"
-                    >
-                      {CATEGORIES.map((category) => (
-                        <MenuItem key={category} value={category}>
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
+            <View style={styles.halfWidth}>
+              <Text style={styles.label}>Subcategory</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="e.g., T-shirt, Jeans, Sneakers"
+                value={formData.subcategory}
+                onChangeText={(text) => setFormData(prev => ({ ...prev, subcategory: text }))}
+              />
+            </View>
+          </View>
 
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Subcategory"
-                    value={formData.subcategory}
-                    onChange={handleInputChange('subcategory')}
-                    placeholder="e.g., T-shirt, Jeans, Sneakers"
-                  />
-                </Grid>
+          <View style={styles.row}>
+            <View style={styles.halfWidth}>
+              <Text style={styles.label}>Brand</Text>
+              <TextInput
+                style={styles.textInput}
+                value={formData.brand}
+                onChangeText={(text) => setFormData(prev => ({ ...prev, brand: text }))}
+              />
+            </View>
 
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Brand"
-                    value={formData.brand}
-                    onChange={handleInputChange('brand')}
-                  />
-                </Grid>
+            <View style={styles.halfWidth}>
+              <Text style={styles.label}>Size</Text>
+              <TouchableOpacity style={styles.picker}>
+                <Text style={styles.pickerText}>
+                  {formData.size || 'Select Size'}
+                </Text>
+                <Ionicons name="chevron-down" size={20} color={DesignSystem.colors.text.secondary} />
+              </TouchableOpacity>
+            </View>
+          </View>
 
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Size</InputLabel>
-                    <Select
-                      value={formData.size}
-                      onChange={handleSelectChange('size')}
-                      label="Size"
-                    >
-                      {SIZES.map((size) => (
-                        <MenuItem key={size} value={size}>
-                          {size}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
+          <View style={styles.row}>
+            <View style={styles.halfWidth}>
+              <Text style={styles.label}>Purchase Date</Text>
+              <TextInput
+                style={styles.textInput}
+                value={formData.purchaseDate}
+                onChangeText={(text) => setFormData(prev => ({ ...prev, purchaseDate: text }))}
+                placeholder="YYYY-MM-DD"
+              />
+            </View>
 
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Purchase Date"
-                    type="date"
-                    value={formData.purchaseDate}
-                    onChange={handleInputChange('purchaseDate')}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
+            <View style={styles.halfWidth}>
+              <Text style={styles.label}>Purchase Price</Text>
+              <TextInput
+                style={styles.textInput}
+                value={String(formData.purchasePrice)}
+                onChangeText={(text) => setFormData(prev => ({ ...prev, purchasePrice: parseFloat(text) || 0 }))}
+                placeholder="$0.00"
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
 
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Purchase Price"
-                    type="number"
-                    value={formData.purchasePrice}
-                    onChange={handleInputChange('purchasePrice')}
-                    InputProps={{ startAdornment: '$' }}
-                  />
-                </Grid>
-              </Grid>
+          {/* Colors */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Colors</Text>
+            <View style={styles.chipContainer}>
+              {formData.colors.map((color, index) => (
+                <View key={index} style={styles.chip}>
+                  <Text style={styles.chipText}>{color}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveColor(color)}>
+                    <Ionicons name="close" size={16} color={DesignSystem.colors.text.secondary} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+            <View style={styles.addRow}>
+              <TextInput
+                style={[styles.textInput, styles.addInput]}
+                placeholder="Add Color"
+                value={newColor}
+                onChangeText={setNewColor}
+                onSubmitEditing={handleAddColor}
+              />
+              <TouchableOpacity style={styles.addButton} onPress={handleAddColor}>
+                <Ionicons name="add" size={20} color={DesignSystem.colors.primary[500]} />
+                <Text style={styles.addButtonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-              {/* Colors */}
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Colors
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                  {formData.colors.map((color, index) => (
-                    <Chip
-                      key={index}
-                      label={color}
-                      onDelete={() => handleRemoveColor(color)}
-                      deleteIcon={<Delete />}
-                    />
-                  ))}
-                </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <TextField
-                    size="small"
-                    label="Add Color"
-                    value={newColor}
-                    onChange={(e) => setNewColor(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddColor()}
-                  />
-                  <Button
-                    variant="outlined"
-                    onClick={handleAddColor}
-                    startIcon={<Add />}
-                  >
-                    Add
-                  </Button>
-                </Box>
-              </Box>
+          {/* Tags */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Tags</Text>
+            <View style={styles.chipContainer}>
+              {formData.tags.map((tag, index) => (
+                <View key={index} style={styles.chip}>
+                  <Text style={styles.chipText}>{tag}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveTag(tag)}>
+                    <Ionicons name="close" size={16} color={DesignSystem.colors.text.secondary} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+            <View style={styles.addRow}>
+              <TextInput
+                style={[styles.textInput, styles.addInput]}
+                placeholder="Add Tag"
+                value={newTag}
+                onChangeText={setNewTag}
+                onSubmitEditing={handleAddTag}
+              />
+              <TouchableOpacity style={styles.addButton} onPress={handleAddTag}>
+                <Ionicons name="add" size={20} color={DesignSystem.colors.primary[500]} />
+                <Text style={styles.addButtonText}>Add</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-              {/* Tags */}
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="subtitle1" gutterBottom>
-                  Tags
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                  {formData.tags.map((tag, index) => (
-                    <Chip
-                      key={index}
-                      label={tag}
-                      onDelete={() => handleRemoveTag(tag)}
-                      deleteIcon={<Delete />}
-                    />
-                  ))}
-                </Box>
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <TextField
-                    size="small"
-                    label="Add Tag"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
-                  />
-                  <Button
-                    variant="outlined"
-                    onClick={handleAddTag}
-                    startIcon={<Add />}
-                  >
-                    Add
-                  </Button>
-                </Box>
-              </Box>
+          {/* Notes */}
+          <View style={styles.section}>
+            <Text style={styles.label}>Notes</Text>
+            <TextInput
+              style={[styles.textInput, styles.textArea]}
+              value={formData.notes}
+              onChangeText={(text) => setFormData(prev => ({ ...prev, notes: text }))}
+              placeholder="Any additional notes about this item..."
+              multiline
+              numberOfLines={3}
+            />
+          </View>
+        </View>
 
-              {/* Notes */}
-              <Box sx={{ mt: 3 }}>
-                <TextField
-                  fullWidth
-                  label="Notes"
-                  multiline
-                  rows={3}
-                  value={formData.notes}
-                  onChange={handleInputChange('notes')}
-                  placeholder="Any additional notes about this item..."
-                />
-              </Box>
-            </Grid>
-          </Grid>
+        {/* Actions */}
+        <View style={styles.actions}>
+          <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
+            <Ionicons name="close" size={20} color={DesignSystem.colors.text.secondary} />
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.saveButton, isSaving && styles.saveButtonDisabled]} 
+            onPress={handleSave}
+            disabled={isSaving}
+          >
+            <Ionicons name="save" size={20} color="white" />
+            <Text style={styles.saveButtonText}>
+              {isSaving ? 'Saving...' : (isEditing ? 'Update Item' : 'Save Item')}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
-          {/* Actions */}
-          <Box sx={{ display: 'flex', gap: 2, mt: 4, justifyContent: 'flex-end' }}>
-            <Button
-              variant="outlined"
-              onClick={onCancel}
-              startIcon={<Cancel />}
-            >
-              Cancel
-            </Button>
-            <LoadingButton
-              variant="contained"
-              onClick={handleSave}
-              loading={isSaving}
-              startIcon={<Save />}
-            >
-              {isEditing ? 'Update Item' : 'Save Item'}
-            </LoadingButton>
-          </Box>
-        </CardContent>
-      </Card>
-
-      {/* AI Naming Dialog */}
-      <Dialog
-        open={showAINaming}
-        onClose={() => setShowAINaming(false)}
-        maxWidth="md"
-        fullWidth
+      {/* AI Naming Modal */}
+      <Modal
+        visible={showAINaming}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowAINaming(false)}
       >
-        <DialogTitle>
-          Generate AI Name
-        </DialogTitle>
-        <DialogContent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>Generate AI Name</Text>
+            <TouchableOpacity onPress={() => setShowAINaming(false)}>
+              <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
+            </TouchableOpacity>
+          </View>
           <AINameGenerator
             item={{
               imageUri: formData.imageUri,
@@ -553,8 +481,233 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
             onNameSelected={handleAINameSelected}
             initialName={formData.name}
           />
-        </DialogContent>
-      </Dialog>
-    </>
+        </View>
+      </Modal>
+    </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: DesignSystem.colors.background.primary,
+  },
+  card: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+    margin: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.lg,
+    padding: DesignSystem.spacing.lg,
+  ...DesignSystem.shadows.soft,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  errorContainer: {
+    backgroundColor: DesignSystem.colors.error.main + '20',
+    padding: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.md,
+    marginBottom: DesignSystem.spacing.md,
+  },
+  errorText: {
+    color: DesignSystem.colors.error.main,
+    fontSize: 14,
+  },
+  imageContainer: {
+    alignItems: 'center',
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  imagePaper: {
+    width: 200,
+    height: 200,
+    backgroundColor: DesignSystem.colors.background.tertiary,
+    borderRadius: DesignSystem.borderRadius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  nameSection: {
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  nameHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: DesignSystem.spacing.md,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: DesignSystem.colors.text.primary,
+  },
+  aiButton: {
+    padding: DesignSystem.spacing.sm,
+    borderRadius: DesignSystem.borderRadius.full,
+  backgroundColor: DesignSystem.colors.primary[500] + '20',
+  },
+  currentNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: DesignSystem.spacing.md,
+    flexWrap: 'wrap',
+  },
+  currentNameLabel: {
+    fontSize: 14,
+    color: DesignSystem.colors.text.secondary,
+    marginRight: DesignSystem.spacing.sm,
+  },
+  currentName: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: DesignSystem.colors.text.primary,
+    marginRight: DesignSystem.spacing.sm,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.primary[500],
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
+    borderRadius: DesignSystem.borderRadius.full,
+    margin: 2,
+  },
+  chipSecondary: {
+    backgroundColor: DesignSystem.colors.secondary[500],
+  },
+  chipText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  divider: {
+    height: 1,
+  backgroundColor: DesignSystem.colors.border.primary,
+    marginVertical: DesignSystem.spacing.lg,
+  },
+  formSection: {
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  row: {
+    flexDirection: 'row',
+    marginBottom: DesignSystem.spacing.md,
+    gap: DesignSystem.spacing.md,
+  },
+  halfWidth: {
+    flex: 1,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.xs,
+  },
+  textInput: {
+    borderWidth: 1,
+  borderColor: DesignSystem.colors.border.primary,
+    borderRadius: DesignSystem.borderRadius.md,
+    padding: DesignSystem.spacing.md,
+    fontSize: 16,
+    color: DesignSystem.colors.text.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  picker: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+  borderColor: DesignSystem.colors.border.primary,
+    borderRadius: DesignSystem.borderRadius.md,
+    padding: DesignSystem.spacing.md,
+    backgroundColor: DesignSystem.colors.background.primary,
+  },
+  pickerText: {
+    fontSize: 16,
+    color: DesignSystem.colors.text.primary,
+  },
+  section: {
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  chipContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: DesignSystem.spacing.md,
+  },
+  addRow: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.sm,
+  },
+  addInput: {
+    flex: 1,
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.primary[500] + '20',
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+    borderRadius: DesignSystem.borderRadius.md,
+    gap: DesignSystem.spacing.xs,
+  },
+  addButtonText: {
+    color: DesignSystem.colors.primary[500],
+    fontWeight: '500',
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: DesignSystem.spacing.md,
+    marginTop: DesignSystem.spacing.lg,
+  },
+  cancelButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.md,
+    borderWidth: 1,
+  borderColor: DesignSystem.colors.border.primary,
+    gap: DesignSystem.spacing.xs,
+  },
+  cancelButtonText: {
+    color: DesignSystem.colors.text.secondary,
+    fontWeight: '500',
+  },
+  saveButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.primary[500],
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.md,
+    gap: DesignSystem.spacing.xs,
+  },
+  saveButtonDisabled: {
+    opacity: 0.6,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontWeight: '500',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: DesignSystem.colors.background.primary,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: DesignSystem.spacing.lg,
+    borderBottomWidth: 1,
+  borderBottomColor: DesignSystem.colors.border.primary,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: DesignSystem.colors.text.primary,
+  },
+}) as any;

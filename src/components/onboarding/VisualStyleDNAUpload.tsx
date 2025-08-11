@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
 import { DesignSystem } from '@/theme/DesignSystem';
+import { errorInDev } from '../../utils/consoleSuppress';
 
 const { width, height } = Dimensions.get('window');
 
@@ -103,7 +104,7 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     } catch (error) {
-      console.error('Error uploading photo:', error);
+      errorInDev('Error uploading photo:', error);
       Alert.alert('Upload Error', 'Failed to upload photo. Please try again.');
     } finally {
       setIsUploading(false);
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 14,
     color: DesignSystem.colors.sage[700],
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
   },
   content: {
     flex: 1,
@@ -336,7 +337,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontFamily: DesignSystem.typography.fonts.heading,
+  fontFamily: DesignSystem.typography.fontFamily.headline,
     color: DesignSystem.colors.sage[700],
     textAlign: 'center',
     marginBottom: 16,
@@ -344,7 +345,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.sage[500],
     textAlign: 'center',
     lineHeight: 24,
@@ -374,14 +375,14 @@ const styles = StyleSheet.create({
   },
   uploadTitle: {
     fontSize: 24,
-    fontFamily: DesignSystem.typography.fonts.heading,
+  fontFamily: DesignSystem.typography.fontFamily.headline,
     color: DesignSystem.colors.sage[700],
     textAlign: 'center',
     marginBottom: 12,
   },
   uploadSubtitle: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.sage[500],
     textAlign: 'center',
     lineHeight: 24,
@@ -404,7 +405,7 @@ const styles = StyleSheet.create({
   },
   primaryUploadButtonText: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
     color: '#FFFFFF',
   },
@@ -422,7 +423,7 @@ const styles = StyleSheet.create({
   },
   secondaryUploadButtonText: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
     color: DesignSystem.colors.sage[500],
   },
@@ -449,7 +450,7 @@ const styles = StyleSheet.create({
     right: -8,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    ...DesignSystem.shadows.small,
+  ...DesignSystem.shadows.soft,
   },
   addMoreButton: {
     width: (width - 72) / 3,
@@ -464,7 +465,7 @@ const styles = StyleSheet.create({
   },
   addMoreText: {
     fontSize: 12,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.sage[500],
     marginTop: 4,
   },
@@ -474,7 +475,7 @@ const styles = StyleSheet.create({
   },
   photoCountText: {
     fontSize: 14,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.sage[500],
   },
   actionButtons: {
@@ -494,7 +495,7 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
     color: DesignSystem.colors.sage[500],
   },
@@ -526,7 +527,7 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
     color: '#FFFFFF',
   },

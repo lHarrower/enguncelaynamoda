@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import OnboardingFlow from '../components/onboarding/OnboardingFlow';
+import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import * as Notifications from 'expo-notifications';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -100,7 +100,7 @@ describe('OnboardingFlow', () => {
     });
     
     await waitFor(() => {
-      expect(getByText('What\'s Your Style?')).toBeTruthy();
+      expect(getByText('Tell Us About Your Style')).toBeTruthy();
     });
     
     // Select a style option
@@ -309,7 +309,7 @@ describe('OnboardingFlow', () => {
     await waitFor(() => fireEvent.press(getByText('Skip for Now')));
     
     await waitFor(() => {
-      expect(getByText('What\'s Your Style?')).toBeTruthy();
+      expect(getByText('Tell Us About Your Style')).toBeTruthy();
     });
     
     // Try to proceed without selecting anything
@@ -319,8 +319,8 @@ describe('OnboardingFlow', () => {
     // Button should be disabled initially
     fireEvent.press(nextButton);
     
-    // Should still be on the same step
-    expect(getByText('What\'s Your Style?')).toBeTruthy();
+  // Should still be on the same step
+  expect(getByText('Tell Us About Your Style')).toBeTruthy();
     
     // Select a style to enable the button
     fireEvent.press(getByText('Casual & Comfortable'));
@@ -334,7 +334,7 @@ describe('OnboardingFlow', () => {
   });
 
   it('handles sample outfit navigation correctly', async () => {
-    const { getByText, getAllByTestId } = render(<OnboardingFlow onComplete={mockOnComplete} />);
+    const { getByText, getAllByTestId, queryByText } = render(<OnboardingFlow onComplete={mockOnComplete} />);
     
     // Navigate to sample outfits quickly
     fireEvent.press(getByText('Begin Your Journey'));
@@ -351,7 +351,7 @@ describe('OnboardingFlow', () => {
     expect(getByText('Confident Professional')).toBeTruthy();
     
     // Test outfit navigation if Next button exists
-    const nextButton = queryByText('Next');
+  const nextButton = queryByText('Next');
     if (nextButton) {
       fireEvent.press(nextButton);
       await waitFor(() => {

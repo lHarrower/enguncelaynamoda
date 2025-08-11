@@ -6,9 +6,9 @@ import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
-import { AynaMirrorScreen } from '../screens/AynaMirrorScreen';
-import { AynaMirrorService } from '../services/aynaMirrorService';
-import { DailyRecommendations, OutfitRecommendation } from '../types/aynaMirror';
+import { AynaMirrorScreen } from '@/screens/AynaMirrorScreen';
+import { AynaMirrorService } from '@/services/aynaMirrorService';
+import { DailyRecommendations, OutfitRecommendation } from '@/types/aynaMirror';
 
 // Mock dependencies
 jest.mock('expo-haptics');
@@ -18,12 +18,7 @@ jest.mock('expo-blur', () => ({
 jest.mock('expo-linear-gradient', () => ({
   LinearGradient: ({ children }: any) => children,
 }));
-jest.mock('react-native-reanimated', () => {
-  const Reanimated = require('react-native-reanimated/mock');
-  Reanimated.default.call = () => {};
-  return Reanimated;
-});
-jest.mock('../services/aynaMirrorService');
+jest.mock('@/services/aynaMirrorService');
 
 // Mock Alert
 jest.spyOn(Alert, 'alert');
@@ -43,6 +38,7 @@ const mockDailyRecommendations: DailyRecommendations = {
           userId: 'user-1',
           imageUri: 'https://example.com/image1.jpg',
           processedImageUri: 'https://example.com/processed1.jpg',
+          nameOverride: false,
           category: 'tops',
           colors: ['blue', 'white'],
           tags: ['casual', 'comfortable'],
@@ -80,6 +76,7 @@ const mockDailyRecommendations: DailyRecommendations = {
           userId: 'user-1',
           imageUri: 'https://example.com/image2.jpg',
           processedImageUri: 'https://example.com/processed2.jpg',
+          nameOverride: false,
           category: 'dresses',
           colors: ['black'],
           tags: ['formal', 'elegant'],

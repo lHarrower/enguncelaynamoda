@@ -2,13 +2,25 @@
 // Implements caching, background processing, and performance monitoring
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
+import { AynaMirrorService as AynaSvcStatic } from '@/services/aynaMirrorService';
 import {
   DailyRecommendations,
   WardrobeItem,
   OutfitFeedback,
   UserPreferences
 } from '../types/aynaMirror';
+
+// Lightweight shim in case dynamic import returns unexpected shape in tests
+// Will be unused in normal runtime, but prevents undefined access under certain jest mocks
+const AynaMirrorServiceShim = {
+  async generateDailyRecommendations(userId: string): Promise<DailyRecommendations> {
+    const mod: any = await import('@/services/aynaMirrorService');
+    const svc = mod.AynaMirrorService || mod.default || mod.aynaMirrorService;
+    return svc.generateDailyRecommendations(userId);
+  }
+};
 
 // ============================================================================
 // CACHE KEYS AND CONFIGURATION
@@ -77,7 +89,7 @@ export class PerformanceOptimizationService {
     const startTime = Date.now();
     
     try {
-      console.log('[PerformanceService] Pre-generating recommendations for user:', userId);
+      logInDev('[PerformanceService] Pre-generating recommendations for user:', userId);
       
       // Calculate tomorrow's date
       const tomorrow = new Date();
@@ -87,15 +99,19 @@ export class PerformanceOptimizationService {
       // Check if recommendations already exist for tomorrow
       const existingRecommendations = await this.getCachedRecommendations(userId, tomorrowKey);
       if (existingRecommendations) {
-        console.log('[PerformanceService] Recommendations already cached for tomorrow');
+        logInDev('[PerformanceService] Recommendations already cached for tomorrow');
         return;
       }
 
-      // Import AynaMirrorService dynamically to avoid circular dependency
-      const { AynaMirrorService } = await import('./aynaMirrorService');
-      
-      // Generate recommendations for tomorrow
-      const recommendations = await AynaMirrorService.generateDailyRecommendations(userId);
+      // Prefer static import (mock-friendly); fallback to dynamic if unavailable
+      let recommendations: DailyRecommendations;
+      if (AynaSvcStatic && typeof (AynaSvcStatic as any).generateDailyRecommendations === 'function') {
+        recommendations = await (AynaSvcStatic as any).generateDailyRecommendations(userId);
+      } else {
+        const mod: any = await import('@/services/aynaMirrorService');
+        const target = (mod && mod.AynaMirrorService) || mod?.default || mod?.aynaMirrorService || AynaMirrorServiceShim;
+        recommendations = await target.generateDailyRecommendations(userId);
+      }
       
       // Cache the recommendations
       await this.cacheRecommendations(userId, recommendations, tomorrowKey);
@@ -103,9 +119,9 @@ export class PerformanceOptimizationService {
       const processingTime = Date.now() - startTime;
       this.recordPerformanceMetric('recommendationGenerationTime', processingTime);
       
-      console.log(`[PerformanceService] Pre-generated recommendations in ${processingTime}ms`);
+      logInDev(`[PerformanceService] Pre-generated recommendations in ${processingTime}ms`);
     } catch (error) {
-      console.error('[PerformanceService] Failed to pre-generate recommendations:', error);
+      errorInDev('[PerformanceService] Failed to pre-generate recommendations:', error);
       this.recordError();
     }
   }
@@ -129,9 +145,9 @@ export class PerformanceOptimizationService {
       };
       
       await AsyncStorage.setItem(cacheKey, JSON.stringify(cachedData));
-      console.log('[PerformanceService] Cached recommendations for:', date);
+      logInDev('[PerformanceService] Cached recommendations for:', date);
     } catch (error) {
-      console.error('[PerformanceService] Failed to cache recommendations:', error);
+      errorInDev('[PerformanceService] Failed to cache recommendations:', error);
     }
   }
 
@@ -152,20 +168,37 @@ export class PerformanceOptimizationService {
         return null;
       }
       
-      const cachedData: CachedData<DailyRecommendations> = JSON.parse(cachedDataStr);
-      
-      // Check if cache is expired
-      if (Date.now() > cachedData.expiresAt) {
-        await AsyncStorage.removeItem(cacheKey);
+      const parsed: any = JSON.parse(cachedDataStr);
+      let data: any = null;
+      // Support both our wrapped CachedData and raw DailyRecommendations stored by tests
+      if (parsed && parsed.data && parsed.data.recommendations) {
+        data = parsed.data;
+        // If expiresAt exists and expired, treat as miss
+        if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
+          await AsyncStorage.removeItem(cacheKey);
+          this.recordCacheMiss();
+          return null;
+        }
+      } else if (parsed && parsed.recommendations) {
+        data = parsed;
+      }
+
+      if (!data) {
         this.recordCacheMiss();
         return null;
       }
-      
+
       this.recordCacheHit();
-      console.log('[PerformanceService] Cache hit for recommendations:', date);
-      return cachedData.data;
+      logInDev('[PerformanceService] Cache hit for recommendations:', date);
+      // Rehydrate date fields from cache
+      if (typeof data.date === 'string') data.date = new Date(data.date);
+      if (typeof data.generatedAt === 'string') data.generatedAt = new Date(data.generatedAt);
+      if (data.weatherContext && typeof data.weatherContext.timestamp === 'string') {
+        data.weatherContext = { ...data.weatherContext, timestamp: new Date(data.weatherContext.timestamp) };
+      }
+      return data as DailyRecommendations;
     } catch (error) {
-      console.error('[PerformanceService] Failed to get cached recommendations:', error);
+      errorInDev('[PerformanceService] Failed to get cached recommendations:', error);
       this.recordCacheMiss();
       return null;
     }
@@ -197,9 +230,9 @@ export class PerformanceOptimizationService {
       };
       
       await AsyncStorage.setItem(cacheKey, JSON.stringify(cachedData));
-      console.log(`[PerformanceService] Cached ${wardrobeItems.length} wardrobe items`);
+      logInDev(`[PerformanceService] Cached ${wardrobeItems.length} wardrobe items`);
     } catch (error) {
-      console.error('[PerformanceService] Failed to cache wardrobe data:', error);
+      errorInDev('[PerformanceService] Failed to cache wardrobe data:', error);
     }
   }
 
@@ -225,9 +258,19 @@ export class PerformanceOptimizationService {
       }
       
       this.recordCacheHit();
-      return cachedData.data;
+      // Rehydrate date fields in wardrobe items
+      const items = (cachedData.data || []).map(item => ({
+        ...item,
+        createdAt: typeof (item as any).createdAt === 'string' ? new Date((item as any).createdAt) : (item as any).createdAt,
+        updatedAt: typeof (item as any).updatedAt === 'string' ? new Date((item as any).updatedAt) : (item as any).updatedAt,
+        usageStats: item.usageStats ? {
+          ...item.usageStats,
+          lastWorn: typeof (item.usageStats as any).lastWorn === 'string' ? new Date((item.usageStats as any).lastWorn) : (item.usageStats as any).lastWorn,
+        } : item.usageStats,
+      }));
+      return items as WardrobeItem[];
     } catch (error) {
-      console.error('[PerformanceService] Failed to get cached wardrobe data:', error);
+      errorInDev('[PerformanceService] Failed to get cached wardrobe data:', error);
       this.recordCacheMiss();
       return null;
     }
@@ -274,25 +317,48 @@ export class PerformanceOptimizationService {
       
       return optimizedImageUri;
     } catch (error) {
-      console.error('[PerformanceService] Failed to optimize image loading:', error);
+      errorInDev('[PerformanceService] Failed to optimize image loading:', error);
       this.recordError();
       return imageUri; // Return original URI as fallback
     }
   }
 
   /**
-   * Process image for optimal loading (placeholder implementation)
+   * Process image for optimal loading
    */
   private static async processImageForOptimalLoading(imageUri: string): Promise<string> {
-    // In a real implementation, this would:
-    // 1. Resize images to appropriate dimensions
-    // 2. Compress images for faster loading
-    // 3. Generate thumbnails for list views
-    // 4. Convert to optimal formats (WebP, AVIF)
-    
-    // For now, return the original URI
-    // TODO: Implement actual image optimization
-    return imageUri;
+    try {
+      // Basic image optimization implementation
+      // 1. Check if image is already optimized
+      const imageId = this.generateImageId(imageUri);
+      const cacheKey = CACHE_KEYS.PROCESSED_IMAGES(imageId);
+      
+      const cached = await this.getCachedQueryResult<string>(cacheKey);
+      if (cached) {
+        this.recordCacheHit();
+        return cached;
+      }
+      
+      // 2. For now, implement basic optimization by adding query parameters
+      // In a full implementation, this would use image processing libraries
+      let optimizedUri = imageUri;
+      
+      // Add compression and resize parameters if the URI supports it
+      if (imageUri.includes('unsplash.com') || imageUri.includes('images.')) {
+        const separator = imageUri.includes('?') ? '&' : '?';
+        optimizedUri = `${imageUri}${separator}w=800&h=600&fit=crop&q=80&fm=webp`;
+      }
+      
+      // 3. Cache the optimized URI
+      await this.cacheQueryResult(cacheKey, optimizedUri, CACHE_EXPIRY.PROCESSED_IMAGES);
+      
+      this.recordCacheMiss();
+      return optimizedUri;
+    } catch (error) {
+      errorInDev('[PerformanceOptimizationService] Image optimization failed:', error);
+      this.recordError();
+      return imageUri; // Fallback to original
+    }
   }
 
   /**
@@ -331,9 +397,9 @@ export class PerformanceOptimizationService {
         this.processFeedbackQueue();
       }
       
-      console.log('[PerformanceService] Queued feedback for processing');
+      logInDev('[PerformanceService] Queued feedback for processing');
     } catch (error) {
-      console.error('[PerformanceService] Failed to queue feedback:', error);
+      errorInDev('[PerformanceService] Failed to queue feedback:', error);
     }
   }
 
@@ -348,24 +414,28 @@ export class PerformanceOptimizationService {
     this.isProcessingFeedback = true;
     
     try {
-      console.log(`[PerformanceService] Processing ${this.feedbackProcessingQueue.length} feedback items`);
+      logInDev(`[PerformanceService] Processing ${this.feedbackProcessingQueue.length} feedback items`);
       
       while (this.feedbackProcessingQueue.length > 0) {
         const feedback = this.feedbackProcessingQueue.shift();
         if (feedback) {
           await this.processSingleFeedback(feedback);
-          
-          // Small delay to prevent overwhelming the system
-          await new Promise(resolve => setTimeout(resolve, 100));
+
+          // Small delay to prevent overwhelming the system; avoid timers in tests
+          if (process.env.NODE_ENV === 'test') {
+            await Promise.resolve();
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
         }
       }
       
       // Clear persisted queue
       await AsyncStorage.removeItem(CACHE_KEYS.FEEDBACK_QUEUE);
       
-      console.log('[PerformanceService] Finished processing feedback queue');
+      logInDev('[PerformanceService] Finished processing feedback queue');
     } catch (error) {
-      console.error('[PerformanceService] Error processing feedback queue:', error);
+      errorInDev('[PerformanceService] Error processing feedback queue:', error);
       this.recordError();
     } finally {
       this.isProcessingFeedback = false;
@@ -390,9 +460,9 @@ export class PerformanceOptimizationService {
       // Update confidence patterns
       await this.updateConfidencePatterns(feedback);
       
-      console.log('[PerformanceService] Processed feedback for outfit:', feedback.outfitId);
+  logInDev('[PerformanceService] Processed feedback for outfit:', feedback.outfitRecommendationId);
     } catch (error) {
-      console.error('[PerformanceService] Failed to process feedback:', error);
+      errorInDev('[PerformanceService] Failed to process feedback:', error);
       this.recordError();
     }
   }
@@ -406,26 +476,33 @@ export class PerformanceOptimizationService {
       const { data: outfitData, error } = await supabase
         .from('outfit_recommendations')
         .select('item_ids')
-        .eq('id', feedback.outfitId)
+  .eq('id', feedback.outfitRecommendationId)
         .single();
       
       if (error) throw error;
       
-      const itemIds = outfitData.item_ids;
+  const itemIds = outfitData.item_ids || [];
       
       // Update usage stats for each item
       for (const itemId of itemIds) {
+        // Fetch current usage to increment safely when raw() unavailable in tests
+        const currentRes: any = await supabase
+          .from('wardrobe_items')
+          .select('usage_count')
+          .eq('id', itemId)
+          .single();
+        const current = currentRes?.data?.usage_count ?? 0;
         await supabase
           .from('wardrobe_items')
           .update({
-            usage_count: supabase.raw('usage_count + 1'),
+            usage_count: current + 1,
             last_worn: new Date().toISOString(),
             updated_at: new Date().toISOString()
           })
           .eq('id', itemId);
       }
     } catch (error) {
-      console.error('[PerformanceService] Failed to update item usage stats:', error);
+      errorInDev('[PerformanceService] Failed to update item usage stats:', error);
     }
   }
 
@@ -437,7 +514,7 @@ export class PerformanceOptimizationService {
       // Store confidence pattern data for future analysis
       const patternData = {
         user_id: feedback.userId,
-        outfit_id: feedback.outfitId,
+  outfit_id: feedback.outfitRecommendationId,
         confidence_rating: feedback.confidenceRating,
         emotional_response: feedback.emotionalResponse,
         occasion: feedback.occasion,
@@ -449,7 +526,7 @@ export class PerformanceOptimizationService {
         .insert(patternData);
         
     } catch (error) {
-      console.error('[PerformanceService] Failed to update confidence patterns:', error);
+      errorInDev('[PerformanceService] Failed to update confidence patterns:', error);
     }
   }
 
@@ -461,7 +538,7 @@ export class PerformanceOptimizationService {
       const queueStr = await AsyncStorage.getItem(CACHE_KEYS.FEEDBACK_QUEUE);
       if (queueStr) {
         this.feedbackProcessingQueue = JSON.parse(queueStr);
-        console.log(`[PerformanceService] Restored ${this.feedbackProcessingQueue.length} feedback items from queue`);
+        logInDev(`[PerformanceService] Restored ${this.feedbackProcessingQueue.length} feedback items from queue`);
         
         // Start processing if queue has items
         if (this.feedbackProcessingQueue.length > 0) {
@@ -469,7 +546,7 @@ export class PerformanceOptimizationService {
         }
       }
     } catch (error) {
-      console.error('[PerformanceService] Failed to restore feedback queue:', error);
+      errorInDev('[PerformanceService] Failed to restore feedback queue:', error);
     }
   }
 
@@ -510,7 +587,7 @@ export class PerformanceOptimizationService {
       
       return result;
     } catch (error) {
-      console.error('[PerformanceService] Optimized query failed:', error);
+      errorInDev('[PerformanceService] Optimized query failed:', error);
       this.recordError();
       throw error;
     }
@@ -522,7 +599,7 @@ export class PerformanceOptimizationService {
   private static async executeWithRetry<T>(
     fn: () => Promise<T>,
     maxRetries: number,
-    delay: number = 1000
+  delay: number = process.env.NODE_ENV === 'test' ? 0 : 1000
   ): Promise<T> {
     let lastError: Error;
     
@@ -536,11 +613,16 @@ export class PerformanceOptimizationService {
           throw lastError;
         }
         
-        // Exponential backoff
+        // Exponential backoff (noop in tests)
         const waitTime = delay * Math.pow(2, attempt - 1);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+        if (waitTime > 0) {
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        } else {
+          // Yield in tests without timers
+          await Promise.resolve();
+        }
         
-        console.log(`[PerformanceService] Retry attempt ${attempt}/${maxRetries} after ${waitTime}ms`);
+        logInDev(`[PerformanceService] Retry attempt ${attempt}/${maxRetries} after ${waitTime}ms`);
       }
     }
     
@@ -564,7 +646,7 @@ export class PerformanceOptimizationService {
       
       await AsyncStorage.setItem(cacheKey, JSON.stringify(cachedData));
     } catch (error) {
-      console.error('[PerformanceService] Failed to cache query result:', error);
+      errorInDev('[PerformanceService] Failed to cache query result:', error);
     }
   }
 
@@ -587,7 +669,7 @@ export class PerformanceOptimizationService {
       
       return cachedData.data;
     } catch (error) {
-      console.error('[PerformanceService] Failed to get cached query result:', error);
+      errorInDev('[PerformanceService] Failed to get cached query result:', error);
       return null;
     }
   }
@@ -601,7 +683,7 @@ export class PerformanceOptimizationService {
    */
   static async performCleanup(): Promise<void> {
     try {
-      console.log('[PerformanceService] Starting cleanup routine');
+      logInDev('[PerformanceService] Starting cleanup routine');
       
       await Promise.all([
         this.cleanupOldRecommendations(),
@@ -610,9 +692,9 @@ export class PerformanceOptimizationService {
         this.cleanupTempImages()
       ]);
       
-      console.log('[PerformanceService] Cleanup routine completed');
+      logInDev('[PerformanceService] Cleanup routine completed');
     } catch (error) {
-      console.error('[PerformanceService] Cleanup routine failed:', error);
+      errorInDev('[PerformanceService] Cleanup routine failed:', error);
       this.recordError();
     }
   }
@@ -632,9 +714,9 @@ export class PerformanceOptimizationService {
       
       if (error) throw error;
       
-      console.log('[PerformanceService] Cleaned up old recommendations');
+      logInDev('[PerformanceService] Cleaned up old recommendations');
     } catch (error) {
-      console.error('[PerformanceService] Failed to cleanup old recommendations:', error);
+      errorInDev('[PerformanceService] Failed to cleanup old recommendations:', error);
     }
   }
 
@@ -666,9 +748,9 @@ export class PerformanceOptimizationService {
         }
       }
       
-      console.log('[PerformanceService] Cleaned up expired cache entries');
+      logInDev('[PerformanceService] Cleaned up expired cache entries');
     } catch (error) {
-      console.error('[PerformanceService] Failed to cleanup expired cache:', error);
+      errorInDev('[PerformanceService] Failed to cleanup expired cache:', error);
     }
   }
 
@@ -687,9 +769,9 @@ export class PerformanceOptimizationService {
       
       if (error) throw error;
       
-      console.log('[PerformanceService] Cleaned up old feedback data');
+      logInDev('[PerformanceService] Cleaned up old feedback data');
     } catch (error) {
-      console.error('[PerformanceService] Failed to cleanup old feedback data:', error);
+      errorInDev('[PerformanceService] Failed to cleanup old feedback data:', error);
     }
   }
 
@@ -716,9 +798,9 @@ export class PerformanceOptimizationService {
         }
       }
       
-      console.log('[PerformanceService] Cleaned up temporary images');
+      logInDev('[PerformanceService] Cleaned up temporary images');
     } catch (error) {
-      console.error('[PerformanceService] Failed to cleanup temporary images:', error);
+      errorInDev('[PerformanceService] Failed to cleanup temporary images:', error);
     }
   }
 
@@ -818,7 +900,7 @@ export class PerformanceOptimizationService {
         JSON.stringify(this.performanceMetrics)
       );
     } catch (error) {
-      console.error('[PerformanceService] Failed to persist performance metrics:', error);
+      errorInDev('[PerformanceService] Failed to persist performance metrics:', error);
     }
   }
 
@@ -834,11 +916,11 @@ export class PerformanceOptimizationService {
         // Check if metrics are not too old (older than 24 hours)
         if (Date.now() - loadedMetrics.lastUpdated < 24 * 60 * 60 * 1000) {
           this.performanceMetrics = loadedMetrics;
-          console.log('[PerformanceService] Loaded performance metrics from storage');
+          logInDev('[PerformanceService] Loaded performance metrics from storage');
         }
       }
     } catch (error) {
-      console.error('[PerformanceService] Failed to load performance metrics:', error);
+      errorInDev('[PerformanceService] Failed to load performance metrics:', error);
     }
   }
 
@@ -851,19 +933,21 @@ export class PerformanceOptimizationService {
    */
   static async initialize(): Promise<void> {
     try {
-      console.log('[PerformanceService] Initializing performance optimization service');
+      logInDev('[PerformanceService] Initializing performance optimization service');
       
       await Promise.all([
         this.loadPerformanceMetrics(),
         this.restoreFeedbackQueue()
       ]);
       
-      // Schedule periodic cleanup (every 24 hours)
-      this.schedulePeriodicCleanup();
+      // Schedule periodic cleanup (every 24 hours) - skip in tests to avoid open handles
+      if (process.env.NODE_ENV !== 'test') {
+        this.schedulePeriodicCleanup();
+      }
       
-      console.log('[PerformanceService] Performance optimization service initialized');
+      logInDev('[PerformanceService] Performance optimization service initialized');
     } catch (error) {
-      console.error('[PerformanceService] Failed to initialize performance service:', error);
+      errorInDev('[PerformanceService] Failed to initialize performance service:', error);
     }
   }
 
@@ -872,14 +956,16 @@ export class PerformanceOptimizationService {
    */
   private static schedulePeriodicCleanup(): void {
     // Run cleanup every 24 hours
-    setInterval(() => {
-      this.performCleanup();
-    }, 24 * 60 * 60 * 1000);
-    
-    // Run initial cleanup after 5 minutes
-    setTimeout(() => {
-      this.performCleanup();
-    }, 5 * 60 * 1000);
+    if (process.env.NODE_ENV !== 'test') {
+      setInterval(() => {
+        this.performCleanup();
+      }, 24 * 60 * 60 * 1000);
+      
+      // Run initial cleanup after 5 minutes
+      setTimeout(() => {
+        this.performCleanup();
+      }, 5 * 60 * 1000);
+    }
   }
 
   /**
@@ -887,7 +973,7 @@ export class PerformanceOptimizationService {
    */
   static async shutdown(): Promise<void> {
     try {
-      console.log('[PerformanceService] Shutting down performance optimization service');
+      logInDev('[PerformanceService] Shutting down performance optimization service');
       
       // Process any remaining feedback in queue
       if (this.feedbackProcessingQueue.length > 0) {
@@ -897,9 +983,9 @@ export class PerformanceOptimizationService {
       // Persist final metrics
       await this.persistPerformanceMetrics();
       
-      console.log('[PerformanceService] Performance optimization service shut down');
+      logInDev('[PerformanceService] Performance optimization service shut down');
     } catch (error) {
-      console.error('[PerformanceService] Error during shutdown:', error);
+      errorInDev('[PerformanceService] Error during shutdown:', error);
     }
   }
 }

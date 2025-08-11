@@ -8,7 +8,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { LuxuryMaterials, LuxuryMotion, LuxurySpacing } from '@/theme/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import WaveOfLight from '@/components/luxury/WaveOfLight';
 
 interface ElegantLikeButtonProps {
@@ -30,22 +30,22 @@ export const ElegantLikeButton: React.FC<ElegantLikeButtonProps> = ({
     // Trigger heart animation
     heartScale.value = withSequence(
       withTiming(1.2, {
-        duration: LuxuryMotion.timing.instant,
+  duration: DesignSystem.motion.duration.quick,
         easing: Easing.out(Easing.cubic),
       }),
       withTiming(1, {
-        duration: LuxuryMotion.timing.quick,
+  duration: DesignSystem.motion.duration.smooth,
         easing: Easing.out(Easing.cubic),
       })
     );
 
     heartRotation.value = withSequence(
       withTiming(15, {
-        duration: LuxuryMotion.timing.instant,
+  duration: DesignSystem.motion.duration.quick,
         easing: Easing.out(Easing.cubic),
       }),
       withTiming(0, {
-        duration: LuxuryMotion.timing.quick,
+  duration: DesignSystem.motion.duration.smooth,
         easing: Easing.out(Easing.cubic),
       })
     );
@@ -80,7 +80,7 @@ export const ElegantLikeButton: React.FC<ElegantLikeButtonProps> = ({
           <Ionicons
             name={isLiked ? 'heart' : 'heart-outline'}
             size={size}
-            color={isLiked ? LuxuryMaterials.colors.liquidGold : LuxuryMaterials.colors.charcoal}
+            color={isLiked ? DesignSystem.colors.gold[500] : DesignSystem.colors.neutral.charcoal}
             style={styles.heartIcon}
           />
         </Animated.View>

@@ -8,6 +8,7 @@ import {
   WardrobeItem
 } from '@/types/aynaMirror';
 import { useAuth } from '@/hooks/useAuth';
+import { logInDev, errorInDev } from '../utils/consoleSuppress';
 
 export interface UseAINamingReturn {
   // State
@@ -50,23 +51,33 @@ export const useAINaming = (): UseAINamingReturn => {
     setError(null);
 
     try {
-      console.log('[useAINaming] Generating name for request:', request);
+      logInDev('[useAINaming] Generating name for request:', request);
       
       const response = await AINameingService.generateItemName({
         ...request,
-        userPreferences: {
-          userId: user.id,
-          ...request.userPreferences
-        }
+        userPreferences: request.userPreferences
+          ? ({
+              userId: request.userPreferences.userId || user.id,
+              namingStyle: request.userPreferences.namingStyle,
+              includeBrand: request.userPreferences.includeBrand,
+              includeColor: request.userPreferences.includeColor,
+              includeMaterial: request.userPreferences.includeMaterial,
+              includeStyle: request.userPreferences.includeStyle,
+              preferredLanguage: request.userPreferences.preferredLanguage,
+              autoAcceptAINames: request.userPreferences.autoAcceptAINames,
+              createdAt: request.userPreferences.createdAt,
+              updatedAt: request.userPreferences.updatedAt,
+            } as NamingPreferences)
+          : undefined,
       });
 
       setLastResponse(response);
-      console.log('[useAINaming] Generated name response:', response);
+      logInDev('[useAINaming] Generated name response:', response);
       
       return response;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate name';
-      console.error('[useAINaming] Error generating name:', err);
+      errorInDev('[useAINaming] Error generating name:', err);
       setError(errorMessage);
       return null;
     } finally {
@@ -86,11 +97,12 @@ export const useAINaming = (): UseAINamingReturn => {
     }
 
     const request: NamingRequest = {
+      itemId: item.id,
       imageUri: item.imageUri,
-      category: item.category,
+      category: item.category as any,
       colors: item.colors,
       brand: item.brand,
-      userPreferences: user ? { userId: user.id } : undefined
+      userPreferences: undefined
     };
 
     return generateName(request);
@@ -113,7 +125,7 @@ export const useAINaming = (): UseAINamingReturn => {
       const prefs = await AINameingService.getUserNamingPreferences(user.id);
       setPreferences(prefs);
     } catch (err) {
-      console.error('[useAINaming] Error loading preferences:', err);
+      errorInDev('[useAINaming] Error loading preferences:', err);
       setError('Failed to load naming preferences');
     }
   }, [user]);
@@ -131,7 +143,7 @@ export const useAINaming = (): UseAINamingReturn => {
       const updatedPrefs = await AINameingService.updateNamingPreferences(user.id, prefs);
       setPreferences(updatedPrefs);
     } catch (err) {
-      console.error('[useAINaming] Error updating preferences:', err);
+      errorInDev('[useAINaming] Error updating preferences:', err);
       setError('Failed to update naming preferences');
     }
   }, [user]);
@@ -143,7 +155,7 @@ export const useAINaming = (): UseAINamingReturn => {
     return AINameingService.getEffectiveItemName(
       item.name,
       item.aiGeneratedName,
-      item.category,
+      item.category as any,
       item.colors
     );
   }, []);
@@ -167,7 +179,7 @@ export const useAINaming = (): UseAINamingReturn => {
         lastResponse.analysisData
       );
     } catch (err) {
-      console.error('[useAINaming] Error saving naming choice:', err);
+      errorInDev('[useAINaming] Error saving naming choice:', err);
       setError('Failed to save naming choice');
     }
   }, [user, lastResponse]);
@@ -205,7 +217,7 @@ export const useQuickNaming = () => {
     try {
       const request: NamingRequest = {
         imageUri,
-        category,
+        category: category as any,
         colors,
         brand
       };
@@ -213,7 +225,7 @@ export const useQuickNaming = () => {
       const response = await AINameingService.generateItemName(request);
       return response.aiGeneratedName;
     } catch (error) {
-      console.error('[useQuickNaming] Error generating quick name:', error);
+      errorInDev('[useQuickNaming] Error generating quick name:', error);
       
       // Return fallback name
       if (colors && colors.length > 0 && category) {
@@ -243,7 +255,7 @@ export const useNamingPreferences = () => {
       const prefs = await AINameingService.getUserNamingPreferences(user.id);
       setPreferences(prefs);
     } catch (err) {
-      console.error('[useNamingPreferences] Error loading preferences:', err);
+      errorInDev('[useNamingPreferences] Error loading preferences:', err);
       setError('Failed to load preferences');
     } finally {
       setIsLoading(false);
@@ -260,7 +272,7 @@ export const useNamingPreferences = () => {
       const updatedPrefs = await AINameingService.updateNamingPreferences(user.id, prefs);
       setPreferences(updatedPrefs);
     } catch (err) {
-      console.error('[useNamingPreferences] Error updating preferences:', err);
+      errorInDev('[useNamingPreferences] Error updating preferences:', err);
       setError('Failed to update preferences');
     } finally {
       setIsLoading(false);

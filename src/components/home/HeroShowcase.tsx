@@ -5,7 +5,7 @@ import Animated, {
   useAnimatedStyle,
   interpolate,
 } from 'react-native-reanimated';
-import { APP_THEME_V2 } from '@/constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get('window');
@@ -42,7 +42,7 @@ const HeroShowcase = ({ scrollY }: { scrollY: Animated.SharedValue<number> }) =>
             <Text style={styles.heroSubtitle}>Rich textures and timeless silhouettes to define your style.</Text>
             <TouchableOpacity style={styles.ctaButton}>
                 <Text style={styles.ctaButtonText}>Discover The Collection</Text>
-                <Ionicons name="arrow-forward" size={16} color={APP_THEME_V2.semantic.text.primary} />
+                <Ionicons name="arrow-forward" size={16} color={DesignSystem.colors.text.primary} />
             </TouchableOpacity>
         </BlurView>
       </View>
@@ -75,14 +75,13 @@ const styles = StyleSheet.create({
     },
     blurContainer: {
         padding: 24,
-        borderRadius: APP_THEME_V2.radius.organic,
+        borderRadius: DesignSystem.borderRadius.lg,
         alignItems: 'center',
         overflow: 'hidden',
         width: width * 0.85,
     },
     heroTitle: {
-        ...APP_THEME_V2.typography.scale.h1,
-        fontFamily: APP_THEME_V2.typography.fonts.display,
+        ...DesignSystem.typography.heading.h1,
         color: '#FFFFFF',
         fontSize: 32,
         shadowColor: '#000',
@@ -90,10 +89,8 @@ const styles = StyleSheet.create({
         shadowRadius: 10,
     },
     heroSubtitle: {
-        ...APP_THEME_V2.typography.scale.body1,
-        fontFamily: APP_THEME_V2.typography.fonts.body,
-        color: 'rgba(255,255,255,0.8)',
-        fontSize: 16,
+        ...DesignSystem.typography.body.medium,
+         color: 'rgba(255,255,255,0.8)',
         textAlign: 'center',
         marginTop: 12,
         marginBottom: 24,
@@ -104,14 +101,13 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 12,
         paddingHorizontal: 24,
-        borderRadius: APP_THEME_V2.radius.organic,
-        ...APP_THEME_V2.elevation.whisper,
+        borderRadius: DesignSystem.borderRadius.lg,
+        ...DesignSystem.elevation.soft,
     },
     ctaButtonText: {
-        ...APP_THEME_V2.typography.scale.body1,
-        fontFamily: APP_THEME_V2.typography.fonts.body,
+        ...DesignSystem.typography.body.medium,
         fontWeight: '600',
-        color: APP_THEME_V2.semantic.text.primary,
+        color: DesignSystem.colors.text.primary,
         marginRight: 8,
     },
 });

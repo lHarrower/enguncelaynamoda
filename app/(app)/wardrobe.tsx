@@ -82,7 +82,7 @@ export default function WardrobeScreen() {
     } else {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       // Navigate to item details
-      router.push(`/item/${item.id}`);
+  router.push(`/item/${item.id}` as any);
     }
   };
 
@@ -90,7 +90,7 @@ export default function WardrobeScreen() {
   const filteredItems = wardrobeItems.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          item.brand.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
+  const matchesCategory = activeCategory === 'All' || (item as any).category === activeCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -240,9 +240,9 @@ export default function WardrobeScreen() {
   );
 
   const renderSearchBar = () => (
-    <View style={styles.searchContainer}>
+  <View style={styles.searchBarContainer}>
       <View style={styles.searchBar}>
-        <Ionicons name="search-outline" size={20} color={DesignSystem.colors.text.tertiary} style={styles.searchIcon} />
+  <Ionicons name="search-outline" size={20} color={DesignSystem.colors.text.tertiary} />
         <TextInput
           style={styles.searchInput}
           placeholder="Search your wardrobe..."
@@ -289,7 +289,7 @@ export default function WardrobeScreen() {
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + DesignSystem.spacing.massive }
+          { paddingBottom: insets.bottom + DesignSystem.spacing.xxxl }
         ]}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -350,7 +350,7 @@ export default function WardrobeScreen() {
         onPress={handleAddItem}
         activeOpacity={0.9}
       >
-        <Ionicons name="camera" size={24} color={DesignSystem.colors.white} />
+  <Ionicons name="camera" size={24} color={DesignSystem.colors.text.inverse} />
       </TouchableOpacity>
     </View>
   );
@@ -359,7 +359,7 @@ export default function WardrobeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.white,
+  backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollView: {
     flex: 1,
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: DesignSystem.colors.white,
+  backgroundColor: DesignSystem.colors.background.primary,
     borderBottomWidth: 1,
     borderBottomColor: DesignSystem.colors.sage[100],
   },
@@ -386,8 +386,8 @@ const styles = StyleSheet.create({
     paddingBottom: DesignSystem.spacing.md,
   },
   headerTitle: {
-    fontSize: DesignSystem.typography.h2.fontSize,
-    fontWeight: DesignSystem.typography.h2.fontWeight,
+  fontSize: DesignSystem.typography.scale.h2.fontSize,
+  fontWeight: DesignSystem.typography.scale.h2.fontWeight,
     color: DesignSystem.colors.sage[900],
   },
   headerButton: {
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
   itemCard: {
     width: '48%',
     marginBottom: DesignSystem.spacing.lg,
-    backgroundColor: DesignSystem.colors.white,
+    backgroundColor: DesignSystem.colors.background.primary,
     borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
     borderWidth: 1,
@@ -470,7 +470,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: DesignSystem.spacing.sm,
     right: DesignSystem.spacing.sm,
-    backgroundColor: DesignSystem.colors.white,
+    backgroundColor: DesignSystem.colors.background.primary,
     borderRadius: DesignSystem.radius.round,
     padding: DesignSystem.spacing.xs,
     zIndex: 1,
@@ -520,8 +520,8 @@ const styles = StyleSheet.create({
     borderColor: DesignSystem.colors.sage[200],
   },
   emptyTitle: {
-    fontSize: DesignSystem.typography.h2.fontSize,
-    fontWeight: DesignSystem.typography.h2.fontWeight,
+  fontSize: DesignSystem.typography.scale.h2.fontSize,
+  fontWeight: DesignSystem.typography.scale.h2.fontWeight,
     color: DesignSystem.colors.sage[900],
     marginBottom: DesignSystem.spacing.sm,
     textAlign: 'center',
@@ -541,9 +541,9 @@ const styles = StyleSheet.create({
     marginTop: DesignSystem.spacing.md,
   },
   addFirstButtonText: {
-    fontSize: DesignSystem.typography.button.fontSize,
-    fontWeight: DesignSystem.typography.button.fontWeight,
-    color: DesignSystem.colors.white,
+  fontSize: DesignSystem.typography.button.medium.fontSize,
+  fontWeight: DesignSystem.typography.button.medium.fontWeight,
+  color: DesignSystem.colors.text.inverse,
     textAlign: 'center',
   },
   categoryChip: {
@@ -564,7 +564,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   activeCategoryChipText: {
-    color: DesignSystem.colors.white,
+  color: DesignSystem.colors.text.inverse,
   },
   fab: {
     position: 'absolute',

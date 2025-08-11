@@ -11,7 +11,8 @@ import * as Haptics from 'expo-haptics';
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ConfidenceRatingStepProps {
-  rating: number;
+  rating?: number; // keep backward compat
+  currentRating?: number; // some tests use currentRating
   onRatingChange: (rating: number) => void;
 }
 
@@ -25,15 +26,17 @@ const CONFIDENCE_LABELS = [
 
 export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
   rating,
+  currentRating,
   onRatingChange,
 }) => {
+  const effectiveRating = typeof rating === 'number' ? rating : (currentRating || 0);
   const starAnimations = useRef(Array.from({ length: 5 }, () => new Animated.Value(1))).current;
   const pulseAnimation = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     // Animate stars when rating changes
     starAnimations.forEach((anim, index) => {
-      if (index < rating) {
+      if (index < effectiveRating) {
         Animated.spring(anim, {
           toValue: 1.2,
           useNativeDriver: true,
@@ -51,7 +54,7 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
     });
 
     // Pulse animation for selected rating
-    if (rating > 0) {
+    if (effectiveRating > 0) {
       Animated.sequence([
         Animated.timing(pulseAnimation, {
           toValue: 1.05,
@@ -65,22 +68,42 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
         }),
       ]).start();
     }
-  }, [rating]);
+  }, [effectiveRating]);
 
   const handleStarPress = (starRating: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onRatingChange(starRating);
   };
 
-  const selectedLabel = CONFIDENCE_LABELS.find(label => label.rating === rating);
+  const selectedLabel = CONFIDENCE_LABELS.find(label => label.rating === effectiveRating);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      accessible
+      accessibilityLabel="Confidence rating"
+      accessibilityRole="adjustable"
+      accessibilityValue={{ min: 0, max: 5, now: effectiveRating }}
+      accessibilityActions={[
+        { name: 'increment', label: 'Increase rating' },
+        { name: 'decrement', label: 'Decrease rating' },
+      ]}
+      onAccessibilityAction={(event: any) => {
+        switch (event.nativeEvent.actionName) {
+          case 'increment':
+            onRatingChange(Math.min(5, (effectiveRating || 0) + 1));
+            break;
+          case 'decrement':
+            onRatingChange(Math.max(0, (effectiveRating || 0) - 1));
+            break;
+        }
+      }}
+    >
       {/* Star Rating */}
       <View style={styles.starsContainer}>
         {Array.from({ length: 5 }, (_, index) => {
           const starNumber = index + 1;
-          const isSelected = starNumber <= rating;
+      const isSelected = starNumber <= effectiveRating;
           
           return (
             <TouchableOpacity
@@ -88,6 +111,9 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
               onPress={() => handleStarPress(starNumber)}
               style={styles.starButton}
               activeOpacity={0.7}
+      accessible
+      accessibilityRole="button"
+      accessibilityLabel={`${starNumber} out of 5 stars${isSelected ? ', selected' : ''}`}
             >
               <Animated.View
                 style={[
@@ -100,7 +126,7 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
                 <Ionicons
                   name={isSelected ? 'star' : 'star-outline'}
                   size={40}
-                  color={isSelected ? DesignSystem.colors.secondary[500] : DesignSystem.colors.neutral[400]}
+                  color={isSelected ? (DesignSystem.colors.sage?.[500] || DesignSystem.colors.neutral[700]) : DesignSystem.colors.neutral[400]}
                 />
               </Animated.View>
             </TouchableOpacity>
@@ -109,7 +135,7 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
       </View>
 
       {/* Rating Feedback */}
-      {rating > 0 && selectedLabel && (
+  {effectiveRating > 0 && selectedLabel && (
         <Animated.View
           style={[
             styles.feedbackContainer,
@@ -125,10 +151,10 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
       )}
 
       {/* Confidence Affirmations */}
-      {rating >= 4 && (
+  {effectiveRating >= 4 && (
         <View style={styles.affirmationContainer}>
           <Text style={styles.affirmationText}>
-            {rating === 5 
+    {effectiveRating === 5 
               ? "You're absolutely radiant! ✨" 
               : "You're looking fantastic! 💫"
             }
@@ -137,7 +163,7 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
       )}
 
       {/* Encouragement for lower ratings */}
-      {rating > 0 && rating <= 2 && (
+  {effectiveRating > 0 && effectiveRating <= 2 && (
         <View style={styles.encouragementContainer}>
           <Text style={styles.encouragementText}>
             Every outfit is a learning experience. Your style journey continues! 🌱
@@ -146,7 +172,7 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
       )}
 
       {/* Instructions */}
-      {rating === 0 && (
+  {effectiveRating === 0 && (
         <View style={styles.instructionsContainer}>
           <Text style={styles.instructionsText}>
             Tap the stars to rate how confident you felt in this outfit
@@ -190,13 +216,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   ratingLabel: {
-    ...DesignSystem.typography.scale.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.neutral[900],
     marginBottom: 4,
     textAlign: 'center',
   },
   ratingDescription: {
-    ...DesignSystem.typography.scale.body2,
+    ...DesignSystem.typography.body2,
     color: DesignSystem.colors.neutral[600],
     textAlign: 'center',
     fontStyle: 'italic',
@@ -209,7 +235,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   affirmationText: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body1,
     color: DesignSystem.colors.primary[500],
     textAlign: 'center',
     fontWeight: '600',
@@ -222,7 +248,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   encouragementText: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body2,
     color: DesignSystem.colors.neutral[600],
     textAlign: 'center',
     fontStyle: 'italic',
@@ -231,7 +257,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   instructionsText: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body2,
     color: DesignSystem.colors.neutral[400],
     textAlign: 'center',
     fontStyle: 'italic',

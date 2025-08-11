@@ -2,6 +2,8 @@
 // Centralized export for all AYNA Mirror related types
 
 export * from '@/types/aynaMirror';
+export * from '@/types/wardrobe';
+export * from '@/types/user';
 
 // Re-export commonly used types for convenience
 export type {

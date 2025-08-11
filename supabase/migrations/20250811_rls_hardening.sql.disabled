@@ -1,0 +1,39 @@
+-- Ensure RLS is enabled on efficiency-related tables and missing policies are added idempotently
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='efficiency_scores') THEN
+    EXECUTE 'ALTER TABLE efficiency_scores ENABLE ROW LEVEL SECURITY';
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='efficiency_scores' AND policyname='Users can view own efficiency scores') THEN
+      EXECUTE 'CREATE POLICY "Users can view own efficiency scores" ON efficiency_scores FOR SELECT USING (auth.uid() = user_id)';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='efficiency_scores' AND policyname='Users can insert own efficiency scores') THEN
+      EXECUTE 'CREATE POLICY "Users can insert own efficiency scores" ON efficiency_scores FOR INSERT WITH CHECK (auth.uid() = user_id)';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='efficiency_scores' AND policyname='Users can update own efficiency scores') THEN
+      EXECUTE 'CREATE POLICY "Users can update own efficiency scores" ON efficiency_scores FOR UPDATE USING (auth.uid() = user_id)';
+    END IF;
+  END IF;
+
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='efficiency_goals') THEN
+    EXECUTE 'ALTER TABLE efficiency_goals ENABLE ROW LEVEL SECURITY';
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='efficiency_goals' AND policyname='Users can view own efficiency goals') THEN
+      EXECUTE 'CREATE POLICY "Users can view own efficiency goals" ON efficiency_goals FOR SELECT USING (auth.uid() = user_id)';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='efficiency_goals' AND policyname='Users can insert own efficiency goals') THEN
+      EXECUTE 'CREATE POLICY "Users can insert own efficiency goals" ON efficiency_goals FOR INSERT WITH CHECK (auth.uid() = user_id)';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='efficiency_goals' AND policyname='Users can update own efficiency goals') THEN
+      EXECUTE 'CREATE POLICY "Users can update own efficiency goals" ON efficiency_goals FOR UPDATE USING (auth.uid() = user_id)';
+    END IF;
+  END IF;
+
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='efficiency_metrics_cache') THEN
+    EXECUTE 'ALTER TABLE efficiency_metrics_cache ENABLE ROW LEVEL SECURITY';
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='efficiency_metrics_cache' AND policyname='Users can view own efficiency cache') THEN
+      EXECUTE 'CREATE POLICY "Users can view own efficiency cache" ON efficiency_metrics_cache FOR SELECT USING (auth.uid() = user_id)';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='efficiency_metrics_cache' AND policyname='Users can upsert own efficiency cache') THEN
+      EXECUTE 'CREATE POLICY "Users can upsert own efficiency cache" ON efficiency_metrics_cache FOR INSERT WITH CHECK (auth.uid() = user_id)';
+      EXECUTE 'CREATE POLICY "Users can update own efficiency cache" ON efficiency_metrics_cache FOR UPDATE USING (auth.uid() = user_id)';
+    END IF;
+  END IF;
+END $$;

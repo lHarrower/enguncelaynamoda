@@ -24,22 +24,19 @@ export const QuickActionsSection: React.FC<QuickActionsSectionProps> = ({
       </Text>
       <View style={styles.quickActions}>
         <QuickActionButton
-          icon="checkmark-circle"
-          label="Wear Today"
+          action={{ type: 'wear', label: 'Wear This', icon: 'checkmark-circle' } as any}
           onPress={() => onQuickAction('wear', selectedRecommendation)}
           variant="primary"
         />
         <QuickActionButton
-          icon="heart"
-          label="Save"
+          action={{ type: 'save', label: 'Save for Later', icon: 'bookmark' } as any}
           onPress={() => onQuickAction('save', selectedRecommendation)}
           variant="secondary"
         />
         <QuickActionButton
-          icon="share"
-          label="Share"
+          action={{ type: 'share', label: 'Share', icon: 'share' } as any}
           onPress={() => onQuickAction('share', selectedRecommendation)}
-          variant="tertiary"
+          variant="accent"
         />
       </View>
     </View>
@@ -51,7 +48,7 @@ const styles = StyleSheet.create({
     marginTop: DesignSystem.spacing.xl,
   },
   quickActionsTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.inkGray[700],
     marginBottom: DesignSystem.spacing.lg,
     textAlign: 'center',

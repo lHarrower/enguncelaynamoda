@@ -7,8 +7,8 @@
 
 // Export shared components
 export { default as SwipeableCard } from './SwipeableCard';
-export { default as DiscoverStats } from './DiscoverStats';
-export { SwipeStack, type OutfitCard } from './SwipeStack';
+export { default as DiscoverStats } from '../vision/shared/DiscoverStats';
+export { default as SwipeStack } from './SwipeStack';
 
 // Export standardized components
 export { default as StandardButton, type StandardButtonProps } from './StandardButton';

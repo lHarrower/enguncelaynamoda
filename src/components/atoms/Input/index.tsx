@@ -8,16 +8,16 @@
 import React, { useState } from 'react';
 import { TextInput, View, Text, StyleSheet, TextInputProps } from 'react-native';
 import { InputComponentProps } from '@/types/componentProps';
-import { UNIFIED_COLORS, TYPOGRAPHY, SPACING } from '@/theme';
+import { DesignSystem } from '@/theme/DesignSystem';
 
-export interface InputProps extends InputComponentProps, Omit<TextInputProps, 'style'> {
+export interface InputProps extends Omit<InputComponentProps, 'leftIcon' | 'rightIcon' | 'variant'>, Omit<TextInputProps, 'style'> {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
   label?: string;
   error?: string;
   hint?: string;
-  variant?: 'default' | 'outlined' | 'filled' | 'luxury';
+  variant?: 'default' | 'glass' | 'luxury' | 'minimal';
   size?: 'small' | 'medium' | 'large';
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -59,7 +59,7 @@ const Input: React.FC<InputProps> = ({
 
   const inputContainerStyle = [
     styles.inputContainer,
-    styles[variant],
+  styles[variant],
     styles[size],
     isFocused && styles.focused,
     error && styles.error,
@@ -105,7 +105,7 @@ const Input: React.FC<InputProps> = ({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={UNIFIED_COLORS.neutral[400]}
+          placeholderTextColor={DesignSystem.colors.neutral.slate}
           multiline={multiline}
           secureTextEntry={secureTextEntry}
           editable={!disabled}
@@ -140,107 +140,111 @@ const Input: React.FC<InputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: SPACING.margin.small,
+    marginBottom: DesignSystem.spacing.sm,
   },
   
   label: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    fontFamily: TYPOGRAPHY.fontFamily.primary,
-    fontWeight: TYPOGRAPHY.fontWeight.medium,
-    color: UNIFIED_COLORS.neutral[700],
-    marginBottom: SPACING.margin.xs,
+    fontSize: 14,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    fontWeight: '500',
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.xs,
   },
   
   requiredLabel: {
-    // Additional styling for required fields if needed
+    // Additional styles for required labels can be added here
   },
   
   asterisk: {
-    color: UNIFIED_COLORS.semantic.error,
+    color: DesignSystem.colors.semantic.error,
   },
   
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: SPACING.radius.medium,
+    borderRadius: DesignSystem.borderRadius.md,
     borderWidth: 1,
-    backgroundColor: UNIFIED_COLORS.neutral[50],
+    backgroundColor: DesignSystem.colors.background.secondary,
   },
   
   // Variants
   default: {
-    borderColor: UNIFIED_COLORS.neutral[300],
-    backgroundColor: UNIFIED_COLORS.neutral[50],
+    borderColor: DesignSystem.colors.border.primary,
+    backgroundColor: DesignSystem.colors.background.secondary,
   },
-  
-  outlined: {
-    borderColor: UNIFIED_COLORS.neutral[300],
+  glass: {
+    borderColor: DesignSystem.colors.border.glass,
+    backgroundColor: 'transparent',
+  },
+  minimal: {
+    borderColor: 'transparent',
     backgroundColor: 'transparent',
   },
   
-  filled: {
-    borderColor: 'transparent',
-    backgroundColor: UNIFIED_COLORS.neutral[100],
+  outlined: {
+    borderColor: DesignSystem.colors.border.primary,
+    backgroundColor: 'transparent',
   },
   
+  
   luxury: {
-    borderColor: UNIFIED_COLORS.luxury.gold,
-    backgroundColor: UNIFIED_COLORS.luxury.cream,
+  borderColor: DesignSystem.colors.gold[500],
+  backgroundColor: DesignSystem.colors.gold[100],
   },
   
   // Sizes
   small: {
-    paddingHorizontal: SPACING.padding.small,
-    paddingVertical: SPACING.padding.xs,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
     minHeight: 36,
   },
   
   medium: {
-    paddingHorizontal: SPACING.padding.medium,
-    paddingVertical: SPACING.padding.small,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
     minHeight: 44,
   },
   
   large: {
-    paddingHorizontal: SPACING.padding.large,
-    paddingVertical: SPACING.padding.medium,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
     minHeight: 52,
   },
   
   // States
   focused: {
-    borderColor: UNIFIED_COLORS.primary[500],
+    borderColor: DesignSystem.colors.primary[500],
     borderWidth: 2,
   },
   
   error: {
-    borderColor: UNIFIED_COLORS.semantic.error,
+    borderColor: DesignSystem.colors.semantic.error,
     borderWidth: 2,
   },
   
   disabled: {
     opacity: 0.5,
-    backgroundColor: UNIFIED_COLORS.neutral[100],
+  backgroundColor: DesignSystem.colors.neutral[100],
   },
   
   input: {
     flex: 1,
-    fontFamily: TYPOGRAPHY.fontFamily.primary,
-    fontSize: TYPOGRAPHY.fontSize.base,
-    color: UNIFIED_COLORS.neutral[900],
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    fontSize: 16,
+    color: DesignSystem.colors.text.primary,
     padding: 0, // Remove default padding
   },
   
   smallInput: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontSize: 14,
   },
   
   mediumInput: {
-    fontSize: TYPOGRAPHY.fontSize.base,
+    fontSize: 16,
   },
   
   largeInput: {
-    fontSize: TYPOGRAPHY.fontSize.lg,
+    fontSize: 18,
   },
   
   multiline: {
@@ -249,23 +253,22 @@ const styles = StyleSheet.create({
   },
   
   iconContainer: {
-    marginHorizontal: SPACING.margin.xs,
+    marginHorizontal: DesignSystem.spacing.xs,
   },
   
   errorText: {
-    fontSize: TYPOGRAPHY.fontSize.xs,
-    fontFamily: TYPOGRAPHY.fontFamily.primary,
-    color: UNIFIED_COLORS.semantic.error,
-    marginTop: SPACING.margin.xs,
+    fontSize: 12,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    color: DesignSystem.colors.semantic.error,
+    marginTop: DesignSystem.spacing.xs,
   },
   
   hint: {
-    fontSize: TYPOGRAPHY.fontSize.xs,
-    fontFamily: TYPOGRAPHY.fontFamily.primary,
-    color: UNIFIED_COLORS.neutral[500],
-    marginTop: SPACING.margin.xs,
+    fontSize: 12,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    color: DesignSystem.colors.text.secondary,
+    marginTop: DesignSystem.spacing.xs,
   },
 });
 
 export default Input;
-export type { InputProps };

@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.xs,
   },
   tabLabel: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     fontSize: 10,
     textAlign: 'center',
   },

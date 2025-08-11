@@ -4,7 +4,7 @@
  */
 
 // Mock external dependencies first
-jest.mock('../../config/supabaseClient', () => ({
+jest.mock('@/config/supabaseClient', () => ({
   supabase: {
     from: jest.fn(),
     auth: {
@@ -12,14 +12,14 @@ jest.mock('../../config/supabaseClient', () => ({
     }
   }
 }));
-jest.mock('../../services/weatherService');
+jest.mock('@/services/weatherService');
 
-import { aynaMirrorService } from '../../services/aynaMirrorService';
-import { intelligenceService } from '../../services/intelligenceService';
-import { enhancedWardrobeService } from '../../services/enhancedWardrobeService';
-import { weatherService } from '../../services/weatherService';
-import { notificationService } from '../../services/notificationService';
-import { supabase } from '../../config/supabaseClient';
+import { aynaMirrorService } from '@/services/aynaMirrorService';
+import { intelligenceService } from '@/services/intelligenceService';
+import { enhancedWardrobeService } from '@/services/enhancedWardrobeService';
+import { weatherService } from '@/services/weatherService';
+import notificationService from '@/services/notificationService';
+import { supabase } from '@/config/supabaseClient';
 
 describe('Performance Benchmarks - AYNA Mirror System', () => {
   const mockUserId = 'performance-test-user';
@@ -60,7 +60,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
       };
 
       // Mock service responses with realistic delays
-      (weatherService.getCurrentWeather as jest.Mock).mockImplementation(
+  jest.spyOn(weatherService as any, 'getCurrentWeatherContext').mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve(mockWeatherContext), 50))
       );
 
@@ -95,7 +95,8 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
 
     it('should process user feedback in under 500ms', async () => {
       const mockFeedback = {
-        outfitId: 'outfit-perf-test',
+        id: 'feedback-perf',
+        outfitRecommendationId: 'outfit-perf-test',
         userId: mockUserId,
         confidenceRating: 4,
         emotionalResponse: {
@@ -105,9 +106,11 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
         },
         socialFeedback: {
           complimentsReceived: 2,
-          positiveReactions: 5
+          positiveReactions: ['like', 'heart'],
+          socialContext: 'friends'
         },
-        comfort: 4,
+        occasion: 'casual',
+        comfort: { physical: 4, emotional: 4, confidence: 4 },
         timestamp: mockDate
       };
 
@@ -176,7 +179,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
         })
       });
 
-      (weatherService.getCurrentWeather as jest.Mock).mockResolvedValue({
+  (weatherService.getCurrentWeather as jest.Mock).mockResolvedValue({
         temperature: 20,
         condition: 'cloudy' as const,
         humidity: 60,
@@ -203,7 +206,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
         outfitId: `outfit-${i}`,
         confidenceRating: 2 + Math.random() * 3,
         emotionalResponse: {
-          primary: ['confident', 'comfortable', 'stylish'][i % 3] as const,
+          primary: ['confident', 'comfortable', 'stylish'][i % 3],
           intensity: 5 + Math.random() * 5
         },
         timestamp: new Date(Date.now() - i * 24 * 60 * 60 * 1000)
@@ -302,7 +305,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
         aynaMirrorService.generateDailyRecommendations(userId)
       );
       
-      const results = await Promise.all(promises);
+  const results = await Promise.all(promises);
       const endTime = performance.now();
       const duration = endTime - startTime;
 
@@ -338,7 +341,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
         })
       });
 
-      (weatherService.getCurrentWeather as jest.Mock).mockResolvedValue({
+  (weatherService.getCurrentWeather as jest.Mock).mockResolvedValue({
         temperature: 18,
         condition: 'cloudy' as const,
         humidity: 65,
@@ -350,13 +353,14 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
 
       // Execute mixed operations concurrently
       const operations = await Promise.all([
-        aynaMirrorService.generateDailyRecommendations('user-1'),
+  aynaMirrorService.generateDailyRecommendations('user-1'),
         aynaMirrorService.processUserFeedback({
-          outfitId: 'outfit-1',
+          id: 'fb-1',
+          outfitRecommendationId: 'outfit-1',
           userId: 'user-2',
           confidenceRating: 4,
           emotionalResponse: { primary: 'confident', intensity: 8, additionalEmotions: [] },
-          comfort: 4,
+          comfort: { physical: 4, emotional: 4, confidence: 4 },
           timestamp: mockDate
         }),
         intelligenceService.analyzeUserStyleProfile('user-3'),
@@ -395,7 +399,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
         })
       });
 
-      (weatherService.getCurrentWeather as jest.Mock).mockResolvedValue({
+  (weatherService.getCurrentWeather as jest.Mock).mockResolvedValue({
         temperature: 22,
         condition: 'sunny' as const,
         humidity: 40,
@@ -408,7 +412,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
 
       // Perform repeated operations
       for (let i = 0; i < 50; i++) {
-        await aynaMirrorService.generateDailyRecommendations(`memory-test-user-${i}`);
+  await aynaMirrorService.generateDailyRecommendations(`memory-test-user-${i}`);
       }
 
       // Measure final memory usage
@@ -422,7 +426,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
 
     it('should handle timeout scenarios gracefully', async () => {
       // Mock slow external service
-      (weatherService.getCurrentWeather as jest.Mock).mockImplementation(
+  (weatherService.getCurrentWeather as jest.Mock).mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve({
           temperature: 20,
           condition: 'cloudy' as const,

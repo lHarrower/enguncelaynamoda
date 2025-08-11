@@ -1,14 +1,13 @@
 // Gesture Animations - Touch-based interactive animations
 import React, { useRef, useCallback } from 'react';
+import { Dimensions, ViewStyle, Animated } from 'react-native';
 import {
-  Animated,
   PanGestureHandler,
   TapGestureHandler,
   PinchGestureHandler,
   State,
   GestureHandlerRootView
 } from 'react-native-gesture-handler';
-import { Dimensions, ViewStyle } from 'react-native';
 import { useSpringAnimation, useFadeAnimation } from '@/hooks/useAnimation';
 import { AnimationSystem, SPRING, TIMING } from '@/theme/foundations/Animation';
 
@@ -399,7 +398,7 @@ export const Tappable: React.FC<TappableProps> = ({
   const scale = useRef(new Animated.Value(1)).current;
   const { isReducedMotionEnabled } = useFadeAnimation();
   
-  const doubleTapRef = useRef<any>();
+  const doubleTapRef = useRef<any>(null);
   
   const animatePress = useCallback(
     (toValue: number) => {
@@ -546,7 +545,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
           }),
           Animated.timing(refreshOpacity, {
             toValue: 1,
-            duration: TIMING.fast,
+            duration: TIMING.quick,
             useNativeDriver: true
           })
         ]).start();
@@ -563,7 +562,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
             }),
             Animated.timing(refreshOpacity, {
               toValue: 0,
-              duration: TIMING.fast,
+              duration: TIMING.quick,
               useNativeDriver: true
             })
           ]).start(() => {

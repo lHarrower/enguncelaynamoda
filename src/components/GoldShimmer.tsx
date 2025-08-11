@@ -10,7 +10,8 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '@/context/ThemeContext';
+import { useSafeTheme } from '@/hooks/useSafeTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface GoldShimmerProps {
   width: number;
@@ -25,7 +26,8 @@ export default function GoldShimmer({
   intensity = 'subtle',
   delay = 0 
 }: GoldShimmerProps) {
-  const { colors } = useTheme();
+  const theme = useSafeTheme();
+  const { colors } = theme;
   const shimmerPosition = useSharedValue(0);
 
   useEffect(() => {
@@ -75,14 +77,14 @@ export default function GoldShimmer({
           colors={[
             'transparent',
             'transparent',
-            `${colors.primary}${Math.round(baseOpacity * 0.3 * 255).toString(16).padStart(2, '0')}`,
-            `${colors.primary}${Math.round(baseOpacity * 0.7 * 255).toString(16).padStart(2, '0')}`,
-            colors.accent + Math.round(baseOpacity * 255).toString(16).padStart(2, '0'),
-            `${colors.primary}${Math.round(baseOpacity * 0.7 * 255).toString(16).padStart(2, '0')}`,
-            `${colors.primary}${Math.round(baseOpacity * 0.3 * 255).toString(16).padStart(2, '0')}`,
+            `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.3 * 255).toString(16).padStart(2, '0')}`,
+            `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.7 * 255).toString(16).padStart(2, '0')}`,
+            `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.5 * 255).toString(16).padStart(2, '0')}`,
+            `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.7 * 255).toString(16).padStart(2, '0')}`,
+            `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.3 * 255).toString(16).padStart(2, '0')}`,
             'transparent',
             'transparent',
-          ]}
+          ] as const}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.gradient}

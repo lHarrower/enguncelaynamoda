@@ -147,12 +147,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   colorName: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.sage[500],
     marginBottom: 12,
   },
   description: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     marginBottom: 20,
   },
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   mood: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.gold[500],
   },
   stylingContainer: {
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   stylingTip: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.secondary,
     marginBottom: 4,
   },

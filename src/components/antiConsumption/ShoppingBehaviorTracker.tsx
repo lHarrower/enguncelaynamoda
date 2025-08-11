@@ -8,9 +8,10 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/theme/ThemeProvider';
+import { useSafeTheme } from '@/hooks/useSafeTheme';
 import { antiConsumptionService, ShoppingBehaviorData } from '@/services/antiConsumptionService';
 import { DesignSystem } from '@/theme/DesignSystem';
+import { errorInDev } from '../../utils/consoleSuppress';
 
 interface ShoppingBehaviorTrackerProps {
   userId: string;
@@ -21,7 +22,8 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
   userId,
   onBehaviorTracked,
 }) => {
-  const { colors } = useTheme();
+  const theme = useSafeTheme();
+  const { colors } = theme;
   const styles = createStyles(colors);
   const [behaviorData, setBehaviorData] = useState<ShoppingBehaviorData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,7 +42,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
       onBehaviorTracked?.(data);
     } catch (err) {
       setError('Failed to load shopping behavior data');
-      console.error('Error loading shopping behavior data:', err);
+      errorInDev('Error loading shopping behavior data:', err);
     } finally {
       setLoading(false);
     }
@@ -179,7 +181,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
           
           <View style={styles.comparisonArrow}>
             <Ionicons 
-              name={reductionIcon} 
+              name={reductionIcon as keyof typeof Ionicons.glyphMap}
               size={24} 
               color={reductionColor} 
             />

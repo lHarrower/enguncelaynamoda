@@ -24,8 +24,8 @@ export const BUTTON_VARIANTS = {
     } as ViewStyle,
     
     text: {
-      ...TYPOGRAPHY.scale.button,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.button.medium,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.inverse,
       textAlign: 'center',
     } as TextStyle,
@@ -58,8 +58,8 @@ export const BUTTON_VARIANTS = {
     } as ViewStyle,
     
     text: {
-      ...TYPOGRAPHY.scale.button,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.button.medium,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.primary,
       textAlign: 'center',
     } as TextStyle,
@@ -96,8 +96,8 @@ export const BUTTON_VARIANTS = {
     } as ViewStyle,
     
     text: {
-      ...TYPOGRAPHY.scale.button,
-      fontFamily: TYPOGRAPHY.fonts.accent,
+      ...TYPOGRAPHY.button.medium,
+      fontFamily: TYPOGRAPHY.fontFamily.accent,
       color: UNIFIED_COLORS.text.primary,
       textAlign: 'center',
       fontWeight: '600',
@@ -130,8 +130,8 @@ export const BUTTON_VARIANTS = {
     } as ViewStyle,
     
     text: {
-      ...TYPOGRAPHY.scale.body1,
-      fontFamily: TYPOGRAPHY.fonts.body,
+      ...TYPOGRAPHY.body.medium,
+      fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.primary,
       textAlign: 'center',
       fontWeight: '500',
@@ -158,7 +158,7 @@ export const BUTTON_VARIANTS = {
     } as ViewStyle,
     
     text: {
-      ...TYPOGRAPHY.scale.body2,
+      ...TYPOGRAPHY.body.small,
       fontWeight: '600',
     } as TextStyle
   },

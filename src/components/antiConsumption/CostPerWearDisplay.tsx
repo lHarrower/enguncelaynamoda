@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/theme/ThemeProvider';
+import { useSafeTheme } from '@/hooks/useSafeTheme';
 import { antiConsumptionService, CostPerWearData } from '@/services/antiConsumptionService';
 import { DesignSystem } from '@/theme/DesignSystem';
+import { errorInDev } from '../../utils/consoleSuppress';
 
 interface CostPerWearDisplayProps {
   itemId: string;
@@ -23,7 +24,8 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
   showProjected = true,
   onPress,
 }) => {
-  const { colors } = useTheme();
+  const theme = useSafeTheme();
+  const { colors } = theme;
   const styles = createStyles(colors);
   const [costData, setCostData] = useState<CostPerWearData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +43,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
       setCostData(data);
     } catch (err) {
       setError('Failed to load cost data');
-      console.error('Error loading cost per wear data:', err);
+      errorInDev('Error loading cost per wear data:', err);
     } finally {
       setLoading(false);
     }
@@ -229,7 +231,7 @@ const createStyles = (colors: any) => StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: `${colors.primary[500]}20`,
+    backgroundColor: `${DesignSystem.colors.primary[500]}20`,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -305,7 +307,7 @@ const createStyles = (colors: any) => StyleSheet.create({
     marginTop: 8,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: colors.border.primary,
+    borderTopColor: DesignSystem.colors.neutral[200],
   },
   actionHintText: {
     fontSize: 12,

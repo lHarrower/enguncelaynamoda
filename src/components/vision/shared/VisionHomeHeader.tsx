@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import { getColor, getSpacing, getTypography } from '@/constants/AynaModaVisionTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface VisionHomeHeaderProps {
   userName?: string;
@@ -23,10 +23,10 @@ const VisionHomeHeader: React.FC<VisionHomeHeaderProps> = ({
   return (
     <View style={styles.header}>
       <View>
-        <Text style={[getTypography('caption', 'medium'), styles.greetingLabel]}>
+        <Text style={[DesignSystem.typography.scale.caption, styles.greetingLabel]}>
           {getGreeting()}
         </Text>
-        <Text style={[getTypography('h2', 'bold'), styles.welcomeTitle]}>
+        <Text style={[DesignSystem.typography.heading.h2, styles.welcomeTitle]}>
           {userName}
         </Text>
       </View>
@@ -40,7 +40,7 @@ const VisionHomeHeader: React.FC<VisionHomeHeaderProps> = ({
           <Ionicons 
             name="person-circle-outline" 
             size={28} 
-            color={getColor('neutral', 'charcoal')} 
+            color={DesignSystem.colors.neutral.charcoal} 
           />
         </BlurView>
       </TouchableOpacity>
@@ -53,23 +53,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    paddingHorizontal: getSpacing('lg'),
-    paddingTop: getSpacing('xxxl'),
-    paddingBottom: getSpacing('xl'),
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.sanctuary,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   greetingLabel: {
-    color: getColor('neutral', 'slate'),
-    marginBottom: getSpacing('xs'),
+    color: DesignSystem.colors.neutral.slate,
+    marginBottom: DesignSystem.spacing.xs,
   },
   welcomeTitle: {
-    color: getColor('neutral', 'charcoal'),
+    color: DesignSystem.colors.neutral.charcoal,
   },
   profileButton: {
     borderRadius: 20,
     overflow: 'hidden',
   },
   profileBlur: {
-    padding: getSpacing('sm'),
+    padding: DesignSystem.spacing.sm,
   },
 });
 

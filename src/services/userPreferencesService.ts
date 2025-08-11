@@ -10,6 +10,7 @@ import {
   ConfidenceNoteStyle,
   UserPreferencesRecord
 } from '@/types/aynaMirror';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 /**
  * UserPreferencesService - Manages user settings and preferences for AYNA Mirror
@@ -32,7 +33,7 @@ export class UserPreferencesService {
    */
   static async getUserPreferences(userId: string): Promise<UserPreferences> {
     try {
-      console.log('[UserPreferencesService] Getting preferences for user:', userId);
+      logInDev('[UserPreferencesService] Getting preferences for user:', userId);
 
       const { data, error } = await supabase
         .from('user_preferences')
@@ -46,7 +47,7 @@ export class UserPreferencesService {
 
       if (!data) {
         // Create default preferences for new user
-        console.log('[UserPreferencesService] Creating default preferences for new user');
+        logInDev('[UserPreferencesService] Creating default preferences for new user');
         return await this.createDefaultPreferences(userId);
       }
 
@@ -54,7 +55,7 @@ export class UserPreferencesService {
       return this.convertRecordToPreferences(data);
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to get user preferences:', error);
+      errorInDev('[UserPreferencesService] Failed to get user preferences:', error);
       // Return default preferences on error
       return this.getDefaultPreferences(userId);
     }
@@ -68,7 +69,7 @@ export class UserPreferencesService {
     updates: Partial<UserPreferences>
   ): Promise<UserPreferences> {
     try {
-      console.log('[UserPreferencesService] Updating preferences for user:', userId);
+      logInDev('[UserPreferencesService] Updating preferences for user:', userId);
 
       // Get current preferences
       const currentPreferences = await this.getUserPreferences(userId);
@@ -93,11 +94,11 @@ export class UserPreferencesService {
 
       if (error) throw error;
 
-      console.log('[UserPreferencesService] Successfully updated preferences');
+      logInDev('[UserPreferencesService] Successfully updated preferences');
       return this.convertRecordToPreferences(data);
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to update preferences:', error);
+      errorInDev('[UserPreferencesService] Failed to update preferences:', error);
       throw error;
     }
   }
@@ -114,7 +115,7 @@ export class UserPreferencesService {
     notificationPrefs: Partial<NotificationPreferences>
   ): Promise<void> {
     try {
-      console.log('[UserPreferencesService] Updating notification preferences');
+      logInDev('[UserPreferencesService] Updating notification preferences');
 
       const currentPreferences = await this.getUserPreferences(userId);
       
@@ -140,7 +141,7 @@ export class UserPreferencesService {
       await this.updateUserPreferences(userId, updates);
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to update notification preferences:', error);
+      errorInDev('[UserPreferencesService] Failed to update notification preferences:', error);
       throw error;
     }
   }
@@ -161,7 +162,7 @@ export class UserPreferencesService {
       };
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to get notification preferences:', error);
+      errorInDev('[UserPreferencesService] Failed to get notification preferences:', error);
       // Return default notification preferences
       return {
         preferredTime: new Date('2024-01-01T06:00:00'),
@@ -185,7 +186,7 @@ export class UserPreferencesService {
     privacySettings: Partial<PrivacySettings>
   ): Promise<void> {
     try {
-      console.log('[UserPreferencesService] Updating privacy settings');
+      logInDev('[UserPreferencesService] Updating privacy settings');
 
       const updates: Partial<UserPreferences> = {
         privacySettings: {
@@ -197,7 +198,7 @@ export class UserPreferencesService {
       await this.updateUserPreferences(userId, updates);
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to update privacy settings:', error);
+      errorInDev('[UserPreferencesService] Failed to update privacy settings:', error);
       throw error;
     }
   }
@@ -211,7 +212,7 @@ export class UserPreferencesService {
       return preferences.privacySettings;
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to get privacy settings:', error);
+      errorInDev('[UserPreferencesService] Failed to get privacy settings:', error);
       // Return default privacy settings
       return {
         shareUsageData: false,
@@ -231,7 +232,7 @@ export class UserPreferencesService {
    */
   static async detectAndUpdateTimezone(userId: string): Promise<string> {
     try {
-      console.log('[UserPreferencesService] Detecting user timezone');
+      logInDev('[UserPreferencesService] Detecting user timezone');
 
       // Get device timezone
       const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -252,7 +253,7 @@ export class UserPreferencesService {
           locationTimezone = deviceTimezone;
         }
       } catch (locationError) {
-        console.log('[UserPreferencesService] Could not get location for timezone detection');
+        logInDev('[UserPreferencesService] Could not get location for timezone detection');
       }
 
       const detectedTimezone = locationTimezone || deviceTimezone;
@@ -262,11 +263,11 @@ export class UserPreferencesService {
         timezone: detectedTimezone
       });
 
-      console.log('[UserPreferencesService] Updated timezone to:', detectedTimezone);
+      logInDev('[UserPreferencesService] Updated timezone to:', detectedTimezone);
       return detectedTimezone;
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to detect timezone:', error);
+      errorInDev('[UserPreferencesService] Failed to detect timezone:', error);
       return 'UTC'; // Fallback to UTC
     }
   }
@@ -276,17 +277,24 @@ export class UserPreferencesService {
    */
   static async handleTimezoneChange(userId: string, newTimezone: string): Promise<void> {
     try {
-      console.log('[UserPreferencesService] Handling timezone change to:', newTimezone);
+      logInDev('[UserPreferencesService] Handling timezone change to:', newTimezone);
 
       await this.updateUserPreferences(userId, {
         timezone: newTimezone
       });
 
-      // TODO: Notify notification service to reschedule notifications
-      // This will be integrated with the notification service in task 5
+      // Notify notification service to reschedule notifications
+      try {
+        const { notificationService } = await import('./notificationService');
+        await notificationService.handleTimezoneChange(userId, newTimezone);
+        logInDev('[UserPreferencesService] Successfully rescheduled notifications for new timezone');
+      } catch (notificationError) {
+        errorInDev('[UserPreferencesService] Failed to reschedule notifications:', notificationError);
+        // Don't throw - timezone update should succeed even if notification rescheduling fails
+      }
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to handle timezone change:', error);
+      errorInDev('[UserPreferencesService] Failed to handle timezone change:', error);
       throw error;
     }
   }
@@ -317,7 +325,7 @@ export class UserPreferencesService {
       });
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to update engagement history:', error);
+      errorInDev('[UserPreferencesService] Failed to update engagement history:', error);
       throw error;
     }
   }
@@ -355,7 +363,7 @@ export class UserPreferencesService {
       }
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to track daily engagement:', error);
+      errorInDev('[UserPreferencesService] Failed to track daily engagement:', error);
     }
   }
 
@@ -385,7 +393,7 @@ export class UserPreferencesService {
       });
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to update style preferences:', error);
+      errorInDev('[UserPreferencesService] Failed to update style preferences:', error);
       throw error;
     }
   }
@@ -399,7 +407,7 @@ export class UserPreferencesService {
    */
   static async syncPreferences(userId: string): Promise<UserPreferences> {
     try {
-      console.log('[UserPreferencesService] Syncing preferences with backend');
+      logInDev('[UserPreferencesService] Syncing preferences with backend');
 
       // Force fetch from database (bypass any caching)
       const { data, error } = await supabase
@@ -420,7 +428,7 @@ export class UserPreferencesService {
       return this.convertRecordToPreferences(data);
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to sync preferences:', error);
+      errorInDev('[UserPreferencesService] Failed to sync preferences:', error);
       throw error;
     }
   }
@@ -454,7 +462,7 @@ export class UserPreferencesService {
       return this.convertRecordToPreferences(data);
 
     } catch (error) {
-      console.error('[UserPreferencesService] Failed to create default preferences:', error);
+      errorInDev('[UserPreferencesService] Failed to create default preferences:', error);
       return this.getDefaultPreferences(userId);
     }
   }

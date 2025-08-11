@@ -1,34 +1,20 @@
 // AI Naming Preferences Component
 import React, { useEffect, useState } from 'react';
 import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
   Switch,
-  Button,
   Alert,
-  Divider,
-  Chip,
-  Grid,
-  Paper
-} from '@mui/material';
-import {
-  AutoAwesome,
-  Palette,
-  Style,
-  Business,
-  Save,
-  Refresh
-} from '@mui/icons-material';
+  Dimensions,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev } from '@/utils/consoleSuppress';
 import { useNamingPreferences } from '@/hooks/useAINaming';
 import { NamingStyle } from '@/types/aynaMirror';
-import { LoadingButton } from '@mui/lab';
 
 interface NamingPreferencesProps {
   onPreferencesChange?: () => void;
@@ -113,26 +99,24 @@ export const NamingPreferences: React.FC<NamingPreferencesProps> = ({
     }
   }, [preferences]);
 
-  const handleStyleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleStyleChange = (value: NamingStyle) => {
     setLocalPreferences(prev => ({
       ...prev,
-      namingStyle: event.target.value as NamingStyle
+      namingStyle: value
     }));
   };
 
-  const handleToggleChange = (field: keyof typeof localPreferences) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleToggleChange = (field: keyof typeof localPreferences, value: boolean) => {
     setLocalPreferences(prev => ({
       ...prev,
-      [field]: event.target.checked
+      [field]: value
     }));
   };
 
-  const handleLanguageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLanguageChange = (value: string) => {
     setLocalPreferences(prev => ({
       ...prev,
-      preferredLanguage: event.target.value
+      preferredLanguage: value
     }));
   };
 
@@ -148,7 +132,7 @@ export const NamingPreferences: React.FC<NamingPreferencesProps> = ({
       // Hide success message after 3 seconds
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (err) {
-      console.error('Error saving preferences:', err);
+      logInDev('Error saving preferences:', err);
     } finally {
       setIsSaving(false);
     }
@@ -200,211 +184,448 @@ export const NamingPreferences: React.FC<NamingPreferencesProps> = ({
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent>
-          <Typography>Loading preferences...</Typography>
-        </CardContent>
-      </Card>
+      <View style={styles.container}>
+        <View style={styles.content}>
+          <Text style={styles.loadingText}>Loading preferences...</Text>
+        </View>
+      </View>
     );
   }
 
   return (
-    <Card>
-      <CardContent>
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AutoAwesome color="primary" />
-            AI Naming Preferences
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.headerSection}>
+          <View style={styles.titleRow}>
+            <Ionicons name="sparkles" size={20} color="#1976d2" />
+            <Text style={styles.title}>AI Naming Preferences</Text>
+          </View>
+          <Text style={styles.subtitle}>
             Customize how AI generates names for your wardrobe items
-          </Typography>
-        </Box>
+          </Text>
+        </View>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
+          <View style={styles.errorAlert}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
         )}
 
         {saveSuccess && (
-          <Alert severity="success" sx={{ mb: 3 }}>
-            Preferences saved successfully!
-          </Alert>
+          <View style={styles.successAlert}>
+            <Text style={styles.successText}>Preferences saved successfully!</Text>
+          </View>
         )}
 
-        <Grid container spacing={3}>
+        <ScrollView style={styles.scrollContainer}>
           {/* Naming Style */}
-          <Grid item xs={12} md={6}>
-            <FormControl component="fieldset" fullWidth>
-              <FormLabel component="legend" sx={{ mb: 2 }}>
-                <Typography variant="subtitle1" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Style fontSize="small" />
-                  Naming Style
-                </Typography>
-              </FormLabel>
-              <RadioGroup
-                value={localPreferences.namingStyle}
-                onChange={handleStyleChange}
-              >
-                {NAMING_STYLE_OPTIONS.map((option) => (
-                  <Box key={option.value} sx={{ mb: 1 }}>
-                    <FormControlLabel
-                      value={option.value}
-                      control={<Radio />}
-                      label={
-                        <Box>
-                          <Typography variant="body2" fontWeight="medium">
-                            {option.label}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {option.description}
-                          </Typography>
-                          <Box sx={{ mt: 0.5 }}>
-                            <Chip
-                              label={option.example}
-                              size="small"
-                              variant="outlined"
-                              sx={{ fontSize: '0.7rem' }}
-                            />
-                          </Box>
-                        </Box>
-                      }
-                    />
-                  </Box>
-                ))}
-              </RadioGroup>
-            </FormControl>
-          </Grid>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleRow}>
+                <Ionicons name="brush" size={16} color="#666" />
+                <Text style={styles.sectionTitle}>Naming Style</Text>
+              </View>
+            </View>
+            
+            <View style={styles.radioGroup}>
+              {NAMING_STYLE_OPTIONS.map((option) => (
+                <TouchableOpacity
+                  key={option.value}
+                  style={styles.radioOption}
+                  onPress={() => handleStyleChange(option.value)}
+                >
+                  <View style={styles.radioContainer}>
+                    <View style={[
+                      styles.radioButton,
+                      localPreferences.namingStyle === option.value && styles.radioButtonSelected
+                    ]}>
+                      {localPreferences.namingStyle === option.value && (
+                        <View style={styles.radioButtonInner} />
+                      )}
+                    </View>
+                    <View style={styles.radioLabel}>
+                      <Text style={styles.radioLabelText}>{option.label}</Text>
+                      <Text style={styles.radioDescription}>{option.description}</Text>
+                      <View style={styles.exampleChip}>
+                        <Text style={styles.exampleText}>{option.example}</Text>
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
 
           {/* Include Options */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Palette fontSize="small" />
-              Include in Names
-            </Typography>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleRow}>
+                <Ionicons name="color-palette" size={16} color="#666" />
+                <Text style={styles.sectionTitle}>Include in Names</Text>
+              </View>
+            </View>
             
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={localPreferences.includeColor}
-                    onChange={handleToggleChange('includeColor')}
-                  />
-                }
-                label="Color"
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={localPreferences.includeBrand}
-                    onChange={handleToggleChange('includeBrand')}
-                  />
-                }
-                label="Brand"
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={localPreferences.includeStyle}
-                    onChange={handleToggleChange('includeStyle')}
-                  />
-                }
-                label="Style"
-              />
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={localPreferences.includeMaterial}
-                    onChange={handleToggleChange('includeMaterial')}
-                  />
-                }
-                label="Material"
-              />
-            </Box>
+            <View style={styles.switchContainer}>
+              <View style={styles.switchRow}>
+                <Text style={styles.switchLabel}>Color</Text>
+                <Switch
+                  value={localPreferences.includeColor}
+                  onValueChange={(value) => handleToggleChange('includeColor', value)}
+                />
+              </View>
+              <View style={styles.switchRow}>
+                <Text style={styles.switchLabel}>Brand</Text>
+                <Switch
+                  value={localPreferences.includeBrand}
+                  onValueChange={(value) => handleToggleChange('includeBrand', value)}
+                />
+              </View>
+              <View style={styles.switchRow}>
+                <Text style={styles.switchLabel}>Style</Text>
+                <Switch
+                  value={localPreferences.includeStyle}
+                  onValueChange={(value) => handleToggleChange('includeStyle', value)}
+                />
+              </View>
+              <View style={styles.switchRow}>
+                <Text style={styles.switchLabel}>Material</Text>
+                <Switch
+                  value={localPreferences.includeMaterial}
+                  onValueChange={(value) => handleToggleChange('includeMaterial', value)}
+                />
+              </View>
+            </View>
 
-            <Divider sx={{ my: 2 }} />
+            <View style={styles.divider} />
 
             {/* Language */}
-            <Typography variant="subtitle1" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Business fontSize="small" />
-              Language
-            </Typography>
-            <FormControl component="fieldset">
-              <RadioGroup
-                value={localPreferences.preferredLanguage}
-                onChange={handleLanguageChange}
-                row
-              >
-                {LANGUAGE_OPTIONS.map((lang) => (
-                  <FormControlLabel
-                    key={lang.value}
-                    value={lang.value}
-                    control={<Radio size="small" />}
-                    label={lang.label}
-                  />
-                ))}
-              </RadioGroup>
-            </FormControl>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleRow}>
+                <Ionicons name="business" size={16} color="#666" />
+                <Text style={styles.sectionTitle}>Language</Text>
+              </View>
+            </View>
+            <View style={styles.languageContainer}>
+              {LANGUAGE_OPTIONS.map((lang) => (
+                <TouchableOpacity
+                  key={lang.value}
+                  style={styles.languageOption}
+                  onPress={() => handleLanguageChange(lang.value)}
+                >
+                  <View style={[
+                    styles.radioButton,
+                    localPreferences.preferredLanguage === lang.value && styles.radioButtonSelected
+                  ]}>
+                    {localPreferences.preferredLanguage === lang.value && (
+                      <View style={styles.radioButtonInner} />
+                    )}
+                  </View>
+                  <Text style={styles.languageLabel}>{lang.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
 
-            <Divider sx={{ my: 2 }} />
+            <View style={styles.divider} />
 
             {/* Auto Accept */}
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={localPreferences.autoAcceptAINames}
-                  onChange={handleToggleChange('autoAcceptAINames')}
-                />
-              }
-              label={
-                <Box>
-                  <Typography variant="body2">Auto-accept AI names</Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Automatically use AI-generated names without manual approval
-                  </Typography>
-                </Box>
-              }
-            />
-          </Grid>
-        </Grid>
+            <View style={styles.switchRow}>
+              <Text style={styles.switchLabel}>Auto Accept AI Names</Text>
+              <Switch
+                value={localPreferences.autoAcceptAINames}
+                onValueChange={(value) => handleToggleChange('autoAcceptAINames', value)}
+              />
+            </View>
+            <View style={styles.autoAcceptDescription}>
+              <Text style={styles.autoAcceptText}>Auto-accept AI names</Text>
+              <Text style={styles.autoAcceptSubtext}>
+                Automatically use AI-generated names without manual approval
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
 
         {/* Preview */}
-        <Paper sx={{ p: 2, mt: 3, bgcolor: 'grey.50' }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Preview
-          </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
+        <View style={styles.previewContainer}>
+          <Text style={styles.previewTitle}>Preview</Text>
+          <Text style={styles.previewDescription}>
             With your current settings, a blue Nike t-shirt would be named:
-          </Typography>
-          <Chip
-            label={getPreviewName()}
-            color="primary"
-            variant="outlined"
-            sx={{ fontWeight: 'medium' }}
-          />
-        </Paper>
+          </Text>
+          <View style={styles.previewChip}>
+            <Text style={styles.previewText}>{getPreviewName()}</Text>
+          </View>
+        </View>
 
         {/* Actions */}
-        <Box sx={{ display: 'flex', gap: 2, mt: 3, justifyContent: 'flex-end' }}>
-          <Button
-            variant="outlined"
-            onClick={handleReset}
-            startIcon={<Refresh />}
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity
+            style={[styles.button, styles.resetButton]}
+            onPress={handleReset}
             disabled={isSaving}
           >
-            Reset
-          </Button>
-          <LoadingButton
-            variant="contained"
-            onClick={handleSave}
-            loading={isSaving}
-            startIcon={<Save />}
+            <Ionicons name="refresh" size={16} color="#1976d2" />
+            <Text style={styles.resetButtonText}>Reset</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.saveButton, isSaving && styles.buttonDisabled]}
+            onPress={handleSave}
+            disabled={isSaving}
           >
-            Save Preferences
-          </LoadingButton>
-        </Box>
-      </CardContent>
-    </Card>
+            <Ionicons name="save" size={16} color="white" />
+            <Text style={styles.saveButtonText}>
+              {isSaving ? 'Saving...' : 'Save Preferences'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    margin: 16,
+  },
+  content: {
+    padding: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#666',
+  },
+  headerSection: {
+    marginBottom: 24,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginLeft: 8,
+    color: '#333',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+  },
+  errorAlert: {
+    backgroundColor: '#ffebee',
+    padding: 12,
+    borderRadius: 4,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#f44336',
+  },
+  errorText: {
+    color: '#c62828',
+    fontSize: 14,
+  },
+  successAlert: {
+    backgroundColor: '#e8f5e8',
+    padding: 12,
+    borderRadius: 4,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#4caf50',
+  },
+  successText: {
+    color: '#2e7d32',
+    fontSize: 14,
+  },
+  scrollContainer: {
+    maxHeight: 400,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    marginBottom: 16,
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+    color: '#333',
+  },
+  radioGroup: {
+    gap: 12,
+  },
+  radioOption: {
+    marginBottom: 8,
+  },
+  radioContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  radioButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    marginRight: 12,
+    marginTop: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioButtonSelected: {
+    borderColor: '#1976d2',
+  },
+  radioButtonInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#1976d2',
+  },
+  radioLabel: {
+    flex: 1,
+  },
+  radioLabelText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#333',
+    marginBottom: 4,
+  },
+  radioDescription: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 8,
+  },
+  exampleChip: {
+    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  exampleText: {
+    fontSize: 11,
+    color: '#666',
+  },
+  switchContainer: {
+    gap: 16,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  switchLabel: {
+    fontSize: 14,
+    color: '#333',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#e0e0e0',
+    marginVertical: 16,
+  },
+  languageContainer: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 16,
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  languageLabel: {
+    fontSize: 14,
+    color: '#333',
+    marginLeft: 8,
+  },
+  autoAcceptDescription: {
+    marginLeft: 32,
+  },
+  autoAcceptText: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 4,
+  },
+  autoAcceptSubtext: {
+    fontSize: 12,
+    color: '#666',
+  },
+  previewContainer: {
+    backgroundColor: '#f5f5f5',
+    padding: 16,
+    borderRadius: 8,
+    marginTop: 24,
+  },
+  previewTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  previewDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+  },
+  previewChip: {
+    backgroundColor: 'white',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#1976d2',
+    alignSelf: 'flex-start',
+  },
+  previewText: {
+    fontSize: 14,
+    color: '#1976d2',
+    fontWeight: '500',
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+    marginTop: 24,
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 6,
+    gap: 6,
+  },
+  resetButton: {
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#1976d2',
+  },
+  resetButtonText: {
+    color: '#1976d2',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  saveButton: {
+    backgroundColor: '#1976d2',
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+});
+
+export default NamingPreferences;

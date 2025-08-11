@@ -6,6 +6,7 @@
 
 import { UNIFIED_COLORS, TYPOGRAPHY, SPACING, ELEVATION, BORDER_RADIUS, GLASSMORPHISM } from '@/theme/DesignSystem';
 import { Dimensions, PixelRatio } from 'react-native';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 interface ValidationResult {
   isValid: boolean;
@@ -656,7 +657,7 @@ class DesignSystemValidationService {
     setInterval(async () => {
       const result = await this.validateDesignSystem();
       if (!result.isValid) {
-        console.warn('Design System Validation Failed:', result.issues);
+        errorInDev('Design System Validation Failed:', result.issues);
       }
     }, intervalMs);
   }

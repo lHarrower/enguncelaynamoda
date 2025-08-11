@@ -1,0 +1,85 @@
+-- =====================================================================
+-- AYNAMODA: Core schema alignment & safety fixes (idempotent)
+-- =====================================================================
+
+-- 1) processed_image_uri: ekle -> doldur -> NOT NULL yap
+ALTER TABLE public.wardrobe_items
+  ADD COLUMN IF NOT EXISTS processed_image_uri TEXT;
+
+UPDATE public.wardrobe_items
+   SET processed_image_uri = image_uri
+ WHERE processed_image_uri IS NULL;
+
+ALTER TABLE public.wardrobe_items
+  ALTER COLUMN processed_image_uri SET NOT NULL;
+
+-- 2) outfit_recommendations.daily_recommendation_id güvenli eklenip indekslenir
+ALTER TABLE public.outfit_recommendations
+  ADD COLUMN IF NOT EXISTS daily_recommendation_id uuid;
+
+-- FK'yi atlamak bilerek: bazý ortamlarda daha önce tanýmlanmýþ olabilir.
+-- Gerekirse ayrý, kontrollü bir migration ile eklenir.
+CREATE INDEX IF NOT EXISTS idx_outfit_recommendations_daily_id
+  ON public.outfit_recommendations(daily_recommendation_id);
+
+-- 3) calculate_item_compatibility: var olaný doðrusu ile deðiþtir (renk/tip alanlarý mevcut þemaya göre)
+CREATE OR REPLACE FUNCTION public.calculate_item_compatibility(item1 uuid, item2 uuid)
+RETURNS numeric
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  rec1 RECORD;
+  rec2 RECORD;
+  score numeric := 0;
+  c1 TEXT;
+  c2 TEXT;
+  tag_overlap BOOLEAN := FALSE;
+BEGIN
+  SELECT category, colors, tags INTO rec1 FROM public.wardrobe_items WHERE id = item1;
+  SELECT category, colors, tags INTO rec2 FROM public.wardrobe_items WHERE id = item2;
+
+  IF rec1 IS NULL OR rec2 IS NULL THEN
+    RETURN 0;
+  END IF;
+
+  -- ana kategori eþleþmesi
+  IF rec1.category = rec2.category THEN
+    score := score + 0.4;
+  END IF;
+
+  -- birincil renk (colors[1]) eþleþmesi
+  c1 := COALESCE(rec1.colors[1], NULL);
+  c2 := COALESCE(rec2.colors[1], NULL);
+  IF c1 IS NOT NULL AND c2 IS NOT NULL AND c1 = c2 THEN
+    score := score + 0.3;
+  END IF;
+
+  -- tag kesiþimi
+  SELECT EXISTS(
+    SELECT 1
+    FROM unnest(COALESCE(rec1.tags, ARRAY[]::text[])) t1
+    INTERSECT
+    SELECT 1
+    FROM unnest(COALESCE(rec2.tags, ARRAY[]::text[])) t2
+  ) INTO tag_overlap;
+
+  IF tag_overlap THEN
+    score := score + 0.3;
+  END IF;
+
+  RETURN LEAST(1, GREATEST(0, score));
+END;
+$$;
+
+-- 4) AI alanlarý: þemayý tekilleþtir (Edge Function/istemci ile hizalama için)
+ALTER TABLE public.wardrobe_items
+  ADD COLUMN IF NOT EXISTS ai_analysis_data JSONB,
+  ADD COLUMN IF NOT EXISTS ai_main_category TEXT,
+  ADD COLUMN IF NOT EXISTS ai_sub_category TEXT,
+  ADD COLUMN IF NOT EXISTS ai_dominant_colors TEXT[];
+
+-- 5) Kullanýþlý indeksler (varsa dokunmaz)
+CREATE INDEX IF NOT EXISTS idx_wardrobe_items_ai_main_category
+  ON public.wardrobe_items(ai_main_category);
+CREATE INDEX IF NOT EXISTS idx_wardrobe_items_ai_sub_category
+  ON public.wardrobe_items(ai_sub_category);

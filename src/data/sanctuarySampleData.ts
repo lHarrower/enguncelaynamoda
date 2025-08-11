@@ -7,7 +7,7 @@ export const SAMPLE_WARDROBE: ClothingItem[] = [
   {
     id: '1',
     name: 'Silk Blouse',
-    category: 'Tops',
+  category: 'tops',
     colors: ['White', 'Cream'],
     imageUrl: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop',
     brand: 'Zara',
@@ -20,7 +20,7 @@ export const SAMPLE_WARDROBE: ClothingItem[] = [
   {
     id: '2',
     name: 'Pleated Skirt',
-    category: 'Bottoms',
+  category: 'bottoms',
     colors: ['Cream', 'Beige'],
     imageUrl: 'https://images.unsplash.com/photo-1583496661160-fb5886a13d77?w=400&h=500&fit=crop',
     brand: 'COS',
@@ -33,7 +33,7 @@ export const SAMPLE_WARDROBE: ClothingItem[] = [
   {
     id: '3',
     name: 'Summer Dress',
-    category: 'Dresses',
+  category: 'dresses',
     colors: ['Lavender', 'Purple'],
     imageUrl: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&h=500&fit=crop',
     brand: 'Mango',
@@ -46,7 +46,7 @@ export const SAMPLE_WARDROBE: ClothingItem[] = [
   {
     id: '4',
     name: 'Pearl Earrings',
-    category: 'Accessories',
+  category: 'accessories',
     colors: ['White', 'Silver'],
     imageUrl: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=500&fit=crop',
     brand: 'Pandora',
@@ -59,7 +59,7 @@ export const SAMPLE_WARDROBE: ClothingItem[] = [
   {
     id: '5',
     name: 'Black Blazer',
-    category: 'Outerwear',
+  category: 'outerwear',
     colors: ['Black'],
     imageUrl: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop',
     brand: 'H&M',
@@ -72,7 +72,7 @@ export const SAMPLE_WARDROBE: ClothingItem[] = [
   {
     id: '6',
     name: 'White Sneakers',
-    category: 'Shoes',
+  category: 'shoes',
     colors: ['White'],
     imageUrl: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=500&fit=crop',
     brand: 'Adidas',
@@ -85,7 +85,7 @@ export const SAMPLE_WARDROBE: ClothingItem[] = [
   {
     id: '7',
     name: 'Denim Jacket',
-    category: 'Outerwear',
+  category: 'outerwear',
     colors: ['Blue', 'Navy'],
     imageUrl: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=500&fit=crop',
     brand: 'Levi\'s',
@@ -98,7 +98,7 @@ export const SAMPLE_WARDROBE: ClothingItem[] = [
   {
     id: '8',
     name: 'Gold Necklace',
-    category: 'Accessories',
+  category: 'accessories',
     colors: ['Gold'],
     imageUrl: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=500&fit=crop',
     brand: 'Mejuri',

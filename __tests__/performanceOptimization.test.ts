@@ -1,27 +1,55 @@
 // Performance Optimization Service Tests
-import { PerformanceOptimizationService } from '../services/performanceOptimizationService';
-import { AynaMirrorService } from '../services/aynaMirrorService';
+import { PerformanceOptimizationService } from '@/services/performanceOptimizationService';
+import { AynaMirrorService } from '@/services/aynaMirrorService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
 import {
   DailyRecommendations,
   WardrobeItem,
   OutfitFeedback,
   EmotionalResponse
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 
 // Mock dependencies
 jest.mock('@react-native-async-storage/async-storage');
-jest.mock('../config/supabaseClient');
-jest.mock('../services/aynaMirrorService');
+jest.mock('@/config/supabaseClient');
+jest.mock('@/services/aynaMirrorService');
 
 const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
 const mockAynaMirrorService = AynaMirrorService as jest.Mocked<typeof AynaMirrorService>;
 
+// Shared fixtures across tests
+const mockUserId = 'test-user-123';
+const mockDate = '2024-01-15';
+const mockRecommendations: DailyRecommendations = {
+  id: 'rec-123',
+  userId: mockUserId,
+  date: new Date('2024-01-15'),
+  recommendations: [],
+  weatherContext: {
+    temperature: 72,
+    condition: 'sunny',
+    humidity: 45,
+    location: 'San Francisco',
+    timestamp: new Date()
+  },
+  generatedAt: new Date()
+};
+const mockFeedback: OutfitFeedback = {
+  outfitId: 'outfit-123',
+  userId: mockUserId,
+  confidenceRating: 4,
+  emotionalResponse: {
+    primary: 'confident',
+    intensity: 8,
+    additionalEmotions: ['stylish']
+  } as EmotionalResponse,
+  comfort: 4,
+  timestamp: new Date()
+};
+
 describe('PerformanceOptimizationService', () => {
-  const mockUserId = 'test-user-123';
-  const mockDate = '2024-01-15';
 
   beforeEach(() => {
     jest.clearAllMocks();

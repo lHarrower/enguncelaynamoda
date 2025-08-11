@@ -1,5 +1,8 @@
+// app/(app)/index.tsx
+
 import React from 'react';
 import { router } from 'expo-router';
+// This import path uses the correct '@/' alias
 import StudioHomeScreen from '@/components/studio/StudioHomeScreen';
 
 export default function HomeScreen() {

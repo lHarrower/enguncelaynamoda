@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.lg,
   },
   subtitle: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.secondary,
     marginBottom: 4,
     textTransform: 'uppercase',
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     lineHeight: 32,
   },
   excerpt: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     lineHeight: 24,
     marginBottom: 16,
@@ -172,12 +172,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   author: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body.small,
     fontWeight: '500',
     color: DesignSystem.colors.text.primary,
   },
   readTime: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.tertiary,
   },
 });

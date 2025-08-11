@@ -117,6 +117,7 @@ export interface ItemNamingHistory {
 }
 
 export interface NamingRequest {
+  itemId?: string;
   imageUri: string;
   category?: ItemCategory;
   subcategory?: string;

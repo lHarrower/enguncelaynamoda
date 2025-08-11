@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   TextInputProps,
 } from 'react-native';
-import { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -21,7 +21,9 @@ import { Ionicons } from '@expo/vector-icons';
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
-interface PremiumInputProps extends TextInputProps {
+type BaseTextInputProps = Omit<TextInputProps, 'style'>;
+
+interface PremiumInputProps extends BaseTextInputProps {
   label?: string;
   error?: string;
   hint?: string;
@@ -67,13 +69,13 @@ const PremiumInput: React.FC<PremiumInputProps> = ({
     const borderColor = interpolateColor(
       focusAnimation.value,
       [0, 1],
-      [PREMIUM_THEME.semantic.border.primary, PREMIUM_THEME.colors.champagne[500]]
+      [DesignSystem.colors.border.primary, DesignSystem.colors.gold[500]]
     );
 
     const errorBorderColor = interpolateColor(
       errorAnimation.value,
       [0, 1],
-      [borderColor, PREMIUM_THEME.semantic.status.error]
+      [borderColor, DesignSystem.colors.error[500]]
     );
 
     const shadowOpacity = interpolate(
@@ -92,13 +94,13 @@ const PremiumInput: React.FC<PremiumInputProps> = ({
     const labelColor = interpolateColor(
       focusAnimation.value,
       [0, 1],
-      [PREMIUM_THEME.semantic.text.secondary, PREMIUM_THEME.colors.champagne[600]]
+      [DesignSystem.colors.text.secondary, DesignSystem.colors.gold[600]]
     );
 
     const errorLabelColor = interpolateColor(
       errorAnimation.value,
       [0, 1],
-      [labelColor, PREMIUM_THEME.semantic.status.error]
+      [labelColor, DesignSystem.colors.error[500]]
     );
 
     return {
@@ -109,38 +111,38 @@ const PremiumInput: React.FC<PremiumInputProps> = ({
   const getContainerStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
       borderWidth: 1.5,
-      borderRadius: PREMIUM_THEME.radius.lg,
+      borderRadius: DesignSystem.borderRadius.lg,
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: PREMIUM_THEME.semantic.surface.secondary,
-      ...PREMIUM_THEME.elevation.hover,
+      backgroundColor: DesignSystem.colors.surface.secondary,
+      ...DesignSystem.elevation.soft,
     };
 
     const sizeStyles: Record<string, ViewStyle> = {
       medium: {
-        paddingHorizontal: PREMIUM_THEME.spacing.lg,
-        paddingVertical: PREMIUM_THEME.spacing.md,
+        paddingHorizontal: DesignSystem.spacing.lg,
+        paddingVertical: DesignSystem.spacing.md,
         minHeight: 56,
       },
       large: {
-        paddingHorizontal: PREMIUM_THEME.spacing.xl,
-        paddingVertical: PREMIUM_THEME.spacing.lg,
+        paddingHorizontal: DesignSystem.spacing.xl,
+        paddingVertical: DesignSystem.spacing.lg,
         minHeight: 64,
       },
     };
 
     const variantStyles: Record<string, ViewStyle> = {
       default: {
-        backgroundColor: PREMIUM_THEME.semantic.surface.secondary,
+        backgroundColor: DesignSystem.colors.surface.secondary,
       },
       glass: {
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         backdropFilter: 'blur(20px)',
       },
       luxury: {
-        backgroundColor: PREMIUM_THEME.semantic.surface.primary,
-        borderColor: PREMIUM_THEME.colors.champagne[200],
-        ...PREMIUM_THEME.elevation.elevate,
+        backgroundColor: DesignSystem.colors.surface.primary,
+        borderColor: DesignSystem.colors.gold[200],
+        ...DesignSystem.elevation.medium,
       },
     };
 
@@ -153,8 +155,8 @@ const PremiumInput: React.FC<PremiumInputProps> = ({
 
   const getInputStyle = (): TextStyle => {
     const baseStyle = {
-      ...PREMIUM_THEME.typography.scale.body1,
-      color: PREMIUM_THEME.semantic.text.primary,
+      ...DesignSystem.typography.body.medium,
+      color: DesignSystem.colors.text.primary,
       flex: 1,
       paddingVertical: 0, // Remove default padding
     };
@@ -167,9 +169,9 @@ const PremiumInput: React.FC<PremiumInputProps> = ({
 
   const getLabelStyle = (): TextStyle => {
     return {
-      ...PREMIUM_THEME.typography.scale.caption,
-      color: PREMIUM_THEME.semantic.text.secondary,
-      marginBottom: PREMIUM_THEME.spacing.sm,
+      ...DesignSystem.typography.scale.caption,
+      color: DesignSystem.colors.text.secondary,
+      marginBottom: DesignSystem.spacing.sm,
       ...labelStyle,
     };
   };
@@ -179,9 +181,9 @@ const PremiumInput: React.FC<PremiumInputProps> = ({
   };
 
   const getIconColor = (): string => {
-    if (error) return PREMIUM_THEME.semantic.status.error;
-    if (isFocused) return PREMIUM_THEME.colors.champagne[500];
-    return PREMIUM_THEME.semantic.text.tertiary;
+    if (error) return DesignSystem.colors.error[500];
+    if (isFocused) return DesignSystem.colors.gold[500];
+    return DesignSystem.colors.text.tertiary;
   };
 
   const handleFocus = (e: any) => {
@@ -215,7 +217,7 @@ const PremiumInput: React.FC<PremiumInputProps> = ({
         <TextInput
           ref={inputRef}
           style={getInputStyle()}
-          placeholderTextColor={PREMIUM_THEME.semantic.text.tertiary}
+          placeholderTextColor={DesignSystem.colors.text.tertiary}
           onFocus={handleFocus}
           onBlur={handleBlur}
           {...textInputProps}
@@ -248,27 +250,30 @@ const PremiumInput: React.FC<PremiumInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: PREMIUM_THEME.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   leftIcon: {
-    marginRight: PREMIUM_THEME.spacing.md,
+    marginRight: DesignSystem.spacing.md,
   },
   rightIconContainer: {
-    marginLeft: PREMIUM_THEME.spacing.md,
-    padding: PREMIUM_THEME.spacing.xs,
+    marginLeft: DesignSystem.spacing.md,
+    padding: DesignSystem.spacing.xs,
   },
   errorText: {
-    ...PREMIUM_THEME.typography.scale.body3,
-    color: PREMIUM_THEME.semantic.status.error,
-    marginTop: PREMIUM_THEME.spacing.xs,
-    marginLeft: PREMIUM_THEME.spacing.sm,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.error[500],
+    marginTop: DesignSystem.spacing.xs,
+    marginLeft: DesignSystem.spacing.sm,
   },
   hintText: {
-    ...PREMIUM_THEME.typography.scale.body3,
-    color: PREMIUM_THEME.semantic.text.tertiary,
-    marginTop: PREMIUM_THEME.spacing.xs,
-    marginLeft: PREMIUM_THEME.spacing.sm,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
+    marginTop: DesignSystem.spacing.xs,
+    marginLeft: DesignSystem.spacing.sm,
   },
+  generateButtonText: {
+    // placeholder to satisfy style references if any
+  }
 });
 
 export default PremiumInput;

@@ -3,8 +3,8 @@ import { TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { useTheme } from '../context/ThemeContext';
-import { SHADOWS, SPACING } from '../constants/AppConstants';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { SPACING } from '../constants/AppConstants';
 
 interface FloatingActionButtonProps {
   onPress: () => void;
@@ -19,7 +19,6 @@ export default function FloatingActionButton({
   size = 56,
   disabled = false,
 }: FloatingActionButtonProps) {
-  const { colors } = useTheme();
 
   const handlePress = () => {
     if (!disabled) {
@@ -38,14 +37,14 @@ export default function FloatingActionButton({
           borderRadius: size / 2,
           opacity: disabled ? 0.5 : 1,
         },
-        SHADOWS.gentle,
+  DesignSystem.elevation.soft,
       ]}
       onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.8}
     >
       <LinearGradient
-        colors={[colors.primary, colors.accent]}
+  colors={[DesignSystem.colors.primary[500], DesignSystem.colors.gold[500]] as const}
         style={[
           styles.gradient,
           {
@@ -78,4 +77,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-}); 
+});

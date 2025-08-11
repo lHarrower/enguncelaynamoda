@@ -5,15 +5,15 @@
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import { AynaMirrorScreen } from '../../screens/AynaMirrorScreen';
-import { FeedbackCollector } from '../../components/feedback/FeedbackCollector';
-import { OutfitRecommendationCard } from '../../components/aynaMirror/OutfitRecommendationCard';
-import { ConfidenceRatingStep } from '../../components/feedback/ConfidenceRatingStep';
+import { AynaMirrorScreen } from '@/screens/AynaMirrorScreen';
+import { FeedbackCollector } from '@/components/feedback/FeedbackCollector';
+import { OutfitRecommendationCard } from '@/components/aynaMirror/OutfitRecommendationCard';
+import { ConfidenceRatingStep } from '@/components/feedback/ConfidenceRatingStep';
 
 // Mock dependencies
-jest.mock('../../config/supabaseClient');
-jest.mock('../../services/aynaMirrorService');
-jest.mock('../../services/weatherService');
+jest.mock('@/config/supabaseClient');
+jest.mock('@/services/aynaMirrorService');
+jest.mock('@/services/weatherService');
 
 describe('Accessibility - Inclusive Design Tests', () => {
   describe('Screen Reader Compatibility', () => {
@@ -384,8 +384,10 @@ describe('Accessibility - Inclusive Design Tests', () => {
     it('should provide accessible error messages', () => {
       const mockProps = {
         outfitId: 'error-test',
+        userId: 'test-user',
         onFeedbackSubmit: jest.fn(),
         onClose: jest.fn(),
+        visible: true,
         error: 'Unable to submit feedback. Please try again.'
       };
 
@@ -403,8 +405,10 @@ describe('Accessibility - Inclusive Design Tests', () => {
       const onRetryMock = jest.fn();
       const mockProps = {
         outfitId: 'retry-test',
+        userId: 'test-user',
         onFeedbackSubmit: jest.fn(),
         onClose: jest.fn(),
+        visible: true,
         onRetry: onRetryMock,
         error: 'Network error occurred.'
       };

@@ -4,7 +4,7 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
 
-import { ConfidenceNote } from '../components/aynaMirror/ConfidenceNote';
+import { ConfidenceNote } from '@/components/aynaMirror/ConfidenceNote';
 
 // Mock dependencies
 jest.mock('expo-blur', () => ({
@@ -13,11 +13,6 @@ jest.mock('expo-blur', () => ({
 jest.mock('expo-linear-gradient', () => ({
   LinearGradient: ({ children }: any) => children,
 }));
-jest.mock('react-native-reanimated', () => {
-  const Reanimated = require('react-native-reanimated/mock');
-  Reanimated.default.call = () => {};
-  return Reanimated;
-});
 
 describe('ConfidenceNote', () => {
   const mockNote = 'This effortless combination will have you feeling comfortable and confident all day! ☀️';

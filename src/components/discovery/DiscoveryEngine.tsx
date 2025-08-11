@@ -79,7 +79,7 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
   const favoritesBarTranslateY = useSharedValue(100);
 
   // Undo timer
-  const undoTimer = useRef<NodeJS.Timeout>();
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Handle swipe right (like)
   const handleSwipeRight = (item: ProductItem) => {
@@ -122,7 +122,7 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
     
     // Auto-hide after 3 seconds
     if (undoTimer.current) clearTimeout(undoTimer.current);
-    undoTimer.current = setTimeout(() => {
+  undoTimer.current = setTimeout(() => {
       hideUndoButton();
     }, 3000);
   };
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptySubtitle: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     ...DesignSystem.elevation.medium,
   },
   undoText: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.inverse,
     marginLeft: 8,
   },
@@ -432,10 +432,10 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.background.elevated,
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: DesignSystem.colors.border.subtle,
+  borderTopColor: DesignSystem.colors.border.secondary,
   },
   favoritesTitle: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     marginBottom: 12,
   },
@@ -460,10 +460,10 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 16,
     padding: 16,
-    ...DesignSystem.elevation.strong,
+  ...DesignSystem.elevation.high,
   },
   notificationText: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     marginBottom: 12,
   },
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border.subtle,
+  borderBottomColor: DesignSystem.colors.border.secondary,
   },
   modalTitle: {
     ...DesignSystem.typography.scale.h2,
@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   selectedItemTitle: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
   },
   similarItemsContainer: {

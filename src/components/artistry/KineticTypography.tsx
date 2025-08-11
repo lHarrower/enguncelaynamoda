@@ -47,19 +47,19 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
   const getTypographyStyle = () => {
     switch (variant) {
       case 'poetry':
-        return DesignSystem.typography.h1;
+        return DesignSystem.typography.heading.h1;
       case 'gallery':
-        return DesignSystem.typography.h2;
+        return DesignSystem.typography.heading.h2;
       case 'whisper':
-        return DesignSystem.typography.caption;
+        return DesignSystem.typography.scale.caption;
       case 'statement':
-        return DesignSystem.typography.h1;
+          return DesignSystem.typography.heading.h1;
       case 'elegant':
-        return DesignSystem.typography.body;
+        return DesignSystem.typography.body.medium;
       case 'kinetic':
-        return DesignSystem.typography.h3;
+        return DesignSystem.typography.heading.h3;
       default:
-        return DesignSystem.typography.body;
+          return DesignSystem.typography.body.medium;
     }
   };
 

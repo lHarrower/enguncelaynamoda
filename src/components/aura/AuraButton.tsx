@@ -103,43 +103,38 @@ const AuraButton: React.FC<AuraButtonProps> = ({
     switch (size) {
       case 'small':
         return {
-          paddingVertical: APP_THEME_V2.spacing.xs,
-          paddingHorizontal: APP_THEME_V2.spacing.md,
+          paddingVertical: DesignSystem.spacing.xs,
+          paddingHorizontal: DesignSystem.spacing.md,
           minHeight: 40,
         };
       case 'large':
         return {
-          paddingVertical: APP_THEME_V2.spacing.md,
-          paddingHorizontal: APP_THEME_V2.spacing.xl,
+          paddingVertical: DesignSystem.spacing.md,
+          paddingHorizontal: DesignSystem.spacing.xl,
           minHeight: 56,
         };
       default:
         return {
-          paddingVertical: APP_THEME_V2.spacing.sm,
-          paddingHorizontal: APP_THEME_V2.spacing.lg,
+          paddingVertical: DesignSystem.spacing.sm,
+          paddingHorizontal: DesignSystem.spacing.lg,
           minHeight: 48,
         };
     }
   };
 
   const getTextStyle = (): TextStyle => {
-    const baseStyle = {
-      ...APP_THEME_V2.typography.scale.body1,
-      fontFamily: APP_THEME_V2.typography.fonts.body,
+    const baseStyle: TextStyle = {
+      ...DesignSystem.typography.body.medium,
       fontWeight: '600',
-      color: variant === 'primary' ? APP_THEME_V2.colors.whisperWhite : APP_THEME_V2.semantic.accent,
+      color: variant === 'primary' ? DesignSystem.colors.text.inverse : DesignSystem.colors.sage[500],
+      opacity: disabled ? 0.5 : 1,
     };
-
-    if (disabled) {
-      baseStyle.opacity = 0.5;
-    }
-
     return baseStyle;
   };
 
   const getGradientColors = (): readonly [string, string] => {
     if (variant === 'primary') {
-      return [APP_THEME_V2.semantic.accent, APP_THEME_V2.colors.zenGold];
+      return [DesignSystem.colors.sage[500], DesignSystem.colors.gold[500]];
     }
     return ['transparent', 'transparent'];
   };

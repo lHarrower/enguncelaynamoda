@@ -12,7 +12,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useEfficiencyScore } from '@/hooks/useEfficiencyScore';
 import { EfficiencyScore, EfficiencyMetrics } from '@/services/efficiencyScoreService';
-import { LineChart, BarChart, PieChart } from 'react-native-chart-kit';
+import { PieChart } from 'react-native-chart-kit';
 
 const { width } = Dimensions.get('window');
 const chartConfig = {
@@ -45,11 +45,9 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
 }) => {
   const {
     efficiencyScore,
-    efficiencyMetrics,
-    trends,
     refreshScore,
     getScoreColor,
-    getGrade,
+    getGradeFromScore,
     getPerformanceLevel
   } = useEfficiencyScore();
 
@@ -57,7 +55,8 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter'>('month');
 
   const currentScore = score || efficiencyScore;
-  const currentMetrics = metrics || efficiencyMetrics;
+  const currentMetrics = metrics; // Hook does not expose metrics; rely on prop when provided
+  const trends: any[] = []; // Timeseries trends not provided by hook; show empty state
 
   useEffect(() => {
     if (!currentScore || !currentMetrics) {
@@ -72,8 +71,8 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
       case 'sustainability': return 'leaf-outline';
       case 'versatility': return 'shuffle-outline';
       case 'curation': return 'star-outline';
-      case 'trend_up': return 'trending-up';
-      case 'trend_down': return 'trending-down';
+      case 'trend_up': return 'trending-up-outline';
+      case 'trend_down': return 'trending-down-outline';
       case 'warning': return 'warning-outline';
       case 'success': return 'checkmark-circle-outline';
       default: return 'information-circle-outline';
@@ -83,11 +82,13 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
   const getInsightColor = (type: string): string => {
     switch (type) {
       case 'trend_up':
-      case 'success': return '#10B981';
+      case 'success':
+        return '#10B981';
       case 'trend_down':
-      case 'warning': return '#F59E0B';
-      case 'error': return '#EF4444';
-      default: return '#6366F1';
+      case 'warning':
+        return '#F59E0B';
+      default:
+        return '#64748B';
     }
   };
 
@@ -100,7 +101,7 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
       );
     }
 
-    const categoryData = [
+  const categoryData = [
       { name: 'Utilization', score: currentScore.breakdown.utilization, color: '#6366F1' },
       { name: 'Cost Efficiency', score: currentScore.breakdown.costEfficiency, color: '#10B981' },
       { name: 'Sustainability', score: currentScore.breakdown.sustainability, color: '#F59E0B' },
@@ -118,7 +119,7 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
           >
             <Text style={styles.scoreTitle}>Overall Efficiency</Text>
             <Text style={styles.scoreValue}>{currentScore.overall}</Text>
-            <Text style={styles.scoreGrade}>{getGrade(currentScore.overall)}</Text>
+            <Text style={styles.scoreGrade}>{getGradeFromScore(currentScore.overall)}</Text>
             <Text style={styles.scoreLevel}>{getPerformanceLevel(currentScore.overall)}</Text>
           </LinearGradient>
         </View>
@@ -131,7 +132,7 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
               <View key={index} style={styles.categoryCard}>
                 <View style={[styles.categoryIcon, { backgroundColor: category.color + '20' }]}>
                   <Ionicons
-                    name={getInsightIcon(category.name.toLowerCase().replace(' ', '_'))}
+                    name={getInsightIcon(category.name.toLowerCase().replace(' ', '_')) as any}
                     size={20}
                     color={category.color}
                   />
@@ -145,7 +146,8 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
                     style={[
                       styles.categoryProgressFill,
                       {
-                        width: `${category.score}%`,
+                        width: '100%',
+                        transform: [{ scaleX: category.score / 100 }],
                         backgroundColor: category.color
                       }
                     ]}
@@ -155,63 +157,74 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
             ))}
           </View>
         </View>
-
         {/* Key Metrics */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Key Metrics</Text>
-          <View style={styles.metricsGrid}>
-            <View style={styles.metricCard}>
-              <Text style={styles.metricValue}>{currentMetrics.wardrobeUtilization}%</Text>
-              <Text style={styles.metricLabel}>Wardrobe Utilization</Text>
+          {currentMetrics ? (
+            <View style={styles.metricsGrid}>
+              <View style={styles.metricCard}>
+                <Text style={styles.metricValue}>
+                  {Math.round(currentMetrics.wardrobeUtilization.utilizationRate)}%
+                </Text>
+                <Text style={styles.metricLabel}>Wardrobe Utilization</Text>
+              </View>
+              <View style={styles.metricCard}>
+                <Text style={styles.metricValue}>
+                  ${currentMetrics.costEfficiency.averageCostPerWear.toFixed(2)}
+                </Text>
+                <Text style={styles.metricLabel}>Avg Cost Per Wear</Text>
+              </View>
+              <View style={styles.metricCard}>
+                <Text style={styles.metricValue}>
+                  {Math.round(currentMetrics.versatility.averageOutfitsPerItem)}
+                </Text>
+                <Text style={styles.metricLabel}>Avg Outfits per Item</Text>
+              </View>
+              <View style={styles.metricCard}>
+                <Text style={styles.metricValue}>
+                  {Math.round(currentMetrics.sustainability.careCompliance * 100)}%
+                </Text>
+                <Text style={styles.metricLabel}>Care Compliance</Text>
+              </View>
             </View>
-            <View style={styles.metricCard}>
-              <Text style={styles.metricValue}>${currentMetrics.averageCostPerWear.toFixed(2)}</Text>
-              <Text style={styles.metricLabel}>Avg Cost Per Wear</Text>
-            </View>
-            <View style={styles.metricCard}>
-              <Text style={styles.metricValue}>{currentMetrics.outfitVariety}</Text>
-              <Text style={styles.metricLabel}>Outfit Combinations</Text>
-            </View>
-            <View style={styles.metricCard}>
-              <Text style={styles.metricValue}>{currentMetrics.sustainabilityScore}%</Text>
-              <Text style={styles.metricLabel}>Sustainability</Text>
-            </View>
-          </View>
+          ) : (
+            <Text style={{ color: '#64748B' }}>Metrics unavailable.</Text>
+          )}
         </View>
 
         {/* Quick Insights */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Quick Insights</Text>
-          {currentScore.insights.slice(0, 3).map((insight, index) => (
-            <View key={index} style={styles.insightCard}>
-              <View style={styles.insightIcon}>
-                <Ionicons
-                  name={getInsightIcon(insight.type)}
-                  size={20}
-                  color={getInsightColor(insight.type)}
-                />
+          {(() => {
+            const quick: Array<{ title: string; type: string }> = [];
+            const strengths = currentScore.insights?.strengths || [];
+            const improvements = currentScore.insights?.improvements || [];
+            const recommendations = currentScore.insights?.recommendations || [];
+            strengths.slice(0, 1).forEach((s: string) => quick.push({ title: s, type: 'success' }));
+            improvements.slice(0, 1).forEach((s: string) => quick.push({ title: s, type: 'warning' }));
+            recommendations.slice(0, 1).forEach((s: string) => quick.push({ title: s, type: 'info' }));
+            return quick.slice(0, 3).map((insight, index) => (
+              <View key={index} style={styles.insightCard}>
+                <View style={styles.insightIcon}>
+                  <Ionicons
+                    name={getInsightIcon(insight.type) as any}
+                    size={20}
+                    color={getInsightColor(insight.type)}
+                  />
+                </View>
+                <View style={styles.insightContent}>
+                  <Text style={styles.insightTitle}>{insight.title}</Text>
+                </View>
               </View>
-              <View style={styles.insightContent}>
-                <Text style={styles.insightTitle}>{insight.title}</Text>
-                <Text style={styles.insightDescription}>{insight.description}</Text>
-                {insight.actionable && (
-                  <TouchableOpacity
-                    style={styles.insightAction}
-                    onPress={() => onActionPress?.(insight.action || 'view_details', insight)}
-                  >
-                    <Text style={styles.insightActionText}>{insight.action || 'Learn More'}</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </View>
-          ))}
+            ));
+          })()}
         </View>
       </ScrollView>
     );
   };
 
   const renderTrendsTab = () => {
-    if (!trends || trends.length === 0) {
+    if (!currentScore) {
       return (
         <View style={styles.emptyState}>
           <Ionicons name="trending-up-outline" size={64} color="#CBD5E1" />
@@ -223,70 +236,39 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
       );
     }
 
-    const chartData = {
-      labels: trends.slice(-6).map(t => new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
-      datasets: [{
-        data: trends.slice(-6).map(t => t.overall),
-        color: (opacity = 1) => `rgba(99, 102, 241, ${opacity})`,
-        strokeWidth: 2
-      }]
-    };
+    const isImproving = currentScore.trends.trajectory === 'improving';
+    const isDeclining = currentScore.trends.trajectory === 'declining';
 
     return (
       <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
-        {/* Time Range Selector */}
-        <View style={styles.timeRangeSelector}>
-          {(['week', 'month', 'quarter'] as const).map((range) => (
-            <TouchableOpacity
-              key={range}
-              style={[
-                styles.timeRangeButton,
-                timeRange === range && styles.timeRangeButtonActive
-              ]}
-              onPress={() => setTimeRange(range)}
-            >
-              <Text style={[
-                styles.timeRangeButtonText,
-                timeRange === range && styles.timeRangeButtonTextActive
-              ]}>
-                {range.charAt(0).toUpperCase() + range.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Trend Chart */}
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Efficiency Score Trend</Text>
-          <LineChart
-            data={chartData}
-            width={width - 40}
-            height={220}
-            chartConfig={chartConfig}
-            bezier
-            style={styles.chart}
-          />
-        </View>
-
-        {/* Trend Analysis */}
         <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>Trend Analysis</Text>
-          <View style={styles.trendCard}>
-            <View style={styles.trendHeader}>
-              <Ionicons
-                name={trends[trends.length - 1]?.overall > trends[trends.length - 2]?.overall ? 'trending-up' : 'trending-down'}
-                size={24}
-                color={trends[trends.length - 1]?.overall > trends[trends.length - 2]?.overall ? '#10B981' : '#EF4444'}
-              />
-              <Text style={styles.trendTitle}>
-                {trends[trends.length - 1]?.overall > trends[trends.length - 2]?.overall ? 'Improving' : 'Declining'} Trend
+          <Text style={styles.sectionTitle}>Trend Summary</Text>
+          <View style={styles.metricsGrid}>
+            <View style={styles.metricCard}>
+              <Text style={styles.metricLabel}>Monthly Change</Text>
+              <Text style={[styles.metricValue, { color: currentScore.trends.monthlyChange >= 0 ? '#10B981' : '#EF4444' }]}>
+                {currentScore.trends.monthlyChange >= 0 ? '+' : ''}{currentScore.trends.monthlyChange}
               </Text>
             </View>
-            <Text style={styles.trendDescription}>
-              Your efficiency score has {trends[trends.length - 1]?.overall > trends[trends.length - 2]?.overall ? 'increased' : 'decreased'} by{' '}
-              {Math.abs((trends[trends.length - 1]?.overall || 0) - (trends[trends.length - 2]?.overall || 0)).toFixed(1)} points
-              over the last period.
-            </Text>
+            <View style={styles.metricCard}>
+              <Text style={styles.metricLabel}>Yearly Change</Text>
+              <Text style={[styles.metricValue, { color: currentScore.trends.yearlyChange >= 0 ? '#10B981' : '#EF4444' }]}>
+                {currentScore.trends.yearlyChange >= 0 ? '+' : ''}{currentScore.trends.yearlyChange}
+              </Text>
+            </View>
+            <View style={styles.metricCard}>
+              <Text style={styles.metricLabel}>Trajectory</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons
+                  name={isImproving ? 'trending-up-outline' : isDeclining ? 'trending-down-outline' : 'remove-outline'}
+                  size={20}
+                  color={isImproving ? '#10B981' : isDeclining ? '#EF4444' : '#64748B'}
+                />
+                <Text style={[styles.metricValue, { marginLeft: 8 }]}>
+                  {currentScore.trends.trajectory.charAt(0).toUpperCase() + currentScore.trends.trajectory.slice(1)}
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -355,9 +337,10 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
         {/* Detailed Breakdown */}
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Detailed Analysis</Text>
-          {Object.entries(currentScore.breakdown).map(([key, value], index) => {
+      {Object.entries(currentScore.breakdown as Record<string, number>).map(([key, value], index) => {
             const categoryName = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
             const color = breakdownData[index]?.color || '#6366F1';
+    const numValue = value as number;
             
             return (
               <View key={key} style={styles.breakdownItem}>
@@ -365,28 +348,29 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
                   <View style={styles.breakdownIconContainer}>
                     <View style={[styles.breakdownIcon, { backgroundColor: color + '20' }]}>
                       <Ionicons
-                        name={getInsightIcon(key)}
+        name={getInsightIcon(key) as any}
                         size={20}
                         color={color}
                       />
                     </View>
                     <Text style={styles.breakdownName}>{categoryName}</Text>
                   </View>
-                  <Text style={[styles.breakdownScore, { color }]}>{value}</Text>
+      <Text style={[styles.breakdownScore, { color }]}>{numValue}</Text>
                 </View>
                 <View style={styles.breakdownProgress}>
                   <View
                     style={[
                       styles.breakdownProgressFill,
                       {
-                        width: `${value}%`,
+        width: '100%',
+        transform: [{ scaleX: (numValue || 0) / 100 }],
                         backgroundColor: color
                       }
                     ]}
                   />
                 </View>
                 <Text style={styles.breakdownDescription}>
-                  {getBreakdownDescription(key, value)}
+      {getBreakdownDescription(key, numValue)}
                 </Text>
               </View>
             );
@@ -399,40 +383,30 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
   const renderRecommendationsTab = () => {
     if (!currentScore) return null;
 
-    const recommendations = currentScore.insights.filter(insight => insight.actionable);
+    const recs = currentScore.insights.recommendations;
 
     return (
       <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionTitle}>Personalized Recommendations</Text>
-          {recommendations.map((recommendation, index) => (
+          {recs.length === 0 && (
+            <Text style={{ color: '#64748B' }}>No recommendations at the moment.</Text>
+          )}
+          {recs.map((text, index) => (
             <View key={index} style={styles.recommendationCard}>
               <View style={styles.recommendationHeader}>
-                <View style={[styles.recommendationIcon, { backgroundColor: getInsightColor(recommendation.type) + '20' }]}>
-                  <Ionicons
-                    name={getInsightIcon(recommendation.type)}
-                    size={24}
-                    color={getInsightColor(recommendation.type)}
-                  />
+                <View style={[styles.recommendationIcon, { backgroundColor: '#F0F4FF' }]}> 
+                  <Ionicons name="bulb-outline" size={24} color="#6366F1" />
                 </View>
                 <View style={styles.recommendationContent}>
-                  <Text style={styles.recommendationTitle}>{recommendation.title}</Text>
-                  <Text style={styles.recommendationDescription}>{recommendation.description}</Text>
+                  <Text style={styles.recommendationTitle}>{text}</Text>
                 </View>
               </View>
-              {recommendation.impact && (
-                <View style={styles.recommendationImpact}>
-                  <Text style={styles.recommendationImpactLabel}>Potential Impact:</Text>
-                  <Text style={styles.recommendationImpactValue}>+{recommendation.impact} points</Text>
-                </View>
-              )}
               <TouchableOpacity
                 style={styles.recommendationAction}
-                onPress={() => onActionPress?.(recommendation.action || 'view_details', recommendation)}
+                onPress={() => onActionPress?.('view_details', { text })}
               >
-                <Text style={styles.recommendationActionText}>
-                  {recommendation.action || 'Take Action'}
-                </Text>
+                <Text style={styles.recommendationActionText}>Take Action</Text>
                 <Ionicons name="arrow-forward" size={16} color="#6366F1" />
               </TouchableOpacity>
             </View>

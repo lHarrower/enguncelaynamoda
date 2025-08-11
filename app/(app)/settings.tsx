@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { APP_THEME_V2 } from '@/constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import PastelBackground from '@/components/common/PastelBackground';
 
 type SettingsRowProps = {
@@ -28,19 +28,19 @@ const SettingsRow = ({ icon, label, description, type, value, onValueChange, onP
   <View>
     <TouchableOpacity style={styles.menuItem} onPress={onPress} disabled={type === 'toggle'}>
       <View style={styles.menuIconContainer}>
-        <Ionicons name={icon} size={22} color={APP_THEME_V2.semantic.text.primary} />
+        <Ionicons name={icon} size={22} color={DesignSystem.colors.text.primary} />
       </View>
       <View style={styles.menuItemTextContainer}>
         <Text style={styles.menuItemText}>{label}</Text>
         {description && <Text style={styles.menuItemDescription}>{description}</Text>}
       </View>
-      {type === 'navigate' && <Ionicons name="chevron-forward" size={22} color={APP_THEME_V2.colors.moonlightSilver} />}
+      {type === 'navigate' && <Ionicons name="chevron-forward" size={22} color={DesignSystem.colors.neutral[300]} />}
       {type === 'toggle' && (
         <Switch
           value={value}
           onValueChange={onValueChange}
-          trackColor={{ false: '#E8DEF2', true: APP_THEME_V2.semantic.accent }}
-          thumbColor={value ? APP_THEME_V2.semantic.text.primary : '#f4f3f4'}
+          trackColor={{ false: '#E8DEF2', true: DesignSystem.colors.accent.gold }}
+          thumbColor={value ? DesignSystem.colors.text.primary : '#f4f3f4'}
         />
       )}
     </TouchableOpacity>
@@ -71,7 +71,7 @@ export default function SettingsScreen() {
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                <Ionicons name="arrow-back" size={24} color={APP_THEME_V2.semantic.text.primary} />
+                <Ionicons name="arrow-back" size={24} color={DesignSystem.colors.text.primary} />
             </TouchableOpacity>
             <Text style={styles.mainTitle}>Settings</Text>
             <View style={styles.backButton} />
@@ -134,7 +134,7 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
     paddingBottom: 40,
   },
   header: {
@@ -149,29 +149,29 @@ const styles = StyleSheet.create({
     width: 40, // for alignment
   },
   mainTitle: {
-    ...APP_THEME_V2.typography.scale.h2,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
   },
   section: {
     marginBottom: 24,
   },
   sectionTitle: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
     paddingLeft: 12,
     marginBottom: 12,
     textTransform: 'uppercase',
     fontSize: 12,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   card: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.lift,
+    backgroundColor: DesignSystem.colors.surface.primary,
+    borderRadius: DesignSystem.borderRadius.lg,
+    ...DesignSystem.elevation.md,
     paddingHorizontal: 0,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.moonlightSilver,
+    borderColor: DesignSystem.colors.neutral[300],
   },
   menuItem: {
     flexDirection: 'row',
@@ -192,15 +192,15 @@ const styles = StyleSheet.create({
       flex: 1,
   },
   menuItemText: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.primary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.body.large,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontSize: 16,
   },
   menuItemDescription: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.secondary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     marginTop: 2,
   },
   separator: {

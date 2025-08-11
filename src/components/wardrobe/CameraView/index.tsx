@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions } from 'rea
 import { Camera, CameraView as ExpoCamera, CameraType, FlashMode } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { errorInDev } from '../../../utils/consoleSuppress';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -56,7 +57,7 @@ const CameraView: React.FC<CameraViewProps> = ({
         );
       }
     } catch (error) {
-      console.error('Error requesting permissions:', error);
+      errorInDev('Error requesting permissions:', error);
       Alert.alert('Error', 'Unable to request camera permissions. Please try again.');
     }
   };
@@ -97,7 +98,7 @@ const CameraView: React.FC<CameraViewProps> = ({
         onPhotoTaken(photo.uri);
       }
     } catch (error) {
-      console.error('Error taking photo:', error);
+      errorInDev('Error taking photo:', error);
       Alert.alert('Error', 'Failed to take photo. Please try again.');
     } finally {
       setIsCapturing(false);
@@ -126,7 +127,7 @@ const CameraView: React.FC<CameraViewProps> = ({
         onPhotoTaken(result.assets[0].uri);
       }
     } catch (error) {
-      console.error('Error selecting from gallery:', error);
+      errorInDev('Error selecting from gallery:', error);
       Alert.alert('Error', 'Failed to select image from gallery. Please try again.');
     }
   };
@@ -395,4 +396,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CameraView; 
+export default CameraView;

@@ -39,7 +39,7 @@ export const ProfileScreen: React.FC = () => {
               <View style={styles.optionLeft}>
                 <View style={styles.optionIcon}>
                   <Ionicons
-                    name={option.icon}
+                    name={option.icon as any}
                     size={20}
                     color={DesignSystem.colors.lilac[600]}
                   />
@@ -87,18 +87,18 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: DesignSystem.typography.scale.h2.fontSize,
-    fontFamily: DesignSystem.typography.serif.family,
+  fontFamily: DesignSystem.typography.fontFamily.serif,
     color: DesignSystem.colors.lilac[600],
   },
   name: {
     fontSize: DesignSystem.typography.scale.h1.fontSize,
-    fontFamily: DesignSystem.typography.serif.family,
+  fontFamily: DesignSystem.typography.fontFamily.serif,
     color: DesignSystem.colors.text.primary,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: DesignSystem.typography.scale.body1.fontSize,
-    fontFamily: DesignSystem.typography.sans.family,
+  fontFamily: DesignSystem.typography.fontFamily.sans,
     color: DesignSystem.colors.text.secondary,
   },
   optionsContainer: {
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.background.secondary,
     borderRadius: DesignSystem.radius.lg,
     marginBottom: 12,
-    ...DesignSystem.elevation.small,
+  ...DesignSystem.elevation.soft,
   },
   optionLeft: {
     flexDirection: 'row',
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   optionLabel: {
     fontSize: DesignSystem.typography.scale.body1.fontSize,
-    fontFamily: DesignSystem.typography.sans.family,
+  fontFamily: DesignSystem.typography.fontFamily.sans,
     color: DesignSystem.colors.text.primary,
   },
 });

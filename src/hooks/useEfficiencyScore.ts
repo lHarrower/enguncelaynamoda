@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { efficiencyScoreService, EfficiencyScore, EfficiencyGoal } from '@/services/efficiencyScoreService';
 import { useAuth } from './useAuth';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 export interface UseEfficiencyScoreReturn {
   // State
@@ -61,7 +62,7 @@ export const useEfficiencyScore = (): UseEfficiencyScoreReturn => {
       // Store the score for historical tracking
       await efficiencyScoreService.storeEfficiencyScore(user.id, score);
     } catch (err) {
-      console.error('Failed to generate efficiency score:', err);
+      errorInDev('Failed to generate efficiency score:', err);
       setError('Failed to generate efficiency score');
     } finally {
       setIsGenerating(false);
@@ -79,7 +80,7 @@ export const useEfficiencyScore = (): UseEfficiencyScoreReturn => {
       const score = await efficiencyScoreService.calculateEfficiencyScore(user.id);
       setEfficiencyScore(score);
     } catch (err) {
-      console.error('Failed to refresh efficiency score:', err);
+      errorInDev('Failed to refresh efficiency score:', err);
       setError('Failed to load efficiency score');
     } finally {
       setIsLoading(false);
@@ -94,7 +95,7 @@ export const useEfficiencyScore = (): UseEfficiencyScoreReturn => {
       const newGoal = await efficiencyScoreService.createEfficiencyGoal(goalData);
       setGoals(prev => [newGoal, ...prev]);
     } catch (err) {
-      console.error('Failed to create efficiency goal:', err);
+      errorInDev('Failed to create efficiency goal:', err);
       setError('Failed to create goal');
     }
   }, [user?.id]);
@@ -106,7 +107,7 @@ export const useEfficiencyScore = (): UseEfficiencyScoreReturn => {
       const userGoals = await efficiencyScoreService.getEfficiencyGoals(user.id);
       setGoals(userGoals);
     } catch (err) {
-      console.error('Failed to refresh efficiency goals:', err);
+      errorInDev('Failed to refresh efficiency goals:', err);
       setError('Failed to load goals');
     }
   }, [user?.id]);
@@ -228,7 +229,7 @@ export const useEfficiencyScore = (): UseEfficiencyScoreReturn => {
     return '#F44336'; // Red
   }, []);
 
-  const getGradeFromScore = useCallback((score: number): string => {
+  function getGradeFromScore(score: number): string {
     if (score >= 90) return 'A+';
     if (score >= 85) return 'A';
     if (score >= 80) return 'A-';
@@ -241,7 +242,7 @@ export const useEfficiencyScore = (): UseEfficiencyScoreReturn => {
     if (score >= 45) return 'D+';
     if (score >= 40) return 'D';
     return 'F';
-  }, []);
+  }
 
   const getPerformanceLevel = useCallback((score: number): 'excellent' | 'good' | 'fair' | 'poor' => {
     if (score >= 80) return 'excellent';

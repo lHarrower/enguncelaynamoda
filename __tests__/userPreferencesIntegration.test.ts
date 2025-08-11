@@ -1,9 +1,9 @@
 // User Preferences Integration Tests
-import { UserPreferencesService } from '../services/userPreferencesService';
-import { supabase } from '../config/supabaseClient';
+import { UserPreferencesService } from '@/services/userPreferencesService';
+import { supabase } from '@/config/supabaseClient';
 
 // Mock dependencies
-jest.mock('../config/supabaseClient');
+jest.mock('@/config/supabaseClient');
 jest.mock('expo-location', () => ({
   getForegroundPermissionsAsync: jest.fn(),
   getCurrentPositionAsync: jest.fn(),

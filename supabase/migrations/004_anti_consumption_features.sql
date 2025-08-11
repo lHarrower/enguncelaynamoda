@@ -72,22 +72,22 @@ ADD COLUMN IF NOT EXISTS cost_per_wear DECIMAL(10,2) DEFAULT 0,
 ADD COLUMN IF NOT EXISTS total_wears INTEGER DEFAULT 0,
 ADD COLUMN IF NOT EXISTS projected_cost_per_wear DECIMAL(10,2) DEFAULT 0;
 
--- Create indexes for performance
-CREATE INDEX idx_shop_closet_recommendations_user_id ON shop_your_closet_recommendations(user_id);
-CREATE INDEX idx_shop_closet_recommendations_created_at ON shop_your_closet_recommendations(created_at);
+-- Create indexes for performance (idempotent)
+CREATE INDEX IF NOT EXISTS idx_shop_closet_recommendations_user_id ON shop_your_closet_recommendations(user_id);
+CREATE INDEX IF NOT EXISTS idx_shop_closet_recommendations_created_at ON shop_your_closet_recommendations(created_at);
 
-CREATE INDEX idx_rediscovery_challenges_user_id ON rediscovery_challenges(user_id);
-CREATE INDEX idx_rediscovery_challenges_expires_at ON rediscovery_challenges(expires_at);
-CREATE INDEX idx_rediscovery_challenges_completed_at ON rediscovery_challenges(completed_at);
+CREATE INDEX IF NOT EXISTS idx_rediscovery_challenges_user_id ON rediscovery_challenges(user_id);
+CREATE INDEX IF NOT EXISTS idx_rediscovery_challenges_expires_at ON rediscovery_challenges(expires_at);
+CREATE INDEX IF NOT EXISTS idx_rediscovery_challenges_completed_at ON rediscovery_challenges(completed_at);
 
-CREATE INDEX idx_monthly_confidence_metrics_user_id ON monthly_confidence_metrics(user_id);
-CREATE INDEX idx_monthly_confidence_metrics_month_year ON monthly_confidence_metrics(month, year);
+CREATE INDEX IF NOT EXISTS idx_monthly_confidence_metrics_user_id ON monthly_confidence_metrics(user_id);
+CREATE INDEX IF NOT EXISTS idx_monthly_confidence_metrics_month_year ON monthly_confidence_metrics(month, year);
 
-CREATE INDEX idx_shopping_behavior_user_id ON shopping_behavior_tracking(user_id);
-CREATE INDEX idx_shopping_behavior_month_year ON shopping_behavior_tracking(month, year);
+CREATE INDEX IF NOT EXISTS idx_shopping_behavior_user_id ON shopping_behavior_tracking(user_id);
+CREATE INDEX IF NOT EXISTS idx_shopping_behavior_month_year ON shopping_behavior_tracking(month, year);
 
-CREATE INDEX idx_wardrobe_items_cost_per_wear ON wardrobe_items(cost_per_wear);
-CREATE INDEX idx_wardrobe_items_last_worn ON wardrobe_items(last_worn);
+CREATE INDEX IF NOT EXISTS idx_wardrobe_items_cost_per_wear ON wardrobe_items(cost_per_wear);
+CREATE INDEX IF NOT EXISTS idx_wardrobe_items_last_worn ON wardrobe_items(last_worn);
 
 -- Function to update cost-per-wear automatically
 CREATE OR REPLACE FUNCTION update_cost_per_wear()
@@ -119,7 +119,8 @@ CREATE TRIGGER trigger_update_cost_per_wear
   FOR EACH ROW
   EXECUTE FUNCTION update_cost_per_wear();
 
--- Function to get neglected items
+-- Drop conflicting function if it exists to avoid return type mismatch
+DROP FUNCTION IF EXISTS get_neglected_items(UUID, INTEGER);
 CREATE OR REPLACE FUNCTION get_neglected_items(
   p_user_id UUID,
   p_days_since INTEGER DEFAULT 60
@@ -151,7 +152,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Function to calculate wardrobe utilization percentage
+-- Drop conflicting function if it exists to avoid signature conflicts
+DROP FUNCTION IF EXISTS calculate_wardrobe_utilization(UUID, INTEGER);
 CREATE OR REPLACE FUNCTION calculate_wardrobe_utilization(
   p_user_id UUID,
   p_days_back INTEGER DEFAULT 30

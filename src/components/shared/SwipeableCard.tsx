@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   description: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     lineHeight: 22,
     marginBottom: DesignSystem.spacing.lg,
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     paddingVertical: DesignSystem.spacing.xs,
     borderRadius: DesignSystem.radius.sm,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border.subtle,
+  borderColor: DesignSystem.colors.border.secondary,
   },
   tagText: {
     ...DesignSystem.typography.scale.caption,

@@ -8,7 +8,7 @@ import Animated, {
   Easing,
   interpolate,
 } from 'react-native-reanimated';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '../../theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 
@@ -56,9 +56,9 @@ const Circle = ({ style, delay, size, initialX, initialY }: any) => {
 const AnimatedPastelCircleBackground = () => {
   return (
     <View style={[StyleSheet.absoluteFill, styles.background]}>
-      <Circle style={{ backgroundColor: APP_THEME_V2.colors.moonlightSilver + '20' }} size={width * 1.6} initialX={-width * 0.3} initialY={-width * 0.8} />
-      <Circle style={{ backgroundColor: APP_THEME_V2.colors.zenGold + '15' }} size={width * 1.2} initialX={width * 0.1} initialY={height * 0.5} />
-      <Circle style={{ backgroundColor: APP_THEME_V2.colors.tranquilBlue + '10' }} size={width} initialX={-width * 0.5} initialY={height * 0.2} />
+      <Circle style={{ backgroundColor: DesignSystem.colors.neutral[300] + '20' }} size={width * 1.6} initialX={-width * 0.3} initialY={-width * 0.8} />
+      <Circle style={{ backgroundColor: DesignSystem.colors.gold[300] + '15' }} size={width * 1.2} initialX={width * 0.1} initialY={height * 0.5} />
+      <Circle style={{ backgroundColor: DesignSystem.colors.sage[300] + '10' }} size={width} initialX={-width * 0.5} initialY={height * 0.2} />
     </View>
   );
 };
@@ -68,11 +68,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     overflow: 'hidden',
-    backgroundColor: APP_THEME_V2.semantic.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   circle: {
     position: 'absolute',
   },
 });
 
-export default AnimatedPastelCircleBackground; 
+export default AnimatedPastelCircleBackground;

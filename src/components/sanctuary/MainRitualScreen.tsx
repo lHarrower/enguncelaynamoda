@@ -212,8 +212,8 @@ export const MainRitualScreen: React.FC = () => {
                     name={mood.icon as any}
                     size={32}
                     color={selectedMood === mood.tag 
-                      ? APP_THEME_V2.colors.whisperWhite 
-                      : APP_THEME_V2.colors.sageGreen[600]
+                      ? DesignSystem.colors.text.inverse 
+                      : DesignSystem.colors.sage[600]
                     }
                   />
                 </View>
@@ -303,7 +303,7 @@ export const MainRitualScreen: React.FC = () => {
               <Ionicons 
                 name="sparkles-outline" 
                 size={48} 
-                color={APP_THEME_V2.colors.liquidGold[400]} 
+                color={DesignSystem.colors.gold[400]} 
               />
             </View>
             <Text 
@@ -342,13 +342,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    ...DesignSystem.typography.hero,
+  ...DesignSystem.typography.scale.hero,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.sm,
   },
   subtitle: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
@@ -357,13 +357,13 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.xxxl,
   },
   sectionTitle: {
-    ...DesignSystem.typography.h2,
+    ...DesignSystem.typography.heading.h2,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.md,
   },
   sectionSubtitle: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.xl,
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.md,
   },
   moodText: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     fontWeight: '600',
     textAlign: 'center',
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.text.inverse,
   },
   moodDescription: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 16,
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    ...DesignSystem.typography.body1,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
@@ -439,13 +439,13 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.xl,
   },
   emptyTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.md,
   },
   emptySubtitle: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,

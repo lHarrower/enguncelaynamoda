@@ -9,6 +9,7 @@
 
 import { ViewStyle, Dimensions } from 'react-native';
 import { SPACING, BORDER_RADIUS, ELEVATION, UNIFIED_COLORS } from '@/theme/tokens';
+import { logInDev } from '../../utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 const GRID_PADDING = SPACING.md;
@@ -236,7 +237,7 @@ export const GRID_INTERACTIONS = {
       transform: [{ scale: 1.05 }],
       borderWidth: 3,
       borderColor: UNIFIED_COLORS.sage[500],
-      backgroundColor: UNIFIED_COLORS.sage[50],
+      backgroundColor: UNIFIED_COLORS.sage[100],
     } as ViewStyle,
     
     // Pressed state
@@ -441,7 +442,7 @@ export const getGridItemWidth = (columns: number, spacing: number = SPACING.md) 
 export const getGridColumns = (screenWidth: number) => {
   // Defensive check to prevent undefined access
   if (!GRID_BREAKPOINTS || !GRID_BREAKPOINTS.medium) {
-    console.warn('GRID_BREAKPOINTS not properly initialized');
+    logInDev('GRID_BREAKPOINTS not properly initialized');
     return 2; // fallback
   }
   
@@ -454,7 +455,7 @@ export const getGridColumns = (screenWidth: number) => {
 export const getGridSpacing = (screenWidth: number) => {
   // Defensive check to prevent undefined access
   if (!GRID_BREAKPOINTS || !GRID_BREAKPOINTS.medium) {
-    console.warn('GRID_BREAKPOINTS not properly initialized');
+    logInDev('GRID_BREAKPOINTS not properly initialized');
     return GRID_SPACING.normal; // fallback
   }
   

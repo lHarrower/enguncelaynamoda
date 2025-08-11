@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/context/ThemeContext'; // Import useTheme
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -30,7 +30,6 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
   title = "Processing Your Photo",
   subtitle = "Creating magic with AI..."
 }) => {
-  const { colors, isDark } = useTheme(); // Use the theme
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
@@ -104,37 +103,37 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
         return {
           icon: 'cloud-upload-outline',
           message: 'Uploading your photo...',
-          color: colors.highlight,
+          color: DesignSystem.colors.primary[500],
         };
       case 'removing_background':
         return {
           icon: 'cut-outline',
           message: 'Removing background with AI...',
-          color: colors.tint,
+          color: DesignSystem.colors.primary[500],
         };
       case 'analyzing':
         return {
           icon: 'eye-outline',
           message: 'Analyzing colors and style...',
-          color: colors.text_secondary,
+          color: DesignSystem.colors.text.secondary,
         };
       case 'processing':
         return {
           icon: 'cog-outline',
           message: 'Processing item details...',
-          color: colors.text,
+          color: DesignSystem.colors.text.primary,
         };
       case 'complete':
         return {
           icon: 'checkmark-circle',
           message: 'Complete! ✨',
-          color: colors.highlight,
+          color: DesignSystem.colors.primary[500],
         };
       default:
         return {
           icon: 'hourglass-outline',
           message: 'Processing...',
-          color: colors.tint,
+          color: DesignSystem.colors.primary[500],
         };
     }
   };
@@ -156,13 +155,13 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
       animationType="none"
       statusBarTranslucent
     >
-      <StatusBar barStyle="light-content" backgroundColor={colors.overlay} />
+      <StatusBar barStyle="light-content" backgroundColor={DesignSystem.colors.background.overlay} />
       <Animated.View 
         style={[
           styles.overlay,
           {
             opacity: fadeAnim,
-            backgroundColor: isDark ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.95)',
+            backgroundColor: 'rgba(0,0,0,0.9)',
           }
         ]}
       >
@@ -170,7 +169,7 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
           style={[
             styles.container,
             {
-              backgroundColor: colors.card,
+              backgroundColor: DesignSystem.colors.background.elevated,
               transform: [{ scale: scaleAnim }],
             }
           ]}
@@ -181,21 +180,21 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
               style={[
                 styles.circle,
                 styles.circle1,
-                { backgroundColor: colors.tint, transform: [{ rotate: spin }, { scale: pulseAnim }] }
+                { backgroundColor: DesignSystem.colors.primary[500], transform: [{ rotate: spin }, { scale: pulseAnim }] }
               ]}
             />
             <Animated.View 
               style={[
                 styles.circle,
                 styles.circle2,
-                { backgroundColor: colors.success, transform: [{ rotate: spin }] }
+                { backgroundColor: DesignSystem.colors.success.main, transform: [{ rotate: spin }] }
               ]}
             />
             <Animated.View 
               style={[
                 styles.circle,
                 styles.circle3,
-                { backgroundColor: colors.highlight, transform: [{ scale: pulseAnim }] }
+                { backgroundColor: DesignSystem.colors.primary[500], transform: [{ scale: pulseAnim }] }
               ]}
             />
           </View>
@@ -218,17 +217,17 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
             </Animated.View>
 
             {/* Title and Subtitle */}
-            <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-            <Text style={[styles.subtitle, { color: colors.text_secondary }]}>{subtitle}</Text>
+            <Text style={[styles.title, { color: DesignSystem.colors.text.primary }]}>{title}</Text>
+            <Text style={[styles.subtitle, { color: DesignSystem.colors.text.secondary }]}>{subtitle}</Text>
 
             {/* Progress Circle */}
             <View style={styles.progressContainer}>
-              <View style={[styles.progressCircle, { backgroundColor: colors.border }]}>
+              <View style={[styles.progressCircle, { backgroundColor: DesignSystem.colors.border.primary }]}>
                 <Animated.View
                   style={[
                     styles.progressFill,
                     {
-                      backgroundColor: colors.tint,
+                      backgroundColor: DesignSystem.colors.primary[500],
                       transform: [
                         {
                           rotate: progressAnim.interpolate({
@@ -240,14 +239,14 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
                     },
                   ]}
                 />
-                <View style={[styles.progressInner, { backgroundColor: colors.card }]}>
-                  <Text style={[styles.progressText, { color: colors.text }]}>{progressPercentage}%</Text>
+                <View style={[styles.progressInner, { backgroundColor: DesignSystem.colors.background.elevated }]}>
+                  <Text style={[styles.progressText, { color: DesignSystem.colors.text.primary }]}>{progressPercentage}%</Text>
                 </View>
               </View>
             </View>
 
             {/* Progress Bar */}
-            <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
+            <View style={[styles.progressBar, { backgroundColor: DesignSystem.colors.border.primary }]}>
               <Animated.View
                 style={[
                   styles.progressBarFill,
@@ -279,22 +278,22 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
                     <View 
                       style={[
                         styles.stepIndicator,
-                        { backgroundColor: colors.border },
-                        isActive && { backgroundColor: colors.tint },
-                        isComplete && { backgroundColor: colors.success },
+                        { backgroundColor: DesignSystem.colors.border.primary },
+                        isActive && { backgroundColor: DesignSystem.colors.primary[500] },
+                        isComplete && { backgroundColor: DesignSystem.colors.success.main },
                       ]}
                     >
                       {isComplete ? (
-                        <Ionicons name="checkmark" size={12} color={colors.card} />
+                        <Ionicons name="checkmark" size={12} color={DesignSystem.colors.background.elevated} />
                       ) : (
-                        <View style={[styles.stepDot, { backgroundColor: colors.card }]} />
+                        <View style={[styles.stepDot, { backgroundColor: DesignSystem.colors.background.elevated }]} />
                       )}
                     </View>
                     <Text 
                       style={[
                         styles.stepText,
-                        { color: colors.text_secondary },
-                        isActive && { color: colors.text, fontWeight: '600' },
+                        { color: DesignSystem.colors.text.secondary },
+                        isActive && { color: DesignSystem.colors.text.primary, fontWeight: '600' },
                       ]}
                     >
                       {step}

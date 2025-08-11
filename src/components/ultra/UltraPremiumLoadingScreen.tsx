@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingMessage: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.lg,

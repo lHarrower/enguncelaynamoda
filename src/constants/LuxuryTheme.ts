@@ -1,370 +1,126 @@
-import { Dimensions, Platform } from 'react-native';
+/**
+ * Legacy Luxury Theme Constants
+ * Backward compatibility exports for existing components
+ */
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+import { UNIFIED_COLORS, TYPOGRAPHY, SPACING, ELEVATION, BORDER_RADIUS } from '../theme/DesignSystem';
 
-// PILLAR 1: MATERIALS & TEXTURES - AN ORGANIC REALITY
+// Legacy luxury materials
 export const LuxuryMaterials = {
-  // The Textured Linen Canvas
-  linen: {
-    base: '#F8F7F4', // Warm, off-white base
-    textureOpacity: 0.05, // Subtle noise overlay
-  },
-  
-  // Glassmorphism & Layered Depth
   glass: {
-    primary: {
-      backgroundColor: 'rgba(255, 255, 255, 0.7)',
-      backdropFilter: 'blur(25px)',
-      borderColor: 'rgba(255, 255, 255, 0.3)',
-      borderWidth: 1,
-    },
-    subtle: {
-      backgroundColor: 'rgba(255, 255, 255, 0.4)',
-      backdropFilter: 'blur(15px)',
-      borderColor: 'rgba(255, 255, 255, 0.2)',
-      borderWidth: 0.5,
-    },
-    dark: {
-      backgroundColor: 'rgba(0, 0, 0, 0.3)',
-      backdropFilter: 'blur(20px)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
-      borderWidth: 0.5,
-    },
+    background: 'rgba(255, 255, 255, 0.15)',
+    border: 'rgba(255, 255, 255, 0.2)',
+    shadow: 'rgba(0, 0, 0, 0.1)'
   },
-  
-  // Organic Color Palette
-  colors: {
-    inkGray: '#333333', // Headlines
-    charcoal: '#555555', // Body text
-    whisper: '#888888', // Captions
-    liquidGold: '#D4AF37', // Accent
-    sage: '#9CAF88', // Secondary
-    pearl: '#F5F5F0', // Light accents
-    shadow: 'rgba(0, 0, 0, 0.08)', // Subtle shadows
+  metal: {
+    gold: UNIFIED_COLORS.gold[500],
+    silver: '#C0C0C0',
+    bronze: '#CD7F32'
   },
+  fabric: {
+    silk: UNIFIED_COLORS.background.primary,
+    velvet: UNIFIED_COLORS.charcoal[800],
+    linen: UNIFIED_COLORS.background.secondary
+  }
 };
 
-// PILLAR 2: TYPOGRAPHY - THE EDITORIAL STANDARD
-export const LuxuryTypography = {
-  // Headlines - Elegant Serif
-  headline: {
-    fontFamily: Platform.select({
-      ios: 'Playfair Display',
-      android: 'PlayfairDisplay-Regular',
-      default: 'serif',
-    }),
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: '400' as const,
-    color: LuxuryMaterials.colors.inkGray,
-    letterSpacing: -0.5,
-  },
-  
-  subheadline: {
-    fontFamily: Platform.select({
-      ios: 'Playfair Display',
-      android: 'PlayfairDisplay-Regular',
-      default: 'serif',
-    }),
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: '400' as const,
-    color: LuxuryMaterials.colors.inkGray,
-    letterSpacing: -0.3,
-  },
-  
-  // Body & UI Text - Premium Sans-serif
-  body: {
-    fontFamily: Platform.select({
-      ios: 'Inter',
-      android: 'Inter-Regular',
-      default: 'sans-serif',
-    }),
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: '400' as const,
-    color: LuxuryMaterials.colors.charcoal,
-    letterSpacing: 0,
-  },
-  
-  bodySmall: {
-    fontFamily: Platform.select({
-      ios: 'Inter',
-      android: 'Inter-Regular',
-      default: 'sans-serif',
-    }),
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '400' as const,
-    color: LuxuryMaterials.colors.charcoal,
-    letterSpacing: 0.1,
-  },
-  
-  // Whispers & Captions
-  whisper: {
-    fontFamily: Platform.select({
-      ios: 'Inter',
-      android: 'Inter-Italic',
-      default: 'sans-serif',
-    }),
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: '400' as const,
-    fontStyle: 'italic' as const,
-    color: LuxuryMaterials.colors.whisper,
-    letterSpacing: 0.2,
-  },
-  
-  // UI Elements
-  button: {
-    fontFamily: Platform.select({
-      ios: 'Inter',
-      android: 'Inter-Medium',
-      default: 'sans-serif',
-    }),
-    fontSize: 16,
-    lineHeight: 20,
-    fontWeight: '500' as const,
-    color: LuxuryMaterials.colors.charcoal,
-    letterSpacing: 0.1,
-  },
-  
-  tab: {
-    fontFamily: Platform.select({
-      ios: 'Inter',
-      android: 'Inter-Medium',
-      default: 'sans-serif',
-    }),
-    fontSize: 15,
-    lineHeight: 20,
-    fontWeight: '500' as const,
-    color: LuxuryMaterials.colors.charcoal,
-    letterSpacing: 0.3,
-  },
-};
-
-// PILLAR 3: MOTION - A FLUID CHOREOGRAPHY
+// Legacy luxury motion
 export const LuxuryMotion = {
-  // Physics-Based Curves
-  curves: {
-    elegant: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Smooth ease-in-out
-    gentle: 'cubic-bezier(0.23, 1, 0.32, 1)', // Gentle spring
-    dramatic: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)', // Dramatic bounce
+  spring: {
+    tension: 300,
+    friction: 30
   },
-  
-  // Timing Constants
   timing: {
-    instant: 150,
-    quick: 250,
-    smooth: 400,
-    cinematic: 600,
-    dramatic: 800,
+    fast: 200,
+    medium: 400,
+    slow: 600
   },
-  
-  // Cinematic Transitions
-  transitions: {
-    fadeIn: {
-      from: { opacity: 0 },
-      to: { opacity: 1 },
-      duration: 400,
-    },
-    fadeOut: {
-      from: { opacity: 1 },
-      to: { opacity: 0 },
-      duration: 300,
-    },
-    dissolve: {
-      duration: 700, // 300ms fade out + 400ms fade in
-    },
-    float: {
-      from: { transform: [{ translateY: 20 }, { scale: 0.95 }] },
-      to: { transform: [{ translateY: 0 }, { scale: 1 }] },
-      duration: 500,
-    },
-  },
-  
-  // Micro-interactions
-  interactions: {
-    tap: {
-      scale: 0.98,
-      duration: 150,
-    },
-    like: {
-      scale: 1.1,
-      duration: 200,
-    },
-    waveOfLight: {
-      circles: 3,
-      duration: 600,
-      stagger: 100,
-    },
-  },
+  easing: {
+    ease: 'ease',
+    easeIn: 'ease-in',
+    easeOut: 'ease-out',
+    easeInOut: 'ease-in-out'
+  }
 };
 
-// PILLAR 4: LIGHT, SHADOW & SPACE - INTENTIONAL AWARENESS
+// Legacy luxury shadows
 export const LuxuryShadows = {
-  // Multi-Layered Shadow System
-  whisper: {
-    shadowColor: LuxuryMaterials.colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  
-  lift: {
-    shadowColor: LuxuryMaterials.colors.shadow,
+  soft: {
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 2
   },
-  
-  float: {
-    shadowColor: LuxuryMaterials.colors.shadow,
+  medium: {
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.15,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 4
   },
-  
-  dramatic: {
-    shadowColor: LuxuryMaterials.colors.shadow,
+  strong: {
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.16,
+    shadowOpacity: 0.2,
     shadowRadius: 16,
-    elevation: 8,
-  },
-  
-  // Multi-layered card shadows (ambient occlusion)
-  card: [
-    {
-      shadowColor: '#000000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.08,
-      shadowRadius: 2,
-      elevation: 1,
-    },
-    {
-      shadowColor: '#000000',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.04,
-      shadowRadius: 12,
-      elevation: 4,
-    },
-  ],
+    elevation: 8
+  }
 };
 
-// The Breathable Interface - 8px Grid System
-export const LuxurySpacing = {
-  xs: 4,   // 0.5 grid units
-  sm: 8,   // 1 grid unit
-  md: 16,  // 2 grid units
-  lg: 24,  // 3 grid units
-  xl: 32,  // 4 grid units
-  xxl: 48, // 6 grid units
-  xxxl: 64, // 8 grid units
-  
-  // Semantic spacing
-  hairline: 1,
-  border: 2,
-  padding: 16,
-  margin: 24,
-  section: 32,
-  screen: 48,
-};
-
-// Responsive Design
+// Legacy luxury layout
 export const LuxuryLayout = {
-  screen: {
-    width: screenWidth,
-    height: screenHeight,
-    isTablet: screenWidth >= 768,
-    isLandscape: screenWidth > screenHeight,
+  container: {
+    padding: 20,
+    maxWidth: 400
   },
-  
-  // Golden Ratio Proportions
-  golden: {
-    ratio: 1.618,
-    small: screenWidth * 0.382, // 1/φ
-    large: screenWidth * 0.618, // φ-1
+  grid: {
+    columns: 2,
+    gap: 16
   },
-  
-  // Component Dimensions
   card: {
-    minHeight: 200,
-    borderRadius: 16,
-    padding: LuxurySpacing.padding,
-  },
-  
-  button: {
-    height: 48,
-    borderRadius: 12,
-    paddingHorizontal: LuxurySpacing.lg,
-  },
-  
-  input: {
-    height: 56,
-    borderRadius: 8,
-    paddingHorizontal: LuxurySpacing.padding,
-  },
+    padding: 16,
+    borderRadius: 12
+  }
 };
 
-// Luxury Component Styles
-export const LuxuryComponents = {
-  // Textured Linen Canvas
-  linenCanvas: {
-    flex: 1,
-    backgroundColor: LuxuryMaterials.linen.base,
-    // Note: Texture overlay will be added via ImageBackground
-  },
-  
-  // Glassmorphism Card
-  glassCard: {
-    ...LuxuryMaterials.glass.primary,
-    borderRadius: LuxuryLayout.card.borderRadius,
-    padding: LuxuryLayout.card.padding,
-    ...LuxuryShadows.float,
-  },
-  
-  // Elegant Tab
-  elegantTab: {
-    paddingVertical: LuxurySpacing.sm,
-    paddingHorizontal: LuxurySpacing.md,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  
-  elegantTabActive: {
-    borderBottomColor: LuxuryMaterials.colors.liquidGold,
-  },
-  
-  // Floating Action Button
-  floatingButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: LuxuryMaterials.colors.liquidGold,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...LuxuryShadows.dramatic,
-  },
-  
-  // Wave of Light Container
-  waveContainer: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-    pointerEvents: 'none',
-  },
+// Legacy luxury spacing
+export const LuxurySpacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  xxl: 32,
+  xxxl: 48
 };
 
-export default {
-  LuxuryMaterials,
-  LuxuryTypography,
-  LuxuryMotion,
-  LuxuryShadows,
-  LuxurySpacing,
-  LuxuryLayout,
-  LuxuryComponents,
-}; 
+// Legacy luxury typography
+export const LuxuryTypography = {
+  fontFamily: {
+    primary: 'Inter',
+    secondary: 'Playfair Display',
+    mono: 'SF Mono'
+  },
+  fontSize: {
+    xs: 12,
+    sm: 14,
+    md: 16,
+    lg: 18,
+    xl: 20,
+    xxl: 24,
+    xxxl: 32
+  },
+  fontWeight: {
+    light: '300',
+    regular: '400',
+    medium: '500',
+    semibold: '600',
+    bold: '700'
+  },
+  lineHeight: {
+    tight: 1.2,
+    normal: 1.4,
+    relaxed: 1.6
+  }
+};

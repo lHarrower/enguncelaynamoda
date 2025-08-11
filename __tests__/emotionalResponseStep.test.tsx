@@ -1,7 +1,7 @@
 // Emotional Response Step Tests
 // Tests for emotional response functionality and data validation
 
-import { EmotionalResponse, EmotionalState } from '../types/aynaMirror';
+import { EmotionalResponse, EmotionalState } from '@/types/aynaMirror';
 
 describe('EmotionalResponseStep', () => {
   

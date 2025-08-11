@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback, Rea
 import { AccessibilityInfo, AppState, AppStateStatus } from 'react-native';
 import hapticService, { HapticType, HapticIntensity } from '../services/HapticService';
 import { AnimationContext } from './AnimationProvider';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 /**
  * Haptic settings interface
@@ -119,13 +120,13 @@ export const HapticProvider: React.FC<HapticProviderProps> = ({
           respectSystemSettings: settings.respectSystemSettings
         });
         
-        console.log('Haptic Provider initialized:', {
+        logInDev('Haptic Provider initialized:', {
           available,
           reduceMotion,
           settings
         });
       } catch (error) {
-        console.warn('Failed to initialize haptic provider:', error);
+        errorInDev('Failed to initialize haptic provider:', error);
       }
     };
     
@@ -166,10 +167,10 @@ export const HapticProvider: React.FC<HapticProviderProps> = ({
    * Sync with animation context for reduced motion
    */
   useEffect(() => {
-    if (animationContext?.settings.accessibility.reduceMotion !== undefined) {
-      setReduceMotionEnabled(animationContext.settings.accessibility.reduceMotion);
+    if (animationContext?.settings?.accessibility?.reduceMotion !== undefined) {
+      setReduceMotionEnabled(!!animationContext.settings?.accessibility?.reduceMotion);
     }
-  }, [animationContext?.settings.accessibility.reduceMotion]);
+  }, [animationContext?.settings?.accessibility?.reduceMotion]);
   
   /**
    * Update haptic service when settings change
@@ -235,7 +236,7 @@ export const HapticProvider: React.FC<HapticProviderProps> = ({
     try {
       await hapticService.trigger(type, customIntensity);
     } catch (error) {
-      console.warn('Failed to trigger haptic:', error);
+      errorInDev('Failed to trigger haptic:', error);
     }
   }, [isEnabled]);
   
@@ -251,7 +252,7 @@ export const HapticProvider: React.FC<HapticProviderProps> = ({
     try {
       await hapticService.triggerSequence(types, delay);
     } catch (error) {
-      console.warn('Failed to trigger haptic sequence:', error);
+      errorInDev('Failed to trigger haptic sequence:', error);
     }
   }, [isEnabled]);
   
@@ -268,7 +269,7 @@ export const HapticProvider: React.FC<HapticProviderProps> = ({
       const customPattern = hapticService.createCustomPattern(pattern, intensity);
       await hapticService.triggerCustom(customPattern);
     } catch (error) {
-      console.warn('Failed to trigger custom haptic pattern:', error);
+      errorInDev('Failed to trigger custom haptic pattern:', error);
     }
   }, [isEnabled]);
   
@@ -345,7 +346,7 @@ export const useHapticSettings = () => {
   
   const createPreset = useCallback((name: string, preset: Partial<HapticSettings>) => {
     // In a real app, you might save this to AsyncStorage
-    console.log(`Haptic preset '${name}' created:`, preset);
+    logInDev(`Haptic preset '${name}' created:`, preset);
   }, []);
   
   return {

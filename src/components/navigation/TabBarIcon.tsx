@@ -1,17 +1,17 @@
 import React from 'react';
-import { type ComponentProps } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { TAB_ICON_SIZE } from '@/constants/Layout';
-import { useTheme } from '@/context/ThemeContext';
+import { DesignSystem } from '@/theme/DesignSystem';
 
-type IconProps = Omit<ComponentProps<typeof Ionicons>, 'name'> & {
-  name: ComponentProps<typeof Ionicons>['name'];
+interface TabBarIconProps {
+  name: React.ComponentProps<typeof Ionicons>['name'];
+  color: string;
   focused?: boolean;
-};
+  style?: any;
+  [key: string]: any;
+}
 
-export function TabBarIcon({ style, name, focused = false, ...rest }: IconProps) {
-  const { colors, isDark } = useTheme();
+export function TabBarIcon({ name, color, focused = false, style, ...rest }: TabBarIconProps) {
   
   return (
     <View style={[styles.container, focused && styles.focusedContainer]}>
@@ -21,8 +21,8 @@ export function TabBarIcon({ style, name, focused = false, ...rest }: IconProps)
           style={[
             styles.glow,
             {
-              backgroundColor: colors.tint,
-              shadowColor: colors.tint,
+              backgroundColor: DesignSystem.colors.primary[500],
+              shadowColor: DesignSystem.colors.primary[500],
             },
           ]}
         />
@@ -30,11 +30,11 @@ export function TabBarIcon({ style, name, focused = false, ...rest }: IconProps)
       
       <Ionicons
         name={name}
-        size={TAB_ICON_SIZE}
+        size={24}
         style={[
           styles.icon,
           {
-            color: focused ? colors.tabIconSelected : colors.tabIconDefault,
+            color: focused ? DesignSystem.colors.primary[500] : color,
           },
           style,
         ]}
@@ -47,7 +47,7 @@ export function TabBarIcon({ style, name, focused = false, ...rest }: IconProps)
           style={[
             styles.indicator,
             {
-              backgroundColor: colors.tint,
+              backgroundColor: DesignSystem.colors.primary[500],
             },
           ]}
         />

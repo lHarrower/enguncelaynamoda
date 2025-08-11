@@ -1,7 +1,7 @@
 // Feedback Collection System Tests
 // Tests for the feedback collection components and data validation
 
-import { OutfitFeedback, EmotionalResponse, SocialFeedback, ComfortRating, EmotionalState } from '../types/aynaMirror';
+import { OutfitFeedback, EmotionalResponse, SocialFeedback, ComfortRating, EmotionalState } from '@/types/aynaMirror';
 
 describe('Feedback Collection System', () => {
   

@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { ExperienceStoryBlock, ExperienceStory, StoryItem } from './ExperienceStoryBlock';
 import { getFeaturedStory, getAllStories } from '../../data/experienceStories';
+import { logInDev } from '../../utils/consoleSuppress';
 import {
   ORIGINAL_COLORS,
   ORIGINAL_TYPOGRAPHY,
@@ -36,7 +37,7 @@ export const ExperienceShowcase: React.FC = () => {
         { 
           text: 'Keşfet', 
           onPress: () => {
-            console.log('Navigate to story item:', item.id, story.id);
+            logInDev('Navigate to story item:', item.id, story.id);
             // In a real app, this would navigate to:
             // - Product details for the specific look
             // - Shopping page with similar items

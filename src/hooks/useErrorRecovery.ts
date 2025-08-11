@@ -38,7 +38,7 @@ export const RETRY_CONFIGS = {
     jitter: true,
     retryCondition: (error: AppError) => 
       error.category === ErrorCategory.AI_SERVICE &&
-      !error.code.includes('QUOTA_EXCEEDED')
+  !(error as any)?.message?.includes?.('QUOTA_EXCEEDED')
   },
   imageProcessing: {
     maxAttempts: 2,
@@ -87,8 +87,8 @@ export function useErrorRecovery<T>(
 
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const countdownRef = useRef<NodeJS.Timeout | null>(null);
+  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const countdownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const retryConfig: RetryConfig = {
     ...RETRY_CONFIGS.default,
@@ -297,7 +297,7 @@ export function useCircuitBreaker<T>(
   const [state, setState] = useState<CircuitState>('CLOSED');
   const [failures, setFailures] = useState(0);
   const [lastFailureTime, setLastFailureTime] = useState(0);
-  const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const execute = useCallback(async (): Promise<T> => {
     const now = Date.now();
@@ -310,14 +310,17 @@ export function useCircuitBreaker<T>(
     // Check circuit state
     if (state === 'OPEN') {
       if (now - lastFailureTime < config.resetTimeout) {
-        throw new AppError(
-          'CIRCUIT_BREAKER_OPEN',
-          'Service temporarily unavailable',
-          'The service is currently unavailable. Please try again later.',
-          ErrorSeverity.HIGH,
-          ErrorCategory.SYSTEM,
-          { circuitState: state, failures }
-        );
+        throw {
+          id: 'CIRCUIT_BREAKER_OPEN',
+          message: 'Service temporarily unavailable',
+          userMessage: 'The service is currently unavailable. Please try again later.',
+          category: ErrorCategory.UNKNOWN,
+          severity: ErrorSeverity.HIGH,
+          context: { timestamp: Date.now(), platform: 'unknown' },
+          isRecoverable: true,
+          retryable: false,
+          reportable: true,
+        } as AppError;
       } else {
         setState('HALF_OPEN');
       }
@@ -399,7 +402,7 @@ export function useAppStateRecovery<T>(
   const appStateRef = useRef(AppState.currentState);
 
   useEffect(() => {
-    const handleAppStateChange = (nextAppState: string) => {
+  const handleAppStateChange = (nextAppState: any) => {
       if (
         appStateRef.current.match(/inactive|background/) &&
         nextAppState === 'active'
@@ -418,7 +421,7 @@ export function useAppStateRecovery<T>(
         }
       }
       
-      appStateRef.current = nextAppState;
+  appStateRef.current = nextAppState as any;
     };
 
     const subscription = AppState.addEventListener('change', handleAppStateChange);
@@ -482,7 +485,7 @@ export function useBatchRecovery<T>(
 
     try {
       // Execute operations with concurrency limit
-      const chunks = [];
+  const chunks: Array<typeof operations> = [] as any;
       for (let i = 0; i < operations.length; i += maxConcurrent) {
         chunks.push(operations.slice(i, i + maxConcurrent));
       }

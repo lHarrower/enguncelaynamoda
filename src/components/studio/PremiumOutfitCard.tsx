@@ -74,11 +74,11 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
 
   // Handle press animation
   const handlePressIn = () => {
-    scale.value = withSpring(0.98, DesignSystem.animations.spring);
+  scale.value = withSpring(0.98, DesignSystem.animations.spring.smooth);
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1, DesignSystem.animations.spring);
+  scale.value = withSpring(1, DesignSystem.animations.spring.gentle);
   };
 
   const handlePress = () => {
@@ -284,12 +284,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   outfitTitle: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     marginBottom: 2,
   },
   outfitSubtitle: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.secondary,
   },
   

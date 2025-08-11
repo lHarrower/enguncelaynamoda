@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { getColor, getSpacing, getTypography } from '@/constants/AynaModaVisionTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import BentoCard from '@/components/vision/shared/BentoCard';
 
 interface BentoGridItem {
@@ -21,7 +21,7 @@ interface BentoGridProps {
 const BentoGrid: React.FC<BentoGridProps> = ({ items }) => {
   const renderInspirationContent = () => (
     <View style={styles.inspirationContent}>
-      <Text style={[getTypography('body', 'regular'), styles.inspirationText]}>
+      <Text style={[DesignSystem.typography.body.medium, styles.inspirationText]}>
         "Elegance is the only beauty that never fades."
       </Text>
     </View>
@@ -29,7 +29,7 @@ const BentoGrid: React.FC<BentoGridProps> = ({ items }) => {
 
   const renderInsightsContent = () => (
     <View style={styles.insightsContent}>
-      <Text style={[getTypography('caption', 'regular'), styles.insightText]}>
+      <Text style={[DesignSystem.typography.scale.caption, styles.insightText]}>
         Your style confidence has increased 12% this week
       </Text>
     </View>
@@ -108,25 +108,25 @@ const BentoGrid: React.FC<BentoGridProps> = ({ items }) => {
 
 const styles = StyleSheet.create({
   bentoGrid: {
-    paddingHorizontal: getSpacing('md'),
-    gap: getSpacing('md'),
+    paddingHorizontal: DesignSystem.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   bentoRow: {
     flexDirection: 'row',
-    gap: getSpacing('md'),
+    gap: DesignSystem.spacing.md,
   },
   inspirationContent: {
-    marginTop: getSpacing('lg'),
+    marginTop: DesignSystem.spacing.lg,
   },
   inspirationText: {
-    color: getColor('neutral', 'charcoal'),
+    color: DesignSystem.colors.neutral.charcoal,
     fontStyle: 'italic',
   },
   insightsContent: {
-    marginTop: getSpacing('md'),
+    marginTop: DesignSystem.spacing.md,
   },
   insightText: {
-    color: getColor('neutral', 'slate'),
+    color: DesignSystem.colors.neutral.slate,
   },
 });
 

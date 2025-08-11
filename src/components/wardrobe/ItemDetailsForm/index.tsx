@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -100,7 +101,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
       newErrors.colors = 'Please select at least one color';
     }
 
-    console.log('[ItemDetailsForm] Validation check:', {
+    logInDev('[ItemDetailsForm] Validation check:', {
       category: category.trim(),
       categoryValid: !!category.trim(),
       selectedColors,
@@ -123,8 +124,8 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
   };
 
   const handleSave = () => {
-    console.log('[ItemDetailsForm] handleSave function called');
-    console.log('[ItemDetailsForm] Form state:', {
+    logInDev('[ItemDetailsForm] handleSave function called');
+    logInDev('[ItemDetailsForm] Form state:', {
       category: category.trim(),
       selectedColors,
       isFormValid,
@@ -133,12 +134,12 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
     });
 
     if (!validateForm()) {
-      console.log('[ItemDetailsForm] Validation failed, showing alert');
+      logInDev('[ItemDetailsForm] Validation failed, showing alert');
       Alert.alert('Validation Error', 'Please fill in all required fields.');
       return;
     }
 
-    console.log('[ItemDetailsForm] Validation passed, preparing item data');
+    logInDev('[ItemDetailsForm] Validation passed, preparing item data');
 
     // Updated to use snake_case keys matching the NewClothingItem interface
     const itemData: ClothingItemSubmission = {
@@ -153,9 +154,9 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
       // Removed id and dateAdded as they're handled by Supabase automatically
     };
 
-    console.log('[ItemDetailsForm] Calling onSave with data:', itemData);
+    logInDev('[ItemDetailsForm] Calling onSave with data:', itemData);
     onSave(itemData);
-    console.log('[ItemDetailsForm] onSave called successfully');
+    logInDev('[ItemDetailsForm] onSave called successfully');
   };
 
   const availableSubcategories = SUBCATEGORIES[category] || [];
@@ -402,7 +403,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
               !isFormValid && styles.saveButtonDisabled
             ]}
             onPress={() => {
-              console.log('[ItemDetailsForm] Save button pressed, isFormValid:', isFormValid);
+              logInDev('[ItemDetailsForm] Save button pressed, isFormValid:', isFormValid);
               handleSave();
             }}
             disabled={!isFormValid}
@@ -515,32 +516,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: Colors.light.border,
+    borderColor: DesignSystem.colors.border.primary,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: Colors.light.card,
+    backgroundColor: DesignSystem.colors.background.elevated,
   },
   dropdownText: {
     fontSize: 16,
-    color: Colors.light.text,
+    color: DesignSystem.colors.charcoal[700],
   },
   placeholder: {
-    color: Colors.light.text_secondary,
+    color: DesignSystem.colors.neutral[500],
   },
   dropdownList: {
     position: 'absolute',
     top: '100%',
     left: 0,
     right: 0,
-    backgroundColor: Colors.light.card,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.light.border,
+    borderColor: DesignSystem.colors.border.primary,
     maxHeight: 200,
     zIndex: 1000,
     elevation: 5,
-    shadowColor: Colors.light.text,
+    shadowColor: DesignSystem.colors.charcoal[800],
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -549,14 +550,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.light.border,
+    borderBottomColor: DesignSystem.colors.border.secondary,
   },
   dropdownItemText: {
     fontSize: 16,
-    color: Colors.light.text,
+    color: DesignSystem.colors.charcoal[700],
   },
   clearOption: {
-    color: Colors.light.text_secondary,
+    color: DesignSystem.colors.neutral[500],
     fontStyle: 'italic',
   },
   colorGrid: {
@@ -572,16 +573,16 @@ const styles = StyleSheet.create({
     margin: 4,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: Colors.light.border,
-    backgroundColor: Colors.light.card,
+    borderColor: DesignSystem.colors.border.primary,
+    backgroundColor: DesignSystem.colors.background.elevated,
     position: 'relative',
   },
   colorTagSelected: {
-    backgroundColor: Colors.light.tint,
-    borderColor: Colors.light.tint,
+    backgroundColor: DesignSystem.colors.sage[500],
+    borderColor: DesignSystem.colors.sage[500],
   },
   colorTagSuggested: {
-    borderColor: Colors.light.highlight,
+    borderColor: DesignSystem.colors.gold[500],
     borderWidth: 2,
   },
   colorDot: {
@@ -592,14 +593,14 @@ const styles = StyleSheet.create({
   },
   whiteBorder: {
     borderWidth: 1,
-    borderColor: Colors.light.border,
+    borderColor: DesignSystem.colors.border.primary,
   },
   colorTagText: {
     fontSize: 14,
-    color: Colors.light.text,
+    color: DesignSystem.colors.charcoal[700],
   },
   colorTagTextSelected: {
-    color: Colors.light.card,
+    color: DesignSystem.colors.background.elevated,
   },
   suggestedBadge: {
     position: 'absolute',

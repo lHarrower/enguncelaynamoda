@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { TYPOGRAPHY, SPACING, SHADOWS, BORDER_RADIUS } from '../constants/AppConstants';
 import { BaseComponentProps } from '../types/componentProps';
+import { errorInDev } from '../utils/consoleSuppress';
 
 interface ErrorBoundaryProps extends BaseComponentProps {
   children: React.ReactNode;
@@ -31,7 +32,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   componentDidCatch(error: Error, info: any) {
-    console.error('Uncaught error:', error, info);
+    errorInDev('Uncaught error:', error, info);
     // You can log the error to an error reporting service here
   }
 
@@ -127,17 +128,17 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   } as ViewStyle,
   title: {
-    fontSize: TYPOGRAPHY.serif.sizes.title,
-    fontWeight: TYPOGRAPHY.serif.weights.bold as TextStyle['fontWeight'],
+    fontSize: TYPOGRAPHY.sizes.title,
+    fontWeight: TYPOGRAPHY.weights.bold as TextStyle['fontWeight'],
     color: '#2D2D2D',
     marginBottom: SPACING.md,
     textAlign: 'center',
   } as TextStyle,
   message: {
-    fontSize: TYPOGRAPHY.sans.sizes.body,
+    fontSize: TYPOGRAPHY.sizes.body,
     color: '#6B6B6B',
     textAlign: 'center',
-    lineHeight: TYPOGRAPHY.sans.lineHeight.body,
+    lineHeight: TYPOGRAPHY.lineHeights.body,
     marginBottom: SPACING.xxxl,
   } as TextStyle,
   errorDetails: {
@@ -149,15 +150,15 @@ const styles = StyleSheet.create({
     maxWidth: 400,
   } as ViewStyle,
   errorTitle: {
-    fontSize: TYPOGRAPHY.sans.sizes.bodySmall,
-    fontWeight: TYPOGRAPHY.sans.weights.bold as TextStyle['fontWeight'],
+    fontSize: TYPOGRAPHY.sizes.bodySmall,
+    fontWeight: TYPOGRAPHY.weights.bold as TextStyle['fontWeight'],
     color: '#FF6B6B',
     marginBottom: SPACING.xs,
   } as TextStyle,
   errorText: {
-    fontSize: TYPOGRAPHY.sans.sizes.caption,
+    fontSize: TYPOGRAPHY.sizes.caption,
     color: '#666',
-    lineHeight: TYPOGRAPHY.sans.lineHeight.caption,
+    lineHeight: TYPOGRAPHY.lineHeights.caption,
   } as TextStyle,
   button: {
     borderRadius: BORDER_RADIUS.medium,
@@ -175,8 +176,8 @@ const styles = StyleSheet.create({
     marginRight: SPACING.sm,
   },
   buttonText: {
-    fontSize: TYPOGRAPHY.sans.sizes.body,
-    fontWeight: TYPOGRAPHY.sans.weights.semibold as TextStyle['fontWeight'],
+    fontSize: TYPOGRAPHY.sizes.body,
+    fontWeight: TYPOGRAPHY.weights.semibold as TextStyle['fontWeight'],
     color: '#FFFFFF',
   } as TextStyle,
 });

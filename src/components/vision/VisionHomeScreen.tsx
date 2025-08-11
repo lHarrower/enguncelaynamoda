@@ -6,7 +6,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { getColor, getSpacing } from '@/constants/AynaModaVisionTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev } from '@/utils/consoleSuppress';
 import VisionHomeHeader from '@/components/vision/shared/VisionHomeHeader';
 import BentoGrid from '@/components/vision/shared/BentoGrid';
 
@@ -29,15 +30,15 @@ const VisionHomeScreen: React.FC<VisionHomeScreenProps> = ({
       title: "Today's Inspiration",
       subtitle: 'Curated just for you',
       icon: 'sparkles',
-      gradient: [getColor('accent', 'coral'), getColor('accent', 'lavender')],
+  gradient: [DesignSystem.colors.sage[300], DesignSystem.colors.sage[100]],
       size: 'hero' as const,
-      onPress: () => console.log('Today\'s Inspiration pressed'),
+      onPress: () => logInDev('Today\'s Inspiration pressed'),
     },
     {
       id: 'wardrobe',
       title: 'Quick Style',
       icon: 'flash',
-      gradient: [getColor('accent', 'mint'), getColor('primary', 'sage')],
+  gradient: [DesignSystem.colors.sage[100], DesignSystem.colors.gold[100]],
       size: 'small' as const,
       onPress: () => onNavigateToWardrobe?.(),
     },
@@ -46,7 +47,7 @@ const VisionHomeScreen: React.FC<VisionHomeScreenProps> = ({
       title: 'Weather Perfect',
       subtitle: '72°F, Sunny',
       icon: 'sunny',
-      gradient: [getColor('accent', 'gold'), getColor('primary', 'champagne')],
+  gradient: [DesignSystem.colors.gold[400], DesignSystem.colors.gold[100]],
       size: 'small' as const,
       onPress: () => onNavigateToDiscover?.(),
     },
@@ -55,9 +56,9 @@ const VisionHomeScreen: React.FC<VisionHomeScreenProps> = ({
       title: 'Wardrobe Insights',
       subtitle: 'Discover hidden gems',
       icon: 'analytics',
-      gradient: [getColor('accent', 'lavender'), getColor('primary', 'pearl')],
+  gradient: [DesignSystem.colors.gold[100], DesignSystem.colors.neutral.pearl],
       size: 'medium' as const,
-      onPress: () => console.log('Wardrobe Insights pressed'),
+      onPress: () => logInDev('Wardrobe Insights pressed'),
     },
   ];
 
@@ -65,9 +66,8 @@ const VisionHomeScreen: React.FC<VisionHomeScreenProps> = ({
     <View style={styles.container}>
       <LinearGradient
         colors={[
-          getColor('primary', 'pearl'),
-          getColor('primary', 'champagne'),
-          getColor('neutral', 'mist'),
+          DesignSystem.colors.gold[100],
+          DesignSystem.colors.neutral.mist,
         ]}
         style={styles.backgroundGradient}
       >
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   
   scrollContent: {
-    paddingBottom: getSpacing('xxxl'),
+    paddingBottom: DesignSystem.spacing.sanctuary,
   },
 });
 

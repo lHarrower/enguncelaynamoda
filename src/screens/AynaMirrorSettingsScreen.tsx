@@ -28,6 +28,7 @@ import {
   ConfidenceNoteStyle 
 } from '../types/aynaMirror';
 import { useAuth } from '../context/AuthContext';
+import { errorInDev } from '../utils/consoleSuppress';
 
 interface SettingsScreenProps {
   navigation: any;
@@ -69,7 +70,7 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
       setPrivacySettings(preferences.privacySettings);
       
     } catch (error) {
-      console.error('Failed to load preferences:', error);
+      errorInDev('Failed to load preferences:', error);
       Alert.alert('Error', 'Failed to load your preferences. Please try again.');
     } finally {
       setLoading(false);
@@ -97,7 +98,7 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
       Alert.alert('Success', 'Your preferences have been saved!');
       
     } catch (error) {
-      console.error('Failed to save preferences:', error);
+      errorInDev('Failed to save preferences:', error);
       Alert.alert('Error', 'Failed to save your preferences. Please try again.');
     } finally {
       setSaving(false);
@@ -113,7 +114,7 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
       setTimezone(detectedTimezone);
       Alert.alert('Timezone Updated', `Your timezone has been set to ${detectedTimezone}`);
     } catch (error) {
-      console.error('Failed to detect timezone:', error);
+      errorInDev('Failed to detect timezone:', error);
       Alert.alert('Error', 'Failed to detect your timezone. Please try again.');
     } finally {
       setSaving(false);
@@ -286,10 +287,10 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
               setPrivacySettings(prev => ({ ...prev, allowLocationTracking: value }))
             }
             trackColor={{ 
-              false: APP_THEME_V2.colors.cloudGray, 
-              true: APP_THEME_V2.semantic.accent 
+              false: DesignSystem.colors.neutral[300], 
+              true: DesignSystem.colors.sage[500] 
             }}
-            thumbColor={APP_THEME_V2.colors.whisperWhite}
+            thumbColor={DesignSystem.colors.background.elevated}
           />
         </View>
 
@@ -306,10 +307,10 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
               setPrivacySettings(prev => ({ ...prev, enableSocialFeatures: value }))
             }
             trackColor={{ 
-              false: APP_THEME_V2.colors.cloudGray, 
-              true: APP_THEME_V2.semantic.accent 
+              false: DesignSystem.colors.neutral[200], 
+              true: DesignSystem.colors.sage[500] 
             }}
-            thumbColor={APP_THEME_V2.colors.whisperWhite}
+            thumbColor={DesignSystem.colors.text.inverse}
           />
         </View>
       </View>
@@ -354,7 +355,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontSize: 16,
     color: DesignSystem.colors.text.secondary,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   header: {
     flexDirection: 'row',
@@ -374,7 +375,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: DesignSystem.colors.text.primary,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   section: {
     backgroundColor: DesignSystem.colors.background.elevated,
@@ -389,13 +390,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: DesignSystem.colors.text.primary,
     marginBottom: 8,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   sectionDescription: {
     fontSize: 14,
     color: DesignSystem.colors.text.secondary,
     marginBottom: 16,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   settingItem: {
     flexDirection: 'row',
@@ -414,12 +415,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: DesignSystem.colors.text.primary,
     marginBottom: 4,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   settingDescription: {
     fontSize: 14,
     color: DesignSystem.colors.text.secondary,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   timeButton: {
     flexDirection: 'row',
@@ -433,7 +434,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: DesignSystem.colors.text.primary,
     marginRight: 8,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   detectButton: {
     backgroundColor: DesignSystem.colors.sage[500],
@@ -445,7 +446,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: DesignSystem.colors.background.elevated,
     fontWeight: '500',
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   optionItem: {
     flexDirection: 'row',
@@ -471,7 +472,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: DesignSystem.colors.text.primary,
     marginBottom: 4,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   optionLabelSelected: {
     color: DesignSystem.colors.sage[500],
@@ -479,7 +480,7 @@ const styles = StyleSheet.create({
   optionDescription: {
     fontSize: 14,
     color: DesignSystem.colors.text.secondary,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   optionDescriptionSelected: {
     color: DesignSystem.colors.text.primary,
@@ -500,6 +501,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: DesignSystem.colors.background.elevated,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
 });

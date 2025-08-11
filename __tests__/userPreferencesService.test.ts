@@ -1,16 +1,16 @@
 // User Preferences Service Tests
-import { UserPreferencesService } from '../services/userPreferencesService';
-import { supabase } from '../config/supabaseClient';
+import { UserPreferencesService } from '@/services/userPreferencesService';
+import { supabase } from '@/config/supabaseClient';
 import * as Location from 'expo-location';
 import { 
   UserPreferences, 
   NotificationPreferences, 
   PrivacySettings,
   ConfidenceNoteStyle 
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 
 // Mock dependencies
-jest.mock('../config/supabaseClient');
+jest.mock('@/config/supabaseClient');
 jest.mock('expo-location', () => ({
   getForegroundPermissionsAsync: jest.fn(),
   getCurrentPositionAsync: jest.fn(),

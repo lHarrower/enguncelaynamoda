@@ -9,7 +9,7 @@ import Animated, {
   Extrapolate,
   runOnJS,
 } from 'react-native-reanimated';
-import { LuxuryMaterials, LuxuryTypography, LuxurySpacing } from '@/theme/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface Tab {
   id: string;
@@ -187,25 +187,25 @@ const styles = StyleSheet.create({
   
   tabsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: LuxurySpacing.md,
+    paddingHorizontal: DesignSystem.spacing.md,
   },
   
   tab: {
-    paddingVertical: LuxurySpacing.md,
-    paddingHorizontal: LuxurySpacing.sm,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
   
   tabLabel: {
-    ...LuxuryTypography.tab,
-    color: LuxuryMaterials.colors.charcoal,
+  ...DesignSystem.typography.scale.h5,
+    color: DesignSystem.colors.neutral.charcoal,
     opacity: 0.6,
     textAlign: 'center',
   },
   
   activeTabLabel: {
-    color: LuxuryMaterials.colors.inkGray,
+    color: DesignSystem.colors.neutral.slate,
     opacity: 1,
     fontWeight: '600' as const,
   },
@@ -214,10 +214,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     height: 2,
-    backgroundColor: LuxuryMaterials.colors.liquidGold,
+    backgroundColor: DesignSystem.colors.gold[500],
     borderRadius: 1,
     // Subtle glow effect
-    shadowColor: LuxuryMaterials.colors.liquidGold,
+    shadowColor: DesignSystem.colors.gold[500],
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
@@ -226,12 +226,12 @@ const styles = StyleSheet.create({
   
   contentContainer: {
     flex: 1,
-    marginTop: LuxurySpacing.md,
+    marginTop: DesignSystem.spacing.md,
   },
   
   contentPage: {
     flex: 1,
-    paddingHorizontal: LuxurySpacing.md,
+    paddingHorizontal: DesignSystem.spacing.md,
   },
 });
 

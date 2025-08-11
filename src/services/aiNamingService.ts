@@ -10,6 +10,7 @@ import {
   NamingStyle,
   ItemNamingHistory
 } from '@/types/aynaMirror';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 export class AINameingService {
   private static readonly DEFAULT_PREFERENCES: Partial<NamingPreferences> = {
@@ -62,13 +63,13 @@ export class AINameingService {
    */
   static async generateItemName(request: NamingRequest): Promise<NamingResponse> {
     try {
-      console.log('[AINameingService] Generating name for item:', request);
+      logInDev('[AINameingService] Generating name for item:', request);
 
       // Get user preferences or use defaults
       const preferences = await this.getUserNamingPreferences(request.userPreferences?.userId);
       
-      // Get AI analysis data
-      const analysisData = await this.getAIAnalysis(request.imageUri);
+  // Get AI analysis data
+  const analysisData = await this.getAIAnalysis(request.imageUri, request.itemId);
       
       // Generate name based on preferences and analysis
       const aiGeneratedName = this.generateNameFromAnalysis(
@@ -94,7 +95,7 @@ export class AINameingService {
         analysisData
       };
     } catch (error) {
-      console.error('[AINameingService] Error generating name:', error);
+      errorInDev('[AINameingService] Error generating name:', error);
       
       // Fallback naming
       const fallbackName = this.generateFallbackName(request);
@@ -118,19 +119,31 @@ export class AINameingService {
   /**
    * Get AI analysis data from existing analysis or trigger new analysis
    */
-  private static async getAIAnalysis(imageUri: string): Promise<AIAnalysisData> {
+  private static async getAIAnalysis(imageUri: string, itemId?: string): Promise<AIAnalysisData> {
     try {
       // Call the existing AI analysis function
       const { data, error } = await supabase.functions.invoke('ai-analysis', {
-        body: { imageUrl: imageUri }
+        body: { imageUrl: imageUri, itemId }
       });
 
       if (error) throw error;
+      // If edge function returns structured analysis, prefer it
+      if (data && data.analysis) {
+        const a = data.analysis;
+        return {
+          detectedTags: a.detectedTags || [],
+          dominantColors: a.dominantColors || [],
+          confidence: 0.8,
+          visualFeatures: {},
+          namingSuggestions: [],
+          analysisTimestamp: new Date()
+        } as AIAnalysisData;
+      }
 
-      // Transform Cloudinary response to our format
+      // Otherwise, transform raw payload
       return this.transformCloudinaryToAnalysisData(data);
     } catch (error) {
-      console.error('[AINameingService] Error getting AI analysis:', error);
+      errorInDev('[AINameingService] Error getting AI analysis:', error);
       throw error;
     }
   }
@@ -427,7 +440,7 @@ export class AINameingService {
       // Create default preferences for user
       return await this.createDefaultNamingPreferences(userId);
     } catch (error) {
-      console.error('[AINameingService] Error getting naming preferences:', error);
+      errorInDev('[AINameingService] Error getting naming preferences:', error);
       return {
         userId,
         ...this.DEFAULT_PREFERENCES,
@@ -466,7 +479,7 @@ export class AINameingService {
         updatedAt: new Date(data.updated_at)
       };
     } catch (error) {
-      console.error('[AINameingService] Error creating default preferences:', error);
+      errorInDev('[AINameingService] Error creating default preferences:', error);
       return {
         userId,
         ...this.DEFAULT_PREFERENCES,
@@ -514,7 +527,7 @@ export class AINameingService {
         updatedAt: new Date(data.updated_at)
       };
     } catch (error) {
-      console.error('[AINameingService] Error updating preferences:', error);
+      errorInDev('[AINameingService] Error updating preferences:', error);
       throw error;
     }
   }
@@ -540,7 +553,7 @@ export class AINameingService {
         visual_features: analysisData?.visualFeatures || {}
       });
     } catch (error) {
-      console.error('[AINameingService] Error saving naming history:', error);
+      errorInDev('[AINameingService] Error saving naming history:', error);
     }
   }
 

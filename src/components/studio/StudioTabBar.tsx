@@ -83,7 +83,7 @@ const StudioTabBar: React.FC<BottomTabBarProps> = ({
   useEffect(() => {
     // Update active indicator position
     const targetPosition = state.index / (state.routes.length - 1);
-    activeIndicator.value = withSpring(targetPosition, DesignSystem.animations.spring);
+  activeIndicator.value = withSpring(targetPosition, DesignSystem.animations.spring.smooth);
 
     // Update tab animations
     tabAnimations.forEach((animation, index) => {
@@ -91,12 +91,12 @@ const StudioTabBar: React.FC<BottomTabBarProps> = ({
       
       animation.scale.value = withSpring(
         isActive ? 1.1 : 1,
-        DesignSystem.animations.spring
+        DesignSystem.animations.spring.smooth
       );
       
       animation.translateY.value = withSpring(
         isActive ? -2 : 0,
-        DesignSystem.animations.spring
+        DesignSystem.animations.spring.smooth
       );
     });
   }, [state.index]);
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tabLabel: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     fontSize: 11,
     marginTop: 4,
     textAlign: 'center',

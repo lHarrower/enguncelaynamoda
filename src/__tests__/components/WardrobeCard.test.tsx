@@ -1,10 +1,10 @@
 // Unit tests for WardrobeCard component
 import React from 'react';
 import { fireEvent, waitFor } from '@testing-library/react-native';
-import { WardrobeCard } from '../../components/wardrobe/WardrobeCard';
-import { createMockWardrobeItem, renderWithProviders } from '../utils/testUtils';
-import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
-import { mocks } from '../mocks';
+import { WardrobeCard } from '@/components/common/WardrobeCard';
+import { createMockWardrobeItem, renderWithProviders } from '@/__tests__/utils/testUtils';
+import { WardrobeCategory, WardrobeColor } from '@/types';
+import { mocks } from '@/__tests__/mocks';
 
 // Mock dependencies
 jest.mock('react-native-haptic-feedback', () => mocks.hapticFeedback);

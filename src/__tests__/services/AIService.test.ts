@@ -1,11 +1,11 @@
 // Unit tests for AIService
-import { AIService } from '../../services/AIService';
-import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
-import { createMockWardrobeItem } from '../utils/testUtils';
-import { mocks } from '../mocks';
+import { AIService } from '@/services/AIService';
+import { WardrobeCategory, WardrobeColor } from '@/types';
+import { createMockWardrobeItem } from '@/__tests__/utils/testUtils';
+import { mocks } from '@/__tests__/mocks';
 
 // Mock dependencies
-jest.mock('../../config/openai', () => ({
+jest.mock('@/config/openai', () => ({
   openaiClient: mocks.openai,
 }));
 
@@ -54,7 +54,7 @@ describe('AIService', () => {
 
       expect(result).toEqual(expectedAnalysis);
       expect(mocks.openai.chat.completions.create).toHaveBeenCalledWith({
-        model: 'gpt-4-vision-preview',
+        model: 'gpt-4o',
         messages: expect.arrayContaining([
           expect.objectContaining({
             role: 'user',

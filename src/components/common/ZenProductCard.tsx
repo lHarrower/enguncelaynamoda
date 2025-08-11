@@ -63,7 +63,7 @@ export default function ZenProductCard({
             <Ionicons 
               name="image-outline" 
               size={32} 
-              color={APP_THEME_V2.colors.moonlightSilver} 
+              color={DesignSystem.colors.neutral[300]} 
             />
           </View>
         )}
@@ -87,7 +87,7 @@ export default function ZenProductCard({
               <Ionicons
                 name={isLiked ? "heart" : "heart-outline"}
                 size={20}
-                color={isLiked ? APP_THEME_V2.semantic.accent : APP_THEME_V2.colors.whisperWhite}
+                color={isLiked ? DesignSystem.colors.sage[500] : DesignSystem.colors.text.inverse}
               />
             </Animated.View>
           </TouchableOpacity>
@@ -172,16 +172,16 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.xs,
   },
   name: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.primary,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     lineHeight: 18,
     marginBottom: DesignSystem.spacing.xs,
   },
   price: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.primary,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
   },
 });

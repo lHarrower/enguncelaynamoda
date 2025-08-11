@@ -8,13 +8,13 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { ButtonComponentProps } from '@/types/componentProps';
-import { UNIFIED_COLORS, TYPOGRAPHY, SPACING, BUTTON_STYLES } from '@/theme';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
-export interface ButtonProps extends ButtonComponentProps {
+export interface ButtonProps extends Omit<ButtonComponentProps, 'variant'> {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'danger' | 'luxury';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'luxury';
   size?: 'small' | 'medium' | 'large';
   fullWidth?: boolean;
   leftIcon?: React.ReactNode;
@@ -38,11 +38,11 @@ const Button: React.FC<ButtonProps> = ({
   accessibilityLabel,
   ...props
 }) => {
-  const { triggerHaptic } = useHapticFeedback();
+  const { trigger } = useHapticFeedback();
 
   const handlePress = () => {
     if (!disabled && !loading) {
-      triggerHaptic('light');
+  trigger('light');
       onPress();
     }
   };
@@ -58,7 +58,10 @@ const Button: React.FC<ButtonProps> = ({
 
   const textStyle = [
     styles.text,
-    styles[`${variant}Text`],
+    variant === 'primary' && styles.primaryText,
+    variant === 'secondary' && styles.secondaryText,
+    variant === 'ghost' && styles.ghostText,
+    variant === 'luxury' && styles.luxuryText,
     styles[`${size}Text`],
     (disabled || loading) && styles.disabledText,
   ];
@@ -88,54 +91,44 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: SPACING.radius.medium,
-    paddingHorizontal: SPACING.padding.medium,
-    paddingVertical: SPACING.padding.small,
+  borderRadius: DesignSystem.borderRadius.md,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
     minHeight: 44, // Accessibility minimum touch target
   },
   
   // Variants
   primary: {
-    backgroundColor: UNIFIED_COLORS.primary[500],
-    ...BUTTON_STYLES.primary.container,
+    backgroundColor: DesignSystem.colors.secondary[500],
   },
   secondary: {
-    backgroundColor: UNIFIED_COLORS.neutral[100],
+    backgroundColor: DesignSystem.colors.surface.elevated,
     borderWidth: 1,
-    borderColor: UNIFIED_COLORS.neutral[300],
-    ...BUTTON_STYLES.secondary.container,
-  },
-  tertiary: {
-    backgroundColor: 'transparent',
-    ...BUTTON_STYLES.tertiary.container,
+    borderColor: DesignSystem.colors.border.primary,
   },
   ghost: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: UNIFIED_COLORS.primary[500],
-  },
-  danger: {
-    backgroundColor: UNIFIED_COLORS.semantic.error,
+    borderColor: DesignSystem.colors.secondary[500],
   },
   luxury: {
-    backgroundColor: UNIFIED_COLORS.luxury.gold,
-    ...BUTTON_STYLES.luxury.container,
+    backgroundColor: DesignSystem.colors.gold[500],
   },
   
   // Sizes
   small: {
-    paddingHorizontal: SPACING.padding.small,
-    paddingVertical: SPACING.padding.xs,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
     minHeight: 36,
   },
   medium: {
-    paddingHorizontal: SPACING.padding.medium,
-    paddingVertical: SPACING.padding.small,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
     minHeight: 44,
   },
   large: {
-    paddingHorizontal: SPACING.padding.large,
-    paddingVertical: SPACING.padding.medium,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
     minHeight: 52,
   },
   
@@ -149,42 +142,35 @@ const styles = StyleSheet.create({
   
   // Text styles
   text: {
-    fontFamily: TYPOGRAPHY.fontFamily.primary,
-    fontWeight: TYPOGRAPHY.fontWeight.medium,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    fontWeight: '500',
     textAlign: 'center',
   },
   
   primaryText: {
-    color: UNIFIED_COLORS.neutral[50],
-    ...BUTTON_STYLES.primary.text,
+    color: DesignSystem.colors.text.inverse,
   },
   secondaryText: {
-    color: UNIFIED_COLORS.neutral[900],
-    ...BUTTON_STYLES.secondary.text,
-  },
-  tertiaryText: {
-    color: UNIFIED_COLORS.primary[500],
-    ...BUTTON_STYLES.tertiary.text,
+    color: DesignSystem.colors.text.primary,
   },
   ghostText: {
-    color: UNIFIED_COLORS.primary[500],
+  color: DesignSystem.colors.secondary[500],
   },
   dangerText: {
-    color: UNIFIED_COLORS.neutral[50],
+    color: DesignSystem.colors.text.inverse,
   },
   luxuryText: {
-    color: UNIFIED_COLORS.neutral[900],
-    ...BUTTON_STYLES.luxury.text,
+    color: DesignSystem.colors.text.primary,
   },
   
   smallText: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontSize: 14,
   },
   mediumText: {
-    fontSize: TYPOGRAPHY.fontSize.base,
+    fontSize: 16,
   },
   largeText: {
-    fontSize: TYPOGRAPHY.fontSize.lg,
+    fontSize: 18,
   },
   
   disabledText: {
@@ -192,9 +178,8 @@ const styles = StyleSheet.create({
   },
   
   icon: {
-    marginHorizontal: SPACING.margin.xs,
+    marginHorizontal: DesignSystem.spacing.xs,
   },
 });
 
 export default Button;
-export type { ButtonProps };

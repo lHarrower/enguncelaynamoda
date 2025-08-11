@@ -159,14 +159,14 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.sm,
   },
   category: {
-    ...DesignSystem.typography.caption.medium,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.sage[600],
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     flex: 1,
   },
   brand: {
-    ...DesignSystem.typography.caption.medium,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     fontStyle: 'italic',
   },
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     borderColor: DesignSystem.colors.sage[200],
   },
   colorText: {
-    ...DesignSystem.typography.caption.medium,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textTransform: 'capitalize',
   },

@@ -1,14 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import onboardingService from '../services/onboardingService';
-import { OnboardingData } from '../components/onboarding/OnboardingFlow';
-import { StylePreferences } from '../components/onboarding/StylePreferenceQuestionnaire';
-import notificationService from '../services/notificationService';
-import { supabase } from '../config/supabaseClient';
+import onboardingService from '@/services/onboardingService';
+import { OnboardingData } from '@/components/onboarding/OnboardingFlow';
+import { StylePreferences } from '@/components/onboarding/StylePreferenceQuestionnaire';
+import notificationService from '@/services/notificationService';
+import { supabase } from '@/config/supabaseClient';
 
 // Mock dependencies
 jest.mock('@react-native-async-storage/async-storage');
-jest.mock('../config/supabaseClient');
-jest.mock('../services/notificationService');
+jest.mock('@/config/supabaseClient');
+jest.mock('@/services/notificationService');
 
 const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
 const mockNotificationService = notificationService as jest.Mocked<typeof notificationService>;

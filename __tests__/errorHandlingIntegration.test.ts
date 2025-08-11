@@ -1,23 +1,23 @@
-import { AynaMirrorService } from '../services/aynaMirrorService';
-import { WeatherService } from '../services/weatherService';
-import NotificationService from '../services/notificationService';
-import { errorHandlingService } from '../services/errorHandlingService';
+import { AynaMirrorService } from '@/services/aynaMirrorService';
+import { WeatherService } from '@/services/weatherService';
+import NotificationService from '@/services/notificationService';
+import { errorHandlingService } from '@/services/errorHandlingService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Mock all external dependencies
 jest.mock('@react-native-async-storage/async-storage');
 jest.mock('expo-notifications');
 jest.mock('expo-location');
-jest.mock('../config/supabaseClient');
+jest.mock('@/config/supabaseClient');
 
 // Mock the services
-jest.mock('../services/enhancedWardrobeService', () => ({
+jest.mock('@/services/enhancedWardrobeService', () => ({
   enhancedWardrobeService: {
     getUserWardrobe: jest.fn(),
   },
 }));
 
-jest.mock('../services/intelligenceService', () => ({
+jest.mock('@/services/intelligenceService', () => ({
   IntelligenceService: jest.fn().mockImplementation(() => ({
     generateStyleRecommendations: jest.fn(),
     calculateOutfitCompatibility: jest.fn(),
@@ -39,7 +39,7 @@ describe('Error Handling Integration Tests', () => {
   describe('AYNA Mirror Service Error Handling', () => {
     it('should handle complete service failure gracefully', async () => {
       // Mock all services to fail
-      const { enhancedWardrobeService } = require('../services/enhancedWardrobeService');
+  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
       enhancedWardrobeService.getUserWardrobe.mockRejectedValue(new Error('Wardrobe service down'));
 
       // Mock cached data to be available
@@ -79,7 +79,7 @@ describe('Error Handling Integration Tests', () => {
     });
 
     it('should retry failed operations with exponential backoff', async () => {
-      const { enhancedWardrobeService } = require('../services/enhancedWardrobeService');
+  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
       
       // Mock to fail twice, then succeed
       enhancedWardrobeService.getUserWardrobe
@@ -105,7 +105,7 @@ describe('Error Handling Integration Tests', () => {
     });
 
     it('should cache successful results for offline use', async () => {
-      const { enhancedWardrobeService } = require('../services/enhancedWardrobeService');
+  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
       
       enhancedWardrobeService.getUserWardrobe.mockResolvedValue([{
         id: 'cache-test-item',
@@ -262,7 +262,7 @@ describe('Error Handling Integration Tests', () => {
 
   describe('Cross-Service Error Recovery', () => {
     it('should maintain service when multiple services fail', async () => {
-      const { enhancedWardrobeService } = require('../services/enhancedWardrobeService');
+  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
       
       // Mock all services to fail initially
       enhancedWardrobeService.getUserWardrobe.mockRejectedValue(new Error('Wardrobe down'));
@@ -343,7 +343,7 @@ describe('Error Handling Integration Tests', () => {
 
   describe('Performance Under Error Conditions', () => {
     it('should not block user experience during retries', async () => {
-      const { enhancedWardrobeService } = require('../services/enhancedWardrobeService');
+  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
       
       // Mock slow failing service
       enhancedWardrobeService.getUserWardrobe.mockImplementation(() => 
@@ -411,7 +411,7 @@ describe('Error Handling Integration Tests', () => {
 
   describe('Data Consistency During Errors', () => {
     it('should maintain data integrity when partial operations fail', async () => {
-      const { enhancedWardrobeService } = require('../services/enhancedWardrobeService');
+  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
       
       // Mock wardrobe service to succeed
       enhancedWardrobeService.getUserWardrobe.mockResolvedValue([{

@@ -4,7 +4,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import PastelBackground from '@/components/common/PastelBackground'; // CORRECTED PATH
-import { APP_THEME_V2 } from '@/constants/AppThemeV2'; // CORRECTED PATH
+import { DesignSystem } from '@/theme/DesignSystem';
 
 export default function ProductDetail() {
   const { id } = useLocalSearchParams();
@@ -26,13 +26,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   text: {
-    ...APP_THEME_V2.typography.scale.h1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h1,
+    color: DesignSystem.colors.text.primary,
     marginBottom: 12,
   },
   subText: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
-    fontFamily: APP_THEME_V2.typography.fonts.body,
+    ...DesignSystem.typography.body.large,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
-}); 
+});

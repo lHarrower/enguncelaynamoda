@@ -1,10 +1,10 @@
-import { antiConsumptionService } from '../services/antiConsumptionService';
-import * as wardrobeService from '../services/wardrobeService';
-import { supabase } from '../config/supabaseClient';
+import { antiConsumptionService } from '../src/services/antiConsumptionService';
+import * as wardrobeService from '../src/services/wardrobeService';
+import { supabase } from '../src/config/supabaseClient';
 
 // Mock dependencies
-jest.mock('../services/wardrobeService');
-jest.mock('../config/supabaseClient');
+jest.mock('../src/services/wardrobeService');
+jest.mock('../src/config/supabaseClient');
 
 const mockWardrobeService = wardrobeService as jest.Mocked<typeof wardrobeService>;
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;

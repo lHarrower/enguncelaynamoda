@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 import PremiumButton from './PremiumButton';
 import PremiumCard from './PremiumCard';
 import { BlurView } from 'expo-blur';
@@ -218,8 +218,8 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
             style={[
               styles.insightCard,
               { 
-                marginLeft: index === 1 ? PREMIUM_THEME.spacing.sm : 0,
-                marginRight: index === 1 ? PREMIUM_THEME.spacing.sm : 0,
+                marginLeft: index === 1 ? DesignSystem.spacing.sm : 0,
+        marginRight: index === 1 ? DesignSystem.spacing.sm : 0,
               }
             ]}
           >
@@ -227,7 +227,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
               <Ionicons
                 name={insight.icon}
                 size={24}
-                color={PREMIUM_THEME.colors.champagne[500]}
+                color={DesignSystem.colors.gold[500]}
               />
               <Text style={styles.insightTrend}>{insight.trend}</Text>
             </View>
@@ -259,7 +259,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.collectionsScrollContainer}
-        snapToInterval={width * 0.8 + PREMIUM_THEME.spacing.lg}
+        snapToInterval={width * 0.8 + DesignSystem.spacing.lg}
         decelerationRate="fast"
       >
         {featuredCollections.map((collection, index) => (
@@ -270,7 +270,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
             onPress={() => setActiveCollection(index)}
             style={[
               styles.collectionCard,
-              { marginLeft: index === 0 ? PREMIUM_THEME.spacing.xl : 0 }
+              { marginLeft: index === 0 ? DesignSystem.spacing.xl : 0 }
             ]}
           >
             <Image
@@ -306,7 +306,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
           <Ionicons
             name="shirt-outline"
             size={32}
-            color={PREMIUM_THEME.semantic.text.primary}
+            color={DesignSystem.colors.text.primary}
           />
           <Text style={styles.quickActionTitle}>My Wardrobe</Text>
           <Text style={styles.quickActionSubtitle}>Organize & discover</Text>
@@ -321,7 +321,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
           <Ionicons
             name="camera-outline"
             size={32}
-            color={PREMIUM_THEME.semantic.text.primary}
+            color={DesignSystem.colors.text.primary}
           />
           <Text style={styles.quickActionTitle}>Add Item</Text>
           <Text style={styles.quickActionSubtitle}>Capture new pieces</Text>
@@ -340,7 +340,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + PREMIUM_THEME.spacing.xxxl }
+          { paddingBottom: insets.bottom + DesignSystem.spacing.xxxl }
         ]}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -358,7 +358,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: PREMIUM_THEME.semantic.background.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollView: {
     flex: 1,
@@ -374,23 +374,23 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     height: 100,
     justifyContent: 'flex-end',
-    paddingBottom: PREMIUM_THEME.spacing.md,
+    paddingBottom: DesignSystem.spacing.md,
   },
   floatingHeaderContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: PREMIUM_THEME.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
   },
   floatingHeaderTitle: {
-    ...PREMIUM_THEME.typography.scale.headline3,
-    color: PREMIUM_THEME.semantic.text.primary,
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '700',
     letterSpacing: 2,
   },
   floatingHeaderActions: {
     flexDirection: 'row',
-    gap: PREMIUM_THEME.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   headerButton: {
     width: 40,
@@ -411,54 +411,54 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   heroContent: {
-    padding: PREMIUM_THEME.spacing.xl,
-    paddingBottom: PREMIUM_THEME.spacing.xxxl,
+    padding: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xxxl,
   },
   heroTitle: {
-    ...PREMIUM_THEME.typography.scale.hero,
-    color: PREMIUM_THEME.semantic.text.inverse,
-    marginBottom: PREMIUM_THEME.spacing.sm,
+  ...DesignSystem.typography.scale.hero,
+    color: DesignSystem.colors.text.inverse,
+    marginBottom: DesignSystem.spacing.sm,
   },
   heroSubtitle: {
-    ...PREMIUM_THEME.typography.scale.poetry,
-    color: PREMIUM_THEME.semantic.text.inverse,
-    marginBottom: PREMIUM_THEME.spacing.md,
+    ...DesignSystem.typography.body.large,
+    color: DesignSystem.colors.text.inverse,
+    marginBottom: DesignSystem.spacing.md,
   },
   heroDescription: {
-    ...PREMIUM_THEME.typography.scale.body1,
-    color: PREMIUM_THEME.semantic.text.inverse,
-    marginBottom: PREMIUM_THEME.spacing.xl,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.inverse,
+    marginBottom: DesignSystem.spacing.xl,
     opacity: 0.9,
   },
   heroActions: {
-    gap: PREMIUM_THEME.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   secondaryHeroButton: {
-    marginTop: PREMIUM_THEME.spacing.sm,
+    marginTop: DesignSystem.spacing.sm,
   },
   insightsSection: {
-    padding: PREMIUM_THEME.spacing.xl,
-    paddingTop: PREMIUM_THEME.spacing.xxxl,
+    padding: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xxxl,
   },
   sectionTitle: {
-    ...PREMIUM_THEME.typography.scale.headline2,
-    color: PREMIUM_THEME.semantic.text.primary,
-    marginBottom: PREMIUM_THEME.spacing.xs,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.xs,
   },
   sectionSubtitle: {
-    ...PREMIUM_THEME.typography.scale.whisper,
-    color: PREMIUM_THEME.semantic.text.secondary,
-    marginBottom: PREMIUM_THEME.spacing.xl,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.xl,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    marginBottom: PREMIUM_THEME.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   insightsGrid: {
     flexDirection: 'row',
-    gap: PREMIUM_THEME.spacing.sm,
+    gap: DesignSystem.spacing.sm,
   },
   insightCard: {
     flex: 1,
@@ -468,39 +468,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: PREMIUM_THEME.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   insightTrend: {
-    ...PREMIUM_THEME.typography.scale.caption,
-    color: PREMIUM_THEME.semantic.status.success,
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.success.main,
     fontWeight: '600',
   },
   insightValue: {
-    ...PREMIUM_THEME.typography.scale.display,
-    color: PREMIUM_THEME.semantic.text.primary,
-    marginBottom: PREMIUM_THEME.spacing.xs,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.xs,
   },
   insightTitle: {
-    ...PREMIUM_THEME.typography.scale.body2,
-    color: PREMIUM_THEME.semantic.text.primary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
-    marginBottom: PREMIUM_THEME.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   insightDescription: {
-    ...PREMIUM_THEME.typography.scale.body3,
-    color: PREMIUM_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
   },
   collectionsSection: {
-    paddingTop: PREMIUM_THEME.spacing.xl,
-    paddingHorizontal: PREMIUM_THEME.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
   },
   collectionsScrollContainer: {
-    paddingRight: PREMIUM_THEME.spacing.xl,
+    paddingRight: DesignSystem.spacing.xl,
   },
   collectionCard: {
     width: width * 0.8,
     height: 300,
-    marginRight: PREMIUM_THEME.spacing.lg,
+    marginRight: DesignSystem.spacing.lg,
     overflow: 'hidden',
   },
   collectionImage: {
@@ -516,46 +516,46 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: PREMIUM_THEME.spacing.xl,
+    padding: DesignSystem.spacing.xl,
   },
   collectionTitle: {
-    ...PREMIUM_THEME.typography.scale.headline3,
-    color: PREMIUM_THEME.semantic.text.inverse,
-    marginBottom: PREMIUM_THEME.spacing.xs,
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.text.inverse,
+    marginBottom: DesignSystem.spacing.xs,
   },
   collectionSubtitle: {
-    ...PREMIUM_THEME.typography.scale.body2,
-    color: PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.inverse,
     opacity: 0.9,
-    marginBottom: PREMIUM_THEME.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   collectionItems: {
-    ...PREMIUM_THEME.typography.scale.caption,
-    color: PREMIUM_THEME.colors.champagne[300],
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.gold[300],
   },
   quickActionsSection: {
-    padding: PREMIUM_THEME.spacing.xl,
-    paddingTop: PREMIUM_THEME.spacing.xxxl,
+    padding: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xxxl,
   },
   quickActionsGrid: {
     flexDirection: 'row',
-    gap: PREMIUM_THEME.spacing.lg,
+    gap: DesignSystem.spacing.lg,
   },
   quickActionCard: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: PREMIUM_THEME.spacing.xl,
+    paddingVertical: DesignSystem.spacing.xl,
   },
   quickActionTitle: {
-    ...PREMIUM_THEME.typography.scale.body1,
-    color: PREMIUM_THEME.semantic.text.primary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
-    marginTop: PREMIUM_THEME.spacing.md,
-    marginBottom: PREMIUM_THEME.spacing.xs,
+    marginTop: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.xs,
   },
   quickActionSubtitle: {
-    ...PREMIUM_THEME.typography.scale.body3,
-    color: PREMIUM_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
 });

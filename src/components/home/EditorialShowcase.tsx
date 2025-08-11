@@ -13,11 +13,27 @@ import {
   StyleSheet,
 } from 'react-native';
 import { EditorialColorSection, ColorTheme, EditorialImage } from '@/components/home/EditorialColorSection';
-import { getCurrentWeekTheme } from '@/data/weeklyColorThemes';
-import { ORIGINAL_COLORS } from '@/components/auth/originalLoginStyles';
+import { weeklyColorThemes } from '@/data/weeklyColorThemes';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev } from '@/utils/consoleSuppress';
 
 export const EditorialShowcase: React.FC = () => {
-  const [currentTheme] = useState<ColorTheme>(getCurrentWeekTheme());
+  // Adapt WeeklyColorTheme to ColorTheme shape
+  const mapToColorTheme = (w: { id: string; name: string; color: string; description: string; week: string; }): ColorTheme => ({
+    id: w.id,
+    name: w.name,
+    subtitle: w.description,
+    primaryColor: w.color,
+    secondaryColor: w.color,
+    accentColor: w.color,
+    gradientColors: [w.color, '#00000000'] as const,
+    description: w.description,
+    week: w.week,
+    heroImage: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200',
+    editorialImages: []
+  });
+
+  const [currentTheme] = useState<ColorTheme>(mapToColorTheme(weeklyColorThemes[0]));
 
   const handleExploreColor = (theme: ColorTheme) => {
     Alert.alert(
@@ -28,7 +44,7 @@ export const EditorialShowcase: React.FC = () => {
         { 
           text: 'Keşfet', 
           onPress: () => {
-            console.log('Navigate to color theme products:', theme.id);
+            logInDev('Navigate to color theme products:', theme.id);
             // In a real app, this would navigate to a curated product list
             // filtered by the color theme
           }
@@ -46,7 +62,7 @@ export const EditorialShowcase: React.FC = () => {
         { 
           text: 'Detaylar', 
           onPress: () => {
-            console.log('Navigate to editorial content:', image.id, theme.id);
+            logInDev('Navigate to editorial content:', image.id, theme.id);
             // In a real app, this might open:
             // - A detailed article about the styling
             // - A product page if it's a specific item
@@ -58,7 +74,7 @@ export const EditorialShowcase: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+  <View style={styles.container}>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -78,7 +94,7 @@ export const EditorialShowcase: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: ORIGINAL_COLORS.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   
   scrollView: {

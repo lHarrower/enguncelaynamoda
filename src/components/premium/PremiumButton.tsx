@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   View,
 } from 'react-native';
-import { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -52,7 +52,7 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
   const glowIntensity = useSharedValue(0);
 
   const handlePressIn = () => {
-    scale.value = withSpring(0.96, PREMIUM_THEME.animation.confident);
+  scale.value = withSpring(0.96, DesignSystem.animations.spring.smooth);
     opacity.value = withTiming(0.8, { duration: 150 });
     if (variant === 'luxury') {
       glowIntensity.value = withTiming(1, { duration: 200 });
@@ -60,7 +60,7 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1, PREMIUM_THEME.animation.silk);
+    scale.value = withSpring(1, DesignSystem.animations.spring.gentle);
     opacity.value = withTiming(1, { duration: 150 });
     if (variant === 'luxury') {
       glowIntensity.value = withTiming(0, { duration: 300 });
@@ -86,60 +86,60 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: iconPosition === 'right' ? 'row-reverse' : 'row',
-      borderRadius: PREMIUM_THEME.radius.lg,
-      ...PREMIUM_THEME.elevation.lift,
+      borderRadius: DesignSystem.borderRadius.lg,
+      ...DesignSystem.elevation.medium,
     };
 
     // Size variations
     const sizeStyles: Record<string, ViewStyle> = {
       small: {
-        paddingHorizontal: PREMIUM_THEME.spacing.md,
-        paddingVertical: PREMIUM_THEME.spacing.sm,
+        paddingHorizontal: DesignSystem.spacing.md,
+        paddingVertical: DesignSystem.spacing.sm,
         minHeight: 36,
       },
       medium: {
-        paddingHorizontal: PREMIUM_THEME.spacing.xl,
-        paddingVertical: PREMIUM_THEME.spacing.md,
+        paddingHorizontal: DesignSystem.spacing.xl,
+        paddingVertical: DesignSystem.spacing.md,
         minHeight: 48,
       },
       large: {
-        paddingHorizontal: PREMIUM_THEME.spacing.xxl,
-        paddingVertical: PREMIUM_THEME.spacing.lg,
+        paddingHorizontal: DesignSystem.spacing.xxl,
+        paddingVertical: DesignSystem.spacing.lg,
         minHeight: 56,
       },
       hero: {
-        paddingHorizontal: PREMIUM_THEME.spacing.xxxl,
-        paddingVertical: PREMIUM_THEME.spacing.xl,
+        paddingHorizontal: DesignSystem.spacing.xxxl,
+        paddingVertical: DesignSystem.spacing.xl,
         minHeight: 64,
-        borderRadius: PREMIUM_THEME.radius.organic,
+        borderRadius: DesignSystem.borderRadius.organic,
       },
     };
 
     // Variant styles
     const variantStyles: Record<string, ViewStyle> = {
       primary: {
-        backgroundColor: PREMIUM_THEME.semantic.interactive.primary,
-        ...PREMIUM_THEME.elevation.elevate,
+        backgroundColor: DesignSystem.colors.sage[500],
+        ...DesignSystem.elevation.medium,
       },
       secondary: {
-        backgroundColor: PREMIUM_THEME.semantic.interactive.secondary,
-        ...PREMIUM_THEME.elevation.hover,
+        backgroundColor: DesignSystem.colors.background.elevated,
+        ...DesignSystem.elevation.soft,
       },
       ghost: {
         backgroundColor: 'transparent',
         borderWidth: 1.5,
-        borderColor: PREMIUM_THEME.semantic.border.primary,
-        ...PREMIUM_THEME.elevation.hover,
+        borderColor: DesignSystem.colors.border.primary,
+        ...DesignSystem.elevation.soft,
       },
       glass: {
-        ...PREMIUM_THEME.glassmorphism.silk,
-        borderRadius: PREMIUM_THEME.radius.lg,
+        ...DesignSystem.glassmorphism.medium,
+        borderRadius: DesignSystem.borderRadius.lg,
       },
       luxury: {
-        backgroundColor: PREMIUM_THEME.colors.champagne[500],
-        ...PREMIUM_THEME.elevation.dramatic,
-        shadowColor: PREMIUM_THEME.colors.champagne[500],
-        borderRadius: PREMIUM_THEME.radius.organic,
+        backgroundColor: DesignSystem.colors.gold[500],
+        ...DesignSystem.elevation.high,
+        shadowColor: DesignSystem.colors.gold[500],
+        borderRadius: DesignSystem.borderRadius.organic,
       },
     };
 
@@ -153,7 +153,7 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
   };
 
   const getTextStyle = (): TextStyle => {
-    const baseTextStyle = PREMIUM_THEME.typography.scale.button;
+    const baseTextStyle = DesignSystem.typography.button.medium;
 
     const sizeTextStyles: Record<string, Partial<TextStyle>> = {
       small: { fontSize: 14, letterSpacing: 0.6 },
@@ -163,11 +163,11 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
     };
 
     const variantTextStyles: Record<string, TextStyle> = {
-      primary: { color: PREMIUM_THEME.semantic.text.inverse },
-      secondary: { color: PREMIUM_THEME.semantic.text.primary },
-      ghost: { color: PREMIUM_THEME.semantic.text.primary },
-      glass: { color: PREMIUM_THEME.semantic.text.primary },
-      luxury: { color: PREMIUM_THEME.semantic.text.primary },
+      primary: { color: DesignSystem.colors.text.inverse },
+      secondary: { color: DesignSystem.colors.text.primary },
+      ghost: { color: DesignSystem.colors.text.primary },
+      glass: { color: DesignSystem.colors.text.primary },
+      luxury: { color: DesignSystem.colors.text.primary },
     };
 
     return {
@@ -190,11 +190,11 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
 
   const getIconColor = (): string => {
     const variantIconColors: Record<string, string> = {
-      primary: PREMIUM_THEME.semantic.text.inverse,
-      secondary: PREMIUM_THEME.semantic.text.primary,
-      ghost: PREMIUM_THEME.semantic.text.primary,
-      glass: PREMIUM_THEME.semantic.text.primary,
-      luxury: PREMIUM_THEME.semantic.text.primary,
+      primary: DesignSystem.colors.text.inverse,
+      secondary: DesignSystem.colors.text.primary,
+      ghost: DesignSystem.colors.text.primary,
+      glass: DesignSystem.colors.text.primary,
+      luxury: DesignSystem.colors.text.primary,
     };
     return variantIconColors[variant];
   };
@@ -253,10 +253,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconLeft: {
-    marginRight: PREMIUM_THEME.spacing.sm,
+    marginRight: DesignSystem.spacing.sm,
   },
   iconRight: {
-    marginLeft: PREMIUM_THEME.spacing.sm,
+    marginLeft: DesignSystem.spacing.sm,
   },
 });
 

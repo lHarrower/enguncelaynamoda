@@ -1,10 +1,10 @@
 // AYNA Mirror Notification Service Tests
 // Testing for notification timing accuracy and timezone handling
 
-import NotificationService from '../services/notificationService';
+import NotificationService from '@/services/notificationService';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NotificationPreferences, EngagementHistory } from '../types/aynaMirror';
+import { NotificationPreferences, EngagementHistory } from '@/types/aynaMirror';
 
 // Mock expo-notifications
 jest.mock('expo-notifications', () => ({

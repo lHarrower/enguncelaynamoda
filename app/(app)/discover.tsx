@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   headerSubtitle: {
-    ...DesignSystem.typography.scale.body,
+  ...DesignSystem.typography.body1,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },

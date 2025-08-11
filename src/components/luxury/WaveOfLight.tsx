@@ -8,7 +8,7 @@ import Animated, {
   withSequence,
   Easing,
 } from 'react-native-reanimated';
-import { LuxuryMaterials, LuxuryMotion } from '@/theme/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface WaveOfLightProps {
   isActive: boolean;
@@ -29,7 +29,7 @@ export const WaveOfLight: React.FC<WaveOfLightProps> = ({
   const wave3Opacity = useSharedValue(0);
 
   const animationConfig = {
-    duration: LuxuryMotion.timing.cinematic,
+    duration: DesignSystem.motion.duration.graceful,
     easing: Easing.out(Easing.cubic),
   };
 
@@ -72,8 +72,8 @@ export const WaveOfLight: React.FC<WaveOfLightProps> = ({
       wave3Scale.value = 0;
       wave3Opacity.value = 0;
 
-      // Start animations with staggered delays
-      const stagger = LuxuryMotion.interactions.waveOfLight.stagger;
+  // Start animations with staggered delays
+  const stagger = DesignSystem.motion.duration.quick;
 
       // First wave
       wave1Opacity.value = createWaveAnimation(0);
@@ -91,7 +91,7 @@ export const WaveOfLight: React.FC<WaveOfLightProps> = ({
       if (onAnimationComplete) {
         setTimeout(() => {
           onAnimationComplete();
-        }, LuxuryMotion.interactions.waveOfLight.duration);
+  }, DesignSystem.motion.duration.graceful);
       }
     }
   }, [isActive]);
@@ -137,15 +137,15 @@ const styles = StyleSheet.create({
   },
   
   wave1: {
-    borderColor: `${LuxuryMaterials.colors.liquidGold}40`, // 25% opacity
+    borderColor: `${DesignSystem.colors.gold[500]}40`, // 25% opacity
   },
   
   wave2: {
-    borderColor: `${LuxuryMaterials.colors.liquidGold}60`, // 37.5% opacity
+    borderColor: `${DesignSystem.colors.gold[500]}60`, // 37.5% opacity
   },
   
   wave3: {
-    borderColor: `${LuxuryMaterials.colors.liquidGold}80`, // 50% opacity
+    borderColor: `${DesignSystem.colors.gold[500]}80`, // 50% opacity
   },
 });
 

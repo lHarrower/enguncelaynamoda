@@ -194,14 +194,14 @@ export const COLLAGE_INTERACTIONS = {
     // Swipe right (like)
     swipeRight: {
       borderWidth: 3,
-      borderColor: UNIFIED_COLORS.success,
-      backgroundColor: UNIFIED_COLORS.sage[50],
+      borderColor: UNIFIED_COLORS.success[500],
+      backgroundColor: UNIFIED_COLORS.sage[100],
     } as ViewStyle,
     
     // Swipe left (pass)
     swipeLeft: {
       borderWidth: 3,
-      borderColor: UNIFIED_COLORS.error,
+      borderColor: UNIFIED_COLORS.error[500],
       backgroundColor: UNIFIED_COLORS.background.secondary,
     } as ViewStyle,
     
@@ -209,7 +209,7 @@ export const COLLAGE_INTERACTIONS = {
     swipeUp: {
       borderWidth: 3,
       borderColor: UNIFIED_COLORS.gold[500],
-      backgroundColor: UNIFIED_COLORS.gold[50],
+      backgroundColor: UNIFIED_COLORS.gold[100],
     } as ViewStyle
   },
   
@@ -267,19 +267,19 @@ export const EFFICIENCY_INDICATOR = {
   levels: {
     high: {
       borderWidth: 3,
-      borderColor: UNIFIED_COLORS.success,
-      backgroundColor: UNIFIED_COLORS.sage[50],
+      borderColor: UNIFIED_COLORS.success[500],
+      backgroundColor: UNIFIED_COLORS.sage[100],
     } as ViewStyle,
     
     medium: {
       borderWidth: 3,
       borderColor: UNIFIED_COLORS.gold[500],
-      backgroundColor: UNIFIED_COLORS.gold[50],
+      backgroundColor: UNIFIED_COLORS.gold[100],
     } as ViewStyle,
     
     low: {
       borderWidth: 3,
-      borderColor: UNIFIED_COLORS.error,
+      borderColor: UNIFIED_COLORS.error[500],
       backgroundColor: UNIFIED_COLORS.background.secondary,
     } as ViewStyle
   }

@@ -1,6 +1,7 @@
 // Unit tests for WardrobeService
-import { WardrobeService } from '../../services/WardrobeService';
-import { WardrobeItem, WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
+import { WardrobeService } from '../../services/wardrobeService';
+import type { WardrobeItem } from '../../services/wardrobeService';
+import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
 import { createMockWardrobeItem, mockApiResponses } from '../utils/testUtils';
 import { mocks } from '../mocks';
 

@@ -11,10 +11,9 @@ import {
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { AYNAMODA_VISION_THEME, getColor, getSpacing, getTypography } from '@/constants/AynaModaVisionTheme';
-
+import { DesignSystem } from '@/theme/DesignSystem';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const BENTO_PADDING = getSpacing('md');
+const BENTO_PADDING = DesignSystem.spacing.md;
 const GRID_SIZE = (SCREEN_WIDTH - BENTO_PADDING * 3) / 2;
 
 interface BentoCardProps {
@@ -50,7 +49,6 @@ const BentoCard: React.FC<BentoCardProps> = ({
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
-    
     onPanResponderGrant: (evt) => {
       // Magnetic attraction effect
       const { locationX, locationY } = evt.nativeEvent;
@@ -64,16 +62,16 @@ const BentoCard: React.FC<BentoCardProps> = ({
         Animated.spring(magneticAnim, {
           toValue: { x: deltaX, y: deltaY },
           useNativeDriver: true,
-          ...AYNAMODA_VISION_THEME.motion.spring.gentle,
+          ...DesignSystem.motion.spring.gentle,
         }),
         Animated.spring(scaleAnim, {
           toValue: 1.05,
           useNativeDriver: true,
-          ...AYNAMODA_VISION_THEME.motion.spring.bouncy,
+          ...DesignSystem.motion.spring.bouncy,
         }),
         Animated.timing(rippleAnim, {
           toValue: 1,
-          duration: AYNAMODA_VISION_THEME.motion.duration.graceful,
+          duration: DesignSystem.motion.duration.graceful,
           useNativeDriver: true,
         }),
       ]).start();
@@ -84,16 +82,16 @@ const BentoCard: React.FC<BentoCardProps> = ({
         Animated.spring(magneticAnim, {
           toValue: { x: 0, y: 0 },
           useNativeDriver: true,
-          ...AYNAMODA_VISION_THEME.motion.spring.snappy,
+          ...DesignSystem.motion.spring.quick,
         }),
         Animated.spring(scaleAnim, {
           toValue: 1,
           useNativeDriver: true,
-          ...AYNAMODA_VISION_THEME.motion.spring.gentle,
+          ...DesignSystem.motion.spring.gentle,
         }),
         Animated.timing(rippleAnim, {
           toValue: 0,
-          duration: AYNAMODA_VISION_THEME.motion.duration.smooth,
+          duration: DesignSystem.motion.duration.smooth,
           useNativeDriver: true,
         }),
       ]).start(() => {
@@ -132,7 +130,7 @@ const BentoCard: React.FC<BentoCardProps> = ({
       {...panResponder.panHandlers}
     >
       <LinearGradient
-        colors={gradient}
+        colors={gradient as any}
         style={styles.cardGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -142,11 +140,11 @@ const BentoCard: React.FC<BentoCardProps> = ({
           
           <View style={styles.cardHeader}>
             <View style={styles.cardTitleContainer}>
-              <Text style={[getTypography('body', 'medium'), styles.cardTitle]}>
+              <Text style={[DesignSystem.typography.body.medium, styles.cardTitle]}>
                 {title}
               </Text>
               {subtitle && (
-                <Text style={[getTypography('caption', 'regular'), styles.cardSubtitle]}>
+                <Text style={[DesignSystem.typography.scale.caption, styles.cardSubtitle]}>
                   {subtitle}
                 </Text>
               )}
@@ -154,7 +152,7 @@ const BentoCard: React.FC<BentoCardProps> = ({
             <Ionicons 
               name={icon as any} 
               size={24} 
-              color={getColor('neutral', 'charcoal')} 
+              color={DesignSystem.colors.neutral.charcoal}
             />
           </View>
           
@@ -171,16 +169,16 @@ const BentoCard: React.FC<BentoCardProps> = ({
 
 const styles = StyleSheet.create({
   bentoCard: {
-    borderRadius: AYNAMODA_VISION_THEME.layout.card.borderRadius,
+    borderRadius: DesignSystem.layout.card.borderRadius,
     overflow: 'hidden',
-    ...AYNAMODA_VISION_THEME.layout.card,
+    ...DesignSystem.layout.card,
   },
   cardGradient: {
     flex: 1,
   },
   cardBlur: {
     flex: 1,
-    padding: getSpacing('lg'),
+    padding: DesignSystem.spacing.lg,
     justifyContent: 'space-between',
   },
   ripple: {
@@ -197,20 +195,20 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: getSpacing('sm'),
+    gap: DesignSystem.spacing.sm,
   },
   cardTitleContainer: {
     flex: 1,
   },
   cardTitle: {
-    color: getColor('neutral', 'charcoal'),
-    marginBottom: getSpacing('xs'),
+    color: DesignSystem.colors.neutral.charcoal,
+    marginBottom: DesignSystem.spacing.xs,
   },
   cardSubtitle: {
-    color: getColor('neutral', 'slate'),
+    color: DesignSystem.colors.neutral.slate,
   },
   cardContent: {
-    marginTop: getSpacing('md'),
+    marginTop: DesignSystem.spacing.md,
   },
 });
 

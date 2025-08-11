@@ -18,7 +18,7 @@ export { GridLayouts, GRID_LAYOUTS, GRID_SIZES, GRID_SPACING, GRID_INTERACTIONS,
 export { StackLayouts, STACK_LAYOUTS, STACK_ITEMS, STACK_ALIGNMENT, STACK_INTERACTIONS, STACK_ANIMATIONS, STACK_RESPONSIVE };
 
 // Helper Functions
-export { getBentoCardWidth, getBentoPattern } from './BentoBox';
+export { getResponsiveCardWidth as getBentoCardWidth, getBentoPattern } from './BentoBox';
 export { getCollageCardPosition } from './Collage';
 export { getGridItemWidth, getGridColumns, getGridSpacing, getMasonryItemHeight } from './Grid';
 export { getStackSpacing, getStackPadding, createStack, createHorizontalStack } from './Stack';

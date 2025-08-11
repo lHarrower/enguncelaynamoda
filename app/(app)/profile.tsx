@@ -70,7 +70,7 @@ const ProfileOption = ({
           <Ionicons 
             name="chevron-forward" 
             size={16} 
-            color={DesignSystem.colors.text.quaternary} 
+            color={DesignSystem.colors.text.tertiary} 
           />
         )}
       </TouchableOpacity>
@@ -195,7 +195,7 @@ export default function ProfileScreen() {
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + DesignSystem.spacing.massive }
+          { paddingBottom: insets.bottom + DesignSystem.spacing.xxxl }
         ]}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -209,21 +209,30 @@ export default function ProfileScreen() {
             icon="person-outline"
             title="Personal Information"
             subtitle="Manage your account details"
-            onPress={() => {/* TODO: Implement personal info */}}
+            onPress={() => {
+              // Navigate to personal info screen or show modal
+              router.push('/(app)/settings/personal-info' as any);
+            }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="shield-checkmark-outline"
             title="Privacy & Security"
             subtitle="Control your data and privacy"
-            onPress={() => {/* TODO: Implement privacy settings */}}
+            onPress={() => {
+              // Navigate to privacy settings
+              router.push('/(app)/settings/privacy' as any);
+            }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="notifications-outline"
             title="Notifications"
             subtitle="Customize your alerts"
-            onPress={() => {/* TODO: Implement notifications */}}
+            onPress={() => {
+              // Navigate to notification settings
+              router.push('/(app)/settings/notifications' as any);
+            }}
           />
         </ProfileSection>
 
@@ -233,21 +242,30 @@ export default function ProfileScreen() {
             icon="color-palette-outline"
             title="Style Profile"
             subtitle="Define your fashion preferences"
-            onPress={() => {/* TODO: Implement style preferences */}}
+            onPress={() => {
+              // Navigate to style preferences
+              router.push('/(app)/settings/style-preferences' as any);
+            }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="resize-outline"
             title="Size & Measurements"
             subtitle="Update your sizing information"
-            onPress={() => {/* TODO: Implement size profile */}}
+            onPress={() => {
+              // Navigate to size profile
+              router.push('/(app)/settings/size-profile' as any);
+            }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="heart-outline"
             title="Favorite Brands"
             subtitle="Manage your preferred brands"
-            onPress={() => {/* TODO: Implement favorite brands */}}
+            onPress={() => {
+              // Navigate to favorite brands
+              router.push('/(app)/settings/favorite-brands' as any);
+            }}
           />
         </ProfileSection>
 
@@ -257,14 +275,20 @@ export default function ProfileScreen() {
             icon="language-outline"
             title="Language"
             subtitle="English"
-            onPress={() => {/* TODO: Implement language settings */}}
+            onPress={() => {
+              // Navigate to language settings
+              router.push('/(app)/settings/language' as any);
+            }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="moon-outline"
             title="Appearance"
             subtitle="Light mode"
-            onPress={() => {/* TODO: Implement appearance settings */}}
+            onPress={() => {
+              // Navigate to appearance settings
+              router.push('/(app)/settings/appearance' as any);
+            }}
           />
         </ProfileSection>
 
@@ -274,21 +298,30 @@ export default function ProfileScreen() {
             icon="help-circle-outline"
             title="Help Center"
             subtitle="Get help and support"
-            onPress={() => {/* TODO: Implement help center */}}
+            onPress={() => {
+              // Navigate to help center
+              router.push('/(app)/help/center' as any);
+            }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="chatbubble-outline"
             title="Contact Support"
             subtitle="Send us your feedback"
-            onPress={() => {/* TODO: Implement contact us */}}
+            onPress={() => {
+              // Navigate to contact support
+              router.push('/(app)/help/contact' as any);
+            }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="document-text-outline"
             title="Terms & Privacy Policy"
             subtitle="Read our policies"
-            onPress={() => {/* TODO: Implement terms & privacy */}}
+            onPress={() => {
+              // Navigate to terms and privacy
+              router.push('/(app)/legal/terms-privacy' as any);
+            }}
           />
         </ProfileSection>
 
@@ -327,7 +360,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     backgroundColor: DesignSystem.colors.background.primary,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border.tertiary,
+  borderBottomColor: DesignSystem.colors.border.secondary,
   },
   headerContent: {
     flexDirection: 'row',
@@ -338,7 +371,7 @@ const styles = StyleSheet.create({
     paddingBottom: DesignSystem.spacing.md,
   },
   headerTitle: {
-    ...DesignSystem.typography.h2,
+  ...DesignSystem.typography.scale.h2,
     color: DesignSystem.colors.text.primary,
     fontWeight: '400',
   },
@@ -380,7 +413,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: DesignSystem.colors.interactive.primary,
+  backgroundColor: DesignSystem.colors.sage[600],
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
@@ -391,18 +424,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   userName: {
-    ...DesignSystem.typography.h1,
+  ...DesignSystem.typography.scale.h1,
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.xs,
     fontWeight: '400',
   },
   userTitle: {
-    ...DesignSystem.typography.body1,
+  ...DesignSystem.typography.body1,
     color: DesignSystem.colors.text.secondary,
     marginBottom: DesignSystem.spacing.xs,
   },
   userLocation: {
-    ...DesignSystem.typography.caption,
+  ...DesignSystem.typography.caption.medium,
     color: DesignSystem.colors.text.tertiary,
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -422,13 +455,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statValue: {
-    ...DesignSystem.typography.h2,
+  ...DesignSystem.typography.scale.h2,
     color: DesignSystem.colors.text.primary,
     fontWeight: '300',
     marginBottom: DesignSystem.spacing.xs,
   },
   statLabel: {
-    ...DesignSystem.typography.caption,
+  ...DesignSystem.typography.caption.medium,
     color: DesignSystem.colors.text.tertiary,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
@@ -502,7 +535,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: DesignSystem.colors.border.tertiary,
+    backgroundColor: DesignSystem.colors.border.secondary,
     marginLeft: DesignSystem.spacing.lg + 44 + DesignSystem.spacing.md,
   },
   signOutSection: {

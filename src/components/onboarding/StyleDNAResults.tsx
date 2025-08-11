@@ -104,8 +104,8 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
     );
   };
 
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.8) return DesignSystem.colors.success;
+  const getConfidenceColor = (confidence: number): string => {
+    if (confidence >= 0.8) return (DesignSystem.colors.semantic?.success as unknown as string) || DesignSystem.colors.sage[600];
     if (confidence >= 0.6) return DesignSystem.colors.gold[500];
     return DesignSystem.colors.sage[500];
   };
@@ -200,7 +200,7 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
               'Your Strengths',
               recommendations.strengths,
               'star',
-              DesignSystem.colors.success
+              (DesignSystem.colors.semantic?.success as unknown as string) || DesignSystem.colors.sage[600]
             )}
             
             {renderRecommendationSection(
@@ -234,6 +234,8 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
   );
 };
 
+export default StyleDNAResults;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -255,14 +257,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontFamily: DesignSystem.typography.headings.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.headline,
     color: DesignSystem.colors.text.primary,
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: 16,
@@ -278,11 +280,11 @@ const styles = StyleSheet.create({
   },
   confidenceText: {
     fontSize: 14,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
   },
   personalityCard: {
-    ...DesignSystem.effects.glassmorphism,
+    ...DesignSystem.effects.elevation.subtle,
     padding: 24,
     marginBottom: 24,
     borderRadius: 20,
@@ -295,25 +297,25 @@ const styles = StyleSheet.create({
   },
   personalityPrimary: {
     fontSize: 24,
-    fontFamily: DesignSystem.typography.headings.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.headline,
     color: DesignSystem.colors.text.primary,
     flex: 1,
   },
   personalitySecondary: {
     fontSize: 18,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.gold[500],
     marginBottom: 12,
     fontWeight: '600',
   },
   personalityDescription: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.text.secondary,
     lineHeight: 24,
   },
   colorPaletteCard: {
-    ...DesignSystem.effects.glassmorphism,
+    ...DesignSystem.effects.elevation.subtle,
     padding: 20,
     marginBottom: 24,
     borderRadius: 16,
@@ -326,7 +328,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    fontFamily: DesignSystem.typography.headings.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.headline,
     color: DesignSystem.colors.text.primary,
   },
   colorSection: {
@@ -334,7 +336,7 @@ const styles = StyleSheet.create({
   },
   colorSectionTitle: {
     fontSize: 14,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.text.secondary,
     marginBottom: 8,
     fontWeight: '600',
@@ -364,7 +366,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontFamily: DesignSystem.typography.headings.fontFamily,
+  fontFamily: DesignSystem.typography.fontFamily.headline,
     color: DesignSystem.colors.text.primary,
     marginBottom: 16,
   },
@@ -372,7 +374,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   preferenceCard: {
-    ...DesignSystem.effects.glassmorphism,
+    ...DesignSystem.effects.elevation.subtle,
     padding: 16,
     borderRadius: 12,
   },
@@ -384,18 +386,18 @@ const styles = StyleSheet.create({
   },
   preferenceTitle: {
     fontSize: 14,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.text.secondary,
     fontWeight: '600',
   },
   preferenceValue: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.text.primary,
     fontWeight: '600',
   },
   recommendationsCard: {
-    ...DesignSystem.effects.glassmorphism,
+    ...DesignSystem.effects.elevation.subtle,
     padding: 20,
     marginBottom: 32,
     borderRadius: 16,
@@ -411,7 +413,7 @@ const styles = StyleSheet.create({
   },
   recommendationTitle: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
   },
   recommendationItem: {
@@ -429,14 +431,14 @@ const styles = StyleSheet.create({
   recommendationText: {
     flex: 1,
     fontSize: 14,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.text.secondary,
     lineHeight: 20,
   },
   continueButton: {
     borderRadius: 16,
     overflow: 'hidden',
-    ...DesignSystem.effects.shadow,
+    ...DesignSystem.effects.elevation.soft,
   },
   continueGradient: {
     flexDirection: 'row',
@@ -448,7 +450,7 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     fontSize: 16,
-    fontFamily: DesignSystem.typography.body.fontFamily,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: '#FFFFFF',
     fontWeight: '600',
   },

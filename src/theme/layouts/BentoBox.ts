@@ -96,18 +96,18 @@ export const BENTO_LAYOUTS = {
   
   // Special card variants for different content types
   contentTypes: {
-    // Daily inspiration card
+    // Inspiration card
     inspiration: {
-      backgroundColor: UNIFIED_COLORS.sage[50],
+      backgroundColor: UNIFIED_COLORS.sage[100],
       borderWidth: 1,
-      borderColor: UNIFIED_COLORS.sage[100],
+      borderColor: UNIFIED_COLORS.sage[200],
     } as ViewStyle,
     
     // Style tips card
     styleTips: {
-      backgroundColor: UNIFIED_COLORS.gold[50],
+      backgroundColor: UNIFIED_COLORS.gold[100],
       borderWidth: 1,
-      borderColor: UNIFIED_COLORS.gold[100],
+      borderColor: UNIFIED_COLORS.gold[300],
     } as ViewStyle,
     
     // AI-curated outfit card

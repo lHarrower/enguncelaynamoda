@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../theme/ThemeProvider';
+import { useSafeTheme } from '@/hooks/useSafeTheme';
 import { antiConsumptionService, MonthlyConfidenceMetrics as MonthlyConfidenceMetricsType } from '../../services/antiConsumptionService';
 import { DesignSystem } from '../../theme/DesignSystem';
 
@@ -27,7 +27,8 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
   year,
   onMetricsLoaded,
 }) => {
-  const { colors } = useTheme();
+  const theme = useSafeTheme();
+  const { colors } = theme;
   const styles = createStyles(colors);
   const [metrics, setMetrics] = useState<MonthlyConfidenceMetricsType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -168,7 +169,7 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
         </View>
 
         <View style={styles.improvementContainer}>
-          <Ionicons name={improvementIcon} size={20} color={improvementColor} />
+          <Ionicons name={improvementIcon as keyof typeof Ionicons.glyphMap} size={20} color={improvementColor} />
           <Text style={[styles.improvementText, { color: improvementColor }]}>
             {metrics.confidenceImprovement > 0 ? '+' : ''}
             {metrics.confidenceImprovement.toFixed(1)} from last month
@@ -330,7 +331,7 @@ const createStyles = (colors: any) => StyleSheet.create({
     marginBottom: 20,
   },
   retryButton: {
-    backgroundColor: colors.primary[500],
+    backgroundColor: DesignSystem.colors.primary[500],
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,

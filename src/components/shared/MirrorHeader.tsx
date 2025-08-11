@@ -29,7 +29,7 @@ export const MirrorHeader: React.FC<MirrorHeaderProps> = ({
   }));
 
   return (
-    <Animated.View style={[styles.header(dimensions), headerAnimatedStyle]}>
+  <Animated.View style={[getHeaderStyle(dimensions), headerAnimatedStyle]}>
       <BlurView intensity={20} style={styles.headerBlur}>
         <LinearGradient
           colors={[
@@ -39,7 +39,7 @@ export const MirrorHeader: React.FC<MirrorHeaderProps> = ({
           style={styles.headerGradient}
         >
           <View style={styles.headerContent}>
-            <Text style={styles.greetingText(dimensions)}>
+      <Text style={getGreetingTextStyle(dimensions)}>
               {greetingText}
             </Text>
             <Text style={styles.dateText}>
@@ -64,11 +64,19 @@ export const MirrorHeader: React.FC<MirrorHeaderProps> = ({
   );
 };
 
+const getHeaderStyle = (dimensions: { headerHeight: number }) => ({
+  height: dimensions.headerHeight,
+  paddingTop: 44, // Status bar height
+});
+
+const getGreetingTextStyle = (dimensions: { isTablet: boolean }) => ({
+  ...DesignSystem.typography.heading.h1,
+  color: DesignSystem.colors.inkGray[800],
+  marginBottom: DesignSystem.spacing.xs,
+  fontSize: dimensions.isTablet ? 32 : 28,
+});
+
 const styles = StyleSheet.create({
-  header: (dimensions: { headerHeight: number }) => ({
-    height: dimensions.headerHeight,
-    paddingTop: 44, // Status bar height
-  }),
   headerBlur: {
     flex: 1,
   },
@@ -80,14 +88,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.lg,
   },
-  greetingText: (dimensions: { isTablet: boolean }) => ({
-    ...DesignSystem.typography.h1,
-    color: DesignSystem.colors.inkGray[800],
-    marginBottom: DesignSystem.spacing.xs,
-    fontSize: dimensions.isTablet ? 32 : 28,
-  }),
   dateText: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.inkGray[600],
     marginBottom: DesignSystem.spacing.sm,
   },
@@ -97,7 +99,7 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.xs,
   },
   weatherText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.inkGray[600],
     textTransform: 'capitalize',
   },

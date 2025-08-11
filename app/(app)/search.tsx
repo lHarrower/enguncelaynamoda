@@ -14,7 +14,8 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme } from '@shopify/restyle';
+import { DesignSystemType } from '@/theme/DesignSystem';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SEMANTIC_TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '@/constants/AppConstants';
 
@@ -86,7 +87,8 @@ const FEATURED_PRODUCTS = [
 ];
 
 export default function SearchScreen() {
-  const { colors, isDark } = useTheme();
+  const theme = useTheme<DesignSystemType>();
+  const { colors } = theme;
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
@@ -102,7 +104,7 @@ export default function SearchScreen() {
           colors={['transparent', 'rgba(0, 0, 0, 0.6)']}
           style={styles.categoryOverlay}
         >
-          <Text style={[styles.categoryName, { color: colors.background }]}>
+            <Text style={[styles.categoryName, { color: colors.background?.primary || '#FAF9F6' }]}>
             {item.name}
           </Text>
         </LinearGradient>
@@ -122,13 +124,13 @@ export default function SearchScreen() {
           style={styles.collectionOverlay}
         >
           <View style={styles.collectionContent}>
-            <Text style={[styles.collectionTitle, { color: colors.background }]}>
+            <Text style={[styles.collectionTitle, { color: colors.background?.primary || '#FAF9F6' }]}>
               {item.title}
             </Text>
-            <Text style={[styles.collectionSubtitle, { color: colors.background }]}>
+            <Text style={[styles.collectionSubtitle, { color: colors.background?.primary || '#FAF9F6' }]}>
               {item.subtitle}
             </Text>
-            <Text style={[styles.collectionCount, { color: colors.background }]}>
+            <Text style={[styles.collectionCount, { color: colors.background?.primary || '#FAF9F6' }]}>
               {item.itemCount} items
             </Text>
           </View>
@@ -145,10 +147,10 @@ export default function SearchScreen() {
         resizeMode="cover"
       />
       <View style={styles.productInfo}>
-        <Text style={[styles.productTitle, { color: colors.text }]}>
+  <Text style={[styles.productTitle, { color: (colors as any).text?.primary || '#212529' }]}>
           {item.title}
         </Text>
-        <Text style={[styles.productPrice, { color: colors.text }]}>
+  <Text style={[styles.productPrice, { color: (colors as any).text?.secondary || '#495057' }]}>
           {item.price}
         </Text>
       </View>
@@ -195,10 +197,10 @@ export default function SearchScreen() {
                   {TRENDING_SEARCHES.map((term, index) => (
                     <TouchableOpacity
                       key={index}
-                      style={[styles.trendingTag, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                      style={[styles.trendingTag, { backgroundColor: (colors as any).surface?.primary || '#FEFEFE', borderColor: (colors as any).border || '#D1D5DB' }]}
                       onPress={() => setSearchQuery(term)}
                     >
-                      <Text style={[styles.trendingText, { color: colors.text }]}>
+                      <Text style={[styles.trendingText, { color: (colors as any).text?.primary || '#212529' }]}>
                         {term}
                       </Text>
                     </TouchableOpacity>
@@ -209,7 +211,7 @@ export default function SearchScreen() {
 
             {/* Categories */}
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              <Text style={[styles.sectionTitle, { color: (colors as any).text?.primary || '#212529' }]}> 
                 Shop by Category
               </Text>
               <FlatList
@@ -224,7 +226,7 @@ export default function SearchScreen() {
 
             {/* Curated Collections */}
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              <Text style={[styles.sectionTitle, { color: (colors as any).text?.primary || '#212529' }]}> 
                 Curated Collections
               </Text>
               <FlatList
@@ -241,7 +243,7 @@ export default function SearchScreen() {
 
         {/* Search Results or Featured Products */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text style={[styles.sectionTitle, { color: (colors as any).text?.primary || '#212529' }]}> 
             {searchQuery.length > 0 ? `Results for "${searchQuery}"` : 'Featured'}
           </Text>
           <FlatList

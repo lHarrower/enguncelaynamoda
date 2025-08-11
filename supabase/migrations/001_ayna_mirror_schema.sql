@@ -136,9 +136,29 @@ CREATE INDEX IF NOT EXISTS idx_wardrobe_items_usage_count ON wardrobe_items(usag
 CREATE INDEX IF NOT EXISTS idx_daily_recommendations_user_date ON daily_recommendations(user_id, recommendation_date);
 CREATE INDEX IF NOT EXISTS idx_daily_recommendations_generated_at ON daily_recommendations(generated_at);
 
--- Outfit recommendations indexes
-CREATE INDEX IF NOT EXISTS idx_outfit_recommendations_daily_id ON outfit_recommendations(daily_recommendation_id);
-CREATE INDEX IF NOT EXISTS idx_outfit_recommendations_selected ON outfit_recommendations(selected_at) WHERE selected_at IS NOT NULL;
+-- Create index only if the column exists (guards older DBs where column is added by later migration)
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name='outfit_recommendations'
+      AND column_name='daily_recommendation_id'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS idx_outfit_recommendations_daily_id
+    ON public.outfit_recommendations(daily_recommendation_id);
+  END IF;
+END $$;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_schema = 'public' 
+      AND table_name = 'outfit_recommendations' 
+      AND column_name = 'selected_at'
+  ) THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_outfit_recommendations_selected ON outfit_recommendations(selected_at) WHERE selected_at IS NOT NULL';
+  END IF;
+END $$;
 
 -- Feedback indexes
 CREATE INDEX IF NOT EXISTS idx_outfit_feedback_user_id ON outfit_feedback(user_id);
@@ -180,32 +200,7 @@ CREATE POLICY "Users can update their own daily recommendations" ON daily_recomm
   FOR UPDATE USING (auth.uid() = user_id);
 
 -- Outfit recommendations policies (accessed through daily recommendations)
-CREATE POLICY "Users can view outfit recommendations for their daily recommendations" ON outfit_recommendations
-  FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM daily_recommendations 
-      WHERE daily_recommendations.id = outfit_recommendations.daily_recommendation_id 
-      AND daily_recommendations.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Users can insert outfit recommendations for their daily recommendations" ON outfit_recommendations
-  FOR INSERT WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM daily_recommendations 
-      WHERE daily_recommendations.id = outfit_recommendations.daily_recommendation_id 
-      AND daily_recommendations.user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Users can update outfit recommendations for their daily recommendations" ON outfit_recommendations
-  FOR UPDATE USING (
-    EXISTS (
-      SELECT 1 FROM daily_recommendations 
-      WHERE daily_recommendations.id = outfit_recommendations.daily_recommendation_id 
-      AND daily_recommendations.user_id = auth.uid()
-    )
-  );
+-- Outfit recommendations policies moved to a later migration
 
 -- Outfit feedback policies
 CREATE POLICY "Users can view their own outfit feedback" ON outfit_feedback

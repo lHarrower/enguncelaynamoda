@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   moodTag: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.inverse,
     backgroundColor: DesignSystem.colors.sage[500],
     alignSelf: 'flex-start',
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   whisper: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     fontSize: 20,
     color: DesignSystem.colors.text.inverse,
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 3,
   },
   itemCount: {
-    ...DesignSystem.typography.body1,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.inverse,
     opacity: 0.8,
     marginTop: DesignSystem.spacing.sm,

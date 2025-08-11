@@ -4,6 +4,7 @@
 import { Animated, Easing } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 export interface TransitionConfig {
   duration: number;
@@ -159,7 +160,7 @@ class TransitionPolishingService {
         toValue,
         duration: config.duration,
         easing: config.easing,
-        useNativeDriver: config.useNativeDriver,
+  useNativeDriver: config.useNativeDriver ?? false,
         delay: config.delay || 0
       });
 
@@ -544,7 +545,7 @@ class TransitionPolishingService {
           break;
       }
     } catch (error) {
-      console.warn('Haptic feedback not available:', error);
+      errorInDev('Haptic feedback not available:', error);
     }
   }
 

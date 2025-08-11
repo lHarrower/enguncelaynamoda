@@ -35,14 +35,17 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const authHeader = req.headers.get('Authorization')!;
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_ANON_KEY')!,
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    // 1. Fetch all products where category is not yet analyzed
+  // 1. Fetch all products where category is not yet analyzed
     const { data: products, error: fetchError } = await supabaseClient
       .from('products')
       .select('id, image_url')
@@ -64,6 +67,17 @@ Deno.serve(async (req) => {
 
         const categoryQuestion = "What is the category of this clothing item? (e.g., t-shirt, dress, jeans, coat, shoes)";
         const colorQuestion = "What are the main colors of this clothing item as a comma separated list?";
+
+        // SSRF guard: only allow Supabase Storage public URLs
+        try {
+          const u = new URL(product.image_url);
+          const allowed = new URL(Deno.env.get('SUPABASE_URL')!).hostname.split('.')[0] + '.supabase.co';
+          if (!u.hostname.includes(allowed) || !u.pathname.includes('/storage/v1/object/public/')) {
+            throw new Error('Disallowed image_url host');
+          }
+        } catch {
+          throw new Error('Invalid or unauthorized image_url');
+        }
 
         const category = await askQuestionToAI(product.image_url, categoryQuestion);
         const colorsText = await askQuestionToAI(product.image_url, colorQuestion);

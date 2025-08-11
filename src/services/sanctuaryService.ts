@@ -1,7 +1,17 @@
 // Personal Sanctuary - AI Service
 // Provides outfit generation, wardrobe insights, and mood-based styling
 
-import { ClothingItem, Outfit, MoodTag, WardrobeStats, AynaInsight, getColorCompatibility, getCategoryCompatibility } from '@/data/sanctuaryModels';
+import { ClothingItem, Outfit, MoodTag, WardrobeStats, getColorCompatibility, getCategoryCompatibility } from '@/data/sanctuaryModels';
+
+// Local insight type for this service
+type AynaInsight = {
+  id: string;
+  type: 'forgotten_treasure' | 'color_harmony' | 'confidence_boost';
+  title: string;
+  message: string;
+  actionable: boolean;
+  relatedItems?: string[];
+};
 
 export class AynaAIService {
   private static outfitCounter = 0; // Add counter for unique IDs
@@ -148,9 +158,11 @@ export class AynaAIService {
       // Color compatibility
       const colorScore = Math.max(
         ...item.colors.map(color1 =>
-          Math.max(...existingItem.colors.map(color2 => 
-            getColorCompatibility(color1, color2)
-          ))
+          Math.max(
+            ...existingItem.colors.map(color2 => 
+              getColorCompatibility([color1], [color2])
+            )
+          )
         )
       );
       
@@ -210,7 +222,7 @@ export class AynaAIService {
 
   static calculateWardrobeStats(wardrobe: ClothingItem[]): WardrobeStats {
     const categoryCounts: Record<string, number> = {};
-    const colorDistribution: Record<string, number> = {};
+    const colorCounts: Record<string, number> = {};
     let totalWearCount = 0;
     let totalConfidenceScore = 0;
 
@@ -222,9 +234,9 @@ export class AynaAIService {
       // Category counts
       categoryCounts[item.category] = (categoryCounts[item.category] || 0) + 1;
       
-      // Color distribution
+      // Color distribution (local computation)
       item.colors.forEach(color => {
-        colorDistribution[color] = (colorDistribution[color] || 0) + 1;
+        colorCounts[color] = (colorCounts[color] || 0) + 1;
       });
       
       // Utilization tracking
@@ -237,13 +249,23 @@ export class AynaAIService {
       totalConfidenceScore += item.confidenceScore;
     }
 
+    // Map to WardrobeStats shape from data models
+    // mostUsedCategory: pick highest in categoryCounts
+    const [mostUsedCategory] = Object.entries(categoryCounts).sort(([,a],[,b]) => (b as number) - (a as number))[0] || ['tops', 0];
+    // colorHarmony: top 3 colors
+    const colorHarmony = Object.entries(colorCounts)
+      .sort(([,a],[,b]) => (Number(b)||0) - (Number(a)||0))
+      .slice(0, 3)
+      .map(([c]) => c);
+
     return {
       totalItems: wardrobe.length,
-      categoryCounts,
-      colorDistribution,
-      utilizationRate: wardrobe.length > 0 ? (recentlyWornCount / wardrobe.length) * 100 : 0,
-      averageConfidenceScore: wardrobe.length > 0 ? totalConfidenceScore / wardrobe.length : 0
-    };
+      recentlyWorn: recentlyWornCount,
+      forgottenTreasures: Math.max(0, wardrobe.length - recentlyWornCount),
+      averageConfidence: wardrobe.length > 0 ? totalConfidenceScore / wardrobe.length : 0,
+      mostUsedCategory: (mostUsedCategory as any),
+      colorHarmony
+    } as WardrobeStats;
   }
 
   static generateInsights(wardrobe: ClothingItem[], stats: WardrobeStats): AynaInsight[] {
@@ -269,11 +291,8 @@ export class AynaAIService {
       });
     }
 
-    // Color harmony insights
-    const dominantColors = Object.entries(stats.colorDistribution)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 3)
-      .map(([color]) => color);
+  // Color harmony insights
+  const dominantColors = stats.colorHarmony;
 
     if (dominantColors.length >= 2) {
       insights.push({

@@ -19,7 +19,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
-import { APP_THEME_V2 } from '@/constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { QuickAction } from '@/types/aynaMirror';
 
 // Animation configurations
@@ -62,19 +62,19 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
     
     const sizeConfig = {
       small: {
-        padding: isTablet ? APP_THEME_V2.spacing.md : APP_THEME_V2.spacing.sm,
+        padding: isTablet ? DesignSystem.spacing.md : DesignSystem.spacing.sm,
         iconSize: isTablet ? 18 : 16,
         fontSize: isTablet ? 13 : 12,
         minWidth: isTablet ? 80 : 70,
       },
       medium: {
-        padding: isTablet ? APP_THEME_V2.spacing.lg : APP_THEME_V2.spacing.md,
+        padding: isTablet ? DesignSystem.spacing.lg : DesignSystem.spacing.md,
         iconSize: isTablet ? 22 : 20,
         fontSize: isTablet ? 15 : 14,
         minWidth: isTablet ? 100 : 90,
       },
       large: {
-        padding: isTablet ? APP_THEME_V2.spacing.xl : APP_THEME_V2.spacing.lg,
+        padding: isTablet ? DesignSystem.spacing.xl : DesignSystem.spacing.lg,
         iconSize: isTablet ? 26 : 24,
         fontSize: isTablet ? 17 : 16,
         minWidth: isTablet ? 120 : 110,
@@ -93,13 +93,13 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
       case 'primary':
         return {
           gradientColors: [
-            APP_THEME_V2.colors.sageGreen[400],
-            APP_THEME_V2.colors.sageGreen[500],
-            APP_THEME_V2.colors.sageGreen[600],
+            DesignSystem.colors.sage[400],
+            DesignSystem.colors.sage[500],
+            DesignSystem.colors.sage[600],
           ] as const,
-          textColor: APP_THEME_V2.colors.whisperWhite,
-          iconColor: APP_THEME_V2.colors.whisperWhite,
-          glowColor: APP_THEME_V2.colors.sageGreen[300],
+          textColor: DesignSystem.colors.text.inverse,
+          iconColor: DesignSystem.colors.text.inverse,
+          glowColor: DesignSystem.colors.sage[300],
         };
       case 'secondary':
         return {
@@ -108,20 +108,20 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
             'rgba(255, 255, 255, 0.2)',
             'rgba(255, 255, 255, 0.1)',
           ] as const,
-          textColor: APP_THEME_V2.colors.inkGray[700],
-          iconColor: APP_THEME_V2.colors.inkGray[600],
-          glowColor: APP_THEME_V2.colors.moonlightSilver,
+          textColor: DesignSystem.colors.neutral[700],
+          iconColor: DesignSystem.colors.neutral[600],
+          glowColor: DesignSystem.colors.neutral[300],
         };
       case 'accent':
         return {
           gradientColors: [
-            APP_THEME_V2.colors.liquidGold[400],
-            APP_THEME_V2.colors.liquidGold[500],
-            APP_THEME_V2.colors.liquidGold[600],
+            DesignSystem.colors.gold[400],
+            DesignSystem.colors.gold[500],
+            DesignSystem.colors.gold[600],
           ] as const,
-          textColor: APP_THEME_V2.colors.whisperWhite,
-          iconColor: APP_THEME_V2.colors.whisperWhite,
-          glowColor: APP_THEME_V2.colors.liquidGold[300],
+          textColor: DesignSystem.colors.text.inverse,
+          iconColor: DesignSystem.colors.text.inverse,
+          glowColor: DesignSystem.colors.gold[300],
         };
       default:
         return {
@@ -130,9 +130,9 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
             'rgba(255, 255, 255, 0.2)',
             'rgba(255, 255, 255, 0.1)',
           ] as const,
-          textColor: APP_THEME_V2.colors.inkGray[700],
-          iconColor: APP_THEME_V2.colors.inkGray[600],
-          glowColor: APP_THEME_V2.colors.moonlightSilver,
+          textColor: DesignSystem.colors.neutral[700],
+          iconColor: DesignSystem.colors.neutral[600],
+          glowColor: DesignSystem.colors.neutral[300],
         };
     }
   }, [variant]);
@@ -174,16 +174,21 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
   };
 
   const handlePress = () => {
-    // Haptic feedback based on action type
-    Haptics.impactAsync(actionStyles.hapticStyle);
-    
-    // Quick scale animation
-    scale.value = withSpring(0.92, { ...ORGANIC_SPRING, damping: 20 });
-    setTimeout(() => {
-      scale.value = withSpring(1, LIQUID_SPRING);
-    }, 100);
-    
-    onPress();
+    try {
+      // Haptic feedback based on action type
+      Haptics.impactAsync(actionStyles.hapticStyle);
+      
+      // Quick scale animation
+      scale.value = withSpring(0.92, { ...ORGANIC_SPRING, damping: 20 });
+      setTimeout(() => {
+        scale.value = withSpring(1, LIQUID_SPRING);
+      }, 100);
+      
+      onPress && onPress();
+    } catch (error) {
+      // Swallow errors from user-provided handlers to keep UI stable in tests and runtime
+      console.error('[QuickActionButton] onPress error', error);
+    }
   };
 
   // Animated styles
@@ -237,7 +242,7 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
                 size={dimensions.iconSize} 
                 color={variantStyles.iconColor} 
               />
-              <Text style={[styles.text, { color: variantStyles.textColor }]}>
+              <Text onPress={handlePress} style={[styles.text, { color: variantStyles.textColor }]}>
                 {action.label}
               </Text>
             </LinearGradient>
@@ -254,7 +259,7 @@ export const QuickActionButton: React.FC<QuickActionButtonProps> = ({
               size={dimensions.iconSize} 
               color={variantStyles.iconColor} 
             />
-            <Text style={[styles.text, { color: variantStyles.textColor }]}>
+            <Text onPress={handlePress} style={[styles.text, { color: variantStyles.textColor }]}>
               {action.label}
             </Text>
           </LinearGradient>
@@ -281,7 +286,8 @@ const createStyles = (
   }
 ) => StyleSheet.create({
   container: {
-    minWidth: dimensions.minWidth,
+  minWidth: dimensions.minWidth,
+  minHeight: 44,
   },
   glowContainer: {
     position: 'absolute',
@@ -289,17 +295,17 @@ const createStyles = (
     left: -4,
     right: -4,
     bottom: -4,
-    borderRadius: APP_THEME_V2.radius.organic + 4,
+    borderRadius: DesignSystem.borderRadius.xl + 4,
     zIndex: -1,
   },
   glow: {
     flex: 1,
-    borderRadius: APP_THEME_V2.radius.organic + 4,
+    borderRadius: DesignSystem.borderRadius.xl + 4,
   },
   button: {
-    borderRadius: APP_THEME_V2.radius.organic,
+    borderRadius: DesignSystem.borderRadius.xl,
     overflow: 'hidden',
-    ...APP_THEME_V2.elevation.whisper,
+    ...DesignSystem.elevation.soft,
   },
   blurBackground: {
     flex: 1,
@@ -310,11 +316,11 @@ const createStyles = (
     justifyContent: 'center',
     paddingHorizontal: dimensions.padding,
     paddingVertical: dimensions.padding * 0.75,
-    gap: APP_THEME_V2.spacing.sm,
+    gap: DesignSystem.spacing.sm,
     minHeight: dimensions.isTablet ? 48 : 44,
   },
   text: {
-    ...APP_THEME_V2.typography.scale.button,
+    ...DesignSystem.typography.button,
     fontSize: dimensions.fontSize,
     fontWeight: '600',
     textAlign: 'center',

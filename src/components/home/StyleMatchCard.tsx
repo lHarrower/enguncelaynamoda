@@ -89,18 +89,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   brandText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     marginBottom: DesignSystem.spacing.xs,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   productText: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.sm,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
   },
   priceContainer: {
     flexDirection: 'row',
@@ -109,9 +109,9 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.sm,
   },
   priceText: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
   },
   discountChip: {
     backgroundColor: DesignSystem.colors.sage[500],
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: DesignSystem.radius.sm,
   },
   discountText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.inverse,
     fontWeight: '500',
     textTransform: 'uppercase',

@@ -1,8 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/context/ThemeContext';
-import { DIMENSIONS, SPACING } from '@/constants/AppConstants';
+import { DesignSystem } from '@/theme/DesignSystem';
 import type { Session } from '@supabase/supabase-js';
 
 interface ProfileHeaderProps {
@@ -16,7 +15,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onEditProfile, 
   onShareProfile 
 }) => {
-  const { colors, isDark } = useTheme();
+
 
   const getUserInitials = (email: string) => {
     return email.charAt(0).toUpperCase();
@@ -25,62 +24,62 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const styles = StyleSheet.create({
     container: {
       alignItems: 'center',
-      paddingVertical: SPACING.XXXL,
+      paddingVertical: DesignSystem.spacing.xxxl,
       borderBottomWidth: 1,
-      borderBottomColor: colors.border,
+      borderBottomColor: DesignSystem.colors.border.primary,
     },
     userAvatar: {
-      width: DIMENSIONS.AVATAR_SIZE,
-      height: DIMENSIONS.AVATAR_SIZE,
-      borderRadius: DIMENSIONS.AVATAR_SIZE / 2,
-      backgroundColor: colors.tint,
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+  backgroundColor: DesignSystem.colors.gold[500],
       justifyContent: 'center',
       alignItems: 'center',
-      marginBottom: SPACING.LG,
+      marginBottom: DesignSystem.spacing.lg,
     },
     userInitials: {
       fontSize: 32,
       fontWeight: 'bold',
-      color: isDark ? colors.text : colors.background,
+      color: DesignSystem.colors.background.primary,
     },
     userName: {
       fontSize: 20,
       fontWeight: 'bold',
-      color: colors.text,
-      marginBottom: SPACING.XS,
+      color: DesignSystem.colors.text.primary,
+      marginBottom: DesignSystem.spacing.xs,
     },
     userEmail: {
       fontSize: 14,
-      color: colors.text,
+      color: DesignSystem.colors.text.primary,
       opacity: 0.7,
-      marginBottom: SPACING.LG,
+      marginBottom: DesignSystem.spacing.lg,
     },
     actionButtons: {
       flexDirection: 'row',
-      gap: SPACING.MD,
+      gap: DesignSystem.spacing.md,
     },
     actionButton: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: colors.card,
-      paddingHorizontal: SPACING.LG,
-      paddingVertical: SPACING.SM,
-      borderRadius: DIMENSIONS.BORDER_RADIUS_ROUND,
+      backgroundColor: DesignSystem.colors.background.elevated,
+      paddingHorizontal: DesignSystem.spacing.lg,
+      paddingVertical: DesignSystem.spacing.sm,
+      borderRadius: 20,
       borderWidth: 1,
-      borderColor: colors.border,
-      gap: SPACING.SM,
+      borderColor: DesignSystem.colors.border.primary,
+      gap: DesignSystem.spacing.sm,
     },
     actionButtonText: {
       fontSize: 14,
       fontWeight: '600',
-      color: colors.text,
+      color: DesignSystem.colors.text.primary,
     },
   });
 
   if (!session) {
     return (
       <View style={styles.container}>
-        <Ionicons name="person-circle-outline" size={100} color={colors.tint} />
+  <Ionicons name="person-circle-outline" size={100} color={DesignSystem.colors.gold[500]} />
         <Text style={styles.userName}>Welcome to AYNAMODA</Text>
         <Text style={styles.userEmail}>
           Sign in to access your profile and wardrobe
@@ -105,12 +104,12 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       
       <View style={styles.actionButtons}>
         <TouchableOpacity style={styles.actionButton} onPress={onEditProfile}>
-          <Ionicons name="pencil" size={16} color={colors.text} />
+          <Ionicons name="pencil" size={16} color={DesignSystem.colors.text.primary} />
           <Text style={styles.actionButtonText}>Edit Profile</Text>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.actionButton} onPress={onShareProfile}>
-          <Ionicons name="share-outline" size={16} color={colors.text} />
+          <Ionicons name="share-outline" size={16} color={DesignSystem.colors.text.primary} />
           <Text style={styles.actionButtonText}>Share</Text>
         </TouchableOpacity>
       </View>

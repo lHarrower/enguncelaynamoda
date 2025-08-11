@@ -4,7 +4,7 @@
  */
 
 // Mock external dependencies first
-jest.mock('../../config/supabaseClient', () => ({
+jest.mock('@/config/supabaseClient', () => ({
   supabase: {
     from: jest.fn(),
     auth: {
@@ -13,9 +13,9 @@ jest.mock('../../config/supabaseClient', () => ({
   }
 }));
 
-import { aynaMirrorService } from '../../services/aynaMirrorService';
-import { intelligenceService } from '../../services/intelligenceService';
-import { supabase } from '../../config/supabaseClient';
+import { aynaMirrorService } from '@/services/aynaMirrorService';
+import { intelligenceService } from '@/services/intelligenceService';
+import { supabase } from '@/config/supabaseClient';
 
 describe('Confidence Note Quality - User Experience Tests', () => {
   const mockUserId = 'ux-test-user';
@@ -193,7 +193,7 @@ describe('Confidence Note Quality - User Experience Tests', () => {
             expect(confidenceNote.length).toBeGreaterThan(40); // Poetic tends to be longer
             break;
         }
-      });
+      }
     });
   });
 

@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   navigationItemTitle: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     fontSize: 18,
     fontWeight: '500',

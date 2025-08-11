@@ -22,6 +22,7 @@ import {
   ORIGINAL_COLORS,
   ACCESSIBILITY_LABELS,
 } from '@/components/auth/originalLoginStyles';
+import { errorInDev } from '../../utils/consoleSuppress';
 
 export interface OriginalLoginFormProps {
   /** Callback when login is attempted */
@@ -112,7 +113,7 @@ export const OriginalLoginForm: React.FC<OriginalLoginFormProps> = ({
       await onLogin(email.trim(), password);
     } catch (err: any) {
       // Error handling is done by parent component
-      console.error('Login error:', err);
+      errorInDev('Login error:', err);
     } finally {
       setIsSubmitting(false);
     }

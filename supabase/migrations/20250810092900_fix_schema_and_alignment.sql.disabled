@@ -1,0 +1,20 @@
+﻿DO $$
+BEGIN
+  -- 1) Kolon yoksa ekle
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name   = 'wardrobe_items'
+      AND column_name  = 'processed_image_uri'
+  ) THEN
+    ALTER TABLE public.wardrobe_items
+      ADD COLUMN processed_image_uri TEXT;
+  END IF;
+END
+$$;
+
+-- 2) Boş olanları image_uri ile doldur
+UPDATE public.wardrobe_items
+SET processed_image_uri = image_uri
+WHERE processed_image_uri IS NULL;

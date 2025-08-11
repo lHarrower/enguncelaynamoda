@@ -1,14 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '@/context/ThemeContext';
-import { LUX_PARISENNE_PALETTE } from '@/constants/Colors';
+
 import Animated, { FadeInUp, FadeInDown, ZoomIn, SlideInDown } from 'react-native-reanimated';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-import { APP_THEME_V2 } from '@/constants/AppThemeV2';
-
-const containerPadding = APP_THEME_V2.spacing.xl; 
+const containerPadding = DesignSystem.spacing.xl; 
 const DISCOVER_CARD_WIDTH = screenWidth - (containerPadding * 2);
 const DISCOVER_CARD_HEIGHT = screenHeight * 0.7;
 
@@ -26,7 +24,7 @@ const SaleBanner: React.FC<SaleBannerProps> = ({
   subtitle = "Up to 70% off designer pieces",
   ctaText = "Shop Now →"
 }) => {
-  const { colors, isDark } = useTheme();
+
 
 const styles = StyleSheet.create({
   container: {
@@ -34,14 +32,14 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     borderRadius: 20,
     overflow: 'hidden',
-    backgroundColor: colors.tint, // Mauve Mystique
-    shadowColor: colors.background,
+    backgroundColor: DesignSystem.colors.primary[500], // Mauve Mystique
+    shadowColor: DesignSystem.colors.background.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
     elevation: 12,
     borderWidth: 1,
-    borderColor: colors.border, // Smoky Quartz
+    borderColor: DesignSystem.colors.border.primary, // Smoky Quartz
     // New dimensions based on DiscoverCard
     width: DISCOVER_CARD_WIDTH * 0.8,
     height: DISCOVER_CARD_HEIGHT * 0.8,
@@ -68,20 +66,20 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Center text
   },
   badge: {
-    backgroundColor: colors.highlight, // Golden Atelier
+    backgroundColor: DesignSystem.colors.primary[500], // Golden Atelier
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
     alignSelf: 'flex-start',
     marginBottom: 8,
-    shadowColor: colors.highlight,
+    shadowColor: DesignSystem.colors.primary[500],
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 4,
   },
   badgeText: {
-    color: colors.background, // Velvet Noir on golden background
+    color: DesignSystem.colors.background.primary, // Velvet Noir on golden background
     fontSize: 12,
     fontFamily: 'Karla_700Bold',
     letterSpacing: 0.5,
@@ -90,34 +88,34 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontFamily: 'PlayfairDisplay_700Bold', // Serif for timeless elegance
-    color: colors.text, // Ivory Whisper
+    color: DesignSystem.colors.text.primary, // Ivory Whisper
     marginBottom: 4,
     letterSpacing: 0.5,
     textAlign: 'center', // Center title text
   },
   subtitle: {
     fontSize: 14,
-    color: colors.text,
+    color: DesignSystem.colors.text.primary,
     opacity: 0.9,
     fontFamily: 'Karla_400Regular',
     lineHeight: 20,
     textAlign: 'center', // Center subtitle text
     },
   ctaButton: {
-    backgroundColor: colors.background, // Velvet Noir
+    backgroundColor: DesignSystem.colors.background.primary, // Velvet Noir
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,
-    shadowColor: colors.background,
+    shadowColor: DesignSystem.colors.background.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: DesignSystem.colors.border.primary,
   },
   ctaText: {
-    color: colors.text, // Ivory Whisper
+    color: DesignSystem.colors.text.primary, // Ivory Whisper
     fontSize: 14,
     fontFamily: 'Karla_700Bold',
     letterSpacing: 0.3,
@@ -129,7 +127,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.highlight,
+    backgroundColor: DesignSystem.colors.primary[500],
     opacity: 0.1,
   },
   decorativeElement2: {
@@ -139,7 +137,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-      backgroundColor: colors.background,
+      backgroundColor: DesignSystem.colors.background.primary,
     opacity: 0.05,
   },
 });
@@ -151,7 +149,7 @@ const styles = StyleSheet.create({
         onPress={onPress}
       >
         <LinearGradient
-          colors={[LUX_PARISENNE_PALETTE.mauve_mystique, LUX_PARISENNE_PALETTE.mauve_mystique_light]}
+          colors={[DesignSystem.colors.primary[500], DesignSystem.colors.gold[400]]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.backgroundGradient}
@@ -160,7 +158,7 @@ const styles = StyleSheet.create({
           <Animated.View style={styles.textContainer}>
             <Animated.View entering={FadeInDown.delay(800).duration(400)}>
               <LinearGradient
-                colors={[LUX_PARISENNE_PALETTE.golden_atelier, LUX_PARISENNE_PALETTE.golden_atelier_light]}
+                colors={[DesignSystem.colors.gold[400], DesignSystem.colors.primary[500]]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.badge}

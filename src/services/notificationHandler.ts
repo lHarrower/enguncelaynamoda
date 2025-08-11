@@ -5,6 +5,7 @@ import * as Notifications from 'expo-notifications';
 import { router } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 export interface NotificationResponse {
   notification: Notifications.Notification;
@@ -47,9 +48,9 @@ class NotificationHandler {
       }
 
       this.isInitialized = true;
-      console.log('Notification handler initialized');
+      logInDev('Notification handler initialized');
     } catch (error) {
-      console.error('Failed to initialize notification handler:', error);
+      errorInDev('Failed to initialize notification handler:', error);
     }
   }
 
@@ -61,7 +62,7 @@ class NotificationHandler {
       const { notification } = response;
       const data = notification.request.content.data;
 
-      console.log('Notification response received:', data);
+      logInDev('Notification response received:', data);
 
       // Handle different notification types
       switch (data.type) {
@@ -75,10 +76,10 @@ class NotificationHandler {
           this.handleReEngagementNotification(data);
           break;
         default:
-          console.warn('Unknown notification type:', data.type);
+          logInDev('Unknown notification type:', data.type);
       }
     } catch (error) {
-      console.error('Error handling notification response:', error);
+      errorInDev('Error handling notification response:', error);
     }
   };
 
@@ -88,12 +89,12 @@ class NotificationHandler {
   private handleNotificationReceived = (notification: Notifications.Notification): void => {
     try {
       const data = notification.request.content.data;
-      console.log('Notification received in foreground:', data);
+      logInDev('Notification received in foreground:', data);
 
       // You can show custom in-app notifications here if needed
       // For now, we'll let the system handle it
     } catch (error) {
-      console.error('Error handling received notification:', error);
+      errorInDev('Error handling received notification:', error);
     }
   };
 
@@ -102,14 +103,14 @@ class NotificationHandler {
    */
   private handleDeepLink = ({ url }: { url: string }): void => {
     try {
-      console.log('Deep link received:', url);
+      logInDev('Deep link received:', url);
 
       const parsedUrl = Linking.parse(url);
       const { hostname, path, queryParams } = parsedUrl;
 
       // Handle AYNA Mirror deep links
       if (hostname === 'ayna-mirror' || path === '/ayna-mirror') {
-        this.navigateToAynaMirror(queryParams);
+  this.navigateToAynaMirror(queryParams || undefined as unknown as Record<string, any>);
       } else if (path === '/ayna-mirror/settings') {
         this.navigateToAynaMirrorSettings();
       } else if (path === '/onboarding') {
@@ -119,7 +120,7 @@ class NotificationHandler {
         this.navigateToAynaMirror();
       }
     } catch (error) {
-      console.error('Error handling deep link:', error);
+      errorInDev('Error handling deep link:', error);
       // Fallback to AYNA Mirror
       this.navigateToAynaMirror();
     }
@@ -130,7 +131,7 @@ class NotificationHandler {
    */
   private handleDailyMirrorNotification(data: any): void {
     try {
-      console.log('Handling daily mirror notification for user:', data.userId);
+      logInDev('Handling daily mirror notification for user:', data.userId);
       
       // Navigate to AYNA Mirror screen
       this.navigateToAynaMirror();
@@ -138,7 +139,7 @@ class NotificationHandler {
       // Track notification engagement
       this.trackNotificationEngagement('daily_mirror', data.userId);
     } catch (error) {
-      console.error('Error handling daily mirror notification:', error);
+      errorInDev('Error handling daily mirror notification:', error);
     }
   }
 
@@ -147,7 +148,7 @@ class NotificationHandler {
    */
   private handleFeedbackPromptNotification(data: any): void {
     try {
-      console.log('Handling feedback prompt notification for outfit:', data.outfitId);
+      logInDev('Handling feedback prompt notification for outfit:', data.outfitId);
       
       // Navigate to AYNA Mirror with feedback parameter
       this.navigateToAynaMirror({ feedback: data.outfitId });
@@ -155,7 +156,7 @@ class NotificationHandler {
       // Track notification engagement
       this.trackNotificationEngagement('feedback_prompt', data.userId);
     } catch (error) {
-      console.error('Error handling feedback prompt notification:', error);
+      errorInDev('Error handling feedback prompt notification:', error);
     }
   }
 
@@ -164,7 +165,7 @@ class NotificationHandler {
    */
   private handleReEngagementNotification(data: any): void {
     try {
-      console.log('Handling re-engagement notification for user:', data.userId);
+      logInDev('Handling re-engagement notification for user:', data.userId);
       
       // Navigate to AYNA Mirror screen
       this.navigateToAynaMirror();
@@ -172,7 +173,7 @@ class NotificationHandler {
       // Track notification engagement
       this.trackNotificationEngagement('re_engagement', data.userId);
     } catch (error) {
-      console.error('Error handling re-engagement notification:', error);
+      errorInDev('Error handling re-engagement notification:', error);
     }
   }
 
@@ -193,7 +194,7 @@ class NotificationHandler {
         }
       }, 100);
     } catch (error) {
-      console.error('Error navigating to AYNA Mirror:', error);
+      errorInDev('Error navigating to AYNA Mirror:', error);
       // Fallback navigation
       setTimeout(() => {
         router.push('/(app)/ayna-mirror');
@@ -210,7 +211,7 @@ class NotificationHandler {
         router.push('/ayna-mirror-settings');
       }, 100);
     } catch (error) {
-      console.error('Error navigating to AYNA Mirror settings:', error);
+      errorInDev('Error navigating to AYNA Mirror settings:', error);
     }
   }
 
@@ -223,14 +224,14 @@ class NotificationHandler {
         router.push('/onboarding');
       }, 100);
     } catch (error) {
-      console.error('Error navigating to onboarding:', error);
+      errorInDev('Error navigating to onboarding:', error);
     }
   }
 
   /**
    * Track notification engagement for analytics
    */
-  private trackNotificationEngagement(type: string, userId: string): void {
+  private async trackNotificationEngagement(type: string, userId: string): Promise<void> {
     try {
       // Store engagement data for analytics
       const engagementData = {
@@ -240,12 +241,13 @@ class NotificationHandler {
         platform: Platform.OS,
       };
 
-      console.log('Notification engagement tracked:', engagementData);
+      logInDev('Notification engagement tracked:', engagementData);
 
-      // TODO: Send to analytics service
-      // analyticsService.track('notification_engagement', engagementData);
+      // Send to analytics service
+      const { analyticsService } = await import('./analyticsService');
+      analyticsService.trackEvent('notification_engagement', engagementData);
     } catch (error) {
-      console.error('Error tracking notification engagement:', error);
+      errorInDev('Error tracking notification engagement:', error);
     }
   }
 
@@ -255,13 +257,15 @@ class NotificationHandler {
   cleanup(): void {
     try {
       // Remove listeners
-      Notifications.removeAllNotificationListeners();
-      Linking.removeAllListeners('url');
+  // Updated API: remove all known subscriptions if tracked elsewhere; fallback no-op
+  // Keeping for compatibility; Expo Notifications doesn't expose a global removeAll in v0.20+
+  // This is a safe no-op in current setup.
+  // Linking.removeAllListeners is not available in expo-linking; listeners are subscription-based.
       
       this.isInitialized = false;
-      console.log('Notification handler cleaned up');
+      logInDev('Notification handler cleaned up');
     } catch (error) {
-      console.error('Error cleaning up notification handler:', error);
+      errorInDev('Error cleaning up notification handler:', error);
     }
   }
 

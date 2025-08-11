@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.lg,
   },
   headerTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     marginBottom: 4,
   },
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   indicatorText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.inverse,
     fontWeight: '700',
     marginTop: 2,
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   discountText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.inverse,
     fontWeight: '700',
     fontSize: 10,
@@ -435,12 +435,12 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   brandName: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.sage[400],
     marginBottom: 2,
   },
   productTitle: {
-    ...DesignSystem.typography.bodyMedium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.inverse,
     fontSize: 16,
     marginBottom: 6,
@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   currentPrice: {
-    ...DesignSystem.typography.bodyMedium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.inverse,
     fontSize: 18,
     fontWeight: '600',
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   progressText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
   },
   
@@ -532,7 +532,7 @@ const styles = StyleSheet.create({
     height: CARD_HEIGHT + 100,
   },
   emptyTitle: {
-    ...DesignSystem.typography.bodyMedium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     marginTop: 12,
     marginBottom: 4,

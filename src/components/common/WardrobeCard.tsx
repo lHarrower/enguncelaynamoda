@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     borderRadius: DesignSystem.borderRadius.md,
   },
   categoryText: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.inverse,
     fontSize: 14,
     textAlign: 'center',

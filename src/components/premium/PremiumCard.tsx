@@ -4,8 +4,9 @@ import {
   StyleSheet,
   ViewStyle,
   TouchableOpacity,
+  StyleProp,
 } from 'react-native';
-import { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { 
   useSharedValue, 
   useAnimatedStyle, 
@@ -23,10 +24,10 @@ interface PremiumCardProps {
   variant?: 'elevated' | 'glass' | 'floating' | 'luxury' | 'silk';
   interactive?: boolean;
   onPress?: () => void;
-  style?: ViewStyle;
-  contentStyle?: ViewStyle;
-  padding?: keyof typeof PREMIUM_THEME.spacing;
-  borderRadius?: keyof typeof PREMIUM_THEME.radius;
+  style?: StyleProp<ViewStyle>;
+  contentStyle?: StyleProp<ViewStyle>;
+  padding?: keyof typeof DesignSystem.spacing;
+  borderRadius?: keyof typeof DesignSystem.borderRadius;
 }
 
 const PremiumCard: React.FC<PremiumCardProps> = ({
@@ -45,7 +46,7 @@ const PremiumCard: React.FC<PremiumCardProps> = ({
 
   const handlePressIn = () => {
     if (interactive) {
-      scale.value = withSpring(0.98, PREMIUM_THEME.animation.confident);
+  scale.value = withSpring(0.98, DesignSystem.animations.spring.smooth);
       elevation.value = withTiming(1.5, { duration: 200 });
       if (variant === 'luxury') {
         glowIntensity.value = withTiming(1, { duration: 200 });
@@ -55,7 +56,7 @@ const PremiumCard: React.FC<PremiumCardProps> = ({
 
   const handlePressOut = () => {
     if (interactive) {
-      scale.value = withSpring(1, PREMIUM_THEME.animation.silk);
+      scale.value = withSpring(1, DesignSystem.animations.spring.gentle);
       elevation.value = withTiming(1, { duration: 300 });
       if (variant === 'luxury') {
         glowIntensity.value = withTiming(0, { duration: 400 });
@@ -84,35 +85,35 @@ const PremiumCard: React.FC<PremiumCardProps> = ({
 
   const getCardStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
-      borderRadius: PREMIUM_THEME.radius[borderRadius],
+      borderRadius: DesignSystem.borderRadius[borderRadius],
       overflow: 'hidden',
     };
 
     const variantStyles: Record<string, ViewStyle> = {
       elevated: {
-        backgroundColor: PREMIUM_THEME.semantic.surface.primary,
-        ...PREMIUM_THEME.elevation.elevate,
+        backgroundColor: DesignSystem.colors.surface.primary,
+        ...DesignSystem.elevation.medium,
       },
       glass: {
         backgroundColor: 'transparent',
-        ...PREMIUM_THEME.elevation.hover,
+        ...DesignSystem.elevation.soft,
       },
       floating: {
-        backgroundColor: PREMIUM_THEME.semantic.surface.secondary,
-        ...PREMIUM_THEME.elevation.levitate,
+        backgroundColor: DesignSystem.colors.surface.secondary,
+        ...DesignSystem.elevation.high,
       },
       luxury: {
-        backgroundColor: PREMIUM_THEME.semantic.surface.primary,
-        ...PREMIUM_THEME.elevation.dramatic,
-        shadowColor: PREMIUM_THEME.colors.champagne[500],
+        backgroundColor: DesignSystem.colors.surface.primary,
+        ...DesignSystem.elevation.floating,
+        shadowColor: DesignSystem.colors.gold[500],
         borderWidth: 1,
-        borderColor: PREMIUM_THEME.colors.champagne[200],
+        borderColor: DesignSystem.colors.gold[200],
       },
       silk: {
-        backgroundColor: PREMIUM_THEME.semantic.surface.secondary,
-        ...PREMIUM_THEME.elevation.hover,
+        backgroundColor: DesignSystem.colors.surface.secondary,
+        ...DesignSystem.elevation.soft,
         borderWidth: 0.5,
-        borderColor: PREMIUM_THEME.semantic.border.secondary,
+        borderColor: DesignSystem.colors.border.secondary,
       },
     };
 
@@ -124,14 +125,13 @@ const PremiumCard: React.FC<PremiumCardProps> = ({
 
   const getContentStyle = (): ViewStyle => {
     return {
-      padding: PREMIUM_THEME.spacing[padding],
-      ...contentStyle,
+      padding: DesignSystem.spacing[padding],
     };
   };
 
   const renderCard = () => {
     const cardContent = (
-      <View style={getContentStyle()}>
+  <View style={[getContentStyle(), contentStyle] as any}>
         {children}
       </View>
     );
@@ -147,7 +147,7 @@ const PremiumCard: React.FC<PremiumCardProps> = ({
             StyleSheet.absoluteFill,
             { 
               backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: PREMIUM_THEME.radius[borderRadius],
+              borderRadius: DesignSystem.borderRadius[borderRadius],
             }
           ]} />
           {cardContent}

@@ -54,7 +54,7 @@ class UserJourneyTestingService {
 
     try {
       this.isTestingMode = true;
-      console.log('🧪 Testing Onboarding to Wardrobe Journey');
+      // Testing Onboarding to Wardrobe Journey
 
       // Step 1: User Registration/Authentication
       const authStep = await this.testAuthenticationStep();
@@ -109,7 +109,7 @@ class UserJourneyTestingService {
       return result;
 
     } catch (error) {
-      console.error('Journey test failed:', error);
+      // Journey test failed
       errors.push(`Unexpected error: ${error}`);
       
       return {
@@ -135,7 +135,7 @@ class UserJourneyTestingService {
 
     try {
       this.isTestingMode = true;
-      console.log('🧪 Testing Wardrobe to Outfit Journey');
+      // Testing Wardrobe to Outfit Journey
 
       // Step 1: Load Wardrobe
       const loadWardrobeStep = await this.testLoadWardrobeStep();
@@ -190,7 +190,7 @@ class UserJourneyTestingService {
       return result;
 
     } catch (error) {
-      console.error('Journey test failed:', error);
+      // Journey test failed
       errors.push(`Unexpected error: ${error}`);
       
       return {
@@ -216,7 +216,7 @@ class UserJourneyTestingService {
 
     try {
       this.isTestingMode = true;
-      console.log('🧪 Testing Discovery to Purchase Journey');
+      // Testing Discovery to Purchase Journey
 
       // Step 1: Browse Discovery Feed
       const browseStep = await this.testBrowseDiscoveryStep();
@@ -264,7 +264,7 @@ class UserJourneyTestingService {
       return result;
 
     } catch (error) {
-      console.error('Journey test failed:', error);
+      // Journey test failed
       errors.push(`Unexpected error: ${error}`);
       
       return {
@@ -337,11 +337,11 @@ class UserJourneyTestingService {
     const stepStart = Date.now();
     try {
       // Test style profile creation
-      const styleData = await styleDNAService.analyzeUserStyle({
-        preferences: ['modern', 'minimalist'],
-        colors: ['navy', 'white', 'gray'],
-        occasions: ['work', 'casual']
-      });
+      const styleData = await styleDNAService.generateStyleDNA('test-user', [
+        { id: 'p1', uri: 'https://example.com/1.jpg', timestamp: Date.now() },
+        { id: 'p2', uri: 'https://example.com/2.jpg', timestamp: Date.now() },
+        { id: 'p3', uri: 'https://example.com/3.jpg', timestamp: Date.now() }
+      ] as any);
       
       navigationIntegrationService.setUserJourneyData({ stylePreferences: styleData });
       
@@ -686,7 +686,7 @@ class UserJourneyTestingService {
         consistency: this.checkDataConsistency(journeyData)
       };
     } catch (error) {
-      console.error('Data validation failed:', error);
+      // Data validation failed
       return {
         userProfile: false,
         wardrobeData: false,
@@ -717,13 +717,13 @@ class UserJourneyTestingService {
       const metrics = await performanceOptimizationService.getPerformanceMetrics();
       
       return {
-        averageNavigationTime: metrics.averageNavigationTime || 200,
-        memoryUsage: metrics.memoryUsage || 50,
-        renderTime: metrics.renderTime || 16,
-        apiResponseTime: metrics.apiResponseTime || 300
+  averageNavigationTime: (metrics as any).averageNavigationTime || 200,
+  memoryUsage: (metrics as any).memoryUsage || 50,
+  renderTime: (metrics as any).renderTime || 16,
+  apiResponseTime: (metrics as any).apiResponseTime || 300
       };
     } catch (error) {
-      console.error('Failed to collect performance metrics:', error);
+      // Failed to collect performance metrics
       return {
         averageNavigationTime: 0,
         memoryUsage: 0,
@@ -735,7 +735,7 @@ class UserJourneyTestingService {
 
   // Run all journey tests
   async runAllJourneyTests(): Promise<JourneyTestResult[]> {
-    console.log('🧪 Running all user journey tests...');
+    // Running all user journey tests
     
     const results = await Promise.all([
       this.testOnboardingToWardrobeJourney(),
@@ -743,7 +743,7 @@ class UserJourneyTestingService {
       this.testDiscoveryToPurchaseJourney()
     ]);
     
-    console.log('✅ All journey tests completed');
+    // All journey tests completed
     return results;
   }
 

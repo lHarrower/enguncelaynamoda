@@ -8,10 +8,10 @@ import Animated, {
   withTiming, 
   interpolate 
 } from 'react-native-reanimated';
-import { useTheme } from '@/context/ThemeContext';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const SkeletonCard: React.FC = () => {
-  const { colors } = useTheme();
+
   const shimmerTranslateX = useSharedValue(-100);
 
   React.useEffect(() => {
@@ -38,14 +38,14 @@ const SkeletonCard: React.FC = () => {
 
   const shimmerColors = [
     'transparent',
-    colors.border + '40',
+    DesignSystem.colors.border.primary + '40',
     'transparent',
   ] as const;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <View style={[styles.container, { backgroundColor: DesignSystem.colors.background.elevated, borderColor: DesignSystem.colors.border.primary }]}>
       {/* Card Image Skeleton */}
-      <View style={[styles.imageContainer, { backgroundColor: colors.background }]}>
+      <View style={[styles.imageContainer, { backgroundColor: DesignSystem.colors.background.primary }]}>
         <View style={styles.shimmerContainer}>
           <Animated.View style={[styles.shimmerOverlay, shimmerStyle]}>
             <LinearGradient
@@ -59,8 +59,8 @@ const SkeletonCard: React.FC = () => {
       </View>
 
       {/* Card Header Skeleton */}
-      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-        <View style={[styles.badge, { backgroundColor: colors.border }]}>
+      <View style={[styles.header, { backgroundColor: DesignSystem.colors.background.primary, borderBottomColor: DesignSystem.colors.border.primary }]}>
+        <View style={[styles.badge, { backgroundColor: DesignSystem.colors.border.primary }]}>
           <View style={styles.shimmerContainer}>
             <Animated.View style={[styles.shimmerOverlay, shimmerStyle]}>
               <LinearGradient
@@ -72,7 +72,7 @@ const SkeletonCard: React.FC = () => {
             </Animated.View>
           </View>
         </View>
-        <View style={[styles.heartIcon, { backgroundColor: colors.border }]}>
+        <View style={[styles.heartIcon, { backgroundColor: DesignSystem.colors.border.primary }]}>
           <View style={styles.shimmerContainer}>
             <Animated.View style={[styles.shimmerOverlay, shimmerStyle]}>
               <LinearGradient
@@ -89,7 +89,7 @@ const SkeletonCard: React.FC = () => {
       {/* Card Content Skeleton */}
       <View style={styles.content}>
         {/* Title Skeleton */}
-        <View style={[styles.titleSkeleton, { backgroundColor: colors.border }]}>
+        <View style={[styles.titleSkeleton, { backgroundColor: DesignSystem.colors.border.primary }]}>
           <View style={styles.shimmerContainer}>
             <Animated.View style={[styles.shimmerOverlay, shimmerStyle]}>
               <LinearGradient
@@ -103,7 +103,7 @@ const SkeletonCard: React.FC = () => {
         </View>
 
         {/* Brand Skeleton */}
-        <View style={[styles.brandSkeleton, { backgroundColor: colors.border }]}>
+        <View style={[styles.brandSkeleton, { backgroundColor: DesignSystem.colors.border.primary }]}>
           <View style={styles.shimmerContainer}>
             <Animated.View style={[styles.shimmerOverlay, shimmerStyle]}>
               <LinearGradient
@@ -117,8 +117,8 @@ const SkeletonCard: React.FC = () => {
         </View>
 
         {/* Price Container Skeleton */}
-        <View style={[styles.priceContainer, { borderTopColor: colors.border }]}>
-          <View style={[styles.priceSkeleton, { backgroundColor: colors.border }]}>
+        <View style={[styles.priceContainer, { borderTopColor: DesignSystem.colors.border.primary }]}>
+          <View style={[styles.priceSkeleton, { backgroundColor: DesignSystem.colors.border.primary }]}>
             <View style={styles.shimmerContainer}>
               <Animated.View style={[styles.shimmerOverlay, shimmerStyle]}>
                 <LinearGradient
@@ -130,7 +130,7 @@ const SkeletonCard: React.FC = () => {
               </Animated.View>
             </View>
           </View>
-          <View style={[styles.originalPriceSkeleton, { backgroundColor: colors.border }]}>
+          <View style={[styles.originalPriceSkeleton, { backgroundColor: DesignSystem.colors.border.primary }]}>
             <View style={styles.shimmerContainer}>
               <Animated.View style={[styles.shimmerOverlay, shimmerStyle]}>
                 <LinearGradient
@@ -142,7 +142,7 @@ const SkeletonCard: React.FC = () => {
               </Animated.View>
             </View>
           </View>
-          <View style={[styles.savingsSkeleton, { backgroundColor: colors.border }]}>
+          <View style={[styles.savingsSkeleton, { backgroundColor: DesignSystem.colors.border.primary }]}>
             <View style={styles.shimmerContainer}>
               <Animated.View style={[styles.shimmerOverlay, shimmerStyle]}>
                 <LinearGradient

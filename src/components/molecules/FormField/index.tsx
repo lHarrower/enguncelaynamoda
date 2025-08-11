@@ -57,21 +57,21 @@ const FormField: React.FC<FormFieldProps> = ({
       />
       
       {shouldShowError && (
-        <Text 
-          variant="caption" 
-          color="error" 
-          style={styles.errorText}
-          accessibilityLabel={`Error: ${error}`}
-          accessibilityRole="alert"
-        >
-          {error}
-        </Text>
+        <View accessibilityLabel={`Error: ${error}`} accessibilityRole="text">
+          <Text 
+            variant="caption" 
+            color="error" 
+            style={styles.errorText}
+          >
+            {error}
+          </Text>
+        </View>
       )}
       
       {shouldShowHint && (
         <Text 
           variant="caption" 
-          color="600" 
+          color="slate" 
           style={styles.hintText}
           accessibilityLabel={`Hint: ${hint}`}
         >
@@ -84,21 +84,20 @@ const FormField: React.FC<FormFieldProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: SPACING.margin.medium,
+    marginBottom: SPACING.medium,
   },
   
   label: {
-    marginBottom: SPACING.margin.xs,
+    marginBottom: SPACING.xs,
   },
   
   errorText: {
-    marginTop: SPACING.margin.xs,
+    marginTop: SPACING.xs,
   },
   
   hintText: {
-    marginTop: SPACING.margin.xs,
+    marginTop: SPACING.xs,
   },
 });
 
 export default FormField;
-export type { FormFieldProps };

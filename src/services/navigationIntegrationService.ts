@@ -105,7 +105,7 @@ class NavigationIntegrationService {
       await this.logNavigation(destination, params);
 
     } catch (error) {
-      console.error('Navigation error:', error);
+      // Navigation error
       this.handleNavigationError(error);
     }
   }
@@ -244,13 +244,13 @@ class NavigationIntegrationService {
         session_id: this.getSessionId()
       });
     } catch (error) {
-      console.error('Failed to log navigation:', error);
+      // Failed to log navigation
     }
   }
 
   // Handle navigation errors
   private handleNavigationError(error: any): void {
-    console.error('Navigation error:', error);
+    // Navigation error
     
     Alert.alert(
       'Navigation Error',
@@ -288,22 +288,22 @@ class NavigationIntegrationService {
   public async testUserJourney(journeyId: string): Promise<boolean> {
     const journey = this.userJourneys.find(j => j.id === journeyId);
     if (!journey) {
-      console.error(`Journey ${journeyId} not found`);
+      // Journey not found
       return false;
     }
 
-    console.log(`Testing user journey: ${journey.name}`);
+    // Testing user journey
     
     // Simulate navigation through journey screens
     for (const screen of journey.screens) {
       const canNavigate = await this.validateNavigation(screen);
       if (!canNavigate) {
-        console.error(`Failed to navigate to ${screen} in journey ${journeyId}`);
+        // Failed to navigate to screen
         return false;
       }
     }
 
-    console.log(`User journey ${journeyId} test completed successfully`);
+    // User journey test completed successfully
     return true;
   }
 

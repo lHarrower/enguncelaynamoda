@@ -10,9 +10,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useTheme } from '@/context/ThemeContext';
-import { TYPOGRAPHY, SPACING, SHADOWS } from '@/constants/AppConstants';
-import { DIGITAL_ATELIER_PALETTE } from '@/constants/Colors';
+import { useSafeTheme } from '@/hooks/useSafeTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface StyleMatchCircleProps {
   percentage: number;
@@ -29,7 +28,8 @@ const StyleMatchCircle: React.FC<StyleMatchCircleProps> = ({
   animated = true,
   confidence = 'high',
 }) => {
-  const { colors } = useTheme();
+  const theme = useSafeTheme();
+  const { colors } = theme;
   
   // Animation values
   const progress = useSharedValue(0);
@@ -88,15 +88,15 @@ const StyleMatchCircle: React.FC<StyleMatchCircleProps> = ({
   }));
 
   const getConfidenceColor = () => {
-    if (percentage >= 90) return colors.primary; // Antique Gold
+    if (percentage >= 90) return DesignSystem.colors.primary[500]; // Antique Gold
     if (percentage >= 70) return colors.accent; // Dusty Rose
     return colors.text_secondary; // Taupe
   };
 
-  const getConfidenceGradient = (): [string, string] => {
-    if (percentage >= 90) return [colors.primary, DIGITAL_ATELIER_PALETTE.antique_gold_light];
-    if (percentage >= 70) return [colors.accent, DIGITAL_ATELIER_PALETTE.dusty_rose_light];
-    return [colors.text_secondary, DIGITAL_ATELIER_PALETTE.taupe_light];
+  const getConfidenceGradient = (): readonly [string, string] => {
+    if (percentage >= 90) return [DesignSystem.colors.primary[500], DesignSystem.colors.gold[300]] as const;
+    if (percentage >= 70) return [colors.accent, DesignSystem.colors.sage[100]] as const;
+    return [colors.text_secondary, DesignSystem.colors.neutral.mist] as const;
   };
 
   const strokeWidth = size * 0.08;
@@ -211,13 +211,13 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
-    ...SHADOWS.gentle,
+    ...DesignSystem.elevation.soft,
   },
   progressCircle: {
     position: 'absolute',
     borderColor: 'transparent',
-    borderTopColor: DIGITAL_ATELIER_PALETTE.antique_gold,
-    borderRightColor: DIGITAL_ATELIER_PALETTE.antique_gold,
+  borderTopColor: DesignSystem.colors.gold[400],
+  borderRightColor: DesignSystem.colors.gold[400],
   },
   gradientOverlay: {
     position: 'absolute',
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   percentageText: {
-    ...TYPOGRAPHY.semantic.cardTitle,
+    ...DesignSystem.typography.heading.h3,
     fontWeight: '700',
     textAlign: 'center',
   },
@@ -240,15 +240,15 @@ const styles = StyleSheet.create({
   },
   confidenceBadge: {
     position: 'absolute',
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    ...SHADOWS.soft,
+    ...DesignSystem.elevation.subtle,
   },
   confidenceText: {
-    ...TYPOGRAPHY.semantic.caption,
+    ...DesignSystem.typography.scale.caption,
     fontWeight: '700',
     letterSpacing: 0.5,
     textAlign: 'center',

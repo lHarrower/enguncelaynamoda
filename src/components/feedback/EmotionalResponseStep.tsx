@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { APP_THEME_V2 } from '../../constants/AppThemeV2';
+import { DesignSystem } from '../../theme/DesignSystem';
 import { EmotionalResponse, EmotionalState } from '../../types/aynaMirror';
 
 interface EmotionalResponseStepProps {
@@ -213,8 +213,8 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
                     isSelected && styles.intensityDotSelected,
                     {
                       backgroundColor: isSelected 
-                        ? selectedEmotion?.color || APP_THEME_V2.semantic.accent
-                        : APP_THEME_V2.semantic.surface,
+                        ? selectedEmotion?.color || DesignSystem.colors.accent.gold
+                        : DesignSystem.colors.surface.primary,
                     },
                   ]}
                 >
@@ -258,8 +258,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     minWidth: 140,
   },
   emotionCard: {
-    backgroundColor: APP_THEME_V2.semantic.surface,
+    backgroundColor: DesignSystem.colors.surface.primary,
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 12,
@@ -285,22 +285,22 @@ const styles = StyleSheet.create({
   },
   emotionCardSelected: {
     borderWidth: 2,
-    backgroundColor: APP_THEME_V2.semantic.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   emotionEmoji: {
     fontSize: 24,
     marginBottom: 8,
   },
   emotionLabel: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.body.large,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 4,
   },
   emotionDescription: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     fontStyle: 'italic',
   },
@@ -341,12 +341,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   intensityLabelText: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.tertiary,
   },
   intensityLabelCenter: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
   },
   summaryContainer: {
@@ -361,14 +361,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   summaryText: {
-    ...APP_THEME_V2.typography.scale.h3,
+    ...DesignSystem.typography.heading.h3,
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 4,
   },
   summaryDescription: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     fontStyle: 'italic',
   },

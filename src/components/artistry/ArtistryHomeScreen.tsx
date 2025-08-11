@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { DesignSystem } from '../../theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
+import { logInDev } from '../../utils/consoleSuppress';
 
 // Import artistry components
 import AtmosphericBackground from './AtmosphericBackground';
@@ -147,7 +148,7 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       },
       onPress: () => {
         // Navigate to daily ritual screen
-        console.log('Navigate to daily ritual');
+        logInDev('Navigate to daily ritual');
       },
     },
     {
@@ -258,7 +259,7 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
 
 
   const handleTotemFacetChange = (facetId: string) => {
-    console.log('Totem facet changed:', facetId);
+    logInDev('Totem facet changed:', facetId);
     // You can add haptic feedback or other interactions here
   };
 
@@ -352,7 +353,7 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
         {/* Atmospheric Indicator */}
         <View style={styles.atmosphereIndicator}>
           <WhisperText animation="shimmer">
-            Atmosphere: {currentAtmosphere}
+            {`Atmosphere: ${currentAtmosphere}`}
           </WhisperText>
         </View>
       </ScrollView>
@@ -431,7 +432,7 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.background.primary,
   },
   loadingText: {
-    ...DesignSystem.typography.body,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.tertiary,
   },
 });

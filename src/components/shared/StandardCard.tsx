@@ -21,7 +21,7 @@ import { BlurView } from 'expo-blur';
 import { CardComponentProps, DEFAULT_PROPS } from '@/types/componentProps';
 import { DesignSystem } from '@/theme/DesignSystem';
 
-export interface StandardCardProps extends CardComponentProps {
+export interface StandardCardProps extends Omit<CardComponentProps, 'children'> {
   /** Card header content */
   header?: React.ReactNode;
   /** Card footer content */
@@ -55,9 +55,13 @@ export interface StandardCardProps extends CardComponentProps {
   /** Custom description style */
   descriptionStyle?: TextStyle;
   /** Gradient colors for luxury variant */
-  gradientColors?: string[];
+  gradientColors?: readonly [string, string, ...string[]];
   /** Blur intensity for glass variant */
   blurIntensity?: number;
+  /** Size preset */
+  size?: 'small' | 'medium' | 'large';
+  /** Elevation level */
+  elevation?: 'none' | 'soft' | 'medium' | 'high' | 'organic' | 'floating' | 'subtle' | 'large';
 }
 
 const StandardCard: React.FC<StandardCardProps> = ({
@@ -118,7 +122,7 @@ const StandardCard: React.FC<StandardCardProps> = ({
       ...styles[`card_${size}`],
       ...(bordered && styles.bordered),
       ...(disabled && styles.disabled),
-      ...DesignSystem.elevation[elevation],
+  ...(DesignSystem.elevation as any)[elevation],
     };
 
     switch (variant) {
@@ -156,12 +160,12 @@ const StandardCard: React.FC<StandardCardProps> = ({
           
           <View style={styles.headerText}>
             {title && (
-              <Text style={[styles.title, styles[`title_${size}`], titleStyle]}>
+              <Text style={[styles.title, (styles as any)[`title_${size}`], titleStyle]}>
                 {title}
               </Text>
             )}
             {subtitle && (
-              <Text style={[styles.subtitle, styles[`subtitle_${size}`], subtitleStyle]}>
+              <Text style={[styles.subtitle, (styles as any)[`subtitle_${size}`], subtitleStyle]}>
                 {subtitle}
               </Text>
             )}
@@ -193,7 +197,7 @@ const StandardCard: React.FC<StandardCardProps> = ({
     return (
       <View style={[styles.body, bodyStyle]}>
         {description && (
-          <Text style={[styles.description, styles[`description_${size}`], descriptionStyle]}>
+          <Text style={[styles.description, (styles as any)[`description_${size}`], descriptionStyle]}>
             {description}
           </Text>
         )}
@@ -215,10 +219,10 @@ const StandardCard: React.FC<StandardCardProps> = ({
   const cardStyle = [getCardStyles(), style];
   const shouldUseGradient = variant === 'luxury' || gradientColors;
   const shouldUseBlur = variant === 'glass';
-  const finalGradientColors = gradientColors || [
+  const finalGradientColors = (gradientColors || [
     DesignSystem.colors.sage[500],
     DesignSystem.colors.sage[600],
-  ];
+  ]) as readonly [string, string, ...string[]];
 
   const cardContent = (
     <>
@@ -384,7 +388,7 @@ const styles = StyleSheet.create({
     marginTop: DesignSystem.spacing.xs,
   },
   subtitle_small: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
   },
   subtitle_medium: {
     ...DesignSystem.typography.body.small,
@@ -427,18 +431,6 @@ const styles = StyleSheet.create({
     borderRadius: DesignSystem.radius.lg,
   },
 });
-
-// Default props
-StandardCard.defaultProps = {
-  variant: DEFAULT_PROPS.variant,
-  size: DEFAULT_PROPS.size,
-  elevation: 'soft',
-  bordered: false,
-  disabled: DEFAULT_PROPS.disabled,
-  loading: DEFAULT_PROPS.loading,
-  hapticFeedback: DEFAULT_PROPS.hapticFeedback,
-  blurIntensity: 10,
-};
 
 StandardCard.displayName = 'StandardCard';
 

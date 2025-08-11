@@ -13,6 +13,19 @@ import { Easing } from 'react-native';
  * - Wellness apps (calm, soothing, mindful)
  */
 
+// Fallback easing functions for test environment
+const createFallbackEasing = () => ({
+  bezier: (x1: number, y1: number, x2: number, y2: number) => (t: number) => t,
+  linear: (t: number) => t,
+  ease: (t: number) => t,
+  in: (easing: any) => (t: number) => t,
+  out: (easing: any) => (t: number) => t,
+  inOut: (easing: any) => (t: number) => t,
+});
+
+// Use actual Easing or fallback for tests
+const EasingAPI = Easing || createFallbackEasing();
+
 // ============================================================================
 // TIMING & DURATION
 // ============================================================================
@@ -41,34 +54,34 @@ export const TIMING = {
 
 export const EASING = {
   // Standard easing - smooth and natural
-  standard: Easing.bezier(0.4, 0.0, 0.2, 1),
+  standard: EasingAPI.bezier(0.4, 0.0, 0.2, 1),
   
   // Entrance animations - confident arrival
-  enter: Easing.bezier(0.0, 0.0, 0.2, 1),
+  enter: EasingAPI.bezier(0.0, 0.0, 0.2, 1),
   
   // Exit animations - graceful departure
-  exit: Easing.bezier(0.4, 0.0, 1, 1),
+  exit: EasingAPI.bezier(0.4, 0.0, 1, 1),
   
   // Organic curves - inspired by nature
   organic: {
-    gentle: Easing.bezier(0.25, 0.46, 0.45, 0.94),    // Like a gentle breeze
-    flowing: Easing.bezier(0.23, 1, 0.32, 1),          // Like water flowing
-    bouncy: Easing.bezier(0.68, -0.55, 0.265, 1.55),   // Like a soft bounce
-    elastic: Easing.bezier(0.175, 0.885, 0.32, 1.275)  // Like elastic material
+    gentle: EasingAPI.bezier(0.25, 0.46, 0.45, 0.94),    // Like a gentle breeze
+    flowing: EasingAPI.bezier(0.23, 1, 0.32, 1),          // Like water flowing
+    bouncy: EasingAPI.bezier(0.68, -0.55, 0.265, 1.55),   // Like a soft bounce
+    elastic: EasingAPI.bezier(0.175, 0.885, 0.32, 1.275)  // Like elastic material
   },
   
   // Luxury curves - refined and sophisticated
   luxury: {
-    smooth: Easing.bezier(0.645, 0.045, 0.355, 1),     // Ultra-smooth luxury
-    confident: Easing.bezier(0.23, 1, 0.320, 1),       // Confident and assured
-    elegant: Easing.bezier(0.165, 0.84, 0.44, 1)       // Elegant and refined
+    smooth: EasingAPI.bezier(0.645, 0.045, 0.355, 1),     // Ultra-smooth luxury
+    confident: EasingAPI.bezier(0.23, 1, 0.320, 1),       // Confident and assured
+    elegant: EasingAPI.bezier(0.165, 0.84, 0.44, 1)       // Elegant and refined
   },
   
   // Wellness curves - calm and soothing
   wellness: {
-    calm: Easing.bezier(0.25, 0.1, 0.25, 1),          // Calm and steady
-    soothing: Easing.bezier(0.4, 0.0, 0.6, 1),         // Soothing transition
-    mindful: Easing.bezier(0.0, 0.0, 0.58, 1)          // Mindful and present
+    calm: EasingAPI.bezier(0.25, 0.1, 0.25, 1),          // Calm and steady
+    soothing: EasingAPI.bezier(0.4, 0.0, 0.6, 1),         // Soothing transition
+    mindful: EasingAPI.bezier(0.0, 0.0, 0.58, 1)          // Mindful and present
   }
 } as const;
 
@@ -249,7 +262,7 @@ export const ACCESSIBILITY = {
   // Reduced motion preferences
   reducedMotion: {
     duration: TIMING.instant,
-    easing: Easing.linear,
+    easing: EasingAPI.linear,
     useNativeDriver: true
   },
   
@@ -298,7 +311,8 @@ export const createStaggeredAnimation = (
   baseAnimation: any,
   staggerConfig = STAGGER.list
 ) => {
-  return items.map((_, index) => ({
+  const count = Math.max(0, Math.floor(items));
+  return Array.from({ length: count }).map((_, index) => ({
     ...baseAnimation,
     delay: Math.min(index * staggerConfig.delay, staggerConfig.maxDelay)
   }));

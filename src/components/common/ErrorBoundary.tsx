@@ -1,7 +1,8 @@
 import React, { Component, ReactNode } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface Props {
   children: ReactNode;
@@ -26,7 +27,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: any) {
     // Log the error for debugging
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    errorInDev('ErrorBoundary caught an error:', error, errorInfo);
     
     // In development, you might want to send this to a crash reporting service
     if (__DEV__) {
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   subtitle: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,

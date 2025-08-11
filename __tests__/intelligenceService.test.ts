@@ -1,8 +1,8 @@
 // Intelligence Service Unit Tests
 // Comprehensive tests for AI-powered style learning and recommendations
 
-import { IntelligenceService } from '../services/intelligenceService';
-import { supabase } from '../config/supabaseClient';
+import { IntelligenceService } from '@/services/intelligenceService';
+import { supabase } from '@/config/supabaseClient';
 import {
   WardrobeItem,
   StyleProfile,
@@ -11,10 +11,10 @@ import {
   WeatherContext,
   UserPreferences,
   Outfit
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 
-// Mock Supabase client
-jest.mock('../config/supabaseClient', () => ({
+// Mock Supabase client (use alias path to align with moduleNameMapper)
+jest.mock('@/config/supabaseClient', () => ({
   supabase: {
     from: jest.fn(),
     rpc: jest.fn()

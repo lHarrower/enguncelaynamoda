@@ -1,12 +1,4 @@
 -- Add naming fields to wardrobe items
--- Migration: 20241201_add_item_naming.sql
--- Description: Add AI-powered automatic naming capabilities
-
--- ============================================================================
--- ADD NAMING FIELDS TO WARDROBE ITEMS
--- ============================================================================
-
--- Add naming columns to wardrobe_items table
 DO $$ 
 BEGIN
   -- Add user-provided name field
@@ -30,11 +22,7 @@ BEGIN
   END IF;
 END $$;
 
--- ============================================================================
--- CREATE ITEM NAMING HISTORY TABLE
--- ============================================================================
-
--- Track naming history for analytics and improvements
+-- Create item_naming_history table if not exists
 CREATE TABLE IF NOT EXISTS item_naming_history (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   item_id UUID REFERENCES wardrobe_items(id) ON DELETE CASCADE,
@@ -47,11 +35,7 @@ CREATE TABLE IF NOT EXISTS item_naming_history (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- ============================================================================
--- CREATE NAMING PREFERENCES TABLE
--- ============================================================================
-
--- Store user preferences for naming style
+-- Create naming_preferences table if not exists
 CREATE TABLE IF NOT EXISTS naming_preferences (
   user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   naming_style TEXT DEFAULT 'descriptive' CHECK (naming_style IN ('descriptive', 'creative', 'minimal', 'brand_focused')),
@@ -65,21 +49,14 @@ CREATE TABLE IF NOT EXISTS naming_preferences (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- ============================================================================
--- INDEXES FOR PERFORMANCE
--- ============================================================================
-
+-- Indexes (safe create)
 CREATE INDEX IF NOT EXISTS idx_wardrobe_items_ai_generated_name ON wardrobe_items(ai_generated_name);
 CREATE INDEX IF NOT EXISTS idx_wardrobe_items_name_override ON wardrobe_items(name_override);
 CREATE INDEX IF NOT EXISTS idx_item_naming_history_item_id ON item_naming_history(item_id);
 CREATE INDEX IF NOT EXISTS idx_item_naming_history_user_id ON item_naming_history(user_id);
 CREATE INDEX IF NOT EXISTS idx_naming_preferences_user_id ON naming_preferences(user_id);
 
--- ============================================================================
--- TRIGGERS
--- ============================================================================
-
--- Update timestamp trigger for naming_preferences
+-- Trigger function (safe replace)
 CREATE OR REPLACE FUNCTION update_naming_preferences_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -88,61 +65,92 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trigger_update_naming_preferences_updated_at ON naming_preferences;
-CREATE TRIGGER trigger_update_naming_preferences_updated_at
-  BEFORE UPDATE ON naming_preferences
-  FOR EACH ROW
-  EXECUTE FUNCTION update_naming_preferences_updated_at();
-
--- ============================================================================
--- RLS POLICIES
--- ============================================================================
+-- Trigger (safe create)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger WHERE tgname = 'trigger_update_naming_preferences_updated_at'
+  ) THEN
+    CREATE TRIGGER trigger_update_naming_preferences_updated_at
+      BEFORE UPDATE ON naming_preferences
+      FOR EACH ROW
+      EXECUTE FUNCTION update_naming_preferences_updated_at();
+  END IF;
+END $$;
 
 -- Enable RLS
 ALTER TABLE item_naming_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE naming_preferences ENABLE ROW LEVEL SECURITY;
 
--- Policies for item_naming_history
-CREATE POLICY "Users can view their own naming history" ON item_naming_history
-  FOR SELECT USING (auth.uid() = user_id);
+-- Policies (safe create)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users can view their own naming history'
+  ) THEN
+    CREATE POLICY "Users can view their own naming history" ON item_naming_history
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can insert their own naming history" ON item_naming_history
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users can insert their own naming history'
+  ) THEN
+    CREATE POLICY "Users can insert their own naming history" ON item_naming_history
+      FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can update their own naming history" ON item_naming_history
-  FOR UPDATE USING (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users can update their own naming history'
+  ) THEN
+    CREATE POLICY "Users can update their own naming history" ON item_naming_history
+      FOR UPDATE USING (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can delete their own naming history" ON item_naming_history
-  FOR DELETE USING (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users can delete their own naming history'
+  ) THEN
+    CREATE POLICY "Users can delete their own naming history" ON item_naming_history
+      FOR DELETE USING (auth.uid() = user_id);
+  END IF;
 
--- Policies for naming_preferences
-CREATE POLICY "Users can view their own naming preferences" ON naming_preferences
-  FOR SELECT USING (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users can view their own naming preferences'
+  ) THEN
+    CREATE POLICY "Users can view their own naming preferences" ON naming_preferences
+      FOR SELECT USING (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can insert their own naming preferences" ON naming_preferences
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users can insert their own naming preferences'
+  ) THEN
+    CREATE POLICY "Users can insert their own naming preferences" ON naming_preferences
+      FOR INSERT WITH CHECK (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can update their own naming preferences" ON naming_preferences
-  FOR UPDATE USING (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users can update their own naming preferences'
+  ) THEN
+    CREATE POLICY "Users can update their own naming preferences" ON naming_preferences
+      FOR UPDATE USING (auth.uid() = user_id);
+  END IF;
 
-CREATE POLICY "Users can delete their own naming preferences" ON naming_preferences
-  FOR DELETE USING (auth.uid() = user_id);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE policyname = 'Users can delete their own naming preferences'
+  ) THEN
+    CREATE POLICY "Users can delete their own naming preferences" ON naming_preferences
+      FOR DELETE USING (auth.uid() = user_id);
+  END IF;
+END $$;
 
--- ============================================================================
--- HELPER FUNCTIONS
--- ============================================================================
-
--- Function to get effective item name (user name or AI name)
+-- Helper functions (safe replace)
 CREATE OR REPLACE FUNCTION get_effective_item_name(item_row wardrobe_items)
 RETURNS TEXT AS $$
 BEGIN
-  -- Return user-provided name if exists, otherwise AI-generated name
   IF item_row.name IS NOT NULL AND item_row.name != '' THEN
     RETURN item_row.name;
   ELSIF item_row.ai_generated_name IS NOT NULL AND item_row.ai_generated_name != '' THEN
     RETURN item_row.ai_generated_name;
   ELSE
-    -- Fallback to category + color if available
     IF array_length(item_row.colors, 1) > 0 THEN
       RETURN item_row.colors[1] || ' ' || item_row.category;
     ELSE
@@ -152,7 +160,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Function to get naming suggestions based on item properties
 CREATE OR REPLACE FUNCTION get_naming_suggestions(
   item_category TEXT,
   item_colors TEXT[],
@@ -166,15 +173,12 @@ DECLARE
   color_name TEXT;
   base_name TEXT;
 BEGIN
-  -- Get primary color
   IF array_length(item_colors, 1) > 0 THEN
     color_name := item_colors[1];
   END IF;
   
-  -- Generate base name from subcategory or category
   base_name := COALESCE(item_subcategory, item_category);
   
-  -- Generate suggestions based on naming style
   CASE naming_style
     WHEN 'descriptive' THEN
       IF color_name IS NOT NULL THEN
@@ -186,7 +190,6 @@ BEGIN
       suggestions := array_append(suggestions, base_name);
       
     WHEN 'creative' THEN
-      -- Add creative variations
       IF color_name IS NOT NULL THEN
         suggestions := array_append(suggestions, 'My ' || color_name || ' ' || base_name);
         suggestions := array_append(suggestions, color_name || ' Essential');
@@ -210,14 +213,3 @@ BEGIN
   RETURN suggestions;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- ============================================================================
--- COMMENTS
--- ============================================================================
-
-COMMENT ON TABLE item_naming_history IS 'Tracks the history of AI-generated and user-provided names for wardrobe items';
-COMMENT ON TABLE naming_preferences IS 'Stores user preferences for automatic item naming';
-COMMENT ON COLUMN wardrobe_items.name IS 'User-provided name for the item';
-COMMENT ON COLUMN wardrobe_items.ai_generated_name IS 'AI-generated name based on visual analysis';
-COMMENT ON COLUMN wardrobe_items.name_override IS 'Flag indicating if user has overridden the AI-generated name';
-COMMENT ON COLUMN wardrobe_items.ai_analysis_data IS 'Raw AI analysis data used for naming and categorization';

@@ -142,7 +142,7 @@ interface AnimatedButtonProps {
   scaleEffect?: boolean;
 }
 
-export const AnimatedButton = forwardRef<TouchableOpacity, AnimatedButtonProps>((
+export const AnimatedButton = forwardRef<View, AnimatedButtonProps>((
   { children, style, onPress, disabled = false, hapticFeedback = true, scaleEffect = true, ...props },
   ref
 ) => {
@@ -175,7 +175,7 @@ export const AnimatedButton = forwardRef<TouchableOpacity, AnimatedButtonProps>(
       ]}
     >
       <TouchableOpacity
-        ref={ref}
+        ref={ref as any}
         style={[
           style,
           disabled && { opacity: 0.6 }
@@ -432,8 +432,8 @@ export const AnimatedSpinner = ({ size = 24, color = '#007AFF', style }: Animate
   useEffect(() => {
     if (!isReducedMotionEnabled) {
       const animate = () => {
-        springTo(1, AnimationSystem.spring.bouncy, () => {
-          springTo(0, AnimationSystem.spring.bouncy, animate);
+        springTo(1, AnimationSystem.spring.bouncy as any, () => {
+          springTo(0, AnimationSystem.spring.bouncy as any, animate);
         });
       };
       animate();
@@ -511,13 +511,13 @@ export const AnimatedProgressBar = ({
     }
   }, [progress, animated, springTo, isReducedMotionEnabled]);
   
-  const width = (animated && !isReducedMotionEnabled)
+  const widthAnim = (animated && !isReducedMotionEnabled)
     ? animatedValue.interpolate({
         inputRange: [0, 1],
         outputRange: ['0%', '100%'],
         extrapolate: 'clamp'
       })
-    : `${progress * 100}%`;
+    : undefined;
   
   return (
     <View
@@ -531,14 +531,25 @@ export const AnimatedProgressBar = ({
         style
       ]}
     >
-      <Animated.View
-        style={{
-          height: '100%',
-          width,
-          backgroundColor: progressColor,
-          borderRadius: height / 2
-        }}
-      />
+      {animated && !isReducedMotionEnabled ? (
+        <Animated.View
+          style={{
+            height: '100%',
+            width: widthAnim as any,
+            backgroundColor: progressColor,
+            borderRadius: height / 2
+          }}
+        />
+      ) : (
+        <View
+          style={{
+            height: '100%',
+            width: `${progress * 100}%`,
+            backgroundColor: progressColor,
+            borderRadius: height / 2
+          }}
+        />
+      )}
     </View>
   );
 };

@@ -21,12 +21,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  ORIGINAL_COLORS,
-  ORIGINAL_TYPOGRAPHY,
-  ORIGINAL_SPACING,
-  ORIGINAL_BORDER_RADIUS,
-} from '@/components/auth/originalLoginStyles';
+import { ORIGINAL_TYPOGRAPHY, ORIGINAL_SPACING, ORIGINAL_BORDER_RADIUS } from '@/components/auth/originalLoginStyles';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -182,7 +178,7 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
               <Ionicons 
                 name="image-outline" 
                 size={48} 
-                color={ORIGINAL_COLORS.placeholderText} 
+                color={DesignSystem.colors.text.placeholder} 
               />
             </View>
           )}
@@ -257,7 +253,7 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
     <View style={styles.container}>
       {/* Header Section */}
       <LinearGradient
-        colors={story.gradientColors}
+  colors={story.gradientColors as unknown as readonly [string, string, ...string[]]}
         style={styles.headerSection}
       >
         <Image
@@ -267,7 +263,7 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
         />
         
         <LinearGradient
-          colors={['rgba(0,0,0,0.4)', 'transparent']}
+          colors={['rgba(0,0,0,0.4)', 'transparent'] as const}
           style={styles.headerOverlay}
         >
           <View style={styles.headerContent}>
@@ -333,7 +329,7 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: ORIGINAL_COLORS.background,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
 
   // Header Section
@@ -407,7 +403,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: ORIGINAL_COLORS.background,
+    backgroundColor: DesignSystem.colors.surface.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

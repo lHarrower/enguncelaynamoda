@@ -32,13 +32,13 @@ const styles = StyleSheet.create({
     ...DesignSystem.elevation.medium,
   },
   title: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     marginTop: DesignSystem.spacing.sm,
     textAlign: 'center',
   },
   subtitle: {
-    ...DesignSystem.typography.body1,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginTop: DesignSystem.spacing.sm,

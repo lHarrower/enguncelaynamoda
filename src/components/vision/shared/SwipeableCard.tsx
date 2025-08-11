@@ -212,12 +212,12 @@ const styles = StyleSheet.create({
     marginRight: DesignSystem.spacing.md,
   },
   title: {
-    ...DesignSystem.typography.h2,
+    ...DesignSystem.typography.heading.h2,
     color: DesignSystem.colors.charcoal[800],
     marginBottom: DesignSystem.spacing.xs,
   },
   description: {
-    ...DesignSystem.typography.body,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.charcoal[600],
   },
   confidenceContainer: {
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.xs,
   },
   confidenceText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     fontWeight: '600',
     color: DesignSystem.colors.sage[600],
   },
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.lg,
   },
   moodText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.coral[600],
     fontWeight: '500',
   },
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     borderRadius: DesignSystem.borderRadius.md,
   },
   pieceText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.charcoal[700],
   },
   swipeIndicators: {

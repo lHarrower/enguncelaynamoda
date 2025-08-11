@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
 
@@ -161,7 +161,7 @@ export default function ModernActionSheet({
                       option.style === 'primary' && styles.primaryIconContainer,
                     ]}>
                       <Ionicons
-                        name={option.icon}
+                        name={option.icon as any}
                         size={20}
                         color={
                           option.style === 'destructive' ? '#D32F2F' :
@@ -220,15 +220,15 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   container: {
-    backgroundColor: Colors.light.card,
+    backgroundColor: DesignSystem.colors.surface.elevated,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 20,
     paddingBottom: 34,
     maxHeight: '80%',
     borderTopWidth: 1,
-    borderTopColor: Colors.dark.border,
-    shadowColor: Colors.dark.background,
+  borderTopColor: DesignSystem.colors.border.primary,
+    shadowColor: DesignSystem.colors.neutral.charcoal,
     shadowOffset: { width: 0, height: -8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   handle: {
     width: 40,
     height: 4,
-    backgroundColor: Colors.dark.border,
+    backgroundColor: DesignSystem.colors.border.secondary,
     borderRadius: 2,
     alignSelf: 'center',
     marginBottom: 20,
@@ -247,19 +247,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.dark.border,
+    borderBottomColor: DesignSystem.colors.border.primary,
   },
   title: {
     fontSize: 20,
     fontFamily: 'PlayfairDisplay_700Bold',
-    color: Colors.light.onSurface,
+    color: DesignSystem.colors.neutral.charcoal,
     textAlign: 'center',
     marginBottom: 4,
     letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 14,
-    color: Colors.light.onSurface,
+    color: DesignSystem.colors.neutral.charcoal,
     textAlign: 'center',
     opacity: 0.7,
     fontFamily: 'Karla_400Regular',
@@ -275,19 +275,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 8,
     borderRadius: 12,
-    backgroundColor: Colors.dark.background,
+  backgroundColor: DesignSystem.colors.neutral.mist,
     borderWidth: 1,
-    borderColor: Colors.dark.border,
-    shadowColor: Colors.dark.background,
+  borderColor: DesignSystem.colors.border.primary,
+    shadowColor: DesignSystem.colors.neutral.charcoal,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
   destructiveOption: {
-    backgroundColor: Colors.dark.highlight,
-    borderColor: Colors.dark.highlight,
-    shadowColor: Colors.dark.highlight,
+    backgroundColor: DesignSystem.colors.gold[100],
+    borderColor: DesignSystem.colors.gold[400],
+    shadowColor: DesignSystem.colors.gold[400],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -310,48 +310,48 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFE8E8',
   },
   primaryIconContainer: {
-    backgroundColor: Colors.light.card,
+    backgroundColor: DesignSystem.colors.surface.elevated,
   },
   textContainer: {
     flex: 1,
   },
   optionText: {
     fontSize: 16,
-    color: Colors.dark.text,
+    color: DesignSystem.colors.neutral.charcoal,
     fontFamily: 'Karla_700Bold',
     flex: 1,
     letterSpacing: 0.3,
   },
   destructiveText: {
-    color: Colors.dark.text,
+    color: DesignSystem.colors.neutral.charcoal,
   },
   primaryText: {
-    color: Colors.light.tint,
+    color: DesignSystem.colors.sage[500],
   },
   optionSubtitle: {
     fontSize: 13,
-    color: Colors.light.text_secondary,
+    color: DesignSystem.colors.neutral.slate,
     marginTop: 2,
     letterSpacing: -0.1,
   },
   cancelContainer: {
     padding: 16,
     borderTopWidth: 1,
-    borderTopColor: Colors.light.border,
+    borderTopColor: DesignSystem.colors.border.primary,
   },
   cancelButton: {
     marginTop: 16,
     marginHorizontal: 20,
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: Colors.dark.border,
+    borderColor: DesignSystem.colors.border.primary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
   },
   cancelText: {
     fontSize: 16,
-    color: Colors.light.onSurface,
+    color: DesignSystem.colors.neutral.charcoal,
     fontFamily: 'Karla_700Bold',
     letterSpacing: 0.3,
   },

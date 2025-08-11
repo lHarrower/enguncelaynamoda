@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     brandText: {
-        ...DesignSystem.typography.caption.medium,
+        ...DesignSystem.typography.scale.caption,
         color: DesignSystem.colors.text.secondary,
         textTransform: 'uppercase',
         fontSize: 10,

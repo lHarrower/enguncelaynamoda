@@ -5,8 +5,8 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import * as Haptics from 'expo-haptics';
 
-import { QuickActionButton } from '../components/aynaMirror/QuickActionButton';
-import { QuickAction } from '../types/aynaMirror';
+import { QuickActionButton } from '@/components/aynaMirror/QuickActionButton';
+import { QuickAction } from '@/types/aynaMirror';
 
 // Mock dependencies
 jest.mock('expo-haptics');
@@ -16,11 +16,6 @@ jest.mock('expo-blur', () => ({
 jest.mock('expo-linear-gradient', () => ({
   LinearGradient: ({ children }: any) => children,
 }));
-jest.mock('react-native-reanimated', () => {
-  const Reanimated = require('react-native-reanimated/mock');
-  Reanimated.default.call = () => {};
-  return Reanimated;
-});
 
 // Sample test data
 const mockActions: Record<string, QuickAction> = {

@@ -9,9 +9,20 @@
 CREATE INDEX IF NOT EXISTS idx_daily_recommendations_user_date 
 ON daily_recommendations(user_id, recommendation_date);
 
--- Index for outfit recommendations lookup
-CREATE INDEX IF NOT EXISTS idx_outfit_recommendations_daily_rec 
-ON outfit_recommendations(daily_recommendation_id);
+-- Index for outfit recommendations lookup (only if column exists)
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM information_schema.columns 
+        WHERE table_name = 'outfit_recommendations' 
+          AND column_name = 'daily_recommendation_id'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_outfit_recommendations_daily_rec ON outfit_recommendations(daily_recommendation_id)';
+    ELSE
+        RAISE NOTICE 'Skipping idx_outfit_recommendations_daily_rec: column daily_recommendation_id does not exist yet';
+    END IF;
+END $$;
 
 -- Index for outfit feedback lookup by user and date
 CREATE INDEX IF NOT EXISTS idx_outfit_feedback_user_date 
@@ -22,16 +33,43 @@ CREATE INDEX IF NOT EXISTS idx_wardrobe_items_user_category
 ON wardrobe_items(user_id, category);
 
 -- Index for wardrobe items by usage patterns
-CREATE INDEX IF NOT EXISTS idx_wardrobe_items_usage 
-ON wardrobe_items(user_id, last_worn DESC NULLS LAST, usage_count DESC);
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'wardrobe_items' AND column_name = 'last_worn'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_wardrobe_items_usage ON wardrobe_items(user_id, last_worn DESC NULLS LAST, usage_count DESC)';
+    ELSE
+        RAISE NOTICE 'Skipping idx_wardrobe_items_usage: column last_worn missing';
+    END IF;
+END $$;
 
 -- Index for wardrobe items by colors (GIN index for array operations)
-CREATE INDEX IF NOT EXISTS idx_wardrobe_items_colors 
-ON wardrobe_items USING GIN(colors);
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'wardrobe_items' AND column_name = 'colors'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_wardrobe_items_colors ON wardrobe_items USING GIN(colors)';
+    ELSE
+        RAISE NOTICE 'Skipping idx_wardrobe_items_colors: column colors missing';
+    END IF;
+END $$;
 
 -- Index for wardrobe items by tags (GIN index for array operations)
-CREATE INDEX IF NOT EXISTS idx_wardrobe_items_tags 
-ON wardrobe_items USING GIN(tags);
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'wardrobe_items' AND column_name = 'tags'
+    ) THEN
+        EXECUTE 'CREATE INDEX IF NOT EXISTS idx_wardrobe_items_tags ON wardrobe_items USING GIN(tags)';
+    ELSE
+        RAISE NOTICE 'Skipping idx_wardrobe_items_tags: column tags missing';
+    END IF;
+END $$;
 
 -- Composite index for user preferences lookup
 CREATE INDEX IF NOT EXISTS idx_user_preferences_user_updated 
@@ -127,39 +165,50 @@ CREATE TRIGGER trigger_invalidate_preferences_cache
 -- ANALYTICS AND AGGREGATION FUNCTIONS
 -- ============================================================================
 
--- Function to get user wardrobe statistics
-CREATE OR REPLACE FUNCTION get_wardrobe_stats(p_user_id UUID)
-RETURNS TABLE (
-    total_items INTEGER,
-    items_by_category JSONB,
-    usage_stats JSONB,
-    color_distribution JSONB
-) AS $$
+-- Function to get user wardrobe statistics (skip if schema lacks colors column)
+DO $$
 BEGIN
-    RETURN QUERY
-    SELECT 
-        COUNT(*)::INTEGER as total_items,
-        jsonb_object_agg(category, category_count) as items_by_category,
-        jsonb_build_object(
-            'avg_usage_count', AVG(usage_count),
-            'items_never_worn', COUNT(*) FILTER (WHERE last_worn IS NULL),
-            'items_worn_recently', COUNT(*) FILTER (WHERE last_worn > NOW() - INTERVAL '30 days')
-        ) as usage_stats,
-        jsonb_object_agg(color, color_count) as color_distribution
-    FROM (
-        SELECT 
-            category,
-            COUNT(*) as category_count,
-            usage_count,
-            last_worn,
-            unnest(colors) as color,
-            COUNT(*) OVER (PARTITION BY unnest(colors)) as color_count
-        FROM wardrobe_items 
-        WHERE user_id = p_user_id
-        GROUP BY category, usage_count, last_worn, colors
-    ) stats;
-END;
-$$ LANGUAGE plpgsql;
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'wardrobe_items' AND column_name = 'colors'
+    ) THEN
+        EXECUTE '
+        CREATE OR REPLACE FUNCTION get_wardrobe_stats(p_user_id UUID)
+        RETURNS TABLE (
+            total_items INTEGER,
+            items_by_category JSONB,
+            usage_stats JSONB,
+            color_distribution JSONB
+        ) AS $BODY$
+        BEGIN
+            RETURN QUERY
+            SELECT 
+                COUNT(*)::INTEGER as total_items,
+                jsonb_object_agg(category, category_count) as items_by_category,
+                jsonb_build_object(
+                    ''avg_usage_count'', AVG(usage_count),
+                    ''items_never_worn'', COUNT(*) FILTER (WHERE last_worn IS NULL),
+                    ''items_worn_recently'', COUNT(*) FILTER (WHERE last_worn > NOW() - INTERVAL ''30 days'')
+                ) as usage_stats,
+                jsonb_object_agg(color, color_count) as color_distribution
+            FROM (
+                SELECT 
+                    category,
+                    COUNT(*) as category_count,
+                    usage_count,
+                    last_worn,
+                    unnest(colors) as color,
+                    COUNT(*) OVER (PARTITION BY unnest(colors)) as color_count
+                FROM wardrobe_items 
+                WHERE user_id = p_user_id
+                GROUP BY category, usage_count, last_worn, colors
+            ) stats;
+        END;
+        $BODY$ LANGUAGE plpgsql;';
+    ELSE
+        RAISE NOTICE 'Skipping get_wardrobe_stats(): wardrobe_items.colors missing';
+    END IF;
+END $$;
 
 -- Function to get user confidence trends
 CREATE OR REPLACE FUNCTION get_confidence_trends(p_user_id UUID, p_days INTEGER DEFAULT 30)
@@ -227,75 +276,128 @@ $$ LANGUAGE plpgsql;
 -- MATERIALIZED VIEWS FOR PERFORMANCE
 -- ============================================================================
 
--- Materialized view for user style profiles (refreshed periodically)
-CREATE MATERIALIZED VIEW IF NOT EXISTS user_style_profiles AS
-SELECT 
-    user_id,
-    jsonb_build_object(
-        'preferred_colors', (
-            SELECT array_agg(DISTINCT color)
-            FROM wardrobe_items wi, unnest(wi.colors) as color
-            WHERE wi.user_id = w.user_id
-            GROUP BY wi.user_id
-            ORDER BY COUNT(*) DESC
-            LIMIT 10
-        ),
-        'preferred_categories', (
-            SELECT jsonb_object_agg(category, count)
-            FROM (
-                SELECT category, COUNT(*) as count
-                FROM wardrobe_items wi2
-                WHERE wi2.user_id = w.user_id
-                GROUP BY category
-                ORDER BY count DESC
-            ) cat_stats
-        ),
-        'confidence_patterns', (
-            SELECT jsonb_agg(
-                jsonb_build_object(
-                    'occasion', occasion,
-                    'avg_rating', avg_rating,
-                    'count', feedback_count
-                )
-            )
-            FROM (
-                SELECT 
-                    COALESCE(occasion, 'general') as occasion,
-                    AVG(confidence_rating) as avg_rating,
-                    COUNT(*) as feedback_count
-                FROM outfit_feedback of
-                WHERE of.user_id = w.user_id
-                GROUP BY occasion
-                HAVING COUNT(*) >= 2
-            ) conf_stats
-        ),
-        'last_updated', NOW()
-    ) as style_profile,
-    NOW() as computed_at
-FROM wardrobe_items w
-GROUP BY user_id;
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'wardrobe_items' AND column_name = 'colors'
+    ) THEN
+        EXECUTE '
+        CREATE MATERIALIZED VIEW IF NOT EXISTS user_style_profiles AS
+        SELECT 
+            user_id,
+            jsonb_build_object(
+                ''preferred_colors'', (
+                    SELECT array_agg(DISTINCT color)
+                    FROM wardrobe_items wi, unnest(wi.colors) as color
+                    WHERE wi.user_id = w.user_id
+                    GROUP BY wi.user_id
+                    ORDER BY COUNT(*) DESC
+                    LIMIT 10
+                ),
+                ''preferred_categories'', (
+                    SELECT jsonb_object_agg(category, count)
+                    FROM (
+                        SELECT category, COUNT(*) as count
+                        FROM wardrobe_items wi2
+                        WHERE wi2.user_id = w.user_id
+                        GROUP BY category
+                        ORDER BY count DESC
+                    ) cat_stats
+                ),
+                ''confidence_patterns'', (
+                    SELECT jsonb_agg(
+                        jsonb_build_object(
+                            ''occasion'', occasion,
+                            ''avg_rating'', avg_rating,
+                            ''count'', feedback_count
+                        )
+                    )
+                    FROM (
+                        SELECT 
+                            COALESCE(occasion, ''general'') as occasion,
+                            AVG(confidence_rating) as avg_rating,
+                            COUNT(*) as feedback_count
+                        FROM outfit_feedback of
+                        WHERE of.user_id = w.user_id
+                        GROUP BY occasion
+                        HAVING COUNT(*) >= 2
+                    ) conf_stats
+                ),
+                ''last_updated'', NOW()
+            ) as style_profile,
+            NOW() as computed_at
+        FROM wardrobe_items w
+        GROUP BY user_id;';
+    ELSE
+        RAISE NOTICE 'Skipping materialized view user_style_profiles: wardrobe_items.colors missing';
+    END IF;
+END $$;
 
--- Index for materialized view
-CREATE UNIQUE INDEX IF NOT EXISTS idx_user_style_profiles_user 
-ON user_style_profiles(user_id);
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM pg_matviews WHERE matviewname = 'user_style_profiles'
+    ) THEN
+        EXECUTE 'CREATE UNIQUE INDEX IF NOT EXISTS idx_user_style_profiles_user ON user_style_profiles(user_id)';
+    ELSE
+        RAISE NOTICE 'Skipping index on user_style_profiles: view not present';
+    END IF;
+END $$;
 
 -- ============================================================================
--- PERFORMANCE OPTIMIZATION SETTINGS
+-- PERFORMANCE OPTIMIZATION SETTINGS (skip if not superuser)
 -- ============================================================================
 
 -- Enable parallel query execution for large datasets
-ALTER SYSTEM SET max_parallel_workers_per_gather = 4;
-ALTER SYSTEM SET max_parallel_workers = 8;
+DO $$
+DECLARE is_super BOOLEAN;
+BEGIN
+    SELECT r.rolsuper INTO is_super FROM pg_roles r WHERE r.rolname = session_user;
+    IF is_super THEN
+        EXECUTE 'ALTER SYSTEM SET max_parallel_workers_per_gather = 4';
+        EXECUTE 'ALTER SYSTEM SET max_parallel_workers = 8';
+    ELSE
+        RAISE NOTICE 'Skipping ALTER SYSTEM (parallel workers): insufficient privileges';
+    END IF;
+END $$;
 
 -- Optimize for read-heavy workload
-ALTER SYSTEM SET random_page_cost = 1.1;
-ALTER SYSTEM SET seq_page_cost = 1.0;
+DO $$
+DECLARE is_super BOOLEAN;
+BEGIN
+    SELECT r.rolsuper INTO is_super FROM pg_roles r WHERE r.rolname = session_user;
+    IF is_super THEN
+        EXECUTE 'ALTER SYSTEM SET random_page_cost = 1.1';
+        EXECUTE 'ALTER SYSTEM SET seq_page_cost = 1.0';
+    ELSE
+        RAISE NOTICE 'Skipping ALTER SYSTEM (page cost): insufficient privileges';
+    END IF;
+END $$;
 
 -- Increase work memory for complex queries
-ALTER SYSTEM SET work_mem = '256MB';
+DO $$
+DECLARE is_super BOOLEAN;
+BEGIN
+    SELECT r.rolsuper INTO is_super FROM pg_roles r WHERE r.rolname = session_user;
+    IF is_super THEN
+        EXECUTE 'ALTER SYSTEM SET work_mem = ''256MB''';
+    ELSE
+        RAISE NOTICE 'Skipping ALTER SYSTEM (work_mem): insufficient privileges';
+    END IF;
+END $$;
 
 -- Enable query plan caching
-ALTER SYSTEM SET plan_cache_mode = 'auto';
+DO $$
+DECLARE is_super BOOLEAN;
+BEGIN
+    SELECT r.rolsuper INTO is_super FROM pg_roles r WHERE r.rolname = session_user;
+    IF is_super THEN
+        EXECUTE 'ALTER SYSTEM SET plan_cache_mode = ''auto''';
+    ELSE
+        RAISE NOTICE 'Skipping ALTER SYSTEM (plan_cache_mode): insufficient privileges';
+    END IF;
+END $$;
 
 -- ============================================================================
 -- REFRESH FUNCTIONS FOR MATERIALIZED VIEWS

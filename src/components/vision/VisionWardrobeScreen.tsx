@@ -20,7 +20,9 @@ import Animated, {
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { AYNAMODA_VISION_THEME, getColor, getSpacing, getTypography } from '../../constants/AynaModaVisionTheme';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { TIMING } from '@/theme/foundations/Animation';
+import { logInDev } from '@/utils/consoleSuppress';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -41,7 +43,7 @@ interface Category {
   name: string;
   icon: string;
   count: number;
-  gradient: string[];
+  gradient: [string, string];
 }
 
 const SAMPLE_CATEGORIES: Category[] = [
@@ -50,28 +52,28 @@ const SAMPLE_CATEGORIES: Category[] = [
     name: 'Tops',
     icon: 'shirt',
     count: 24,
-    gradient: [getColor('accent', 'coral'), getColor('accent', 'lavender')],
+    gradient: [DesignSystem.colors.coral[400], DesignSystem.colors.lavender[400]],
   },
   {
     id: 'bottoms',
     name: 'Bottoms',
     icon: 'pants',
     count: 18,
-    gradient: [getColor('accent', 'mint'), getColor('primary', 'sage')],
+    gradient: [DesignSystem.colors.sage[300], DesignSystem.colors.sage[500]],
   },
   {
     id: 'dresses',
     name: 'Dresses',
     icon: 'woman',
     count: 12,
-    gradient: [getColor('accent', 'gold'), getColor('primary', 'champagne')],
+    gradient: [DesignSystem.colors.gold[400], DesignSystem.colors.neutral[200]],
   },
   {
     id: 'outerwear',
     name: 'Outerwear',
     icon: 'jacket',
     count: 8,
-    gradient: [getColor('accent', 'lavender'), getColor('primary', 'pearl')],
+    gradient: [DesignSystem.colors.lavender[400], DesignSystem.colors.neutral[50]],
   },
 ];
 
@@ -113,14 +115,14 @@ const MorphingGallery: React.FC<MorphingGalleryProps> = ({ items, viewMode, onIt
   useEffect(() => {
     morphProgress.value = withSpring(
       viewMode === 'grid' ? 0 : 1,
-      AYNAMODA_VISION_THEME.motion.spring.bouncy
+      DesignSystem.animations.spring.bouncy
     );
   }, [viewMode]);
 
   const renderItem = ({ item, index }: { item: WardrobeItem; index: number }) => {
     const animatedStyle = useAnimatedStyle(() => {
-      const gridWidth = (SCREEN_WIDTH - getSpacing('lg') * 3) / 2;
-      const listWidth = SCREEN_WIDTH - getSpacing('lg') * 2;
+  const gridWidth = (SCREEN_WIDTH - DesignSystem.spacing.lg * 3) / 2;
+  const listWidth = SCREEN_WIDTH - DesignSystem.spacing.lg * 2;
       
       const width = interpolate(
         morphProgress.value,
@@ -139,7 +141,7 @@ const MorphingGallery: React.FC<MorphingGalleryProps> = ({ items, viewMode, onIt
       return {
         width,
         height,
-        marginBottom: getSpacing('md'),
+        marginBottom: DesignSystem.spacing.md,
       };
     });
 
@@ -152,7 +154,7 @@ const MorphingGallery: React.FC<MorphingGalleryProps> = ({ items, viewMode, onIt
         padding: interpolate(
           morphProgress.value,
           [0, 1],
-          [getSpacing('lg'), getSpacing('md')],
+          [DesignSystem.spacing.lg, DesignSystem.spacing.md],
           Extrapolate.CLAMP
         ),
       };
@@ -166,7 +168,7 @@ const MorphingGallery: React.FC<MorphingGalleryProps> = ({ items, viewMode, onIt
           activeOpacity={0.8}
         >
           <LinearGradient
-            colors={[getColor('primary', 'cream'), getColor('primary', 'pearl')]}
+            colors={[DesignSystem.colors.neutral[100], DesignSystem.colors.neutral[50]]}
             style={styles.itemGradient}
           >
             <BlurView intensity={20} style={styles.itemBlur}>
@@ -174,24 +176,24 @@ const MorphingGallery: React.FC<MorphingGalleryProps> = ({ items, viewMode, onIt
                 {/* Item Visual */}
                 <View style={styles.itemVisual}>
                   <LinearGradient
-                    colors={[getColor('accent', 'mint'), getColor('accent', 'lavender')]}
+                    colors={[DesignSystem.colors.sage[300], DesignSystem.colors.lavender[400]]}
                     style={styles.itemImage}
                   >
                     <Ionicons 
-                      name="shirt" 
+                      name="shirt"
                       size={24} 
-                      color={getColor('neutral', 'charcoal')} 
+                      color={DesignSystem.colors.neutral[800]} 
                     />
                   </LinearGradient>
                 </View>
 
                 {/* Item Info */}
                 <View style={styles.itemInfo}>
-                  <Text style={[getTypography('h3'), styles.itemName]}>
+                  <Text style={[DesignSystem.typography.heading.h3, styles.itemName]}>
                     {item.name}
                   </Text>
-                  <Text style={[getTypography('bodySmall'), styles.itemDetails]}>
-                    {item.color} • {item.lastWorn}
+                  <Text style={[DesignSystem.typography.body.small, styles.itemDetails]}>
+                      {item.color} • {item.lastWorn}
                   </Text>
                   
                   {/* Confidence Score */}
@@ -204,7 +206,7 @@ const MorphingGallery: React.FC<MorphingGalleryProps> = ({ items, viewMode, onIt
                         ]} 
                       />
                     </View>
-                    <Text style={[getTypography('bodySmall'), styles.confidenceText]}>
+                    <Text style={[DesignSystem.typography.body.small, styles.confidenceText]}>
                       {item.confidence}%
                     </Text>
                   </View>
@@ -216,7 +218,7 @@ const MorphingGallery: React.FC<MorphingGalleryProps> = ({ items, viewMode, onIt
                     <Ionicons 
                       name="heart-outline" 
                       size={16} 
-                      color={getColor('accent', 'coral')} 
+                      color={DesignSystem.colors.coral[400]} 
                     />
                   </TouchableOpacity>
                 </View>
@@ -253,7 +255,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onPress, isSelect
 
   useEffect(() => {
     glowAnim.value = withTiming(isSelected ? 1 : 0, {
-      duration: AYNAMODA_VISION_THEME.motion.duration.smooth,
+      duration: TIMING.deliberate,
     });
   }, [isSelected]);
 
@@ -264,11 +266,11 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onPress, isSelect
   }));
 
   const handlePressIn = () => {
-    scaleAnim.value = withSpring(0.95, AYNAMODA_VISION_THEME.motion.spring.bouncy);
+  scaleAnim.value = withSpring(0.95, DesignSystem.animations.spring.bouncy);
   };
 
   const handlePressOut = () => {
-    scaleAnim.value = withSpring(1, AYNAMODA_VISION_THEME.motion.spring.gentle);
+  scaleAnim.value = withSpring(1, DesignSystem.animations.spring.gentle);
   };
 
   return (
@@ -287,12 +289,12 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onPress, isSelect
             <Ionicons 
               name={category.icon as any} 
               size={32} 
-              color={getColor('neutral', 'charcoal')} 
+                      color={DesignSystem.colors.neutral[800]} 
             />
-            <Text style={[getTypography('h3'), styles.categoryName]}>
+            <Text style={[DesignSystem.typography.heading.h3, styles.categoryName]}>
               {category.name}
             </Text>
-            <Text style={[getTypography('bodySmall'), styles.categoryCount]}>
+            <Text style={[DesignSystem.typography.body.small, styles.categoryCount]}>
               {category.count} items
             </Text>
           </BlurView>
@@ -314,7 +316,7 @@ const VisionWardrobeScreen: React.FC = () => {
   });
 
   const handleItemPress = (item: WardrobeItem) => {
-    console.log('Item pressed:', item.name);
+    logInDev('Item pressed:', item.name);
   };
 
   const toggleViewMode = () => {
@@ -325,19 +327,19 @@ const VisionWardrobeScreen: React.FC = () => {
     <View style={styles.container}>
       <LinearGradient
         colors={[
-          getColor('primary', 'pearl'),
-          getColor('primary', 'cream'),
-          getColor('primary', 'sage'),
+          DesignSystem.colors.neutral[50],
+          DesignSystem.colors.neutral[100],
+          DesignSystem.colors.sage[500],
         ]}
         style={styles.backgroundGradient}
       >
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={[getTypography('display'), styles.headerTitle]}>
+            <Text style={[DesignSystem.typography.heading.h2, styles.headerTitle]}>
               Your Treasure Chest
             </Text>
-            <Text style={[getTypography('body'), styles.headerSubtitle]}>
+            <Text style={[DesignSystem.typography.body.medium, styles.headerSubtitle]}>
               {filteredItems.length} pieces of confidence
             </Text>
           </View>
@@ -347,7 +349,7 @@ const VisionWardrobeScreen: React.FC = () => {
               <Ionicons 
                 name={viewMode === 'grid' ? 'list' : 'grid'} 
                 size={24} 
-                color={getColor('neutral', 'charcoal')} 
+                color={DesignSystem.colors.neutral[800]} 
               />
             </TouchableOpacity>
             
@@ -355,7 +357,7 @@ const VisionWardrobeScreen: React.FC = () => {
               <Ionicons 
                 name="search" 
                 size={24} 
-                color={getColor('neutral', 'charcoal')} 
+                color={DesignSystem.colors.neutral[800]} 
               />
             </TouchableOpacity>
           </View>
@@ -373,7 +375,7 @@ const VisionWardrobeScreen: React.FC = () => {
               name: 'All',
               icon: 'apps',
               count: SAMPLE_ITEMS.length,
-              gradient: [getColor('primary', 'cream'), getColor('primary', 'pearl')],
+              gradient: [DesignSystem.colors.neutral[100], DesignSystem.colors.neutral[50]],
             }}
             onPress={() => setSelectedCategory('all')}
             isSelected={selectedCategory === 'all'}
@@ -399,9 +401,9 @@ const VisionWardrobeScreen: React.FC = () => {
         </View>
 
         {/* Floating Add Button */}
-        <TouchableOpacity style={styles.addButton}>
+    <TouchableOpacity style={styles.addButton}>
           <LinearGradient
-            colors={[getColor('accent', 'coral'), getColor('accent', 'lavender')]}
+      colors={[DesignSystem.colors.coral[400], DesignSystem.colors.lavender[400]]}
             style={styles.addButtonGradient}
           >
             <Ionicons 
@@ -429,23 +431,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    paddingHorizontal: getSpacing('lg'),
-    paddingTop: getSpacing('xxxl'),
-    paddingBottom: getSpacing('lg'),
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: DesignSystem.spacing.xxxl,
+    paddingBottom: DesignSystem.spacing.lg,
   },
   
   headerTitle: {
-    color: getColor('neutral', 'charcoal'),
+  color: DesignSystem.colors.neutral[800],
   },
   
   headerSubtitle: {
-    color: getColor('neutral', 'slate'),
-    marginTop: getSpacing('xs'),
+  color: DesignSystem.colors.neutral[500],
+    marginTop: DesignSystem.spacing.xs,
   },
   
   headerActions: {
     flexDirection: 'row',
-    gap: getSpacing('sm'),
+    gap: DesignSystem.spacing.sm,
   },
   
   headerButton: {
@@ -458,15 +460,15 @@ const styles = StyleSheet.create({
   },
   
   categoriesContainer: {
-    paddingHorizontal: getSpacing('lg'),
-    paddingBottom: getSpacing('lg'),
-    gap: getSpacing('md'),
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.lg,
+    gap: DesignSystem.spacing.md,
   },
   
   categoryCard: {
     width: 120,
     height: 100,
-    borderRadius: AYNAMODA_VISION_THEME.layout.card.borderRadius,
+  borderRadius: DesignSystem.borderRadius.xl,
     overflow: 'hidden',
   },
   
@@ -478,34 +480,34 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: getSpacing('md'),
+    padding: DesignSystem.spacing.md,
   },
   
   categoryName: {
-    color: getColor('neutral', 'charcoal'),
-    marginTop: getSpacing('xs'),
+  color: DesignSystem.colors.neutral[800],
+    marginTop: DesignSystem.spacing.xs,
     textAlign: 'center',
   },
   
   categoryCount: {
-    color: getColor('neutral', 'slate'),
-    marginTop: getSpacing('xs'),
+  color: DesignSystem.colors.neutral[500],
+    marginTop: DesignSystem.spacing.xs,
     textAlign: 'center',
   },
   
   gallerySection: {
     flex: 1,
-    paddingHorizontal: getSpacing('lg'),
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   
   galleryContainer: {
-    paddingBottom: getSpacing('xxxl'),
+    paddingBottom: DesignSystem.spacing.xxxl,
   },
   
   wardrobeItem: {
-    borderRadius: AYNAMODA_VISION_THEME.layout.card.borderRadius,
+  borderRadius: DesignSystem.borderRadius.xl,
     overflow: 'hidden',
-    marginRight: getSpacing('md'),
+    marginRight: DesignSystem.spacing.md,
   },
   
   itemTouchable: {
@@ -521,7 +523,7 @@ const styles = StyleSheet.create({
   },
   
   itemVisual: {
-    marginBottom: getSpacing('md'),
+    marginBottom: DesignSystem.spacing.md,
   },
   
   itemImage: {
@@ -534,41 +536,41 @@ const styles = StyleSheet.create({
   
   itemInfo: {
     flex: 1,
-    marginLeft: getSpacing('md'),
+    marginLeft: DesignSystem.spacing.md,
   },
   
   itemName: {
-    color: getColor('neutral', 'charcoal'),
-    marginBottom: getSpacing('xs'),
+  color: DesignSystem.colors.neutral[800],
+    marginBottom: DesignSystem.spacing.xs,
   },
   
   itemDetails: {
-    color: getColor('neutral', 'slate'),
-    marginBottom: getSpacing('sm'),
+  color: DesignSystem.colors.neutral[500],
+    marginBottom: DesignSystem.spacing.sm,
   },
   
   confidenceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: getSpacing('sm'),
+    gap: DesignSystem.spacing.sm,
   },
   
   confidenceBar: {
     flex: 1,
     height: 4,
-    backgroundColor: getColor('neutral', 'mist'),
+  backgroundColor: DesignSystem.colors.neutral[100],
     borderRadius: 2,
     overflow: 'hidden',
   },
   
   confidenceFill: {
     height: '100%',
-    backgroundColor: getColor('accent', 'mint'),
+  backgroundColor: DesignSystem.colors.sage[400],
     borderRadius: 2,
   },
   
   confidenceText: {
-    color: getColor('neutral', 'slate'),
+  color: DesignSystem.colors.neutral[500],
     minWidth: 35,
   },
   
@@ -588,13 +590,13 @@ const styles = StyleSheet.create({
   
   addButton: {
     position: 'absolute',
-    bottom: getSpacing('xxxl'),
-    right: getSpacing('lg'),
+    bottom: DesignSystem.spacing.xxxl,
+    right: DesignSystem.spacing.lg,
     width: 64,
     height: 64,
     borderRadius: 32,
     overflow: 'hidden',
-    ...AYNAMODA_VISION_THEME.layout.card,
+  backgroundColor: 'transparent',
   },
   
   addButtonGradient: {

@@ -27,19 +27,22 @@ export const RecommendationsList: React.FC<RecommendationsListProps> = ({
   }));
 
   return (
-    <Animated.View style={[styles.content, contentAnimatedStyle]}>
+    <Animated.View style={[styles.content as any, contentAnimatedStyle as any]}>
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
+        style={styles.scrollView as any}
+        contentContainerStyle={styles.scrollContent as any}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.recommendationsContainer(dimensions)}>
-          {recommendations.map((recommendation, index) => (
+        <View style={recommendationsContainer(dimensions)}>
+      {recommendations.map((recommendation, index) => (
             <OutfitRecommendationCard
               key={recommendation.id}
               recommendation={recommendation}
               isSelected={selectedRecommendation?.id === recommendation.id}
-              onPress={() => onRecommendationSelect(recommendation)}
+              onSelect={() => onRecommendationSelect(recommendation)}
+              showInlineActions={false}
+              showConfidenceNote={false}
+        a11yLabelPrefix={selectedRecommendation?.id === recommendation.id ? 'Outfit recommendation' : 'Recommendation'}
               animationDelay={index * 100}
             />
           ))}
@@ -61,8 +64,9 @@ const styles = StyleSheet.create({
     paddingTop: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.xxxl,
   },
-  recommendationsContainer: (dimensions: { cardSpacing: number }) => ({
-    gap: dimensions.cardSpacing,
-    marginBottom: DesignSystem.spacing.xxl,
-  }),
+});
+
+const recommendationsContainer = (dimensions: { cardSpacing: number }) => ({
+  gap: dimensions.cardSpacing,
+  marginBottom: DesignSystem.spacing.xxl,
 });

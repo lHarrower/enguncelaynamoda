@@ -231,7 +231,7 @@ const UltraPremiumHomeScreen: React.FC<UltraPremiumHomeScreenProps> = ({
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + DesignSystem.spacing.massive }
+          { paddingBottom: insets.bottom + DesignSystem.spacing.sanctuary }
         ]}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
     backgroundColor: DesignSystem.colors.background.primary,
     borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border.tertiary,
+  borderBottomColor: DesignSystem.colors.border.secondary,
   },
   headerContent: {
     flexDirection: 'row',
@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.md,
   },
   heroSubtitle: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.sm,
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   categorySubtitle: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.secondary,
     marginBottom: DesignSystem.spacing.sm,
   },

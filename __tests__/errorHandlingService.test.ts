@@ -1,12 +1,66 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { errorHandlingService, ErrorHandlingService } from '../services/errorHandlingService';
-import { WeatherContext, WardrobeItem, DailyRecommendations } from '../types/aynaMirror';
+import { errorHandlingService, ErrorHandlingService } from '@/services/errorHandlingService';
+import { WeatherContext, WardrobeItem, DailyRecommendations } from '@/types/aynaMirror';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({
   getItem: jest.fn(),
   setItem: jest.fn(),
   removeItem: jest.fn(),
+}));
+
+// Mock PerformanceOptimizationService
+jest.mock('@/services/performanceOptimizationService', () => ({
+  PerformanceOptimizationService: {
+    async getCachedRecommendations(userId, date) {
+      // Use the actual AsyncStorage mock to get cached data
+      const AsyncStorage = require('@react-native-async-storage/async-storage');
+      const dateKey = date || new Date().toISOString().split('T')[0];
+      const cacheKey = `recommendations_${userId}_${dateKey}`;
+      
+      try {
+        const cachedDataStr = await AsyncStorage.getItem(cacheKey);
+        
+        if (cachedDataStr) {
+          const cachedData = JSON.parse(cachedDataStr);
+          
+          // Check if cache is expired (mimicking real implementation)
+          if (cachedData.expiresAt && Date.now() > cachedData.expiresAt) {
+            await AsyncStorage.removeItem(cacheKey);
+            return null;
+          }
+          
+          // Return the cached data (could be test-specific structure)
+          return cachedData.data || cachedData;
+        }
+      } catch (error) {
+        // Fall back to null on error
+        return null;
+      }
+      
+      // Return null if no cached data found
+      return null;
+    },
+    
+    // Other methods that might be called
+    async cacheRecommendations() { return Promise.resolve(); },
+    async getCachedWardrobeData() { return Promise.resolve(null); },
+    async cacheWardrobeData() { return Promise.resolve(); },
+    async preGenerateRecommendations() { return Promise.resolve(); },
+    async optimizeImageLoading(uri) { return Promise.resolve(uri); },
+    async queueFeedbackForProcessing() { return Promise.resolve(); },
+    async executeOptimizedQuery(queryFn) { 
+      if (typeof queryFn === 'function') {
+        return queryFn();
+      }
+      return Promise.resolve({ data: 'mock-data' });
+    },
+    async performCleanup() { return Promise.resolve(); },
+    getPerformanceMetrics() { return {}; },
+    getPerformanceSummary() { return {}; },
+    async initialize() { return Promise.resolve(); },
+    async shutdown() { return Promise.resolve(); }
+  }
 }));
 
 describe('ErrorHandlingService', () => {
@@ -191,20 +245,28 @@ describe('ErrorHandlingService', () => {
       const recentItem = {
         ...mockWardrobeItem,
         id: 'recent-item',
+        category: 'tank-top', // Will be filtered out in cold weather
         lastWorn: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
       };
       
       const oldItem = {
         ...mockWardrobeItem,
         id: 'old-item',
+        category: 'tank-top', // Will be filtered out in cold weather
         lastWorn: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
       };
 
       const wardrobeItems = [oldItem, recentItem];
       
+      // Use cold weather to filter out tank-tops, forcing emergency mode
+      const coldWeatherContext = {
+        ...mockWeatherContext,
+        temperature: 5, // Cold weather
+      };
+      
       const result = await errorHandlingService.handleAIServiceError(
         wardrobeItems,
-        mockWeatherContext,
+        coldWeatherContext,
         mockUserId
       );
 
@@ -296,14 +358,28 @@ describe('ErrorHandlingService', () => {
     it('should log critical errors for manual intervention', async () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       
-      // Mock AsyncStorage to fail
+      // Mock AsyncStorage to fail for both getItem and setItem
+      (AsyncStorage.getItem as jest.Mock).mockRejectedValue(new Error('Storage full'));
       (AsyncStorage.setItem as jest.Mock).mockRejectedValue(new Error('Storage full'));
+      
+      // Mock sendInAppNotification to throw an error to trigger logCriticalError
+      const originalSendInApp = (errorHandlingService as any).sendInAppNotification;
+      (errorHandlingService as any).sendInAppNotification = jest.fn().mockRejectedValue(new Error('In-app notification failed'));
 
       await errorHandlingService.handleNotificationError(mockUserId, {
         type: 'daily_mirror',
         userId: mockUserId,
       });
 
+      // Should log both the storage error and the critical error
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to store pending notification:',
+        expect.any(Error)
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Notification error handling failed:',
+        expect.any(Error)
+      );
       expect(consoleSpy).toHaveBeenCalledWith(
         'CRITICAL ERROR:',
         expect.objectContaining({
@@ -312,6 +388,8 @@ describe('ErrorHandlingService', () => {
         })
       );
 
+      // Restore original method
+      (errorHandlingService as any).sendInAppNotification = originalSendInApp;
       consoleSpy.mockRestore();
     });
   });
@@ -346,12 +424,22 @@ describe('ErrorHandlingService', () => {
     it('should handle sync errors gracefully', async () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       
+      // Mock AsyncStorage.getItem to reject for all sync operations
       (AsyncStorage.getItem as jest.Mock).mockRejectedValue(new Error('Sync error'));
 
       await errorHandlingService.syncPendingOperations();
 
+      // Should log specific sync failures
       expect(consoleSpy).toHaveBeenCalledWith(
-        'Failed to sync pending operations:',
+        'Failed to sync pending feedback:',
+        expect.any(Error)
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to sync pending notifications:',
+        expect.any(Error)
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to sync pending wardrobe updates:',
         expect.any(Error)
       );
 

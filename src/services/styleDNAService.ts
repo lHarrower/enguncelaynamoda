@@ -3,6 +3,7 @@
 
 import { supabase } from '@/config/supabaseClient';
 import { intelligenceService } from './intelligenceService';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
 interface UploadedPhoto {
   id: string;
@@ -55,7 +56,7 @@ export class StyleDNAService {
    */
   async generateStyleDNA(userId: string, photos: UploadedPhoto[]): Promise<GeneratedStyleDNA> {
     try {
-      console.log(`[StyleDNA] Generating Style DNA for user ${userId} with ${photos.length} photos`);
+      logInDev(`[StyleDNA] Generating Style DNA for user ${userId} with ${photos.length} photos`);
       
       if (photos.length < 3) {
         throw new Error('Minimum 3 photos required for Style DNA generation');
@@ -95,11 +96,11 @@ export class StyleDNAService {
       // Step 7: Store Style DNA in database
       await this.storeStyleDNA(styleDNA);
       
-      console.log(`[StyleDNA] Successfully generated Style DNA with ${confidence}% confidence`);
+      logInDev(`[StyleDNA] Successfully generated Style DNA with ${confidence}% confidence`);
       return styleDNA;
       
     } catch (error) {
-      console.error('[StyleDNA] Error generating Style DNA:', error);
+      errorInDev('[StyleDNA] Error generating Style DNA:', error);
       throw error;
     }
   }
@@ -135,10 +136,10 @@ export class StyleDNAService {
           .getPublicUrl(fileName);
           
         uploadedUrls.push(publicUrl);
-        console.log(`[StyleDNA] Uploaded photo ${i + 1}/${photos.length}`);
+        logInDev(`[StyleDNA] Uploaded photo ${i + 1}/${photos.length}`);
         
       } catch (error) {
-        console.error(`[StyleDNA] Failed to upload photo ${photo.id}:`, error);
+        errorInDev(`[StyleDNA] Failed to upload photo ${photo.id}:`, error);
         // Continue with other photos
       }
     }
@@ -157,7 +158,7 @@ export class StyleDNAService {
         const analysis = await this.analyzePhotoWithCloudinary(url);
         analyses.push(analysis);
       } catch (error) {
-        console.error('[StyleDNA] Failed to analyze photo:', error);
+        errorInDev('[StyleDNA] Failed to analyze photo:', error);
         // Continue with other photos
       }
     }
@@ -211,7 +212,7 @@ export class StyleDNAService {
       };
       
     } catch (error) {
-      console.error('[StyleDNA] Cloudinary analysis failed:', error);
+      errorInDev('[StyleDNA] Cloudinary analysis failed:', error);
       // Return default analysis
       return {
         dominantColors: [],
@@ -478,9 +479,9 @@ export class StyleDNAService {
         
       if (error) throw error;
       
-      console.log(`[StyleDNA] Stored Style DNA profile for user ${styleDNA.userId}`);
+      logInDev(`[StyleDNA] Stored Style DNA profile for user ${styleDNA.userId}`);
     } catch (error) {
-      console.error('[StyleDNA] Failed to store Style DNA:', error);
+      errorInDev('[StyleDNA] Failed to store Style DNA:', error);
       throw error;
     }
   }
@@ -616,7 +617,7 @@ export class StyleDNAService {
         createdAt: data.created_at
       };
     } catch (error) {
-      console.error('[StyleDNA] Error retrieving Style DNA:', error);
+      errorInDev('[StyleDNA] Error retrieving Style DNA:', error);
       return null;
     }
   }

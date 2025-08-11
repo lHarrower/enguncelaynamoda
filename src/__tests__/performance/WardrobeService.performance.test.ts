@@ -1,16 +1,16 @@
 // Performance tests for WardrobeService
-import { WardrobeService } from '../../services/WardrobeService';
-import { createMockWardrobeItem } from '../utils/testUtils';
-import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
-import { mocks } from '../mocks';
+import { WardrobeService } from '@/services/wardrobeService';
+import { createMockWardrobeItem } from '@/__tests__/utils/testUtils';
+import { WardrobeCategory, WardrobeColor } from '@/types';
+import { mocks } from '@/__tests__/mocks';
 
 // Mock dependencies
-jest.mock('../../config/supabaseClient', () => mocks.supabaseClient);
+jest.mock('@/config/supabaseClient', () => ({ supabase: mocks.supabase }));
 jest.mock('@react-native-async-storage/async-storage', () => mocks.asyncStorage);
 
 describe('WardrobeService Performance', () => {
   let wardrobeService: WardrobeService;
-  const mockSupabase = mocks.supabaseClient;
+  const mockSupabase = mocks.supabase;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -32,15 +32,28 @@ describe('WardrobeService Performance', () => {
       );
 
       mockSupabase.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({
-              data: largeDataset,
-              error: null,
-            }),
-          }),
+        select: jest.fn().mockReturnThis(),
+        insert: jest.fn().mockReturnThis(),
+        update: jest.fn().mockReturnThis(),
+        delete: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnValue({
+          order: jest.fn().mockResolvedValue({ data: largeDataset, error: null }),
         }),
-      });
+        neq: jest.fn().mockReturnThis(),
+        gt: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+        lt: jest.fn().mockReturnThis(),
+        lte: jest.fn().mockReturnThis(),
+        like: jest.fn().mockReturnThis(),
+        ilike: jest.fn().mockReturnThis(),
+        in: jest.fn().mockReturnThis(),
+        contains: jest.fn().mockReturnThis(),
+        order: jest.fn().mockResolvedValue({ data: largeDataset, error: null }),
+        limit: jest.fn().mockReturnThis(),
+        range: jest.fn().mockReturnThis(),
+        single: jest.fn(),
+        maybeSingle: jest.fn(),
+      } as any);
 
       const startTime = performance.now();
       const result = await wardrobeService.getAllItems('user-id');
@@ -60,17 +73,33 @@ describe('WardrobeService Performance', () => {
       );
 
       mockSupabase.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            or: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({
-                data: largeDataset.filter(item => item.name.includes('Summer')),
-                error: null,
-              }),
+        select: jest.fn().mockReturnThis(),
+        insert: jest.fn().mockReturnThis(),
+        update: jest.fn().mockReturnThis(),
+        delete: jest.fn().mockReturnThis(),
+        eq: jest.fn().mockReturnValue({
+          or: jest.fn().mockReturnValue({
+            order: jest.fn().mockResolvedValue({
+              data: largeDataset.filter(item => (item.name || '').includes('Summer')),
+              error: null,
             }),
           }),
         }),
-      });
+        neq: jest.fn().mockReturnThis(),
+        gt: jest.fn().mockReturnThis(),
+        gte: jest.fn().mockReturnThis(),
+        lt: jest.fn().mockReturnThis(),
+        lte: jest.fn().mockReturnThis(),
+        like: jest.fn().mockReturnThis(),
+        ilike: jest.fn().mockReturnThis(),
+        in: jest.fn().mockReturnThis(),
+        contains: jest.fn().mockReturnThis(),
+        order: jest.fn(),
+        limit: jest.fn().mockReturnThis(),
+        range: jest.fn().mockReturnThis(),
+        single: jest.fn(),
+        maybeSingle: jest.fn(),
+      } as any);
 
       const startTime = performance.now();
       const result = await wardrobeService.searchItems('user-id', 'Summer');

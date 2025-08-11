@@ -9,7 +9,7 @@ import {
   Dimensions
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '@/constants/Colors';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -94,11 +94,11 @@ export default function CustomModal({
 
   const getTypeColor = () => {
     switch (type) {
-      case 'success': return Colors.light.highlight;
-      case 'warning': return '#D2691E';
-      case 'error': return '#D32F2F';
-      case 'info': return Colors.light.tint;
-      default: return Colors.light.tint;
+      case 'success': return DesignSystem.colors.success[500];
+      case 'warning': return DesignSystem.colors.warning[500];
+      case 'error': return DesignSystem.colors.error[600];
+      case 'info': return DesignSystem.colors.info[600];
+      default: return DesignSystem.colors.sage[500];
     }
   };
 
@@ -231,24 +231,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   modalContainer: {
-    backgroundColor: Colors.light.card, // Ivory Grey for contrast
+    backgroundColor: DesignSystem.colors.surface.elevated, // Elevated surface
     borderRadius: 20, // Luxury rounded corners
     width: '100%',
     maxWidth: 360,
-    shadowColor: Colors.dark.background, // Ink Blue shadow
+    shadowColor: DesignSystem.colors.neutral.charcoal, // Ink Blue shadow
     shadowOffset: { width: 0, height: 16 },
     shadowOpacity: 0.4,
     shadowRadius: 32,
     elevation: 20,
     borderWidth: 1,
-    borderColor: Colors.dark.border, // Deep Aubergine border
+  borderColor: DesignSystem.colors.border.primary, // Subtle border
   },
   modalHeader: {
     padding: 24,
     paddingBottom: 20,
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: Colors.dark.border,
+  borderBottomColor: DesignSystem.colors.border.primary,
   },
   iconContainer: {
     width: 64,
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
-    shadowColor: Colors.dark.background,
+    shadowColor: DesignSystem.colors.neutral.charcoal,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 22,
     fontFamily: 'PlayfairDisplay_700Bold', // Serif for luxury
-    color: Colors.light.onSurface, // Ink Blue on Ivory Grey
+    color: DesignSystem.colors.neutral.charcoal, // Ink Blue on Ivory Grey
     textAlign: 'center',
     letterSpacing: 0.5,
   },
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   modalMessage: {
     fontSize: 16,
     lineHeight: 24,
-    color: Colors.light.onSurface, // Ink Blue
+    color: DesignSystem.colors.neutral.charcoal, // Ink Blue
     textAlign: 'center',
     letterSpacing: 0.2,
     fontFamily: 'Karla_400Regular',
@@ -301,11 +301,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    backgroundColor: Colors.dark.background, // Ink Blue
+  backgroundColor: DesignSystem.colors.neutral.mist,
     borderWidth: 1,
-    borderColor: Colors.dark.border,
+  borderColor: DesignSystem.colors.border.primary,
     minHeight: 52,
-    shadowColor: Colors.dark.background,
+    shadowColor: DesignSystem.colors.neutral.charcoal,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -318,18 +318,18 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   primaryButton: {
-    backgroundColor: Colors.dark.tint, // Bronze Gold
-    borderColor: Colors.dark.tint,
-    shadowColor: Colors.dark.tint,
+    backgroundColor: DesignSystem.colors.sage[500],
+    borderColor: DesignSystem.colors.sage[500],
+    shadowColor: DesignSystem.colors.sage[500],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
   },
   destructiveButton: {
-    backgroundColor: Colors.dark.highlight, // Deep Aubergine
-    borderColor: Colors.dark.highlight,
-    shadowColor: Colors.dark.highlight,
+    backgroundColor: DesignSystem.colors.error[600],
+    borderColor: DesignSystem.colors.error[600],
+    shadowColor: DesignSystem.colors.error[600],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     backgroundColor: 'transparent',
-    borderColor: Colors.dark.border,
+    borderColor: DesignSystem.colors.border.primary,
   },
   buttonIcon: {
     marginRight: 8,
@@ -345,16 +345,16 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontFamily: 'Karla_700Bold',
-    color: Colors.dark.text, // Warm Ivory
+  color: DesignSystem.colors.text.inverse,
     letterSpacing: 0.3,
   },
   primaryButtonText: {
-    color: Colors.dark.text, // Warm Ivory
+    color: DesignSystem.colors.text.inverse,
   },
   destructiveButtonText: {
-    color: Colors.dark.text, // Warm Ivory
+    color: DesignSystem.colors.text.inverse,
   },
   cancelButtonText: {
-    color: Colors.light.onSurface, // Ink Blue
+    color: DesignSystem.colors.text.primary,
   },
 });

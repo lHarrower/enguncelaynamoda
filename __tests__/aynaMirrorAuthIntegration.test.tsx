@@ -1,26 +1,14 @@
 // AYNA Mirror Authentication Integration Tests
 import React from 'react';
 import { render, waitFor, act } from '@testing-library/react-native';
-import { AuthProvider, useAuth } from '../context/AuthContext';
-import { ThemeProvider } from '../context/ThemeContext';
-import AynaMirrorPage from '../app/(app)/ayna-mirror';
-import AynaMirrorSettingsPage from '../app/ayna-mirror-settings';
-import { supabase } from '../config/supabaseClient';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { ThemeProvider } from '@/theme/ThemeProvider';
+import AynaMirrorPage from '@/../app/(app)/ayna-mirror';
+import AynaMirrorSettingsPage from '@/../app/ayna-mirror-settings';
+import { supabase } from '@/config/supabaseClient';
+const { mockAuth } = require('../__mocks__/supabaseClient');
 
-// Mock Supabase
-jest.mock('../config/supabaseClient', () => ({
-  supabase: {
-    auth: {
-      getSession: jest.fn(),
-      onAuthStateChange: jest.fn(() => ({
-        data: { subscription: { unsubscribe: jest.fn() } }
-      })),
-      signInWithPassword: jest.fn(),
-      signUp: jest.fn(),
-      signOut: jest.fn(),
-    },
-  },
-}));
+// Mock Supabase is handled by the shared mock file
 
 // Mock expo-router
 jest.mock('expo-router', () => ({
@@ -38,7 +26,7 @@ jest.mock('expo-router', () => ({
 }));
 
 // Mock AYNA Mirror screens
-jest.mock('../screens/AynaMirrorScreen', () => ({
+jest.mock('@/screens/AynaMirrorScreen', () => ({
   AynaMirrorScreen: ({ userId }: { userId: string }) => (
     <div data-testid="ayna-mirror-screen" data-user-id={userId}>
       AYNA Mirror for user: {userId}
@@ -46,7 +34,7 @@ jest.mock('../screens/AynaMirrorScreen', () => ({
   ),
 }));
 
-jest.mock('../screens/AynaMirrorSettingsScreen', () => ({
+jest.mock('@/screens/AynaMirrorSettingsScreen', () => ({
   __esModule: true,
   default: ({ navigation }: { navigation: any }) => (
     <div data-testid="ayna-mirror-settings-screen">
@@ -56,7 +44,7 @@ jest.mock('../screens/AynaMirrorSettingsScreen', () => ({
 }));
 
 // Mock services
-jest.mock('../services/notificationHandler', () => ({
+jest.mock('@/services/notificationHandler', () => ({
   __esModule: true,
   default: {
     initialize: jest.fn(),
@@ -75,7 +63,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 describe('AYNA Mirror Authentication Integration', () => {
-  const mockSupabase = supabase as jest.Mocked<typeof supabase>;
+  // Use the mockAuth from the shared mock
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -84,7 +72,7 @@ describe('AYNA Mirror Authentication Integration', () => {
   describe('Authenticated User Flow', () => {
     beforeEach(() => {
       // Mock authenticated session
-      mockSupabase.auth.getSession.mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: {
           session: {
             user: {
@@ -99,7 +87,7 @@ describe('AYNA Mirror Authentication Integration', () => {
       } as any);
 
       // Mock auth state change listener
-      mockSupabase.auth.onAuthStateChange.mockImplementation((callback) => {
+      mockAuth.onAuthStateChange.mockImplementation((callback: any) => {
         // Simulate authenticated state
         setTimeout(() => {
           callback('SIGNED_IN', {
@@ -162,13 +150,13 @@ describe('AYNA Mirror Authentication Integration', () => {
   describe('Unauthenticated User Flow', () => {
     beforeEach(() => {
       // Mock no session
-      mockSupabase.auth.getSession.mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: { session: null },
         error: null,
       } as any);
 
       // Mock auth state change listener for unauthenticated state
-      mockSupabase.auth.onAuthStateChange.mockImplementation((callback) => {
+      mockAuth.onAuthStateChange.mockImplementation((callback: any) => {
         setTimeout(() => {
           callback('SIGNED_OUT', null);
         }, 0);
@@ -211,7 +199,7 @@ describe('AYNA Mirror Authentication Integration', () => {
   describe('Loading States', () => {
     beforeEach(() => {
       // Mock loading state - session call takes time
-      mockSupabase.auth.getSession.mockImplementation(() => 
+      mockAuth.getSession.mockImplementation(() => 
         new Promise(resolve => {
           setTimeout(() => {
             resolve({
@@ -246,12 +234,12 @@ describe('AYNA Mirror Authentication Integration', () => {
       let authCallback: any;
 
       // Start with unauthenticated state
-      mockSupabase.auth.getSession.mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: { session: null },
         error: null,
       } as any);
 
-      mockSupabase.auth.onAuthStateChange.mockImplementation((callback) => {
+      mockAuth.onAuthStateChange.mockImplementation((callback: any) => {
         authCallback = callback;
         return {
           data: { subscription: { unsubscribe: jest.fn() } }
@@ -300,7 +288,7 @@ describe('AYNA Mirror Authentication Integration', () => {
       let authCallback: any;
 
       // Start with authenticated state
-      mockSupabase.auth.getSession.mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: {
           session: {
             user: {
@@ -314,7 +302,7 @@ describe('AYNA Mirror Authentication Integration', () => {
         error: null,
       } as any);
 
-      mockSupabase.auth.onAuthStateChange.mockImplementation((callback) => {
+      mockAuth.onAuthStateChange.mockImplementation((callback: any) => {
         authCallback = callback;
         return {
           data: { subscription: { unsubscribe: jest.fn() } }
@@ -356,7 +344,7 @@ describe('AYNA Mirror Authentication Integration', () => {
   describe('Error Handling', () => {
     it('should handle authentication errors gracefully', async () => {
       // Mock authentication error
-      mockSupabase.auth.getSession.mockRejectedValue(new Error('Auth error'));
+      mockAuth.getSession.mockRejectedValue(new Error('Auth error'));
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
@@ -376,7 +364,7 @@ describe('AYNA Mirror Authentication Integration', () => {
 
     it('should handle session parsing errors', async () => {
       // Mock malformed session response
-      mockSupabase.auth.getSession.mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: { session: 'invalid-session' as any },
         error: null,
       } as any);
@@ -409,7 +397,7 @@ describe('AYNA Mirror Authentication Integration', () => {
         );
       };
 
-      mockSupabase.auth.getSession.mockResolvedValue({
+      mockAuth.getSession.mockResolvedValue({
         data: {
           session: {
             user: { id: 'context-test-user' },

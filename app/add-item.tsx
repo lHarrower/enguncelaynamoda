@@ -2,10 +2,12 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme } from '@shopify/restyle';
+import { DesignSystemType } from '@/theme/DesignSystem';
 
 export default function AddItemScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme<DesignSystemType>();
+  const { colors } = theme;
 
   return (
     <SafeAreaView style={styles.container}>

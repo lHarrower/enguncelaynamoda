@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DesignSystem } from '@/theme/DesignSystem';
-import { VisionHeader } from '@/components/vision/shared/VisionHeader';
+import { VisionHeader } from '@/components/shared/VisionHeader';
 import { SwipeStack, OutfitCard } from '@/components/vision/shared/SwipeStack';
 import DiscoverStats from '@/components/vision/shared/DiscoverStats';
 

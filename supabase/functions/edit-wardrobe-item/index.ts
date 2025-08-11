@@ -40,25 +40,25 @@ serve(async (req: Request) => {
     }
     
     // Parse request body
-    const { itemId, mainCategory, subCategory, dominantColors } = await req.json();
+  const { itemId, name, tags, colors, category, subcategory } = await req.json();
     
     if (!itemId) {
       throw new Error('itemId is required');
     }
     
     // Validate that at least one field is being updated
-    if (!mainCategory && !subCategory && !dominantColors) {
+    if (!name && !tags && !colors && !category && !subcategory) {
       throw new Error('At least one field must be provided for update');
     }
     
     // Validate dominantColors format if provided
-    if (dominantColors && !Array.isArray(dominantColors)) {
-      throw new Error('dominantColors must be an array of hex color strings');
+    if (colors && !Array.isArray(colors)) {
+      throw new Error('colors must be an array of strings');
     }
     
     // First, verify that the user owns this item
     const { data: item, error: fetchError } = await supabase
-      .from('wardrobeItems')
+  .from('wardrobe_items')
       .select('user_id')
       .eq('id', itemId)
       .single();
@@ -72,25 +72,16 @@ serve(async (req: Request) => {
     }
     
     // Build update object dynamically
-    const updateData: any = {
-      is_user_edited: true,
-    };
-    
-    if (mainCategory !== undefined) {
-      updateData.user_main_category = mainCategory;
-    }
-    
-    if (subCategory !== undefined) {
-      updateData.user_sub_category = subCategory;
-    }
-    
-    if (dominantColors !== undefined) {
-      updateData.user_dominant_colors = dominantColors;
-    }
+  const updateData: any = {};
+  if (typeof name === 'string') updateData.name = name;
+  if (Array.isArray(tags)) updateData.tags = tags;
+  if (Array.isArray(colors)) updateData.colors = colors;
+  if (typeof category === 'string') updateData.category = category.toLowerCase();
+  if (typeof subcategory === 'string') updateData.subcategory = subcategory.toLowerCase();
     
     // Update the wardrobe item with user overrides
     const { error: updateError } = await supabase
-      .from('wardrobeItems')
+  .from('wardrobe_items')
       .update(updateData)
       .eq('id', itemId)
       .eq('user_id', user.id); // Extra safety check
@@ -104,9 +95,11 @@ serve(async (req: Request) => {
         success: true, 
         itemId,
         updated: {
-          mainCategory: mainCategory !== undefined,
-          subCategory: subCategory !== undefined,
-          dominantColors: dominantColors !== undefined,
+          name: typeof name === 'string',
+          tags: Array.isArray(tags),
+          colors: Array.isArray(colors),
+          category: typeof category === 'string',
+          subcategory: typeof subcategory === 'string',
         }
       }), 
       {

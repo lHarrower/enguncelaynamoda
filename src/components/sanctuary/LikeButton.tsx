@@ -17,6 +17,7 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 
 import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev, errorInDev } from '../../utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -97,7 +98,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     } catch (error) {
-      console.log('Haptics not available:', error);
+      logInDev('Haptics not available:', error);
     }
   };
 
@@ -155,7 +156,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
       // Call the actual onPress handler
       onPress();
     } catch (error) {
-      console.error('Error in LikeButton press:', error);
+      errorInDev('Error in LikeButton press:', error);
       // Still call onPress even if animations fail
       onPress();
     }

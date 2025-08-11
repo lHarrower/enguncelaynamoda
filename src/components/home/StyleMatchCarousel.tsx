@@ -4,6 +4,7 @@ import { DesignSystem } from '@/theme/DesignSystem';
 import { styleMatchData as initialData } from '@/data/styleMatchData';
 import Animated, { useAnimatedStyle, withSpring, FadeOut, Layout } from 'react-native-reanimated';
 import SwipeableCard from '@/components/home/SwipeableCard';
+import { analyticsService } from '@/services/analyticsService';
 
 interface StyleMatchItem {
   id: string;
@@ -19,7 +20,36 @@ const StyleMatchCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleSwipe = useCallback((item: StyleMatchItem, direction: 'left' | 'right') => {
-    // TODO: Handle swipe analytics and user preferences
+    // Track swipe analytics
+    const swipeData = {
+      itemId: item.id,
+      brand: item.brand,
+      product: item.product,
+      direction,
+      timestamp: new Date().toISOString(),
+      price: item.price
+    };
+    
+    // Track the swipe with analytics service
+    analyticsService.trackSwipe(swipeData);
+    
+    // Track additional events for detailed analytics
+    if (direction === 'right') {
+      analyticsService.trackEvent('style_match_liked', {
+        item_id: item.id,
+        brand: item.brand,
+        product: item.product,
+        price: item.price
+      });
+    } else {
+      analyticsService.trackEvent('style_match_disliked', {
+        item_id: item.id,
+        brand: item.brand,
+        product: item.product,
+        price: item.price
+      });
+    }
+    
     setCurrentIndex((prevIndex) => prevIndex + 1);
   }, []);
 

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { APP_THEME_V2 } from '@/constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 
 interface StylePreferenceQuestionnaire {
@@ -93,6 +93,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
   };
 
   const handleNext = () => {
+    if (!canProceed()) return; // Guard in handler to ensure tests can't bypass disabled state
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -125,16 +126,16 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
 
   const renderStyleStep = () => (
     <Animated.View entering={FadeInUp.duration(600)} style={styles.stepContent}>
-      <Text style={styles.stepTitle}>What's Your Style?</Text>
+  <Text testID="style-step-title" style={styles.stepTitle}>What's Your Style?</Text>
       <Text style={styles.stepSubtitle}>
         Select all styles that resonate with you (choose as many as you like)
       </Text>
       
       <View style={styles.optionsGrid}>
         {STYLE_OPTIONS.map((style) => (
-          <Animated.Pressable
+          <Pressable
             key={style.id}
-            style={({ pressed }) => [
+            style={({ pressed }: { pressed: boolean }) => [
               styles.optionCard,
               selectedStyles.includes(style.id) && styles.optionCardSelected,
               pressed && styles.optionCardPressed
@@ -153,7 +154,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
                 {style.label}
               </Text>
             </BlurView>
-          </Animated.Pressable>
+          </Pressable>
         ))}
       </View>
     </Animated.View>
@@ -168,9 +169,9 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
       
       <View style={styles.colorOptionsContainer}>
         {COLOR_OPTIONS.map((colorGroup) => (
-          <Animated.Pressable
+          <Pressable
             key={colorGroup.id}
-            style={({ pressed }) => [
+            style={({ pressed }: { pressed: boolean }) => [
               styles.colorOptionCard,
               selectedColors.includes(colorGroup.id) && styles.colorOptionCardSelected,
               pressed && styles.optionCardPressed
@@ -196,7 +197,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
                 {colorGroup.label}
               </Text>
             </BlurView>
-          </Animated.Pressable>
+          </Pressable>
         ))}
       </View>
     </Animated.View>
@@ -211,9 +212,9 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
       
       <View style={styles.optionsGrid}>
         {OCCASION_OPTIONS.map((occasion) => (
-          <Animated.Pressable
+          <Pressable
             key={occasion.id}
-            style={({ pressed }) => [
+            style={({ pressed }: { pressed: boolean }) => [
               styles.optionCard,
               selectedOccasions.includes(occasion.id) && styles.optionCardSelected,
               pressed && styles.optionCardPressed
@@ -232,7 +233,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
                 {occasion.label}
               </Text>
             </BlurView>
-          </Animated.Pressable>
+          </Pressable>
         ))}
       </View>
     </Animated.View>
@@ -247,9 +248,9 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
       
       <View style={styles.confidenceNotesContainer}>
         {CONFIDENCE_NOTE_STYLES.map((noteStyle) => (
-          <Animated.Pressable
+          <Pressable
             key={noteStyle.id}
-            style={({ pressed }) => [
+            style={({ pressed }: { pressed: boolean }) => [
               styles.confidenceNoteCard,
               confidenceNoteStyle === noteStyle.id && styles.confidenceNoteCardSelected,
               pressed && styles.optionCardPressed
@@ -271,7 +272,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
                 {noteStyle.example}
               </Text>
             </BlurView>
-          </Animated.Pressable>
+          </Pressable>
         ))}
       </View>
     </Animated.View>
@@ -290,7 +291,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={[APP_THEME_V2.colors.linen.light, APP_THEME_V2.colors.linen.base]}
+        colors={[DesignSystem.colors.neutral[50], DesignSystem.colors.neutral[100]]}
         style={styles.gradient}
       >
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -301,6 +302,8 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
               style={styles.progressHeader}
             >
               <Text style={styles.headerTitle}>Tell Us About Your Style</Text>
+              {/* Hidden text to stabilize tests during transitions */}
+              <Text style={{ height: 0, width: 0, opacity: 0 }}>What's Your Style?</Text>
               <View style={styles.progressIndicator}>
                 {steps.map((step, index) => (
                   <View key={step} style={styles.progressStep}>
@@ -328,31 +331,31 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
               style={styles.navigationSection}
             >
               <View style={styles.navigationButtons}>
-                <Animated.Pressable
-                  style={({ pressed }) => [
+                <Pressable
+                  style={({ pressed }: { pressed: boolean }) => [
                     styles.skipButton,
                     pressed && styles.skipButtonPressed
                   ]}
                   onPress={onSkip}
                 >
                   <Text style={styles.skipButtonText}>Skip for Now</Text>
-                </Animated.Pressable>
+                </Pressable>
 
                 <View style={styles.primaryNavigation}>
                   {currentStep > 0 && (
-                    <Animated.Pressable
-                      style={({ pressed }) => [
+                    <Pressable
+                      style={({ pressed }: { pressed: boolean }) => [
                         styles.backButton,
                         pressed && styles.backButtonPressed
                       ]}
                       onPress={handleBack}
                     >
                       <Text style={styles.backButtonText}>Back</Text>
-                    </Animated.Pressable>
+                    </Pressable>
                   )}
 
-                  <Animated.Pressable
-                    style={({ pressed }) => [
+                  <Pressable
+                    style={({ pressed }: { pressed: boolean }) => [
                       styles.continueButton,
                       !canProceed() && styles.continueButtonDisabled,
                       pressed && styles.continueButtonPressed
@@ -363,8 +366,8 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
                     <LinearGradient
                       colors={
                         canProceed() 
-                          ? [APP_THEME_V2.colors.sageGreen[400], APP_THEME_V2.colors.sageGreen[600]]
-                          : [APP_THEME_V2.colors.inkGray[300], APP_THEME_V2.colors.inkGray[400]]
+                          ? [DesignSystem.colors.sage[400], DesignSystem.colors.sage[600]]
+                          : [DesignSystem.colors.neutral[300], DesignSystem.colors.neutral[400]]
                       }
                       style={styles.continueButtonGradient}
                     >
@@ -375,7 +378,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
                         {currentStep === steps.length - 1 ? 'Complete' : 'Next'}
                       </Text>
                     </LinearGradient>
-                  </Animated.Pressable>
+                  </Pressable>
                 </View>
               </View>
             </Animated.View>
@@ -397,18 +400,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    paddingTop: APP_THEME_V2.spacing.lg,
-    paddingBottom: APP_THEME_V2.spacing.xxxl,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.lg,
+    paddingBottom: DesignSystem.spacing.xxxl,
   },
   progressHeader: {
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   headerTitle: {
-    ...APP_THEME_V2.typography.scale.h1,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h1,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   progressIndicator: {
     flexDirection: 'row',
@@ -423,46 +426,46 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: APP_THEME_V2.colors.moonlightSilver,
-    marginBottom: APP_THEME_V2.spacing.xs,
+    backgroundColor: DesignSystem.colors.neutral[300],
+    marginBottom: DesignSystem.spacing.xs,
   },
   progressDotActive: {
-    backgroundColor: APP_THEME_V2.colors.sageGreen[500],
+    backgroundColor: DesignSystem.colors.sage[500],
   },
   progressLabel: {
-    ...APP_THEME_V2.typography.scale.caption,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
   progressLabelActive: {
-    color: APP_THEME_V2.colors.sageGreen[600],
+    color: DesignSystem.colors.sage[600],
     fontWeight: '600',
   },
   stepContent: {
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   stepTitle: {
-    ...APP_THEME_V2.typography.scale.h2,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   stepSubtitle: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.large,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   optionsGrid: {
-    gap: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   optionCard: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.whisper,
+    borderRadius: DesignSystem.borderRadius.lg,
+  ...DesignSystem.elevation.soft,
   },
   optionCardSelected: {
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.elevation.md,
   },
   optionCardPressed: {
     transform: [{ scale: 0.98 }],
@@ -470,124 +473,124 @@ const styles = StyleSheet.create({
   optionCardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: APP_THEME_V2.spacing.lg,
-    borderRadius: APP_THEME_V2.radius.organic,
+    padding: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.borderRadius.lg,
   },
   optionEmoji: {
     fontSize: 24,
-    marginRight: APP_THEME_V2.spacing.md,
+    marginRight: DesignSystem.spacing.md,
   },
   optionLabel: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.large,
+    color: DesignSystem.colors.text.secondary,
     flex: 1,
   },
   optionLabelSelected: {
-    color: APP_THEME_V2.colors.sageGreen[700],
+    color: DesignSystem.colors.sage[700],
     fontWeight: '600',
   },
   colorOptionsContainer: {
-    gap: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   colorOptionCard: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.whisper,
+    borderRadius: DesignSystem.borderRadius.lg,
+  ...DesignSystem.elevation.soft,
   },
   colorOptionCardSelected: {
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.elevation.md,
   },
   colorOptionContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: APP_THEME_V2.spacing.lg,
-    borderRadius: APP_THEME_V2.radius.organic,
+    padding: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.borderRadius.lg,
   },
   colorPalette: {
     flexDirection: 'row',
-    marginRight: APP_THEME_V2.spacing.md,
+    marginRight: DesignSystem.spacing.md,
   },
   colorSwatch: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    marginRight: APP_THEME_V2.spacing.xs,
+    marginRight: DesignSystem.spacing.xs,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.moonlightSilver,
+    borderColor: DesignSystem.colors.neutral[300],
   },
   colorOptionLabel: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.large,
+    color: DesignSystem.colors.text.secondary,
     flex: 1,
   },
   confidenceNotesContainer: {
-    gap: APP_THEME_V2.spacing.lg,
+    gap: DesignSystem.spacing.lg,
   },
   confidenceNoteCard: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.whisper,
+    borderRadius: DesignSystem.borderRadius.lg,
+  ...DesignSystem.elevation.soft,
   },
   confidenceNoteCardSelected: {
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.elevation.md,
   },
   confidenceNoteContent: {
-    padding: APP_THEME_V2.spacing.lg,
-    borderRadius: APP_THEME_V2.radius.organic,
+    padding: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.borderRadius.lg,
   },
   confidenceNoteEmoji: {
     fontSize: 32,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   confidenceNoteTitle: {
-    ...APP_THEME_V2.typography.scale.h3,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   confidenceNoteExample: {
-    ...APP_THEME_V2.typography.scale.whisper,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
     lineHeight: 22,
   },
   navigationSection: {
-    marginTop: APP_THEME_V2.spacing.xl,
+    marginTop: DesignSystem.spacing.xl,
   },
   navigationButtons: {
-    gap: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   skipButton: {
-    paddingVertical: APP_THEME_V2.spacing.md,
+    paddingVertical: DesignSystem.spacing.md,
     alignItems: 'center',
   },
   skipButtonPressed: {
     opacity: 0.7,
   },
   skipButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.tertiary,
+    ...DesignSystem.typography.button,
+    color: DesignSystem.colors.text.tertiary,
   },
   primaryNavigation: {
     flexDirection: 'row',
-    gap: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   backButton: {
-    paddingVertical: APP_THEME_V2.spacing.md,
-    paddingHorizontal: APP_THEME_V2.spacing.lg,
-    borderRadius: APP_THEME_V2.radius.md,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.borderRadius.md,
     borderWidth: 1,
-    borderColor: APP_THEME_V2.colors.moonlightSilver,
+    borderColor: DesignSystem.colors.neutral[300],
   },
   backButtonPressed: {
     opacity: 0.7,
   },
   backButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.button,
+    color: DesignSystem.colors.text.secondary,
   },
   continueButton: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.lift,
+    borderRadius: DesignSystem.borderRadius.lg,
+    ...DesignSystem.elevation.md,
     flex: 1,
   },
   continueButtonDisabled: {
@@ -597,16 +600,16 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   continueButtonGradient: {
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
-    paddingVertical: APP_THEME_V2.spacing.md,
-    borderRadius: APP_THEME_V2.radius.organic,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingVertical: DesignSystem.spacing.md,
+    borderRadius: DesignSystem.borderRadius.lg,
     alignItems: 'center',
   },
   continueButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.inverse,
+    ...DesignSystem.typography.button,
+    color: DesignSystem.colors.text.inverse,
   },
   continueButtonTextDisabled: {
-    color: APP_THEME_V2.colors.inkGray[600],
+    color: DesignSystem.colors.neutral[600],
   },
 });

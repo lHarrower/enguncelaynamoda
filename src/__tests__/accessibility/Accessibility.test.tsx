@@ -2,13 +2,13 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { AccessibilityInfo, findNodeHandle } from 'react-native';
-import { WardrobeCard } from '../../components/WardrobeCard';
-import { AddItemScreen } from '../../screens/AddItemScreen';
-import { WardrobeScreen } from '../../screens/WardrobeScreen';
-import { ErrorBoundary } from '../../components/ErrorBoundary';
-import { renderWithProviders, createMockWardrobeItem } from '../utils/testUtils';
-import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
-import { mocks } from '../mocks';
+import { WardrobeCard } from '@/components/common/WardrobeCard';
+// import { AddItemScreen } from '@/screens/AddItemScreen'; // TODO: Create AddItemScreen
+import { WardrobeScreen } from '@/screens/WardrobeScreen';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { renderWithProviders, createMockWardrobeItem } from '@/__tests__/utils/testUtils';
+import { WardrobeCategory, WardrobeColor } from '@/types';
+import { mocks } from '@/__tests__/mocks';
 
 // Mock AccessibilityInfo
 jest.mock('react-native', () => ({
@@ -166,7 +166,7 @@ describe('Accessibility Tests', () => {
     ];
 
     beforeEach(() => {
-      const mockWardrobeService = require('../../services/WardrobeService').WardrobeService;
+  const mockWardrobeService = require('../../services/wardrobeService').WardrobeService;
       mockWardrobeService.prototype.getAllItems = jest.fn().mockResolvedValue(mockItems);
     });
 

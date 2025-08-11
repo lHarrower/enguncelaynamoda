@@ -10,9 +10,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { AppError, ErrorCategory, ErrorSeverity, RecoveryAction } from '../../utils/ErrorHandler';
-import { COLORS } from '../../theme/foundations/Colors';
-import { TYPOGRAPHY } from '../../theme/foundations/Typography';
-import { SPACING } from '../../theme/foundations/Spacing';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -79,7 +77,7 @@ export const AIServiceErrorState: React.FC<BaseErrorStateProps> = ({
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         <Text style={styles.illustration}>🤖</Text>
-        <View style={[styles.illustrationAccent, { backgroundColor: COLORS.accent.purple }]} />
+  <View style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.lilac[600] }]} />
       </View>
       
       <Text style={styles.title}>{title}</Text>
@@ -116,7 +114,7 @@ export const ImageErrorState: React.FC<BaseErrorStateProps> = ({
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         <Text style={styles.illustration}>🖼️</Text>
-        <View style={[styles.illustrationAccent, { backgroundColor: COLORS.accent.coral }]} />
+  <View style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.coral[400] }]} />
       </View>
       
       <Text style={styles.title}>{title}</Text>
@@ -153,7 +151,7 @@ export const AuthErrorState: React.FC<BaseErrorStateProps> = ({
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         <Text style={styles.illustration}>🔐</Text>
-        <View style={[styles.illustrationAccent, { backgroundColor: COLORS.accent.gold }]} />
+  <View style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.gold[400] }]} />
       </View>
       
       <Text style={styles.title}>{title}</Text>
@@ -190,7 +188,7 @@ export const PermissionErrorState: React.FC<BaseErrorStateProps> = ({
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         <Text style={styles.illustration}>🛡️</Text>
-        <View style={[styles.illustrationAccent, { backgroundColor: COLORS.accent.sage }]} />
+  <View style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.sage[400] }]} />
       </View>
       
       <Text style={styles.title}>{title}</Text>
@@ -227,7 +225,7 @@ export const ValidationErrorState: React.FC<BaseErrorStateProps> = ({
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         <Text style={styles.illustration}>✏️</Text>
-        <View style={[styles.illustrationAccent, { backgroundColor: COLORS.accent.lavender }]} />
+        <View style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.accent.lavender }]} />
       </View>
       
       <Text style={styles.title}>{title}</Text>
@@ -306,7 +304,7 @@ export const LoadingErrorState: React.FC<LoadingErrorStateProps> = ({
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         {isRetrying ? (
-          <ActivityIndicator size="large" color={COLORS.primary[500]} />
+          <ActivityIndicator size="large" color={DesignSystem.colors.primary[500]} />
         ) : (
           <Text style={styles.illustration}>⏳</Text>
         )}
@@ -442,12 +440,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: SPACING.xl,
-    backgroundColor: COLORS.background.primary,
+    padding: DesignSystem.spacing.xl,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   illustrationContainer: {
     position: 'relative',
-    marginBottom: SPACING.xl,
+    marginBottom: DesignSystem.spacing.xl,
     alignItems: 'center',
   },
   illustration: {
@@ -461,101 +459,101 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: COLORS.primary[500],
+    backgroundColor: DesignSystem.colors.primary[500],
     opacity: 0.8,
   },
   title: {
-    ...TYPOGRAPHY.h2,
-    color: COLORS.text.primary,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: SPACING.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   message: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: SPACING.xl,
+    marginBottom: DesignSystem.spacing.xl,
     lineHeight: 24,
     maxWidth: screenWidth * 0.8,
   },
   actionsContainer: {
     width: '100%',
     maxWidth: 300,
-    gap: SPACING.md,
+    gap: DesignSystem.spacing.md,
   },
   actionButton: {
-    backgroundColor: COLORS.background.secondary,
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.lg,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border.primary,
+    borderColor: DesignSystem.colors.border.primary,
   },
   primaryButton: {
-    backgroundColor: COLORS.primary[500],
-    borderColor: COLORS.primary[500],
+    backgroundColor: DesignSystem.colors.primary[500],
+    borderColor: DesignSystem.colors.primary[500],
   },
   actionText: {
-    ...TYPOGRAPHY.button,
-    color: COLORS.text.primary,
+    ...DesignSystem.typography.button.medium,
+    color: DesignSystem.colors.text.primary,
   },
   primaryText: {
-    color: COLORS.text.inverse,
+    color: DesignSystem.colors.text.inverse,
   },
   progressContainer: {
     width: '100%',
     maxWidth: 200,
-    marginTop: SPACING.lg,
+    marginTop: DesignSystem.spacing.lg,
     alignItems: 'center',
   },
   progressBar: {
     width: '100%',
     height: 4,
-    backgroundColor: COLORS.background.secondary,
+    backgroundColor: DesignSystem.colors.background.secondary,
     borderRadius: 2,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: COLORS.primary[500],
+    backgroundColor: DesignSystem.colors.primary[500],
     borderRadius: 2,
   },
   progressText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.text.secondary,
-    marginTop: SPACING.xs,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    marginTop: DesignSystem.spacing.xs,
   },
   // Inline Error Styles
   inlineContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: SPACING.xs,
-    paddingHorizontal: SPACING.sm,
-    backgroundColor: COLORS.semantic.error + '10',
+    paddingVertical: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    backgroundColor: DesignSystem.colors.semantic.error + '10',
     borderRadius: 6,
-    marginTop: SPACING.xs,
+    marginTop: DesignSystem.spacing.xs,
   },
   inlineIcon: {
     fontSize: 14,
-    marginRight: SPACING.xs,
+    marginRight: DesignSystem.spacing.xs,
   },
   inlineMessage: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.semantic.error,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.semantic.error,
     flex: 1,
   },
   // Toast Error Styles
   toastContainer: {
     position: 'absolute',
     top: 60,
-    left: SPACING.md,
-    right: SPACING.md,
+    left: DesignSystem.spacing.md,
+    right: DesignSystem.spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.semantic.error,
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.lg,
+    backgroundColor: DesignSystem.colors.semantic.error,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -566,20 +564,20 @@ const styles = StyleSheet.create({
   },
   toastIcon: {
     fontSize: 16,
-    marginRight: SPACING.sm,
+    marginRight: DesignSystem.spacing.sm,
   },
   toastMessage: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.text.inverse,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.inverse,
     flex: 1,
   },
   toastDismiss: {
-    padding: SPACING.xs,
-    marginLeft: SPACING.sm,
+    padding: DesignSystem.spacing.xs,
+    marginLeft: DesignSystem.spacing.sm,
   },
   toastDismissText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.text.inverse,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.inverse,
     fontWeight: 'bold',
   },
 });

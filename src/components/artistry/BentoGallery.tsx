@@ -363,13 +363,13 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.md,
   },
   imageTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     fontSize: 18,
     marginBottom: DesignSystem.spacing.xs,
   },
   imageSubtitle: {
-    ...DesignSystem.typography.body,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.tertiary,
     fontSize: 14,
   },
@@ -393,13 +393,13 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.md,
   },
   textTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.scale.h3,
     color: DesignSystem.colors.text.accent,
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.xs,
   },
   textMessage: {
-    ...DesignSystem.typography.body,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     fontSize: 14,
@@ -415,14 +415,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   metricValue: {
-    ...DesignSystem.typography.h1,
+    ...DesignSystem.typography.scale.h1,
     color: DesignSystem.colors.text.accent,
     fontSize: 32,
     fontWeight: '300',
     marginBottom: DesignSystem.spacing.xs,
   },
   metricLabel: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
     marginTop: DesignSystem.spacing.xs,
   },
   metricTrendText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     marginLeft: DesignSystem.spacing.xs,
   },
@@ -457,14 +457,14 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.md,
   },
   interactiveTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     fontSize: 18,
     marginBottom: DesignSystem.spacing.xs,
   },
   interactiveSubtitle: {
-    ...DesignSystem.typography.body,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
     fontSize: 14,
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.text.accent,
   },
   kineticTitle: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },

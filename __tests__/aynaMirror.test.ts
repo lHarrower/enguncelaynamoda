@@ -7,9 +7,9 @@ import {
   OutfitRecommendation,
   WeatherContext,
   ItemCategory 
-} from '../types/aynaMirror';
-import { EnhancedWardrobeService } from '../services/enhancedWardrobeService';
-import { AynaMirrorService } from '../services/aynaMirrorService';
+} from '../src/types/aynaMirror';
+import { EnhancedWardrobeService } from '../src/services/enhancedWardrobeService';
+import { AynaMirrorService } from '../src/services/aynaMirrorService';
 
 describe('AYNA Mirror Data Models', () => {
   
@@ -23,6 +23,7 @@ describe('AYNA Mirror Data Models', () => {
         category: 'tops' as ItemCategory,
         colors: ['blue', 'white'],
         tags: ['casual', 'work'],
+        nameOverride: false,
         usageStats: {
           itemId: 'test-id',
           totalWears: 5,

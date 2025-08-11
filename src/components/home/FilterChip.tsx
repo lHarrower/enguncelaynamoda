@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     ...DesignSystem.elevation.soft,
   },
   categoryText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: 'bold',
   },

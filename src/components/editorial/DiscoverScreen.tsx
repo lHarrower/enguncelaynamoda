@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   instructions: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: 40,

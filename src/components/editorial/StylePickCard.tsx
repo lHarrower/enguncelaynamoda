@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.background.primary,
     borderRadius: DesignSystem.borderRadius.lg,
     overflow: 'hidden',
-    ...DesignSystem.elevation.small,
+  ...DesignSystem.elevation.soft,
     marginBottom: DesignSystem.spacing.md,
   },
   imageContainer: {
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   brand: {
-    ...DesignSystem.typography.scale.body2,
+  ...DesignSystem.typography.body.small,
     fontFamily: 'Inter_500Medium',
     color: DesignSystem.colors.text.primary,
     textTransform: 'uppercase',
@@ -173,13 +173,13 @@ const styles = StyleSheet.create({
   },
   title: {
     ...DesignSystem.typography.scale.h2,
-    fontFamily: DesignSystem.typography.serif.family,
+  fontFamily: DesignSystem.typography.fontFamily.serif,
     color: DesignSystem.colors.text.primary,
     marginBottom: 8,
     lineHeight: 28,
   },
   description: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     lineHeight: 22,
     marginBottom: 16,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.text.primary,
   },
   originalPrice: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.tertiary,
     textDecorationLine: 'line-through',
     marginLeft: 8,

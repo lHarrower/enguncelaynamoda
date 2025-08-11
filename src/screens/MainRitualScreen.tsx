@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { LinenCanvas } from '../components/luxury/LinenCanvas';
+import LinenCanvas from '../components/luxury/LinenCanvas';
 import { AynaOutfitCard } from '../components/sanctuary/AynaOutfitCard';
 import { Outfit, ClothingItem } from '../data/sanctuaryModels';
+import { logInDev } from '../utils/consoleSuppress';
 
 // Sample outfit data with correct types
 const createClothingItem = (id: string, name: string, category: any, imageUrl: string): ClothingItem => ({
@@ -57,7 +58,7 @@ export const MainRitualScreen = () => {
           <AynaOutfitCard
             key={outfit.id}
             outfit={outfit}
-            onPress={() => console.log('Outfit selected:', outfit.id)}
+            onPress={() => logInDev('Outfit selected:', outfit.id)}
           />
         ))}
       </ScrollView>

@@ -2,14 +2,15 @@
 import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { ThemeProvider } from '../../providers/ThemeProvider';
+import { ThemeProvider } from '../../theme/ThemeProvider';
 import { AnimationProvider } from '../../providers/AnimationProvider';
 import { HapticProvider } from '../../providers/HapticProvider';
 import { ErrorProvider } from '../../providers/ErrorProvider';
 import { WardrobeProvider } from '../../providers/WardrobeProvider';
 import { AIProvider } from '../../providers/AIProvider';
 import { AppError, ErrorSeverity, ErrorCategory } from '../../utils/ErrorHandler';
-import { WardrobeItem, WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
+import { WardrobeItem } from '../../types/aynaMirror';
+import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
 import { User } from '../../types/user';
 
 /**

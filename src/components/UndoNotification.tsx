@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming, runOnJS } from 'react-native-reanimated';
-import { useTheme } from '@/context/ThemeContext';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { TAB_BAR_CONTENT_HEIGHT } from '@/constants/Layout';
 
 export type UndoNotificationProps = {
@@ -13,7 +13,6 @@ export type UndoNotificationProps = {
 };
 
 export default function UndoNotification({ visible, message, onUndo, onDismiss }: UndoNotificationProps) {
-  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(50);
@@ -49,10 +48,10 @@ export default function UndoNotification({ visible, message, onUndo, onDismiss }
   }
 
   return (
-    <Animated.View style={[styles.container, { bottom: tabBarHeight + 10, backgroundColor: colors.card }, animatedStyle]}>
-      <Text style={[styles.message, { color: colors.text }]}>{message}</Text>
+    <Animated.View style={[styles.container, { bottom: tabBarHeight + 10, backgroundColor: DesignSystem.colors.background.elevated }, animatedStyle]}>
+      <Text style={[styles.message, { color: DesignSystem.colors.text.primary }]}>{message}</Text>
       <TouchableOpacity onPress={onUndo}>
-        <Text style={[styles.undoText, { color: colors.tint }]}>Undo</Text>
+        <Text style={[styles.undoText, { color: DesignSystem.colors.primary[500] }]}>Undo</Text>
       </TouchableOpacity>
     </Animated.View>
   );

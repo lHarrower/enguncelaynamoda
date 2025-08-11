@@ -126,7 +126,7 @@ const WELLNESS_ERROR_MESSAGES: Record<ErrorCategory, string> = {
 /**
  * Error Handler Class
  */
-class ErrorHandler {
+export class ErrorHandler {
   private config: ErrorHandlerConfig;
   private errorQueue: AppError[] = [];
   private retryAttempts: Map<string, number> = new Map();
@@ -284,7 +284,7 @@ class ErrorHandler {
         actions.push({
           strategy: RecoveryStrategy.REFRESH,
           label: 'Refresh',
-          action: () => console.log('Refreshing...')
+          action: () => {}
         });
         break;
         
@@ -292,7 +292,7 @@ class ErrorHandler {
         actions.push({
           strategy: RecoveryStrategy.LOGOUT,
           label: 'Sign In Again',
-          action: () => console.log('Logging out...')
+          action: () => {}
         });
         break;
         
@@ -300,7 +300,7 @@ class ErrorHandler {
         actions.push({
           strategy: RecoveryStrategy.NAVIGATE,
           label: 'Check Settings',
-          action: () => console.log('Navigate to settings...')
+          action: () => {}
         });
         break;
     }
@@ -310,7 +310,7 @@ class ErrorHandler {
       actions.push({
         strategy: RecoveryStrategy.FALLBACK,
         label: 'Continue',
-        action: () => console.log('Continuing with fallback...')
+        action: () => {}
       });
     }
     
@@ -419,7 +419,7 @@ class ErrorHandler {
       try {
         listener(error);
       } catch (listenerError) {
-        console.warn('Error in error listener:', listenerError);
+        // Error in error listener
       }
     });
   }
@@ -432,7 +432,7 @@ class ErrorHandler {
     try {
       // In a real implementation, you would send this to your error reporting service
       // e.g., Sentry, Bugsnag, or custom endpoint
-      console.log('Reporting error to:', this.config.reportingEndpoint, error);
+      // Reporting error to endpoint
       
       // Example implementation:
       // await fetch(this.config.reportingEndpoint, {
@@ -450,7 +450,7 @@ class ErrorHandler {
       //   })
       // });
     } catch (reportingError) {
-      console.warn('Failed to report error:', reportingError);
+      // Failed to report error
     }
   }
 }

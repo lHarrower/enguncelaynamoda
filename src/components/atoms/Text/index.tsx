@@ -8,14 +8,14 @@
 import React from 'react';
 import { Text as RNText, StyleSheet, TextStyle } from 'react-native';
 import { BaseComponentProps } from '@/types/componentProps';
-import { UNIFIED_COLORS, TYPOGRAPHY } from '@/theme';
+import { DesignSystem } from '@/theme/DesignSystem';
 
-export interface TextProps extends BaseComponentProps {
+export interface TextProps extends Omit<BaseComponentProps, 'style'> {
   children: React.ReactNode;
   variant?: 'display' | 'headline' | 'title' | 'body' | 'label' | 'caption';
   weight?: 'light' | 'regular' | 'medium' | 'semibold' | 'bold';
   size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
-  color?: keyof typeof UNIFIED_COLORS.neutral | 'primary' | 'secondary' | 'error' | 'warning' | 'success' | 'luxury';
+  color?: 'charcoal' | 'slate' | 'light' | 'primary' | 'secondary' | 'error' | 'warning' | 'success' | 'luxury';
   align?: 'left' | 'center' | 'right' | 'justify';
   transform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize';
   decoration?: 'none' | 'underline' | 'line-through';
@@ -31,7 +31,7 @@ const Text: React.FC<TextProps> = ({
   variant = 'body',
   weight = 'regular',
   size,
-  color = '900',
+  color = 'charcoal',
   align = 'left',
   transform = 'none',
   decoration = 'none',
@@ -44,11 +44,12 @@ const Text: React.FC<TextProps> = ({
   accessibilityLabel,
   ...props
 }) => {
+  const sizeStyleKey = size === 'base' ? 'baseSize' : size;
   const textStyle = [
     styles.base,
     styles[variant],
     styles[weight],
-    size && styles[size],
+    size && styles[sizeStyleKey as keyof typeof styles],
     getColorStyle(color),
     { textAlign: align },
     { textTransform: transform },
@@ -75,19 +76,25 @@ const Text: React.FC<TextProps> = ({
 const getColorStyle = (color: TextProps['color']): TextStyle => {
   switch (color) {
     case 'primary':
-      return { color: UNIFIED_COLORS.primary[500] };
+      return { color: DesignSystem.colors.primary[500] };
     case 'secondary':
-      return { color: UNIFIED_COLORS.secondary[500] };
+      return { color: DesignSystem.colors.secondary[500] };
     case 'error':
-      return { color: UNIFIED_COLORS.semantic.error };
+      return { color: DesignSystem.colors.semantic.error };
     case 'warning':
-      return { color: UNIFIED_COLORS.semantic.warning };
+      return { color: DesignSystem.colors.semantic.warning };
     case 'success':
-      return { color: UNIFIED_COLORS.semantic.success };
+      return { color: DesignSystem.colors.semantic.success };
     case 'luxury':
-      return { color: UNIFIED_COLORS.luxury.gold };
+      return { color: DesignSystem.colors.gold[500] };
+    case 'charcoal':
+      return { color: DesignSystem.colors.neutral.charcoal };
+    case 'slate':
+      return { color: DesignSystem.colors.neutral.slate };
+    case 'light':
+  return { color: DesignSystem.colors.neutral[100] };
     default:
-      return { color: UNIFIED_COLORS.neutral[color as keyof typeof UNIFIED_COLORS.neutral] };
+      return { color: DesignSystem.colors.neutral.charcoal };
   }
 };
 
@@ -104,99 +111,87 @@ const getDecorationStyle = (decoration: TextProps['decoration']): TextStyle => {
 
 const styles = StyleSheet.create({
   base: {
-    fontFamily: TYPOGRAPHY.fontFamily.primary,
-    color: UNIFIED_COLORS.neutral[900],
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    color: DesignSystem.colors.neutral.charcoal,
   },
   
   // Variants
   display: {
-    fontSize: TYPOGRAPHY.fontSize['4xl'],
-    fontWeight: TYPOGRAPHY.fontWeight.bold,
-    lineHeight: TYPOGRAPHY.lineHeight.tight,
+    ...DesignSystem.typography.heading.h1,
   },
   
   headline: {
-    fontSize: TYPOGRAPHY.fontSize['3xl'],
-    fontWeight: TYPOGRAPHY.fontWeight.bold,
-    lineHeight: TYPOGRAPHY.lineHeight.tight,
+    ...DesignSystem.typography.heading.h1,
   },
   
   title: {
-    fontSize: TYPOGRAPHY.fontSize['2xl'],
-    fontWeight: TYPOGRAPHY.fontWeight.semibold,
-    lineHeight: TYPOGRAPHY.lineHeight.snug,
+    ...DesignSystem.typography.heading.h2,
   },
   
   body: {
-    fontSize: TYPOGRAPHY.fontSize.base,
-    fontWeight: TYPOGRAPHY.fontWeight.regular,
-    lineHeight: TYPOGRAPHY.lineHeight.normal,
+    ...DesignSystem.typography.body.medium,
   },
   
   label: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-    fontWeight: TYPOGRAPHY.fontWeight.medium,
-    lineHeight: TYPOGRAPHY.lineHeight.normal,
+    ...DesignSystem.typography.caption.medium,
   },
   
   caption: {
-    fontSize: TYPOGRAPHY.fontSize.xs,
-    fontWeight: TYPOGRAPHY.fontWeight.regular,
-    lineHeight: TYPOGRAPHY.lineHeight.normal,
+    ...DesignSystem.typography.scale.caption,
   },
   
   // Weights
   light: {
-    fontWeight: TYPOGRAPHY.fontWeight.light,
+    fontWeight: '300',
   },
   
   regular: {
-    fontWeight: TYPOGRAPHY.fontWeight.regular,
+    fontWeight: '400',
   },
   
   medium: {
-    fontWeight: TYPOGRAPHY.fontWeight.medium,
+    fontWeight: '500',
   },
   
   semibold: {
-    fontWeight: TYPOGRAPHY.fontWeight.semibold,
+    fontWeight: '600',
   },
   
   bold: {
-    fontWeight: TYPOGRAPHY.fontWeight.bold,
+    fontWeight: '700',
   },
   
   // Sizes
   xs: {
-    fontSize: TYPOGRAPHY.fontSize.xs,
+    fontSize: 12,
   },
   
   sm: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontSize: 14,
   },
   
-  base: {
-    fontSize: TYPOGRAPHY.fontSize.base,
+  baseSize: {
+    fontSize: 16,
   },
   
   lg: {
-    fontSize: TYPOGRAPHY.fontSize.lg,
+    fontSize: 18,
   },
   
   xl: {
-    fontSize: TYPOGRAPHY.fontSize.xl,
+    fontSize: 20,
   },
   
   '2xl': {
-    fontSize: TYPOGRAPHY.fontSize['2xl'],
+    fontSize: 24,
   },
   
   '3xl': {
-    fontSize: TYPOGRAPHY.fontSize['3xl'],
+    fontSize: 30,
   },
   
   '4xl': {
-    fontSize: TYPOGRAPHY.fontSize['4xl'],
+    fontSize: 36,
   },
   
   italic: {
@@ -205,4 +200,3 @@ const styles = StyleSheet.create({
 });
 
 export default Text;
-export type { TextProps };

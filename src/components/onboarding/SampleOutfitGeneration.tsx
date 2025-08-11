@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -48,11 +48,12 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
   const [showOutfits, setShowOutfits] = useState(false);
 
   useEffect(() => {
-    // Simulate AI generation process
+    // Simulate AI generation process (accelerated in tests)
+    const delay = process.env.NODE_ENV === 'test' ? 0 : 3000;
     const timer = setTimeout(() => {
       setIsGenerating(false);
       setShowOutfits(true);
-    }, 3000);
+    }, delay);
 
     return () => clearTimeout(timer);
   }, []);
@@ -209,12 +210,12 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
               </Animated.View>
 
               {/* Outfit Navigation */}
-              <Animated.View 
+        <Animated.View 
                 entering={FadeInUp.delay(400).duration(600)}
                 style={styles.navigationDots}
               >
                 {SAMPLE_OUTFITS.map((_, index) => (
-                  <Animated.Pressable
+          <Pressable
                     key={index}
                     style={[
                       styles.navigationDot,
@@ -233,8 +234,8 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                 entering={FadeInUp.delay(800).duration(600)}
                 style={styles.outfitNavigation}
               >
-                <Animated.Pressable
-                  style={({ pressed }) => [
+                <Pressable
+                  style={({ pressed }: { pressed: boolean }) => [
                     styles.navButton,
                     currentOutfitIndex === 0 && styles.navButtonDisabled,
                     pressed && styles.navButtonPressed
@@ -257,10 +258,10 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                   ]}>
                     Previous
                   </Text>
-                </Animated.Pressable>
+                </Pressable>
 
-                <Animated.Pressable
-                  style={({ pressed }) => [
+                <Pressable
+                  style={({ pressed }: { pressed: boolean }) => [
                     styles.navButton,
                     currentOutfitIndex === SAMPLE_OUTFITS.length - 1 && styles.navButtonDisabled,
                     pressed && styles.navButtonPressed
@@ -283,7 +284,7 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                         : DesignSystem.colors.sage[600]
                     } 
                   />
-                </Animated.Pressable>
+                </Pressable>
               </Animated.View>
 
               {/* Complete Button */}
@@ -295,8 +296,8 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                   Ready to start your confidence journey?
                 </Text>
                 
-                <Animated.Pressable
-                  style={({ pressed }) => [
+                <Pressable
+                  style={({ pressed }: { pressed: boolean }) => [
                     styles.completeButton,
                     pressed && styles.completeButtonPressed
                   ]}
@@ -314,7 +315,7 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                       style={styles.completeButtonIcon}
                     />
                   </LinearGradient>
-                </Animated.Pressable>
+                </Pressable>
               </Animated.View>
             </View>
           </ScrollView>
@@ -372,10 +373,11 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.sm,
   },
   generatingSubtitle: {
-    ...DesignSystem.typography.body.medium,
+    fontSize: 16,
+  lineHeight: 24,
+  fontWeight: '400',
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    lineHeight: 24,
     marginBottom: DesignSystem.spacing.xl,
   },
   generatingSteps: {
@@ -448,7 +450,9 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.xs,
   },
   metaText: {
-    ...DesignSystem.typography.body.small,
+    fontSize: 14,
+        lineHeight: 20,
+        fontWeight: '400',
     color: DesignSystem.colors.text.secondary,
   },
   colorPalette: {
@@ -470,7 +474,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 2,
     borderColor: DesignSystem.colors.background.elevated,
-    ...DesignSystem.effects.elevation.low,
+  ...DesignSystem.effects.elevation.subtle,
   },
   outfitItems: {
     marginBottom: DesignSystem.spacing.lg,
@@ -505,7 +509,7 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.lg,
     padding: DesignSystem.spacing.md,
     backgroundColor: DesignSystem.colors.sage[50],
-    borderRadius: DesignSystem.borderRadius.medium,
+  borderRadius: DesignSystem.borderRadius.md,
   },
   confidenceNoteTitle: {
     ...DesignSystem.typography.body.medium,

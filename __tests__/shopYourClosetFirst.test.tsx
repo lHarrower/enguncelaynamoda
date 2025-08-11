@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import { ShopYourClosetFirst } from '../components/antiConsumption/ShopYourClosetFirst';
-import { antiConsumptionService } from '../services/antiConsumptionService';
+import { ShopYourClosetFirst } from '@/components/antiConsumption/ShopYourClosetFirst';
+import { antiConsumptionService } from '@/services/antiConsumptionService';
 
 // Mock dependencies
-jest.mock('../services/antiConsumptionService');
+jest.mock('@/services/antiConsumptionService');
 jest.mock('react-native', () => ({
   ...jest.requireActual('react-native'),
   Alert: {

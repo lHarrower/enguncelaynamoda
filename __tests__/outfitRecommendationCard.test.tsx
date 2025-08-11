@@ -5,8 +5,8 @@ import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import * as Haptics from 'expo-haptics';
 
-import { OutfitRecommendationCard } from '../components/aynaMirror/OutfitRecommendationCard';
-import { OutfitRecommendation } from '../types/aynaMirror';
+import { OutfitRecommendationCard } from '@/components/aynaMirror/OutfitRecommendationCard';
+import { OutfitRecommendation } from '@/types/aynaMirror';
 
 // Mock dependencies
 jest.mock('expo-haptics');
@@ -16,11 +16,6 @@ jest.mock('expo-blur', () => ({
 jest.mock('expo-linear-gradient', () => ({
   LinearGradient: ({ children }: any) => children,
 }));
-jest.mock('react-native-reanimated', () => {
-  const Reanimated = require('react-native-reanimated/mock');
-  Reanimated.default.call = () => {};
-  return Reanimated;
-});
 
 // Sample test data
 const mockRecommendation: OutfitRecommendation = {
@@ -32,6 +27,7 @@ const mockRecommendation: OutfitRecommendation = {
       userId: 'user-1',
       imageUri: 'https://example.com/image1.jpg',
       processedImageUri: 'https://example.com/processed1.jpg',
+  nameOverride: false,
       category: 'tops',
       colors: ['blue', 'white'],
       tags: ['casual', 'comfortable'],
@@ -53,6 +49,7 @@ const mockRecommendation: OutfitRecommendation = {
       userId: 'user-1',
       imageUri: 'https://example.com/image2.jpg',
       processedImageUri: 'https://example.com/processed2.jpg',
+  nameOverride: false,
       category: 'bottoms',
       colors: ['black'],
       tags: ['casual'],

@@ -54,9 +54,9 @@ export default function ZenButton({
     const baseStyle = [
       styles.button,
       styles[size],
-      fullWidth && styles.fullWidth,
-      disabled && styles.disabled,
-    ];
+      fullWidth ? styles.fullWidth : null,
+      disabled ? styles.disabled : null,
+    ].filter(Boolean) as ViewStyle[];
 
     switch (variant) {
       case 'secondary':
@@ -71,7 +71,7 @@ export default function ZenButton({
   };
 
   const getTextStyle = (): TextStyle[] => {
-    const baseStyle = [styles.text, styles[`${size}Text` as keyof typeof styles]];
+    const baseStyle = [styles.text, styles[`${size}Text` as keyof typeof styles]] as TextStyle[];
 
     switch (variant) {
       case 'secondary':
@@ -86,19 +86,19 @@ export default function ZenButton({
   };
 
   const getIconColor = () => {
-    if (disabled) return APP_THEME_V2.colors.moonlightSilver;
+    if (disabled) return DesignSystem.colors.neutral[300];
     
     switch (variant) {
       case 'primary':
-        return APP_THEME_V2.colors.whisperWhite;
+        return DesignSystem.colors.text.inverse;
       case 'secondary':
-        return APP_THEME_V2.semantic.text.primary;
+        return DesignSystem.colors.text.primary;
       case 'outline':
-        return APP_THEME_V2.semantic.accent;
+        return DesignSystem.colors.sage[500];
       case 'ghost':
-        return APP_THEME_V2.semantic.text.secondary;
+        return DesignSystem.colors.text.secondary;
       default:
-        return APP_THEME_V2.colors.whisperWhite;
+        return DesignSystem.colors.text.inverse;
     }
   };
 
@@ -136,7 +136,7 @@ export default function ZenButton({
       >
         {variant === 'primary' && !disabled ? (
           <LinearGradient
-            colors={[APP_THEME_V2.colors.sageGreen[400], APP_THEME_V2.colors.sageGreen[600]]}
+            colors={[DesignSystem.colors.sage[400], DesignSystem.colors.sage[600]]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.gradient}
@@ -215,19 +215,19 @@ const styles = StyleSheet.create({
   // Text styles
   text: {
     textAlign: 'center',
-    fontFamily: DesignSystem.typography.fonts.body,
+  fontFamily: DesignSystem.typography.fontFamily.body,
     letterSpacing: 0.3,
   },
   smallText: {
-    ...DesignSystem.typography.scale.caption,
+    ...DesignSystem.typography.caption.medium,
     fontWeight: '600',
   },
   mediumText: {
-    ...DesignSystem.typography.scale.body2,
+    ...DesignSystem.typography.body.small,
     fontWeight: '600',
   },
   largeText: {
-    ...DesignSystem.typography.scale.body1,
+    ...DesignSystem.typography.body.medium,
     fontWeight: '600',
   },
   

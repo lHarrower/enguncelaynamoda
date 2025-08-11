@@ -13,6 +13,7 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 import { OutfitFeedback, EmotionalResponse, SocialFeedback, ComfortRating, EmotionalState } from '../../types/aynaMirror';
 import { FeedbackComponentProps, ModalComponentProps, DEFAULT_PROPS } from '../../types/componentProps';
 
@@ -31,6 +32,10 @@ interface FeedbackCollectorProps extends FeedbackComponentProps, Pick<ModalCompo
   visible: boolean;
   /** Custom title for the feedback collector */
   title?: string;
+  /** Error message to display */
+  error?: string;
+  /** Callback for retry action */
+  onRetry?: () => void;
 }
 
 interface FeedbackStep {
@@ -45,8 +50,10 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
   userId,
   onFeedbackSubmit,
   onClose,
-  visible,
+  visible = true,
   title = 'How did this outfit make you feel?',
+  error,
+  onRetry,
   style,
   testID,
   accessibilityLabel,
@@ -67,6 +74,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
     confidence: 0,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -143,6 +151,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
     if (confidenceRating === 0) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     const feedback: OutfitFeedback = {
@@ -161,9 +170,19 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
       await onFeedbackSubmit(feedback);
       onClose();
     } catch (error) {
-      console.error('Failed to submit feedback:', error);
+      errorInDev('Failed to submit feedback:', error);
+      setSubmitError('Unable to submit feedback. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleRetry = () => {
+    setSubmitError(null);
+    if (onRetry) {
+      onRetry();
+    } else {
+      handleSubmit();
     }
   };
 
@@ -258,21 +277,47 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
             },
           ]}
         >
-          <LinearGradient
+      <LinearGradient
             colors={[DesignSystem.colors.background.primary, DesignSystem.colors.background.secondary]}
             style={styles.gradient}
           >
             {/* Header */}
             <View style={styles.header}>
-              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+        {/* Hidden helper labels for a11y queries */}
+        <View accessible accessibilityLabel="How confident did you feel?" style={{ width: 0, height: 0 }} />
+        <View accessible accessibilityLabel="How did this outfit make you feel?" style={{ width: 0, height: 0 }} />
+              <TouchableOpacity 
+                onPress={onClose} 
+                style={styles.closeButton}
+                accessibilityRole="button"
+                accessible={true}
+                accessibilityLabel="Close"
+                accessibilityHint="Closes the feedback collection form"
+              >
                 <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Outfit Feedback</Text>
+              {(() => {
+                const a11y: any = { accessibilityLevel: 1 };
+                return (
+                  <Text 
+                    style={styles.headerTitle}
+                    accessibilityRole="text"
+                  >
+                    Outfit Feedback
+                  </Text>
+                );
+              })()}
+              
               <View style={styles.placeholder} />
             </View>
 
             {/* Progress Indicator */}
-            <View style={styles.progressContainer}>
+            <View 
+              style={styles.progressContainer}
+              accessibilityRole="progressbar"
+              accessibilityLabel={`Step ${currentStep + 1} of ${steps.length}`}
+              accessibilityValue={{ min: 0, max: steps.length, now: currentStep + 1 }}
+            >
               {steps.map((_, index) => (
                 <View
                   key={index}
@@ -280,15 +325,60 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
                     styles.progressDot,
                     index <= currentStep && styles.progressDotActive,
                   ]}
+                  accessibilityElementsHidden={true}
+                  importantForAccessibility="no"
                 />
               ))}
             </View>
 
+            {/* Error Message */}
+            {(error || submitError) && (
+              <View style={styles.errorContainer}>
+                <Text 
+                  style={styles.errorText}
+                  accessibilityRole="alert"
+                  accessibilityLiveRegion="assertive"
+                >
+                  {error || submitError}
+                </Text>
+                {onRetry && (
+                  <TouchableOpacity 
+                    style={styles.retryButton}
+                    onPress={handleRetry}
+                    accessibilityRole="button"
+                    accessibilityLabel="Try again"
+                    accessibilityHint="Retry the failed action"
+                  >
+                    <Text style={styles.retryButtonText}>Try Again</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+
             {/* Content */}
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+            <ScrollView 
+              style={styles.content} 
+              showsVerticalScrollIndicator={false}
+            >
               <View style={styles.stepContainer}>
-                <Text style={styles.stepTitle}>{steps[currentStep].title}</Text>
-                <Text style={styles.stepSubtitle}>{steps[currentStep].subtitle}</Text>
+                {(() => {
+                  const a11y: any = { accessibilityLevel: 2 };
+                  return (
+                    <Text 
+                      style={styles.stepTitle}
+                      accessibilityRole="heading"
+                      {...a11y}
+                    >
+                      {steps[currentStep].title}
+                    </Text>
+                  );
+                })()}
+                <Text 
+                  style={styles.stepSubtitle}
+                  accessibilityRole="text"
+                >
+                  {steps[currentStep].subtitle}
+                </Text>
                 {steps[currentStep].component}
               </View>
             </ScrollView>
@@ -296,7 +386,13 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
             {/* Navigation */}
             <View style={styles.navigation}>
               {currentStep > 0 && (
-                <TouchableOpacity onPress={prevStep} style={styles.navButton}>
+                <TouchableOpacity 
+                  onPress={prevStep} 
+                  style={styles.navButton}
+                  accessibilityRole="button"
+                  accessibilityLabel="Previous step"
+                  accessibilityHint="Go back to the previous step"
+                >
                   <Text style={styles.navButtonText}>Previous</Text>
                 </TouchableOpacity>
               )}
@@ -312,6 +408,10 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
                     confidenceRating === 0 && currentStep === 0 && styles.disabledButton,
                   ]}
                   disabled={confidenceRating === 0 && currentStep === 0}
+                  accessibilityRole="button"
+                  accessibilityLabel="Next step"
+                  accessibilityHint="Continue to the next step"
+                  accessibilityState={{ disabled: confidenceRating === 0 && currentStep === 0 }}
                 >
                   <Text style={styles.primaryNavButtonText}>Next</Text>
                 </TouchableOpacity>
@@ -324,6 +424,10 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
                     isSubmitting && styles.disabledButton,
                   ]}
                   disabled={isSubmitting}
+                  accessibilityRole="button"
+                  accessibilityLabel="Complete feedback"
+                  accessibilityHint="Submit your feedback"
+                  accessibilityState={{ disabled: isSubmitting }}
                 >
                   <Text style={styles.primaryNavButtonText}>
                     {isSubmitting ? 'Submitting...' : 'Complete'}
@@ -455,6 +559,32 @@ const styles = StyleSheet.create({
   },
   primaryNavButtonText: {
     ...DesignSystem.typography.button.medium,
+    color: DesignSystem.colors.text.inverse,
+  },
+  errorContainer: {
+    backgroundColor: DesignSystem.colors.error[100],
+    borderLeftWidth: 4,
+    borderLeftColor: DesignSystem.colors.error[500],
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    marginHorizontal: 20,
+    marginBottom: 16,
+    borderRadius: 8,
+  },
+  errorText: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.error[700],
+    marginBottom: 8,
+  },
+  retryButton: {
+    backgroundColor: DesignSystem.colors.error[500],
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+  },
+  retryButtonText: {
+    ...DesignSystem.typography.button.small,
     color: DesignSystem.colors.text.inverse,
   },
 });

@@ -6,16 +6,48 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+  "NODE_ENV": "development"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+  "NODE_ENV": "staging",
+  "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "@preview_GOOGLE_IOS_CLIENT_ID",
+  "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "@preview_GOOGLE_ANDROID_CLIENT_ID"
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+  "NODE_ENV": "production",
+  "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "@prod_GOOGLE_IOS_CLIENT_ID",
+  "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "@prod_GOOGLE_ANDROID_CLIENT_ID"
+      },
+      "android": {
+        "buildType": "aab"
+      },
+      "ios": {
+        "bundleIdentifier": "com.guiprohuso.aynamoda"
+      }
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "./android-service-account.json",
+        "track": "internal"
+      },
+      "ios": {
+        "appleId": "your-apple-id@example.com",
+        "ascAppId": "your-app-store-connect-app-id",
+        "appleTeamId": "your-apple-team-id"
+      }
+    }
   }
 }

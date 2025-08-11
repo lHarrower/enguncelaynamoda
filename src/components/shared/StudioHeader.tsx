@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     borderLeftColor: DesignSystem.colors.sage[500],
   },
   messageText: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     lineHeight: 24,

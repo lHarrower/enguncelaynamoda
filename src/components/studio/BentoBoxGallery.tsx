@@ -52,7 +52,7 @@ const BentoBoxGallery: React.FC<BentoBoxGalleryProps> = ({
 
   useEffect(() => {
     // Fast, joyful entrance animation
-    galleryAnimation.value = withSpring(1, DesignSystem.animations.spring);
+    galleryAnimation.value = withSpring(1, DesignSystem.animations.spring.smooth);
   }, []);
 
   const getItemHeight = (size: string) => {
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   outfitSubtitle: {
-    ...DesignSystem.typography.caption.medium,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     marginBottom: 8,
   },
@@ -449,7 +449,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   confidenceText: {
-    ...DesignSystem.typography.caption.small,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
   },
   
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   moodSubtitle: {
-    ...DesignSystem.typography.caption.medium,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
@@ -499,12 +499,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   insightSubtitle: {
-    ...DesignSystem.typography.caption.medium,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     marginBottom: 8,
   },
   insightDescription: {
-    ...DesignSystem.typography.caption.medium,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
     lineHeight: 18,
   },
@@ -517,14 +517,14 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.md,
   },
   metricValue: {
-    ...DesignSystem.typography.heading.large,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.sage[500],
     fontSize: 32,
     fontWeight: '700',
     marginBottom: 4,
   },
   metricLabel: {
-    ...DesignSystem.typography.caption.medium,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: 8,
@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   metricTrendText: {
-    ...DesignSystem.typography.caption.small,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
     marginLeft: 4,
   },
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   actionSubtitle: {
-    ...DesignSystem.typography.caption.medium,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.inverse,
     textAlign: 'center',
     opacity: 0.9,
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   imageSubtitle: {
-    ...DesignSystem.typography.caption.medium,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.inverse,
     opacity: 0.9,
   },

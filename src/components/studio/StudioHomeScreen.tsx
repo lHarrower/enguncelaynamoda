@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { DesignSystem } from '@/theme/DesignSystem';
 import * as Haptics from 'expo-haptics';
+import { logInDev } from '@/utils/consoleSuppress';
 
 // Import components
 import { StudioHeader } from '@/components/shared/StudioHeader';
@@ -223,7 +224,7 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
   };
 
   const handleOutfitPress = (outfitId: string) => {
-    console.log('Outfit pressed:', outfitId);
+    logInDev('Outfit pressed:', outfitId);
     // Navigate to outfit details
   };
 
@@ -255,14 +256,14 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
           <MiniDiscoveryEngine
             items={personalizedItems}
             onLike={(item) => {
-              console.log('Liked personalized item:', item.title);
+              logInDev('Liked personalized item:', item.title);
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
             onDislike={(item) => {
-              console.log('Disliked personalized item:', item.title);
+              logInDev('Disliked personalized item:', item.title);
             }}
             onUndo={() => {
-              console.log('Undo last action');
+              logInDev('Undo last action');
             }}
           />
         </View>
@@ -318,10 +319,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingBottom: DesignSystem.spacing.massive,
+    paddingBottom: DesignSystem.spacing.sanctuary,
   },
   section: {
-    marginBottom: DesignSystem.spacing.massive,
+    marginBottom: DesignSystem.spacing.sanctuary,
   },
   outfitCard: {
     marginRight: DesignSystem.spacing.lg,

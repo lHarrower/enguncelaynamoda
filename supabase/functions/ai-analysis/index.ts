@@ -1,7 +1,6 @@
+/// <reference lib="deno.window" />
 // AYNAMODA AI Analysis Function - Security Hardened Version
 // This function performs AI-powered clothing analysis with strict security controls
-
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 import { corsHeaders } from '../_shared/cors.ts';
 
@@ -88,7 +87,7 @@ function extractDominantColors(cloudinaryResponse: any): string[] {
   }
 }
 
-serve(async (req: Request) => {
+Deno.serve(async (req: Request) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -142,8 +141,8 @@ serve(async (req: Request) => {
     
     // SECURITY: Verify ownership of the wardrobe item
     const { data: item, error: fetchError } = await supabase
-      .from('wardrobeItems')
-      .select('user_id, ai_cache')
+      .from('wardrobe_items')
+      .select('user_id, ai_analysis_data')
       .eq('id', itemId)
       .single();
       
@@ -158,13 +157,13 @@ serve(async (req: Request) => {
     }
     
     // CACHING: Check if AI analysis already exists
-    if (item.ai_cache && Object.keys(item.ai_cache).length > 0) {
+  if (item.ai_analysis_data && (typeof item.ai_analysis_data === 'object') && Object.keys(item.ai_analysis_data).length > 0) {
       console.log(`[AI Analysis] Cache hit for item ${itemId}`);
       return new Response(JSON.stringify({ 
         success: true, 
         itemId, 
         cached: true,
-        message: 'Using cached AI analysis'
+    analysis: item.ai_analysis_data
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -215,14 +214,14 @@ serve(async (req: Request) => {
       (t: any) => t.tag.toLowerCase()
     ) || [];
     
-    let aiMainCategory = 'Uncategorized';
-    let aiSubCategory = 'Uncategorized';
+  let aiMainCategory = 'uncategorized';
+  let aiSubCategory = 'uncategorized';
 
     // Match detected tags to our category mapping
     for (const tag of detectedTags) {
       if (TAG_TO_CATEGORY_MAP[tag]) {
-        aiMainCategory = TAG_TO_CATEGORY_MAP[tag].main;
-        aiSubCategory = TAG_TO_CATEGORY_MAP[tag].sub;
+  aiMainCategory = TAG_TO_CATEGORY_MAP[tag].main.toLowerCase();
+  aiSubCategory = TAG_TO_CATEGORY_MAP[tag].sub.toLowerCase();
         break;
       }
     }
@@ -238,13 +237,15 @@ serve(async (req: Request) => {
 
     // CRITICAL: Update ONLY the AI-specific columns
     const { error: updateError } = await supabase
-      .from('wardrobeItems')
+      .from('wardrobe_items')
       .update({
-        ai_cache: analysisResult,           // Store complete Cloudinary response
-        ai_main_category: aiMainCategory,   // AI-generated main category
-        ai_sub_category: aiSubCategory,     // AI-generated sub category  
-        ai_dominant_colors: aiDominantColors, // AI-extracted colors
-        // IMPORTANT: Do NOT touch user_* or main columns
+        ai_analysis_data: {
+          mainCategory: aiMainCategory,
+          subCategory: aiSubCategory,
+          dominantColors: aiDominantColors,
+          detectedTags: detectedTags.slice(0, 10),
+          raw: analysisResult,
+        }
       })
       .eq('id', itemId)
       .eq('user_id', user.id); // Extra security check
@@ -263,7 +264,7 @@ serve(async (req: Request) => {
         mainCategory: aiMainCategory,
         subCategory: aiSubCategory,
         dominantColors: aiDominantColors,
-        detectedTags: detectedTags.slice(0, 5) // Return first 5 tags for debugging
+        detectedTags: detectedTags.slice(0, 5)
       }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

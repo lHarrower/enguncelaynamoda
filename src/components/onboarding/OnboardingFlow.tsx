@@ -1,132 +1,86 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import VisualStyleDNAUpload from '@/components/onboarding/VisualStyleDNAUpload';
-import StyleDNASurvey from '@/components/onboarding/StyleDNASurvey';
-import WelcomeGift from '@/components/onboarding/WelcomeGift';
-import ConfidenceLoop from '@/components/onboarding/ConfidenceLoop';
-import { StyleDNAResults } from './StyleDNAResults';
-import { intelligenceService } from '@/services/intelligenceService';
-import { styleDNAService } from '@/services/styleDNAService';
+import OnboardingWelcome from '@/components/onboarding/OnboardingWelcome';
+import WardrobeSetupWizard from '@/components/onboarding/WardrobeSetupWizard';
+import StylePreferenceQuestionnaire, { StylePreferences } from '@/components/onboarding/StylePreferenceQuestionnaire';
+import NotificationPermissionRequest from '@/components/onboarding/NotificationPermissionRequest';
+import SampleOutfitGeneration from '@/components/onboarding/SampleOutfitGeneration';
+import { logInDev } from '@/utils/consoleSuppress';
 
 interface OnboardingFlowProps {
   onComplete: (userData: any) => void;
 }
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
-  const [currentStep, setCurrentStep] = useState<'upload' | 'results' | 'survey' | 'gift' | 'confidence' | 'complete'>('upload');
-  const [uploadedPhotos, setUploadedPhotos] = useState<any[]>([]);
-  const [styleDNA, setStyleDNA] = useState<any>(null);
-  const [isGeneratingStyleDNA, setIsGeneratingStyleDNA] = useState(false);
-  const [selectedOutfit, setSelectedOutfit] = useState<any>(null);
-  const [confidenceFeedback, setConfidenceFeedback] = useState<string>('');
-  const [showConfidenceLoop, setShowConfidenceLoop] = useState(false);
+  type Step = 'welcome' | 'wardrobe' | 'style' | 'notifications' | 'samples' | 'complete';
+  const [currentStep, setCurrentStep] = useState<Step>('welcome');
+  const [wardrobeItemsAdded, setWardrobeItemsAdded] = useState(0);
+  const [stylePreferences, setStylePreferences] = useState<StylePreferences | null>(null);
+  const [notificationPermissionGranted, setNotificationPermissionGranted] = useState(false);
 
-  const handlePhotoUploadComplete = async (photos: any[]) => {
-    setUploadedPhotos(photos);
-    setIsGeneratingStyleDNA(true);
-    
-    try {
-      // Generate Style DNA from uploaded photos
-      const generatedStyleDNA = await styleDNAService.generateStyleDNA(user?.id || 'anonymous', photos);
-      setStyleDNA(generatedStyleDNA);
-      console.log('[OnboardingFlow] Style DNA generated successfully:', generatedStyleDNA);
-    } catch (error) {
-      console.error('[OnboardingFlow] Failed to generate Style DNA:', error);
-      // Continue with flow even if Style DNA generation fails
-    } finally {
-      setIsGeneratingStyleDNA(false);
-      // Show results if Style DNA was generated, otherwise go to survey
-      setCurrentStep(generatedStyleDNA ? 'results' : 'survey');
-    }
-  };
+  const goNext = (next: Step) => setCurrentStep(next);
 
-  const handlePhotoUploadSkip = () => {
-    setCurrentStep('survey');
-  };
-  
-  const handleStyleDNAResultsContinue = () => {
-    setCurrentStep('survey');
-  };
+  const handleWelcomeNext = () => goNext('wardrobe');
+  const handleWardrobeNext = () => goNext('style');
+  const handleWardrobeSkip = () => goNext('style');
 
-  const handleSurveyComplete = (dnaData: any) => {
-    setStyleDNA({ ...dnaData, uploadedPhotos });
-    setCurrentStep('gift');
+  const handleStyleNext = (prefs: StylePreferences) => {
+    setStylePreferences(prefs);
+    goNext('notifications');
   };
+  const handleStyleSkip = () => goNext('notifications');
 
-  const handleOutfitSelect = (outfit: any, feedback: string) => {
-    setSelectedOutfit(outfit);
-    setConfidenceFeedback(feedback);
-    setShowConfidenceLoop(true);
+  const handleNotificationsNext = (granted: boolean) => {
+    setNotificationPermissionGranted(granted);
+    goNext('samples');
   };
+  const handleNotificationsSkip = () => goNext('samples');
 
-  const handleGiftComplete = () => {
-    if (!selectedOutfit) {
-      // If no outfit was selected, skip confidence loop
-      handleOnboardingComplete();
-    }
-    // Otherwise, confidence loop will handle completion
-  };
-
-  const handleConfidenceLoopClose = () => {
-    setShowConfidenceLoop(false);
-  };
-
-  const handleConfidenceLoopContinue = () => {
-    setShowConfidenceLoop(false);
-    handleOnboardingComplete();
-  };
-
-  const handleOnboardingComplete = () => {
-    const userData = {
-      styleDNA,
-      uploadedPhotos,
-      firstOutfitChoice: selectedOutfit,
-      onboardingCompleted: true,
-      onboardingDate: new Date().toISOString(),
-      confidenceLoopExperienced: !!selectedOutfit,
-      visualOnboardingCompleted: uploadedPhotos.length > 0,
+  const handleSamplesComplete = () => {
+    const data = {
+      notificationPermissionGranted,
+      wardrobeItemsAdded,
+      stylePreferences: stylePreferences || {
+        preferredStyles: [],
+        preferredColors: [],
+        occasions: [],
+        bodyTypePreferences: [],
+        confidenceNoteStyle: 'encouraging',
+      },
+      completedAt: new Date(),
     };
-
-    onComplete(userData);
+    onComplete(data);
   };
 
   return (
     <View style={styles.container}>
-      {currentStep === 'upload' && (
-        <VisualStyleDNAUpload
-          onComplete={handlePhotoUploadComplete}
-          onSkip={handlePhotoUploadSkip}
-          isGenerating={isGeneratingStyleDNA}
-        />
+      {currentStep === 'welcome' && (
+        <OnboardingWelcome onNext={handleWelcomeNext} />
       )}
-      
-      {currentStep === 'results' && styleDNA && (
-        <StyleDNAResults
-          styleDNA={styleDNA}
-          onContinue={handleStyleDNAResultsContinue}
-        />
-      )}
-      
-      {currentStep === 'survey' && (
-        <StyleDNASurvey onComplete={handleSurveyComplete} />
-      )}
-      
-      {currentStep === 'gift' && styleDNA && (
-        <WelcomeGift
-          styleDNA={styleDNA}
-          onComplete={handleGiftComplete}
-          onOutfitSelect={handleOutfitSelect}
+
+      {currentStep === 'wardrobe' && (
+        <WardrobeSetupWizard
+          onNext={handleWardrobeNext}
+          onSkip={handleWardrobeSkip}
         />
       )}
 
-      {selectedOutfit && (
-        <ConfidenceLoop
-          visible={showConfidenceLoop}
-          outfit={selectedOutfit}
-          feedback={confidenceFeedback}
-          onClose={handleConfidenceLoopClose}
-          onContinue={handleConfidenceLoopContinue}
+      {currentStep === 'style' && (
+        <StylePreferenceQuestionnaire
+          onNext={handleStyleNext}
+          onSkip={handleStyleSkip}
         />
+      )}
+
+      {currentStep === 'notifications' && (
+        <NotificationPermissionRequest
+          onNext={handleNotificationsNext}
+          onSkip={handleNotificationsSkip}
+        />
+      )}
+
+      {currentStep === 'samples' && (
+        <SampleOutfitGeneration onComplete={handleSamplesComplete} />
       )}
     </View>
   );

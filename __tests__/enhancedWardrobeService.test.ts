@@ -1,10 +1,10 @@
 // Enhanced Wardrobe Service - Unit Tests
-import { EnhancedWardrobeService } from '../services/enhancedWardrobeService';
-import { supabase } from '../config/supabaseClient';
-import { WardrobeItemRecord, UsageStats, UtilizationStats, ItemCategory } from '../types/aynaMirror';
+import { EnhancedWardrobeService } from '@/services/enhancedWardrobeService';
+import { supabase } from '@/config/supabaseClient';
+import { WardrobeItemRecord, UsageStats, UtilizationStats, ItemCategory } from '@/types/aynaMirror';
 
 // Mock Supabase client
-jest.mock('../config/supabaseClient', () => ({
+jest.mock('@/config/supabaseClient', () => ({
   supabase: {
     from: jest.fn(),
     rpc: jest.fn()
@@ -58,7 +58,7 @@ describe('EnhancedWardrobeService', () => {
 
       const result = await service.saveClothingItem(mockItem);
 
-      expect(mockSupabaseFrom).toHaveBeenCalledWith('wardrobeItems');
+  expect(mockSupabaseFrom).toHaveBeenCalledWith('wardrobe_items');
       expect(mockChain.insert).toHaveBeenCalledWith([{
         ...mockItem,
         usage_count: 0,
@@ -184,7 +184,7 @@ describe('EnhancedWardrobeService', () => {
 
       const result = await service.getUserWardrobe(mockUserId);
 
-      expect(mockSupabaseFrom).toHaveBeenCalledWith('wardrobeItems');
+  expect(mockSupabaseFrom).toHaveBeenCalledWith('wardrobe_items');
       expect(mockChain.select).toHaveBeenCalledWith('*');
       expect(mockChain.eq).toHaveBeenCalledWith('user_id', mockUserId);
       expect(mockChain.order).toHaveBeenCalledWith('created_at', { ascending: false });

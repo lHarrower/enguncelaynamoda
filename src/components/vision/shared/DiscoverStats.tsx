@@ -94,12 +94,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   statValue: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.charcoal[800],
     fontWeight: '700',
   },
   statLabel: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.charcoal[600],
     textAlign: 'center',
   },

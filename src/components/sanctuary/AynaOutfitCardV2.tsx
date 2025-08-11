@@ -19,6 +19,7 @@ import Animated, {
 
 import { Outfit } from '@/data/sanctuaryModels';
 import { DesignSystem } from '@/theme/DesignSystem';
+import { errorInDev } from '../../utils/consoleSuppress';
 
 // Animation configurations for React Native Reanimated
 const SPRING_CONFIG = {
@@ -128,7 +129,7 @@ export const AynaOutfitCardV2: React.FC<AynaOutfitCardV2Props> = ({
       }, 150);
       onPress();
     } catch (error) {
-      console.error('Error in outfit card press:', error);
+      errorInDev('Error in outfit card press:', error);
     }
   };
 
@@ -136,7 +137,7 @@ export const AynaOutfitCardV2: React.FC<AynaOutfitCardV2Props> = ({
     try {
       onFavorite?.();
     } catch (error) {
-      console.error('Error in favorite press:', error);
+      errorInDev('Error in favorite press:', error);
     }
   };
 
@@ -354,7 +355,7 @@ const createStyles = (dimensions: {
     opacity: 0.6,
   },
   fallbackText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     marginTop: DesignSystem.spacing.sm,
     fontSize: dimensions.isTablet ? 14 : 12,
@@ -390,7 +391,7 @@ const createStyles = (dimensions: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
   },
   moodTagText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.primary,
     textTransform: 'uppercase',
     fontSize: dimensions.isTablet ? 13 : 12,
@@ -414,13 +415,13 @@ const createStyles = (dimensions: {
     paddingBottom: dimensions.isTablet ? DesignSystem.spacing.xxxl : DesignSystem.spacing.xxl,
   },
   outfitName: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.sm,
     fontSize: dimensions.isTablet ? 22 : 20,
   },
   whisperText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.lg,
     lineHeight: dimensions.isTablet ? 26 : 24,
@@ -450,7 +451,7 @@ const createStyles = (dimensions: {
     alignItems: 'center',
   },
   moreItemsText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     fontSize: dimensions.isTablet ? 10 : 9,
   },
@@ -471,7 +472,7 @@ const createStyles = (dimensions: {
     borderRadius: DesignSystem.radius.sm,
   },
   confidenceText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     fontSize: dimensions.isTablet ? 11 : 10,
   },

@@ -47,21 +47,21 @@ export const onShare = async (
     if (result.action === Share.sharedAction) {
       if (result.activityType) {
         // Shared via specific app (iOS)
-        console.log('Shared via:', result.activityType);
+        // Shared via activity type
       } else {
         // Shared successfully (Android)
-        console.log('Content shared successfully');
+        // Content shared successfully
       }
       return true;
     } else if (result.action === Share.dismissedAction) {
       // User dismissed the share sheet
-      console.log('Share sheet dismissed');
+      // Share sheet dismissed
       return false;
     }
 
     return false;
   } catch (error) {
-    console.error('Error sharing content:', error);
+    // Error sharing content
     
     // Show user-friendly error message
     Alert.alert(

@@ -12,11 +12,11 @@ import { UNIFIED_COLORS, SPACING, ELEVATION } from '@/theme';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 import Text from '@/components/atoms/Text';
 
-export interface CardProps extends CardComponentProps {
+export interface CardProps extends Omit<CardComponentProps, 'variant'> {
   children: React.ReactNode;
   title?: string;
   subtitle?: string;
-  variant?: 'default' | 'elevated' | 'outlined' | 'glass' | 'luxury';
+  variant?: 'default' | 'elevated' | 'outlined' | 'glass' | 'luxury' | 'floating' | 'minimal';
   padding?: 'none' | 'small' | 'medium' | 'large';
   onPress?: () => void;
   disabled?: boolean;
@@ -41,18 +41,18 @@ const Card: React.FC<CardProps> = ({
   accessibilityLabel,
   ...props
 }) => {
-  const { triggerHaptic } = useHapticFeedback();
+  const { trigger } = useHapticFeedback();
 
   const handlePress = () => {
     if (onPress && !disabled) {
-      triggerHaptic('light');
+  trigger('light');
       onPress();
     }
   };
 
   const cardStyle = [
     styles.base,
-    styles[variant],
+    styles[variant as keyof typeof styles],
     styles[`${padding}Padding`],
     disabled && styles.disabled,
     style,
@@ -90,7 +90,7 @@ const Card: React.FC<CardProps> = ({
             </Text>
           )}
           {subtitle && (
-            <Text variant="body" color="600" style={styles.subtitle}>
+            <Text variant="body" color="slate" style={styles.subtitle}>
               {subtitle}
             </Text>
           )}
@@ -112,7 +112,7 @@ const Card: React.FC<CardProps> = ({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: SPACING.radius.large,
+  borderRadius: 12,
     backgroundColor: UNIFIED_COLORS.neutral[50],
     overflow: 'hidden',
   },
@@ -143,9 +143,9 @@ const styles = StyleSheet.create({
   },
   
   luxury: {
-    backgroundColor: UNIFIED_COLORS.luxury.cream,
+  backgroundColor: UNIFIED_COLORS.background.primary,
     borderWidth: 1,
-    borderColor: UNIFIED_COLORS.luxury.gold,
+  borderColor: UNIFIED_COLORS.gold[400],
     ...ELEVATION.high,
   },
   
@@ -155,15 +155,15 @@ const styles = StyleSheet.create({
   },
   
   smallPadding: {
-    padding: SPACING.padding.small,
+  padding: SPACING.small,
   },
   
   mediumPadding: {
-    padding: SPACING.padding.medium,
+  padding: SPACING.medium,
   },
   
   largePadding: {
-    padding: SPACING.padding.large,
+  padding: SPACING.large,
   },
   
   disabled: {
@@ -172,19 +172,19 @@ const styles = StyleSheet.create({
   
   imageContainer: {
     width: '100%',
-    marginBottom: SPACING.margin.small,
+  marginBottom: SPACING.small,
   },
   
   header: {
-    marginBottom: SPACING.margin.small,
+  marginBottom: SPACING.small,
   },
   
   titleContainer: {
-    marginBottom: SPACING.margin.medium,
+  marginBottom: SPACING.medium,
   },
   
   title: {
-    marginBottom: SPACING.margin.xs,
+  marginBottom: SPACING.xs,
   },
   
   subtitle: {
@@ -196,12 +196,11 @@ const styles = StyleSheet.create({
   },
   
   footer: {
-    marginTop: SPACING.margin.medium,
-    paddingTop: SPACING.padding.small,
+  marginTop: SPACING.medium,
+  paddingTop: SPACING.small,
     borderTopWidth: 1,
     borderTopColor: UNIFIED_COLORS.neutral[200],
   },
 });
 
 export default Card;
-export type { CardProps };

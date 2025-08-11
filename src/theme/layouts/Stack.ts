@@ -192,7 +192,7 @@ export const STACK_ITEMS = {
     
     // Pressed state for interactive items
     pressed: {
-      backgroundColor: UNIFIED_COLORS.sage[50],
+      backgroundColor: UNIFIED_COLORS.sage[100],
       ...ELEVATION.none,
       transform: [{ scale: 0.98 }],
     } as ViewStyle

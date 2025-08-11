@@ -57,7 +57,7 @@ const VellumCanvas: React.FC<VellumCanvasProps> = ({
       
       {/* Vignette for depth */}
       <LinearGradient
-        colors={['transparent', APP_THEME_V2.colors.moonlightSilver + '20']}
+        colors={['transparent', DesignSystem.colors.neutral[300] + '20']}
         locations={[0.7, 1]}
         style={styles.vignette}
         pointerEvents="none"

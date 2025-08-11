@@ -357,13 +357,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   outfitTitle: {
-    ...DesignSystem.typography.h1,
+    ...DesignSystem.typography.heading.h1,
     color: DesignSystem.colors.text.primary,
     marginBottom: 8,
     fontSize: 32,
   },
   outfitSubtitle: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
     marginBottom: 16,
   },
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   confidenceText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.accent,
   },
   
@@ -404,21 +404,21 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   whisperTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.accent,
     textAlign: 'center',
     marginBottom: 16,
     fontSize: 18,
   },
   whisperText: {
-    ...DesignSystem.typography.body,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 16,
     lineHeight: 24,
   },
   whisperSignature: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   componentLabel: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
@@ -464,14 +464,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   moodTitle: {
-    ...DesignSystem.typography.h1,
+    ...DesignSystem.typography.heading.h1,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: 12,
     fontSize: 28,
   },
   moodDescription: {
-    ...DesignSystem.typography.body,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   hintText: {
-    ...DesignSystem.typography.caption,
+    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
     marginLeft: 6,
     fontSize: 10,

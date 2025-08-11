@@ -23,7 +23,7 @@ import { DesignSystem } from '@/theme/DesignSystem';
 
 export interface StandardButtonProps extends ButtonComponentProps {
   /** Button gradient colors for luxury variants */
-  gradientColors?: string[];
+  gradientColors?: readonly [string, string, ...string[]];
   /** Shadow configuration */
   shadow?: boolean;
 }
@@ -175,10 +175,10 @@ const StandardButton: React.FC<StandardButtonProps> = ({
 
   const buttonStyle = [getButtonStyles(), style];
   const shouldUseGradient = variant === 'luxury' || gradientColors;
-  const finalGradientColors = gradientColors || [
+  const finalGradientColors = (gradientColors ?? [
     DesignSystem.colors.sage[500],
     DesignSystem.colors.sage[600],
-  ];
+  ]) as readonly [string, string, ...string[]];
 
   if (shouldUseGradient) {
     return (
@@ -334,16 +334,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// Default props
-StandardButton.defaultProps = {
-  variant: DEFAULT_PROPS.variant,
-  size: DEFAULT_PROPS.size,
-  disabled: DEFAULT_PROPS.disabled,
-  loading: DEFAULT_PROPS.loading,
-  hapticFeedback: DEFAULT_PROPS.hapticFeedback,
-  fullWidth: DEFAULT_PROPS.fullWidth,
-  iconPosition: 'left',
-  shadow: true,
-};
+// Defaults via parameter defaults are already applied at usage sites
 
 export default StandardButton;

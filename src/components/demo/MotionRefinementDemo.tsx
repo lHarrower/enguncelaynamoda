@@ -189,13 +189,13 @@ const styles = StyleSheet.create({
   },
   
   headerTitle: {
-    ...DesignSystem.typography.hero,
+    ...DesignSystem.typography.scale.h1,
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.xs,
   },
   
   headerSubtitle: {
-    ...DesignSystem.typography.body2,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     opacity: 0.8,
   },
@@ -221,13 +221,13 @@ const styles = StyleSheet.create({
   },
   
   demoTitle: {
-    ...DesignSystem.typography.h2,
+    ...DesignSystem.typography.heading.h2,
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.sm,
   },
   
   demoDescription: {
-    ...DesignSystem.typography.body1,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     marginBottom: DesignSystem.spacing.lg,
     lineHeight: 24,
@@ -252,13 +252,13 @@ const styles = StyleSheet.create({
   },
   
   physicsTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.md,
   },
   
   physicsPoint: {
-    ...DesignSystem.typography.body1,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     marginBottom: DesignSystem.spacing.sm,
     lineHeight: 22,
@@ -278,13 +278,13 @@ const styles = StyleSheet.create({
   },
   
   principleTitle: {
-    ...DesignSystem.typography.h3,
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.sm,
   },
   
   principleText: {
-    ...DesignSystem.typography.body1,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     lineHeight: 20,
   },

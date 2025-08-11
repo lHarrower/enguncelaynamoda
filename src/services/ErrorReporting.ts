@@ -191,7 +191,7 @@ export class ErrorReportingService {
       
       this.addBreadcrumb({
         category: 'system',
-        message: `Error reported: ${error.code}`,
+  message: `Error reported: ${error.category || 'unknown'}`,
         level: 'error',
         data: { errorId: report.id }
       });
@@ -378,7 +378,7 @@ export class ErrorReportingService {
     }
 
     // Check blacklisted errors
-    if (this.config.blacklistedErrors.includes(error.code)) {
+  if (this.config.blacklistedErrors.includes((error as any).code || error.category)) {
       return false;
     }
 
@@ -438,11 +438,20 @@ export class ErrorReportingService {
    * Sanitize error data
    */
   private sanitizeError(error: AppError): AppError {
-    const sanitized = { ...error };
+  const sanitized = { ...error } as AppError;
     
     // Remove sensitive data from error context
     if (sanitized.context) {
-      sanitized.context = this.sanitizeData(sanitized.context);
+      const base = sanitized.context;
+      const cleaned = this.sanitizeData(base as any);
+      sanitized.context = {
+        timestamp: base.timestamp,
+        platform: base.platform,
+        screen: base.screen,
+        action: base.action,
+        version: base.version,
+        additionalData: cleaned,
+      } as any;
     }
 
     return sanitized;

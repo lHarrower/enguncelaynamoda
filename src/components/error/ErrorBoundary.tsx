@@ -2,9 +2,7 @@
 import React, { Component, ReactNode, ErrorInfo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import errorHandler, { AppError, ErrorCategory, ErrorSeverity, RecoveryAction } from '../../utils/ErrorHandler';
-import { COLORS } from '../../theme/foundations/Colors';
-import { TYPOGRAPHY } from '../../theme/foundations/Typography';
-import { SPACING } from '../../theme/foundations/Spacing';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 /**
  * Error boundary state
@@ -322,90 +320,89 @@ export function withErrorBoundary<P extends object>(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background.primary,
+    backgroundColor: DesignSystem.colors.background.primary,
   },
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: SPACING.lg,
+    padding: DesignSystem.spacing.lg,
     minHeight: '100%',
   },
   iconContainer: {
-    marginBottom: SPACING.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   errorIcon: {
     fontSize: 64,
     textAlign: 'center',
   },
   title: {
-    ...TYPOGRAPHY.h2,
-    color: COLORS.text.primary,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: SPACING.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   message: {
-    ...TYPOGRAPHY.body,
-    color: COLORS.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: SPACING.xl,
+    marginBottom: DesignSystem.spacing.xl,
     lineHeight: 24,
   },
   debugContainer: {
-    backgroundColor: COLORS.background.secondary,
-    padding: SPACING.md,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    padding: DesignSystem.spacing.md,
     borderRadius: 8,
-    marginBottom: SPACING.lg,
+    marginBottom: DesignSystem.spacing.lg,
     width: '100%',
   },
   debugTitle: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.text.primary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '600',
-    marginBottom: SPACING.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   debugText: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.text.secondary,
-    marginBottom: SPACING.xs / 2,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.xs / 2,
     fontFamily: 'monospace',
   },
   actionsContainer: {
     width: '100%',
-    gap: SPACING.md,
+    gap: DesignSystem.spacing.md,
   },
   actionButton: {
-    backgroundColor: COLORS.background.secondary,
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.lg,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border.primary,
+    borderColor: DesignSystem.colors.border.primary,
   },
   primaryActionButton: {
-    backgroundColor: COLORS.primary[500],
-    borderColor: COLORS.primary[500],
+    backgroundColor: DesignSystem.colors.primary[500],
+    borderColor: DesignSystem.colors.primary[500],
   },
   disabledButton: {
-    backgroundColor: COLORS.background.disabled,
-    borderColor: COLORS.border.disabled,
+  opacity: 0.6,
   },
   actionButtonText: {
-    ...TYPOGRAPHY.button,
-    color: COLORS.text.primary,
+    ...DesignSystem.typography.button.medium,
+    color: DesignSystem.colors.text.primary,
   },
   primaryActionButtonText: {
-    color: COLORS.text.inverse,
+    color: DesignSystem.colors.text.inverse,
   },
   disabledButtonText: {
-    color: COLORS.text.disabled,
+    color: DesignSystem.colors.text.disabled,
   },
   retryInfo: {
-    ...TYPOGRAPHY.caption,
-    color: COLORS.text.secondary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    marginTop: SPACING.md,
+    marginTop: DesignSystem.spacing.md,
     fontStyle: 'italic',
   },
 });

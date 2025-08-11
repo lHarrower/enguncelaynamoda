@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { 
@@ -85,15 +85,15 @@ const PremiumTabBar: React.FC<PremiumTabBarProps> = ({ state, descriptors, navig
 
   React.useEffect(() => {
     // Update indicator position
-    const tabWidth = (width - PREMIUM_THEME.spacing.xl * 2) / tabs.length;
-    indicatorPosition.value = withSpring(activeIndex * tabWidth, PREMIUM_THEME.animation.silk);
+    const tabWidth = (width - DesignSystem.spacing.xl * 2) / tabs.length;
+    indicatorPosition.value = withSpring(activeIndex * tabWidth, DesignSystem.animations.spring.gentle);
 
     // Update tab animations
     tabAnimations.forEach((anim, index) => {
       const isActive = index === activeIndex;
-      anim.scale.value = withSpring(isActive ? 1.1 : 1, PREMIUM_THEME.animation.confident);
+      anim.scale.value = withSpring(isActive ? 1.1 : 1, DesignSystem.animations.spring.confident);
       anim.opacity.value = withTiming(isActive ? 1 : 0.6, { duration: 200 });
-      anim.translateY.value = withSpring(isActive ? -2 : 0, PREMIUM_THEME.animation.silk);
+      anim.translateY.value = withSpring(isActive ? -2 : 0, DesignSystem.animations.spring.gentle);
     });
   }, [activeIndex]);
 
@@ -143,13 +143,13 @@ const PremiumTabBar: React.FC<PremiumTabBarProps> = ({ state, descriptors, navig
           <Ionicons
             name={isActive ? tab.iconFocused : tab.icon}
             size={24}
-            color={isActive ? PREMIUM_THEME.semantic.text.primary : PREMIUM_THEME.semantic.text.tertiary}
+            color={isActive ? DesignSystem.colors.text.primary : DesignSystem.colors.text.tertiary}
           />
           <Text
             style={[
               styles.tabLabel,
               {
-                color: isActive ? PREMIUM_THEME.semantic.text.primary : PREMIUM_THEME.semantic.text.tertiary,
+                color: isActive ? DesignSystem.colors.text.primary : DesignSystem.colors.text.tertiary,
                 fontWeight: isActive ? '600' : '400',
               },
             ]}
@@ -163,7 +163,7 @@ const PremiumTabBar: React.FC<PremiumTabBarProps> = ({ state, descriptors, navig
   };
 
   const floatingIndicatorStyle = useAnimatedStyle(() => {
-    const tabWidth = (width - PREMIUM_THEME.spacing.xl * 2) / tabs.length;
+    const tabWidth = (width - DesignSystem.spacing.xl * 2) / tabs.length;
     
     return {
       transform: [{ translateX: indicatorPosition.value }],
@@ -198,35 +198,35 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: 0,
-    left: PREMIUM_THEME.spacing.lg,
-    right: PREMIUM_THEME.spacing.lg,
-    marginBottom: PREMIUM_THEME.spacing.lg,
+    left: DesignSystem.spacing.lg,
+    right: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   tabBarBackground: {
     ...StyleSheet.absoluteFillObject,
-    borderRadius: PREMIUM_THEME.radius.organic,
+    borderRadius: DesignSystem.borderRadius.xl,
     overflow: 'hidden',
-    ...PREMIUM_THEME.elevation.elevate,
+    ...DesignSystem.elevation.medium,
   },
   floatingIndicator: {
     position: 'absolute',
-    top: PREMIUM_THEME.spacing.xs,
+    top: DesignSystem.spacing.xs,
     height: 4,
-    backgroundColor: PREMIUM_THEME.colors.champagne[500],
+    backgroundColor: DesignSystem.colors.gold[500],
     borderRadius: 2,
-    ...PREMIUM_THEME.elevation.hover,
+    ...DesignSystem.elevation.soft,
   },
   tabsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: PREMIUM_THEME.spacing.sm,
-    paddingVertical: PREMIUM_THEME.spacing.md,
-    paddingTop: PREMIUM_THEME.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.md,
+    paddingTop: DesignSystem.spacing.lg,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: PREMIUM_THEME.spacing.sm,
+    paddingVertical: DesignSystem.spacing.sm,
   },
   tabContent: {
     alignItems: 'center',
@@ -234,19 +234,19 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   tabLabel: {
-    ...PREMIUM_THEME.typography.scale.caption,
-    marginTop: PREMIUM_THEME.spacing.xs,
+    ...DesignSystem.typography.scale.caption,
+    marginTop: DesignSystem.spacing.xs,
     fontSize: 10,
     letterSpacing: 0.5,
   },
   activeIndicator: {
     position: 'absolute',
-    bottom: -PREMIUM_THEME.spacing.md,
+    bottom: -DesignSystem.spacing.md,
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: PREMIUM_THEME.colors.champagne[500],
-    ...PREMIUM_THEME.elevation.hover,
+    backgroundColor: DesignSystem.colors.gold[500],
+    ...DesignSystem.elevation.soft,
   },
 });
 

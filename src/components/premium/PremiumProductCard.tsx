@@ -7,7 +7,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import { PREMIUM_THEME } from '@/constants/PremiumThemeSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, { 
@@ -55,17 +55,17 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
   const confidenceOpacity = useSharedValue(0);
 
   const handlePressIn = () => {
-    scale.value = withSpring(0.98, PREMIUM_THEME.animation.confident);
+    scale.value = withSpring(0.98, DesignSystem.animations.spring.confident);
   };
 
   const handlePressOut = () => {
-    scale.value = withSpring(1, PREMIUM_THEME.animation.silk);
+    scale.value = withSpring(1, DesignSystem.animations.spring.gentle);
   };
 
   const handleLike = () => {
     likeScale.value = withSequence(
-      withSpring(1.3, PREMIUM_THEME.animation.confident),
-      withSpring(1, PREMIUM_THEME.animation.silk)
+      withSpring(1.3, DesignSystem.animations.spring.confident),
+      withSpring(1, DesignSystem.animations.spring.gentle)
     );
     onLike?.();
   };
@@ -178,7 +178,7 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
               <Ionicons
                 name={product.isLiked ? 'heart' : 'heart-outline'}
                 size={20}
-                color={product.isLiked ? PREMIUM_THEME.semantic.status.error : PREMIUM_THEME.semantic.text.primary}
+                color={product.isLiked ? DesignSystem.colors.status.error : DesignSystem.colors.text.primary}
               />
             </View>
           </AnimatedTouchableOpacity>
@@ -213,10 +213,10 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     flex: 1,
-    borderRadius: PREMIUM_THEME.radius.lg,
+    borderRadius: DesignSystem.borderRadius.lg,
     overflow: 'hidden',
     position: 'relative',
-    marginBottom: PREMIUM_THEME.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   productImage: {
     width: '100%',
@@ -227,8 +227,8 @@ const styles = StyleSheet.create({
   },
   likeButton: {
     position: 'absolute',
-    top: PREMIUM_THEME.spacing.sm,
-    right: PREMIUM_THEME.spacing.sm,
+    top: DesignSystem.spacing.sm,
+    right: DesignSystem.spacing.sm,
   },
   likeButtonBackground: {
     width: 36,
@@ -237,87 +237,87 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
-    ...PREMIUM_THEME.elevation.hover,
+    ...DesignSystem.elevation.soft,
   },
   categoryBadge: {
     position: 'absolute',
-    top: PREMIUM_THEME.spacing.sm,
-    left: PREMIUM_THEME.spacing.sm,
+    top: DesignSystem.spacing.sm,
+    left: DesignSystem.spacing.sm,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingHorizontal: PREMIUM_THEME.spacing.sm,
-    paddingVertical: PREMIUM_THEME.spacing.xs,
-    borderRadius: PREMIUM_THEME.radius.sm,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
+    borderRadius: DesignSystem.borderRadius.sm,
   },
   categoryText: {
-    ...PREMIUM_THEME.typography.scale.caption,
-    color: PREMIUM_THEME.semantic.text.inverse,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.inverse,
     fontSize: 10,
   },
   productInfo: {
-    paddingHorizontal: PREMIUM_THEME.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.xs,
   },
   brandName: {
-    ...PREMIUM_THEME.typography.scale.caption,
-    color: PREMIUM_THEME.semantic.text.accent,
-    marginBottom: PREMIUM_THEME.spacing.xs,
+    ...DesignSystem.typography.scale.caption,
+  color: DesignSystem.colors.gold[600],
+    marginBottom: DesignSystem.spacing.xs,
     fontWeight: '600',
   },
   productName: {
-    ...PREMIUM_THEME.typography.scale.body2,
-    color: PREMIUM_THEME.semantic.text.primary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '500',
-    marginBottom: PREMIUM_THEME.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
     lineHeight: 20,
   },
   productPrice: {
-    ...PREMIUM_THEME.typography.scale.body1,
-    color: PREMIUM_THEME.semantic.text.primary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
     fontWeight: '700',
-    marginBottom: PREMIUM_THEME.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   confidenceContainer: {
-    marginBottom: PREMIUM_THEME.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   confidenceLabel: {
-    ...PREMIUM_THEME.typography.scale.caption,
-    color: PREMIUM_THEME.semantic.text.secondary,
-    marginBottom: PREMIUM_THEME.spacing.xs,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.xs,
     fontSize: 10,
   },
   confidenceTrack: {
     height: 3,
-    backgroundColor: PREMIUM_THEME.semantic.border.secondary,
+    backgroundColor: DesignSystem.colors.border.secondary,
     borderRadius: 1.5,
     overflow: 'hidden',
-    marginBottom: PREMIUM_THEME.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   confidenceBar: {
     height: '100%',
-    backgroundColor: PREMIUM_THEME.colors.champagne[500],
+    backgroundColor: DesignSystem.colors.gold[500],
     borderRadius: 1.5,
   },
   confidenceValue: {
-    ...PREMIUM_THEME.typography.scale.caption,
-    color: PREMIUM_THEME.colors.champagne[600],
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.gold[600],
     fontSize: 10,
     fontWeight: '600',
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: PREMIUM_THEME.spacing.xs,
+    gap: DesignSystem.spacing.xs,
   },
   tag: {
-    backgroundColor: PREMIUM_THEME.semantic.surface.secondary,
-    paddingHorizontal: PREMIUM_THEME.spacing.sm,
-    paddingVertical: PREMIUM_THEME.spacing.xs,
-    borderRadius: PREMIUM_THEME.radius.sm,
+    backgroundColor: DesignSystem.colors.surface.secondary,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
+    borderRadius: DesignSystem.borderRadius.sm,
     borderWidth: 0.5,
-    borderColor: PREMIUM_THEME.semantic.border.secondary,
+    borderColor: DesignSystem.colors.border.secondary,
   },
   tagText: {
-    ...PREMIUM_THEME.typography.scale.caption,
-    color: PREMIUM_THEME.semantic.text.secondary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
     fontSize: 9,
   },
 });

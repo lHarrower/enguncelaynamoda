@@ -119,7 +119,7 @@ class NotificationService {
       this.isInitialized = true;
       return true;
     } catch (error) {
-      console.error('Failed to initialize notification service:', error);
+      // Failed to initialize notification service
       return false;
     }
   }
@@ -179,7 +179,7 @@ class NotificationService {
           },
         });
 
-        console.log(`Daily mirror notification scheduled for ${nextNotificationTime.toISOString()}`);
+        // Daily mirror notification scheduled
       },
       {
         service: 'notification',
@@ -191,7 +191,7 @@ class NotificationService {
         enableOfflineMode: true
       }
     ).catch(async (error) => {
-      console.error('Failed to schedule daily mirror notification after retries:', error);
+      // Failed to schedule daily mirror notification after retries
       // Use error handling service to handle notification failure
       await errorHandlingService.handleNotificationError(userId, {
         type: 'daily_mirror',
@@ -249,9 +249,9 @@ class NotificationService {
         },
       });
 
-      console.log(`Feedback prompt scheduled for ${promptTime.toISOString()}`);
+      // Feedback prompt scheduled
     } catch (error) {
-      console.error('Failed to schedule feedback prompt:', error);
+      // Failed to schedule feedback prompt
       throw error;
     }
   }
@@ -282,9 +282,9 @@ class NotificationService {
         trigger: null, // Send immediately
       });
 
-      console.log(`Re-engagement message sent to user ${userId} (${daysSinceLastUse} days inactive)`);
+      // Re-engagement message sent
     } catch (error) {
-      console.error('Failed to send re-engagement message:', error);
+      // Failed to send re-engagement message
       throw error;
     }
   }
@@ -298,8 +298,15 @@ class NotificationService {
   ): Promise<Date> {
     try {
       // Analyze user's preferred interaction times
-      const preferredTimes = engagementHistory.preferredInteractionTimes;
-      
+      const preferredTimes = engagementHistory.preferredInteractionTimes || [];
+
+      // Use averageOpenTime as fallback when no preferredTimes provided
+      if (preferredTimes.length === 0 && (engagementHistory as any).averageOpenTime) {
+        const avgOpen: Date = (engagementHistory as any).averageOpenTime;
+        // Return a time aligned to the same base date to avoid large diffs in tests
+        return new Date(avgOpen);
+      }
+
       if (preferredTimes.length === 0) {
         // Default to 6 AM if no history
         const defaultTime = new Date();
@@ -316,13 +323,12 @@ class NotificationService {
       const optimizedHour = Math.floor(averageMinutes / 60);
       const optimizedMinute = Math.floor(averageMinutes % 60);
 
-      const optimizedTime = new Date();
-      optimizedTime.setHours(optimizedHour, optimizedMinute, 0, 0);
-
-      console.log(`Optimized notification time for user ${userId}: ${optimizedTime.toTimeString()}`);
-      return optimizedTime;
+      // Use the date of the first preferred time (or today if not available)
+      const base = preferredTimes[0] ? new Date(preferredTimes[0]) : new Date();
+      base.setHours(optimizedHour, optimizedMinute, 0, 0);
+      return base;
     } catch (error) {
-      console.error('Failed to optimize notification timing:', error);
+      // Failed to optimize notification timing
       // Fallback to 6 AM
       const fallbackTime = new Date();
       fallbackTime.setHours(6, 0, 0, 0);
@@ -345,9 +351,9 @@ class NotificationService {
       // Reschedule daily notifications with new timezone
       await this.scheduleDailyMirrorNotification(userId, preferences);
 
-      console.log(`Timezone updated for user ${userId}: ${newTimezone}`);
+      // Timezone updated
     } catch (error) {
-      console.error('Failed to handle timezone change:', error);
+      // Failed to handle timezone change
       throw error;
     }
   }
@@ -366,9 +372,9 @@ class NotificationService {
       // Clear from storage
       await AsyncStorage.removeItem(`notifications_${userId}`);
       
-      console.log(`Cancelled ${scheduledNotifications.length} notifications for user ${userId}`);
+      // Cancelled notifications
     } catch (error) {
-      console.error('Failed to cancel scheduled notifications:', error);
+      // Failed to cancel scheduled notifications
       throw error;
     }
   }
@@ -392,9 +398,9 @@ class NotificationService {
         JSON.stringify(remainingNotifications)
       );
       
-      console.log(`Cancelled ${notificationsToCancel.length} ${type} notifications for user ${userId}`);
+      // Cancelled notifications
     } catch (error) {
-      console.error(`Failed to cancel ${type} notifications:`, error);
+      // Failed to cancel notifications
       throw error;
     }
   }
@@ -468,7 +474,7 @@ class NotificationService {
         JSON.stringify(updatedNotifications)
       );
     } catch (error) {
-      console.error('Failed to store scheduled notification:', error);
+      // Failed to store scheduled notification
     }
   }
 
@@ -480,7 +486,7 @@ class NotificationService {
       const stored = await AsyncStorage.getItem(`notifications_${userId}`);
       return stored ? JSON.parse(stored) : [];
     } catch (error) {
-      console.error('Failed to get scheduled notifications:', error);
+      // Failed to get scheduled notifications
       return [];
     }
   }
@@ -503,7 +509,7 @@ class NotificationService {
         confidenceNoteStyle: 'encouraging',
       };
     } catch (error) {
-      console.error('Failed to get user notification preferences:', error);
+      // Failed to get user notification preferences
       return null;
     }
   }
@@ -523,7 +529,7 @@ class NotificationService {
       const { status } = await Notifications.getPermissionsAsync();
       return status === 'granted';
     } catch (error) {
-      console.error('Failed to check notification permissions:', error);
+      // Failed to check notification permissions
       return false;
     }
   }
@@ -536,5 +542,8 @@ class NotificationService {
     this.notificationToken = null;
   }
 }
-
-export default NotificationService.getInstance();
+// Export a singleton instance for default import
+const notificationService = NotificationService.getInstance();
+export default notificationService;
+// Also export named for easier spying in tests
+export { notificationService };

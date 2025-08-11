@@ -35,7 +35,7 @@ export interface ColorTheme {
   primaryColor: string;
   secondaryColor: string;
   accentColor: string;
-  gradientColors: string[];
+  gradientColors: readonly string[];
   description: string;
   week: string;
   heroImage: string;
@@ -232,7 +232,7 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
       {/* Hero Section */}
       <View style={styles.heroSection}>
         <LinearGradient
-          colors={colorTheme.gradientColors}
+          colors={colorTheme.gradientColors as unknown as readonly [string, string, ...string[]]}
           style={styles.heroGradient}
         >
           <Image
@@ -243,7 +243,7 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
           
           {/* Hero Content Overlay */}
           <LinearGradient
-            colors={['rgba(0,0,0,0.3)', 'transparent', 'rgba(0,0,0,0.6)']}
+            colors={['rgba(0,0,0,0.3)', 'transparent', 'rgba(0,0,0,0.6)'] as const}
             style={styles.heroOverlay}
           >
             <View style={styles.heroContent}>

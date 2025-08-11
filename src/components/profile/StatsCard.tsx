@@ -1,153 +1,186 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { memo, useMemo } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/context/ThemeContext';
-import { DIMENSIONS, SPACING } from '@/constants/AppConstants';
+import Animated, { FadeInUp, FadeInRight } from 'react-native-reanimated';
 
-interface UserStats {
-  wardrobeItems: number;
-  favoriteItems: number;
-  followingBoutiques: number;
-  totalSaved: number;
-  thisMonthSaved: number;
-  stylesCreated: number;
+const { width: screenWidth } = Dimensions.get('window');
+
+interface StatItemProps {
+  icon: keyof typeof Ionicons.glyphMap;
+  value: string;
+  label: string;
+  color: string;
+  delay?: number;
 }
 
 interface StatsCardProps {
-  stats: UserStats;
-  onStatPress: (statType: string) => void;
+  totalItems?: number;
+  favoriteItems?: number;
+  recentlyAdded?: number;
+  categories?: number;
+  onPress?: () => void;
 }
 
-export const StatsCard: React.FC<StatsCardProps> = ({ stats, onStatPress }) => {
-  const { colors, isDark } = useTheme();
+const StatItem = memo<StatItemProps>(({ icon, value, label, color, delay = 0 }) => {
 
-  const statItems = [
-    { 
-      key: 'wardrobe', 
-      label: 'Wardrobe Items', 
-      value: stats.wardrobeItems, 
-      icon: 'shirt-outline' as keyof typeof Ionicons.glyphMap,
-      color: colors.tint 
-    },
-    { 
-      key: 'favorites', 
-      label: 'Favorites', 
-      value: stats.favoriteItems, 
-      icon: 'heart-outline' as keyof typeof Ionicons.glyphMap,
-      color: colors.accentOrange 
-    },
-    { 
-      key: 'boutiques', 
-      label: 'Following', 
-      value: stats.followingBoutiques, 
-      icon: 'storefront-outline' as keyof typeof Ionicons.glyphMap,
-      color: colors.accentGreen 
-    },
-    { 
-      key: 'saved', 
-      label: 'Total Saved', 
-      value: `$${stats.totalSaved}`, 
-      icon: 'cash-outline' as keyof typeof Ionicons.glyphMap,
-      color: colors.tint 
-    },
-  ];
-
-  const styles = StyleSheet.create({
-    container: {
-      backgroundColor: colors.card,
-      borderRadius: DIMENSIONS.BORDER_RADIUS_LARGE,
-      padding: SPACING.LG,
-      marginVertical: SPACING.LG,
-      shadowColor: isDark ? '#000' : colors.tint,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: colors.text,
-      marginBottom: SPACING.LG,
-    },
-    statsGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      justifyContent: 'space-between',
-    },
+  
+  const styles = useMemo(() => StyleSheet.create({
     statItem: {
-      width: '48%',
-      backgroundColor: colors.background,
-      borderRadius: DIMENSIONS.BORDER_RADIUS_MEDIUM,
-      padding: SPACING.MD,
-      marginBottom: SPACING.MD,
       alignItems: 'center',
-      borderWidth: 1,
-      borderColor: colors.border,
+      flex: 1,
+      paddingVertical: DesignSystem.spacing.medium,
     },
-    statIcon: {
-      marginBottom: SPACING.SM,
+    iconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: color + '20',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: DesignSystem.spacing.small,
     },
     statValue: {
       fontSize: 20,
-      fontWeight: 'bold',
-      color: colors.text,
-      marginBottom: SPACING.XS,
+      fontWeight: '700',
+      color: DesignSystem.colors.text.primary,
+      marginBottom: 2,
     },
     statLabel: {
       fontSize: 12,
-      color: colors.text,
-      opacity: 0.7,
+      color: DesignSystem.colors.text.secondary,
       textAlign: 'center',
+      fontWeight: '500',
     },
-    monthlySection: {
-      marginTop: SPACING.MD,
-      paddingTop: SPACING.MD,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
+  }), [color]);
+
+  return (
+    <Animated.View 
+      entering={FadeInUp.delay(delay).duration(600)}
+      style={styles.statItem}
+    >
+      <View style={styles.iconContainer}>
+        <Ionicons name={icon} size={24} color={color} />
+      </View>
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </Animated.View>
+  );
+});
+
+const StatsCard: React.FC<StatsCardProps> = ({
+  totalItems = 127,
+  favoriteItems = 23,
+  recentlyAdded = 8,
+  categories = 12,
+  onPress
+}) => {
+
+  
+  const statsConfig = useMemo(() => [
+    {
+      icon: 'shirt-outline' as keyof typeof Ionicons.glyphMap,
+      value: totalItems.toString(),
+      label: 'Total Items',
+      color: DesignSystem.colors.semantic.success,
+      delay: 0
+    },
+    {
+      icon: 'heart' as keyof typeof Ionicons.glyphMap,
+      value: favoriteItems.toString(),
+      label: 'Favorites',
+      color: DesignSystem.colors.semantic.error,
+      delay: 100
+    },
+    {
+      icon: 'add-circle-outline' as keyof typeof Ionicons.glyphMap,
+      value: `+${recentlyAdded}`,
+      label: 'This Week',
+      color: DesignSystem.colors.semantic.warning,
+      delay: 200
+    },
+    {
+      icon: 'grid-outline' as keyof typeof Ionicons.glyphMap,
+      value: categories.toString(),
+      label: 'Categories',
+      color: DesignSystem.colors.primary[500],
+      delay: 300
+    }
+  ], [totalItems, favoriteItems, recentlyAdded, categories]);
+  
+  const styles = useMemo(() => StyleSheet.create({
+    container: {
+      backgroundColor: DesignSystem.colors.background.elevated,
+      marginHorizontal: DesignSystem.spacing.large,
+      marginVertical: DesignSystem.spacing.medium,
+      borderRadius: DesignSystem.borderRadius.large,
+      padding: DesignSystem.spacing.large,
+      borderWidth: 1,
+      borderColor: DesignSystem.colors.border.primary,
+      shadowColor: DesignSystem.colors.shadow.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    header: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+      marginBottom: DesignSystem.spacing.large,
+      paddingBottom: DesignSystem.spacing.medium,
+      borderWidth: 1,
+      borderBottomColor: DesignSystem.colors.border.secondary,
     },
-    monthlyText: {
+    title: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: DesignSystem.colors.text.primary,
+    },
+    subtitle: {
       fontSize: 14,
-      color: colors.text,
+      color: DesignSystem.colors.text.secondary,
+      marginTop: 2,
     },
-    monthlyValue: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      color: colors.tint,
+    statsContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
     },
-  });
+  }), []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Your Fashion Stats</Text>
-      
-      <View style={styles.statsGrid}>
-        {statItems.map((stat) => (
-          <TouchableOpacity 
-            key={stat.key}
-            style={styles.statItem}
-            onPress={() => onStatPress(stat.key)}
-          >
-            <View style={styles.statIcon}>
-              <Ionicons 
-                name={stat.icon} 
-                size={DIMENSIONS.ICON_SIZE_LARGE} 
-                color={stat.color} 
-              />
-            </View>
-            <Text style={styles.statValue}>{stat.value}</Text>
-            <Text style={styles.statLabel}>{stat.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <View style={styles.monthlySection}>
-        <Text style={styles.monthlyText}>Saved This Month</Text>
-        <Text style={styles.monthlyValue}>${stats.thisMonthSaved}</Text>
-      </View>
-    </View>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.95}>
+      <Animated.View 
+        entering={FadeInRight.duration(800)}
+        style={styles.container}
+      >
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.title}>Wardrobe Stats</Text>
+            <Text style={styles.subtitle}>Your collection overview</Text>
+          </View>
+          <Ionicons 
+            name="analytics-outline" 
+            size={24} 
+            color={DesignSystem.colors.primary[500]} 
+          />
+        </View>
+        
+        <View style={styles.statsContainer}>
+          {statsConfig.map((stat, index) => (
+            <StatItem
+              key={stat.label}
+              icon={stat.icon}
+              value={stat.value}
+              label={stat.label}
+              color={stat.color}
+              delay={stat.delay}
+            />
+          ))}
+        </View>
+      </Animated.View>
+    </TouchableOpacity>
   );
 };
+
+export default memo(StatsCard);

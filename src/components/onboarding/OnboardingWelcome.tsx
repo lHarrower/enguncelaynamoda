@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import { APP_THEME_V2 } from '@/constants/AppThemeV2';
+import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 
 const { width, height } = Dimensions.get('window');
@@ -16,7 +16,7 @@ export default function OnboardingWelcome({ onNext }: OnboardingWelcomeProps) {
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={[APP_THEME_V2.colors.linen.light, APP_THEME_V2.colors.linen.base]}
+        colors={[DesignSystem.colors.neutral[50], DesignSystem.colors.neutral[100]]}
         style={styles.gradient}
       >
         {/* Background Pattern */}
@@ -72,20 +72,20 @@ export default function OnboardingWelcome({ onNext }: OnboardingWelcomeProps) {
               Ready to start your confidence journey?
             </Text>
             
-            <Animated.Pressable
-              style={({ pressed }) => [
+            <Pressable
+              style={({ pressed }: { pressed: boolean }) => [
                 styles.continueButton,
                 pressed && styles.continueButtonPressed
               ]}
               onPress={onNext}
             >
               <LinearGradient
-                colors={[APP_THEME_V2.colors.sageGreen[400], APP_THEME_V2.colors.sageGreen[600]]}
+                colors={[DesignSystem.colors.sage[400], DesignSystem.colors.sage[600]]}
                 style={styles.buttonGradient}
               >
                 <Text style={styles.continueButtonText}>Begin Your Journey</Text>
               </LinearGradient>
-            </Animated.Pressable>
+            </Pressable>
           </Animated.View>
         </View>
       </LinearGradient>
@@ -107,96 +107,96 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     opacity: 0.1,
-    backgroundColor: APP_THEME_V2.colors.sageGreen[100],
+    backgroundColor: DesignSystem.colors.sage[100],
   },
   content: {
     flex: 1,
-    paddingHorizontal: APP_THEME_V2.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
     justifyContent: 'space-between',
-    paddingTop: APP_THEME_V2.spacing.xxxl,
-    paddingBottom: APP_THEME_V2.spacing.xl,
+    paddingTop: DesignSystem.spacing.xxxl,
+    paddingBottom: DesignSystem.spacing.xl,
   },
   heroSection: {
     alignItems: 'center',
-    marginTop: APP_THEME_V2.spacing.xxxl,
+    marginTop: DesignSystem.spacing.xxxl,
   },
   heroTitle: {
-    ...APP_THEME_V2.typography.scale.hero,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h1,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.sm,
+    marginBottom: DesignSystem.spacing.sm,
   },
   heroSubtitle: {
-    ...APP_THEME_V2.typography.scale.whisper,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
   descriptionSection: {
     flex: 1,
     justifyContent: 'center',
-    marginVertical: APP_THEME_V2.spacing.xxxl,
+    marginVertical: DesignSystem.spacing.xxxl,
   },
   descriptionCard: {
-    ...APP_THEME_V2.glassmorphism.subtle,
-    borderRadius: APP_THEME_V2.radius.organic,
-    padding: APP_THEME_V2.spacing.xl,
-    ...APP_THEME_V2.elevation.lift,
+    ...DesignSystem.effects.elevation.subtle,
+    borderRadius: DesignSystem.borderRadius.xl,
+    padding: DesignSystem.spacing.xl,
+    ...DesignSystem.elevation.medium,
   },
   descriptionTitle: {
-    ...APP_THEME_V2.typography.scale.h2,
-    color: APP_THEME_V2.semantic.text.primary,
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.lg,
+    marginBottom: DesignSystem.spacing.lg,
   },
   descriptionText: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   featureList: {
-    gap: APP_THEME_V2.spacing.md,
+    gap: DesignSystem.spacing.md,
   },
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: APP_THEME_V2.spacing.sm,
+    paddingVertical: DesignSystem.spacing.sm,
   },
   featureIcon: {
     fontSize: 20,
-    marginRight: APP_THEME_V2.spacing.md,
+    marginRight: DesignSystem.spacing.md,
     width: 30,
   },
   featureText: {
-    ...APP_THEME_V2.typography.scale.body2,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     flex: 1,
   },
   actionSection: {
     alignItems: 'center',
   },
   actionText: {
-    ...APP_THEME_V2.typography.scale.body1,
-    color: APP_THEME_V2.semantic.text.secondary,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    marginBottom: APP_THEME_V2.spacing.xl,
+    marginBottom: DesignSystem.spacing.xl,
   },
   continueButton: {
-    borderRadius: APP_THEME_V2.radius.organic,
-    ...APP_THEME_V2.elevation.lift,
+    borderRadius: DesignSystem.borderRadius.xl,
+    ...DesignSystem.elevation.medium,
   },
   continueButtonPressed: {
     transform: [{ scale: 0.98 }],
   },
   buttonGradient: {
-    paddingHorizontal: APP_THEME_V2.spacing.xxxl,
-    paddingVertical: APP_THEME_V2.spacing.lg,
-    borderRadius: APP_THEME_V2.radius.organic,
+    paddingHorizontal: DesignSystem.spacing.xxxl,
+    paddingVertical: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.borderRadius.xl,
     alignItems: 'center',
   },
   continueButtonText: {
-    ...APP_THEME_V2.typography.scale.button,
-    color: APP_THEME_V2.semantic.text.inverse,
+    ...DesignSystem.typography.button,
+    color: DesignSystem.colors.text.inverse,
   },
 });

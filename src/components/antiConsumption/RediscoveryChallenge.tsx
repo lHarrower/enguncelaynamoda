@@ -9,10 +9,11 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/theme/ThemeProvider';
+import { useSafeTheme } from '@/hooks/useSafeTheme';
 import { antiConsumptionService, RediscoveryChallenge as RediscoveryChallengeType } from '@/services/antiConsumptionService';
-import { WardrobeItem } from '@/types';
+import { WardrobeItem } from '@/services/wardrobeService';
 import { DesignSystem } from '@/theme/DesignSystem';
+import { errorInDev } from '../../utils/consoleSuppress';
 
 interface RediscoveryChallengeProps {
   userId: string;
@@ -27,7 +28,8 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
   onChallengeComplete,
   onItemWorn,
 }) => {
-  const { colors } = useTheme();
+  const theme = useSafeTheme();
+  const { colors } = theme;
   const styles = createStyles(colors);
   const [challenge, setChallenge] = useState<RediscoveryChallengeType | null>(initialChallenge || null);
   const [loading, setLoading] = useState(!initialChallenge);
@@ -47,7 +49,7 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
       setChallenge(newChallenge);
     } catch (err) {
       setError('Failed to create challenge');
-      console.error('Error creating rediscovery challenge:', err);
+      errorInDev('Error creating rediscovery challenge:', err);
     } finally {
       setLoading(false);
     }
@@ -182,7 +184,7 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View style={[styles.iconContainer, { backgroundColor: `${challengeColor}20` }]}>
-          <Ionicons name={challengeIcon} size={24} color={challengeColor} />
+          <Ionicons name={challengeIcon as keyof typeof Ionicons.glyphMap} size={24} color={challengeColor} />
         </View>
         <Text style={styles.title}>{challenge.title}</Text>
         <Text style={styles.description}>{challenge.description}</Text>
@@ -244,7 +246,9 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
                 onPress={() => !isWorn && !isCompleted && handleItemWorn(item)}
                 disabled={isWorn || isCompleted}
               >
-                <Image source={{ uri: item.imageUri }} style={styles.itemImage} />
+                {'imageUri' in item ? (
+                  <Image source={{ uri: (item as any).imageUri }} style={styles.itemImage} />
+                ) : null}
                 {isWorn && (
                   <View style={styles.wornOverlay}>
                     <Ionicons name="checkmark-circle" size={24} color="white" />
@@ -269,12 +273,12 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
                       />
                     ))}
                   </View>
-                  {item.tags.length > 0 && (
+          {Array.isArray(item.tags) && item.tags.length > 0 && (
                     <Text style={[
                       styles.itemTags,
                       isWorn && styles.itemTagsWorn
                     ]}>
-                      {item.tags.slice(0, 2).join(', ')}
+            {item.tags.slice(0, 2).join(', ')}
                     </Text>
                   )}
                 </View>

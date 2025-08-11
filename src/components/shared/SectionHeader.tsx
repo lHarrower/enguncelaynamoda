@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     borderRadius: DesignSystem.radius.sm,
   },
   actionText: {
-    ...DesignSystem.typography.scale.body1,
+  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.sage[600],
     fontWeight: '500',
   },

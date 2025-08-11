@@ -164,16 +164,64 @@ CREATE OR REPLACE FUNCTION calculate_item_compatibility(
 )
 RETURNS DECIMAL(3,2) AS $$
 DECLARE
-  compatibility_score DECIMAL(3,2) := 0.5; -- Default neutral score
+  compatibility_score DECIMAL(3,2) := 0.0;
+  item1_record RECORD;
+  item2_record RECORD;
+  color_score DECIMAL(3,2) := 0.0;
+  style_score DECIMAL(3,2) := 0.0;
+  category_score DECIMAL(3,2) := 0.0;
 BEGIN
-  -- TODO: Implement actual compatibility logic based on:
-  -- - Color harmony
-  -- - Style matching
-  -- - Occasion appropriateness
-  -- - User feedback history
+  -- Get item details
+  SELECT category, color, style, tags INTO item1_record
+  FROM wardrobe_items WHERE id = item1_id;
   
-  -- For now, return a placeholder score
-  -- This will be enhanced with AI-powered style analysis
+  SELECT category, color, style, tags INTO item2_record
+  FROM wardrobe_items WHERE id = item2_id;
+  
+  -- Return 0 if items not found
+  IF item1_record IS NULL OR item2_record IS NULL THEN
+    RETURN 0.0;
+  END IF;
+  
+  -- Color harmony scoring (simplified)
+  IF item1_record.color = item2_record.color THEN
+    color_score := 0.9; -- Same color
+  ELSIF item1_record.color IN ('black', 'white', 'gray', 'navy') OR 
+        item2_record.color IN ('black', 'white', 'gray', 'navy') THEN
+    color_score := 0.8; -- Neutral colors
+  ELSE
+    color_score := 0.6; -- Different colors
+  END IF;
+  
+  -- Style consistency scoring
+  IF item1_record.style = item2_record.style THEN
+    style_score := 0.9;
+  ELSIF (item1_record.style IN ('casual', 'smart-casual') AND 
+         item2_record.style IN ('casual', 'smart-casual')) OR
+        (item1_record.style IN ('formal', 'business') AND 
+         item2_record.style IN ('formal', 'business')) THEN
+    style_score := 0.7;
+  ELSE
+    style_score := 0.4;
+  END IF;
+  
+  -- Category compatibility (tops with bottoms, etc.)
+  IF (item1_record.category IN ('tops', 'shirts', 'blouses') AND 
+      item2_record.category IN ('bottoms', 'pants', 'skirts', 'shorts')) OR
+     (item1_record.category IN ('bottoms', 'pants', 'skirts', 'shorts') AND 
+      item2_record.category IN ('tops', 'shirts', 'blouses')) THEN
+    category_score := 1.0; -- Perfect category match
+  ELSIF item1_record.category = item2_record.category THEN
+    category_score := 0.3; -- Same category (less ideal)
+  ELSE
+    category_score := 0.6; -- Other combinations
+  END IF;
+  
+  -- Calculate weighted average
+  compatibility_score := (color_score * 0.4 + style_score * 0.4 + category_score * 0.2);
+  
+  -- Ensure score is between 0 and 1
+  compatibility_score := GREATEST(0.0, LEAST(1.0, compatibility_score));
   
   RETURN compatibility_score;
 END;

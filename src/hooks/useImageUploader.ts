@@ -180,42 +180,31 @@ export const useImageUploader = (callbacks: UICallbacks) => {
 
   // Helper function to ask specific questions to the VQA model
   const askQuestionToAI = async (imageUrl: string, question: string): Promise<string> => {
-    const HUGGINGFACE_API_URL = `${API_CONFIG.HUGGINGFACE_API_URL}${API_CONFIG.HUGGINGFACE_VQA_MODEL}`;
-    const token = ENV.HUGGINGFACE_TOKEN;
-
-    if (!token) {
-      throw new Error(ERROR_MESSAGES.HUGGINGFACE_MISSING);
+    // For cost-efficiency, prefer text reasoning via OpenRouter. For VQA (image+question),
+    // use OpenAI vision via ai-proxy, sending the image URL and question.
+    try {
+      const { aiProxyChatCompletion } = await import('@/config/aiProxy');
+      const completion: any = await aiProxyChatCompletion({
+        provider: 'openai',
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: `Answer concisely: ${question}` },
+              { type: 'image_url', image_url: { url: imageUrl } },
+            ],
+          },
+        ],
+        max_tokens: 200,
+        temperature: 0.1,
+      });
+      const content = completion?.choices?.[0]?.message?.content?.trim();
+      return content || 'unknown';
+    } catch (err) {
+      console.error('VQA via ai-proxy failed, returning unknown:', err);
+      return 'unknown';
     }
-
-    const response = await fetch(HUGGINGFACE_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        inputs: {
-          image: imageUrl,
-          question: question
-        }
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('VQA API Error Response:', errorText);
-      throw new Error(`VQA API request failed: ${response.status} ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    console.log('VQA API Result for question "' + question + '":', result);
-    
-    // The VQA model returns an array of answers with scores
-    if (Array.isArray(result) && result.length > 0) {
-      return result[0].answer || 'unknown';
-    }
-    
-    return 'unknown';
   };
 
   // Analyze image with AI using Visual Question Answering

@@ -125,7 +125,7 @@ export const ArtistryShowcase: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Typography Hierarchy</Text>
           <View style={styles.typographyDemo}>
-            <Text style={[DesignSystem.typography.display.large, { color: DesignSystem.colors.text.primary }]}>
+            <Text style={[DesignSystem.typography.heading.h1, { color: DesignSystem.colors.text.primary }]}>
               Hero Text
             </Text>
             <Text style={[DesignSystem.typography.heading.h1, { color: DesignSystem.colors.text.primary }]}>
@@ -145,7 +145,7 @@ export const ArtistryShowcase: React.FC = () => {
           <Text style={styles.sectionTitle}>Glassmorphism Effects</Text>
           <View style={styles.glassContainer}>
             <BlurView intensity={20} tint="light" style={styles.glassCard}>
-              <View style={[styles.glassCardContent, DesignSystem.effects.glassmorphism.subtle]}>
+              <View style={[styles.glassCardContent, DesignSystem.glassmorphism.light]}>
                 <Text style={[DesignSystem.typography.heading.h3, { color: DesignSystem.colors.text.primary }]}>
                   Primary Glass
                 </Text>
@@ -156,7 +156,7 @@ export const ArtistryShowcase: React.FC = () => {
             </BlurView>
             
             <BlurView intensity={15} tint="light" style={styles.glassCard}>
-              <View style={[styles.glassCardContent, DesignSystem.effects.glassmorphism.warm]}>
+              <View style={[styles.glassCardContent, DesignSystem.glassmorphism.medium]}>
                 <Text style={[DesignSystem.typography.heading.h3, { color: DesignSystem.colors.text.primary }]}>
                   Liquid Gold Glass
                 </Text>
@@ -232,7 +232,7 @@ export const ArtistryShowcase: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Elevation System</Text>
           <View style={styles.elevationDemo}>
-            <View style={[styles.elevationCard, DesignSystem.effects.elevation.low]}>
+            <View style={[styles.elevationCard, DesignSystem.effects.elevation.soft]}>
               <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.secondary }]}>
                 Whisper
               </Text>
@@ -247,7 +247,7 @@ export const ArtistryShowcase: React.FC = () => {
                 Float
               </Text>
             </View>
-            <View style={[styles.elevationCard, DesignSystem.effects.elevation.highest]}>
+            <View style={[styles.elevationCard, DesignSystem.effects.elevation.high]}>
               <Text style={[DesignSystem.typography.body.small, { color: DesignSystem.colors.text.secondary }]}>
                 Dramatic
               </Text>
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    ...DesignSystem.typography.display.large,
+  ...DesignSystem.typography.heading.h1,
     color: DesignSystem.colors.text.primary,
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.sm,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   colorSwatch: {
     width: 80,
     height: 80,
-    borderRadius: DesignSystem.borderRadius.large,
+  borderRadius: DesignSystem.borderRadius.lg,
     justifyContent: 'center',
     alignItems: 'center',
     ...DesignSystem.effects.elevation.medium,
@@ -321,12 +321,12 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.lg,
   },
   glassCard: {
-    borderRadius: DesignSystem.borderRadius.large,
+  borderRadius: DesignSystem.borderRadius.lg,
     overflow: 'hidden',
   },
   glassCardContent: {
     padding: DesignSystem.spacing.xl,
-    borderRadius: DesignSystem.borderRadius.large,
+  borderRadius: DesignSystem.borderRadius.lg,
   },
   interactionDemo: {
     alignItems: 'center',
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.xl,
   },
   demoButton: {
-    borderRadius: DesignSystem.borderRadius.large,
+  borderRadius: DesignSystem.borderRadius.lg,
     overflow: 'hidden',
     ...DesignSystem.effects.elevation.medium,
   },
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 60,
     backgroundColor: DesignSystem.colors.background.elevated,
-    borderRadius: DesignSystem.borderRadius.medium,
+  borderRadius: DesignSystem.borderRadius.md,
     justifyContent: 'center',
     alignItems: 'center',
   },

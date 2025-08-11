@@ -4,7 +4,7 @@
  */
 
 // Mock external dependencies first
-jest.mock('../../config/supabaseClient', () => ({
+jest.mock('@/config/supabaseClient', () => ({
   supabase: {
     from: jest.fn(),
     auth: {
@@ -12,12 +12,12 @@ jest.mock('../../config/supabaseClient', () => ({
     }
   }
 }));
-jest.mock('../../services/weatherService');
+jest.mock('@/services/weatherService');
 
-import { aynaMirrorService } from '../../services/aynaMirrorService';
-import { intelligenceService } from '../../services/intelligenceService';
-import { weatherService } from '../../services/weatherService';
-import { supabase } from '../../config/supabaseClient';
+import { AynaMirrorService, aynaMirrorService } from '@/services/aynaMirrorService';
+import { intelligenceService } from '@/services/intelligenceService';
+import { weatherService } from '@/services/weatherService';
+import { supabase } from '@/config/supabaseClient';
 
 describe('Recommendation Accuracy - User Experience Tests', () => {
   const mockUserId = 'accuracy-test-user';
@@ -65,7 +65,7 @@ describe('Recommendation Accuracy - User Experience Tests', () => {
         })
       });
 
-      const recommendations = await aynaMirrorService.generateDailyRecommendations(mockUserId);
+  const recommendations = await AynaMirrorService.generateDailyRecommendations(mockUserId);
 
       expect(recommendations.recommendations.length).toBeGreaterThan(0);
 
@@ -127,7 +127,7 @@ describe('Recommendation Accuracy - User Experience Tests', () => {
         })
       });
 
-      const recommendations = await aynaMirrorService.generateDailyRecommendations(mockUserId);
+  const recommendations = await AynaMirrorService.generateDailyRecommendations(mockUserId);
       const allRecommendedItems = recommendations.recommendations.flatMap(rec => rec.items);
 
       // Should include light, breathable clothing
@@ -179,7 +179,7 @@ describe('Recommendation Accuracy - User Experience Tests', () => {
         })
       });
 
-      const recommendations = await aynaMirrorService.generateDailyRecommendations(mockUserId);
+  const recommendations = await AynaMirrorService.generateDailyRecommendations(mockUserId);
       const allRecommendedItems = recommendations.recommendations.flatMap(rec => rec.items);
 
       // Should prioritize waterproof items
@@ -245,7 +245,7 @@ describe('Recommendation Accuracy - User Experience Tests', () => {
         })
       });
 
-      const recommendations = await aynaMirrorService.generateDailyRecommendations(mockUserId);
+  const recommendations = await AynaMirrorService.generateDailyRecommendations(mockUserId);
       const allRecommendedItems = recommendations.recommendations.flatMap(rec => rec.items);
 
       // Should prioritize highly-rated items
@@ -290,7 +290,7 @@ describe('Recommendation Accuracy - User Experience Tests', () => {
         })
       });
 
-      const recommendations = await aynaMirrorService.generateDailyRecommendations(mockUserId);
+  const recommendations = await AynaMirrorService.generateDailyRecommendations(mockUserId);
       const allRecommendedItems = recommendations.recommendations.flatMap(rec => rec.items);
 
       // Should favor preferred colors

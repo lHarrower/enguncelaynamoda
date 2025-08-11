@@ -287,10 +287,19 @@ export const APP_THEME_V2 = {
   spacing: SPACING_V2,
   radius: RADIUS_V2,
   
-  // Semantic color mappings
+  // Semantic color mappings for consistent usage
   semantic: {
-    background: ORGANIC_PALETTE.linen.base,
-    surface: ORGANIC_PALETTE.whisperWhite,
+    background: {
+      primary: ORGANIC_PALETTE.linen.base,
+      secondary: ORGANIC_PALETTE.linen.light,
+      tertiary: ORGANIC_PALETTE.linen.dark,
+      elevated: ORGANIC_PALETTE.whisperWhite,
+      overlay: 'rgba(0, 0, 0, 0.05)',
+    },
+    surface: {
+      primary: ORGANIC_PALETTE.whisperWhite,
+      secondary: ORGANIC_PALETTE.cloudGray,
+    },
     primary: ORGANIC_PALETTE.sageGreen[500],
     secondary: ORGANIC_PALETTE.liquidGold[500],
     accent: ORGANIC_PALETTE.liquidGold[400],
@@ -300,11 +309,14 @@ export const APP_THEME_V2 = {
       tertiary: ORGANIC_PALETTE.inkGray[400],
       inverse: ORGANIC_PALETTE.whisperWhite,
     },
-    border: ORGANIC_PALETTE.moonlightSilver,
+    border: {
+      primary: ORGANIC_PALETTE.moonlightSilver,
+      secondary: ORGANIC_PALETTE.inkGray[200],
+    },
     success: ORGANIC_PALETTE.sageGreen[500],
     warning: ORGANIC_PALETTE.liquidGold[500],
     error: '#E57373',
   },
 };
 
-export default APP_THEME_V2; 
+export default APP_THEME_V2;

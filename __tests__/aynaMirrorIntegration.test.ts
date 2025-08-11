@@ -1,9 +1,9 @@
 // AYNA Mirror Service Integration Tests
 // Comprehensive tests for the complete daily recommendation flow
 
-import { AynaMirrorService } from '../services/aynaMirrorService';
-import { enhancedWardrobeService } from '../services/enhancedWardrobeService';
-import { IntelligenceService } from '../services/intelligenceService';
+import { AynaMirrorService } from '@/services/aynaMirrorService';
+import { enhancedWardrobeService } from '@/services/enhancedWardrobeService';
+import { IntelligenceService } from '@/services/intelligenceService';
 import { 
   WardrobeItem, 
   DailyRecommendations, 
@@ -12,10 +12,10 @@ import {
   RecommendationContext,
   WeatherContext,
   UserPreferences
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 
 // Mock Supabase client
-jest.mock('../config/supabaseClient', () => ({
+jest.mock('@/config/supabaseClient', () => ({
   supabase: {
     from: jest.fn(() => ({
       select: jest.fn(() => ({
@@ -105,6 +105,9 @@ const mockWardrobeItems: WardrobeItem[] = [
     imageUri: 'https://example.com/shirt.jpg',
     processedImageUri: 'https://example.com/shirt-processed.jpg',
     category: 'tops',
+  name: 'Mock Shirt',
+  aiGeneratedName: 'AI Shirt',
+  nameOverride: false,
     colors: ['blue', 'white'],
     tags: ['casual', 'work'],
     usageStats: {
@@ -126,6 +129,9 @@ const mockWardrobeItems: WardrobeItem[] = [
     imageUri: 'https://example.com/pants.jpg',
     processedImageUri: 'https://example.com/pants-processed.jpg',
     category: 'bottoms',
+  name: 'Mock Pants',
+  aiGeneratedName: 'AI Pants',
+  nameOverride: false,
     colors: ['black'],
     tags: ['professional', 'versatile'],
     usageStats: {
@@ -147,6 +153,9 @@ const mockWardrobeItems: WardrobeItem[] = [
     imageUri: 'https://example.com/shoes.jpg',
     processedImageUri: 'https://example.com/shoes-processed.jpg',
     category: 'shoes',
+  name: 'Mock Shoes',
+  aiGeneratedName: 'AI Shoes',
+  nameOverride: false,
     colors: ['brown'],
     tags: ['casual', 'comfortable'],
     usageStats: {
@@ -165,7 +174,7 @@ const mockWardrobeItems: WardrobeItem[] = [
 ];
 
 // Mock services
-jest.mock('../services/enhancedWardrobeService', () => ({
+jest.mock('@/services/enhancedWardrobeService', () => ({
   enhancedWardrobeService: {
     getUserWardrobe: jest.fn(() => Promise.resolve(mockWardrobeItems))
   }
@@ -459,7 +468,7 @@ describe('AYNA Mirror Service Integration Tests', () => {
 
     it('should handle database errors gracefully', async () => {
       // Mock database error
-      const mockSupabase = require('../config/supabaseClient').supabase;
+  const mockSupabase = require('@/config/supabaseClient').supabase;
       mockSupabase.from.mockReturnValueOnce({
         select: () => ({
           eq: () => ({
@@ -494,7 +503,7 @@ describe('AYNA Mirror Service Integration Tests', () => {
 
     it('should make efficient database calls', async () => {
       const userId = 'test-user-123';
-      const mockSupabase = require('../config/supabaseClient').supabase;
+  const mockSupabase = require('@/config/supabaseClient').supabase;
       
       await AynaMirrorService.generateDailyRecommendations(userId);
       

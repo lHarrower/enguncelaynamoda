@@ -19,6 +19,7 @@ import * as Haptics from 'expo-haptics';
 
 import { DesignSystem } from '@/theme/DesignSystem';
 
+
 const { width: screenWidth } = Dimensions.get('window');
 
 interface TabConfig {
@@ -136,7 +137,7 @@ export const FluidTabNavigator: React.FC<FluidTabNavigatorProps> = ({
           <Ionicons
             name={isActive ? tab.activeIcon : tab.icon}
             size={24}
-            color={isActive ? APP_THEME_V2.colors.liquidGold[500] : APP_THEME_V2.colors.inkGray[400]}
+            color={isActive ? DesignSystem.colors.gold[500] : DesignSystem.colors.neutral[400]}
           />
           <Text style={[
             styles.tabLabel,
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.inkGray[400],
+    color: DesignSystem.colors.neutral[400],
     marginTop: DesignSystem.spacing.xs,
     textAlign: 'center',
   },
