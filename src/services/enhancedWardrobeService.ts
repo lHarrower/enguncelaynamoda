@@ -420,9 +420,14 @@ export class EnhancedWardrobeService {
    */
   async getNeglectedItems(userId: string, daysSince: number = 30): Promise<WardrobeItem[]> {
     try {
+      // Support both legacy and current SQL parameter names
       const { data, error } = await supabase.rpc('get_neglected_items', {
+        // legacy names
         user_uuid: userId,
-        days_threshold: daysSince
+        days_threshold: daysSince,
+        // current names
+        p_user_id: userId,
+        p_days_since: daysSince,
       });
 
       if (error) throw error;
@@ -512,13 +517,16 @@ export class EnhancedWardrobeService {
         return 'tops'; // Default fallback
       }
 
-      // Extract category from AI analysis
-      if (data && data.category) {
-        return data.category as ItemCategory;
+      // Extract category from AI analysis (new response shape wraps in data.analysis)
+      const analysis = data?.analysis || data; // support legacy tests that return flat fields
+      if (analysis && (analysis.mainCategory || analysis.category)) {
+        const cat = (analysis.mainCategory || analysis.category) as string;
+        return (cat || 'tops') as ItemCategory;
       }
 
       // Try to infer from tags
-      if (data && data.tags && data.tags.length > 0) {
+  const tagsFromAnalysis: string[] | undefined = analysis?.detectedTags || analysis?.tags;
+  if (tagsFromAnalysis && tagsFromAnalysis.length > 0) {
         const categoryMap: Record<string, ItemCategory> = {
           'shirt': 'tops',
           'blouse': 'tops',
@@ -537,7 +545,7 @@ export class EnhancedWardrobeService {
           'blazer': 'outerwear'
         };
 
-        for (const tag of data.tags) {
+  for (const tag of tagsFromAnalysis) {
           const category = categoryMap[tag.toLowerCase()];
           if (category) {
             return category;
@@ -569,10 +577,11 @@ export class EnhancedWardrobeService {
   return ['#000000']; // Default fallback to hex
       }
 
-      // Extract colors from AI analysis
-      if (data && data.colors && data.colors.length > 0) {
-        // Convert color objects to color names
-        return data.colors.map((color: any) => {
+      // Extract colors from AI analysis (new response shape wraps in data.analysis)
+      const analysis = data?.analysis || data;
+      const colorsCandidate = analysis?.dominantColors || analysis?.colors;
+      if (colorsCandidate && Array.isArray(colorsCandidate) && colorsCandidate.length > 0) {
+        return colorsCandidate.map((color: any) => {
           if (typeof color === 'string') {
             return color;
           }

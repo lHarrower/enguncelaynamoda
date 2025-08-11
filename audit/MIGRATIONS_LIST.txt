@@ -18,9 +18,8 @@ Name
 20250810104100_fix_core_schema.sql.disabled                     
 20250810104337_fix_core_schema_v2.sql.disabled                  
 20250810125013_fix_core_reset.sql                               
-20250810125013_fix_core_reset.sql.bak                           
 20250811_fix_calculate_item_compatibility.sql                   
-20250811_rls_hardening.sql                                      
+20250811_rls_hardening.sql.disabled                             
 create_user_profiles_table.sql                                  
 README.md                                                       
 
