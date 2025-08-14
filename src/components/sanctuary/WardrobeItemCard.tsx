@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -19,14 +19,19 @@ interface WardrobeItemCardProps {
   onPress: () => void;
   onLongPress?: () => void;
   showAIIndicator?: boolean;
+  onAnalysisApplied?: (itemId: string, update: { processedImageUri?: string; aiAnalysisData?: any }) => void;
 }
 
 export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
   item,
   onPress,
   onLongPress,
-  showAIIndicator = true
+  showAIIndicator = true,
+  onAnalysisApplied
 }) => {
+  const [analyzing, setAnalyzing] = useState(false);
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false);
+  const [analysis, setAnalysis] = useState<any>(() => (item as any).aiAnalysisData || (item as any).ai_analysis_data);
   
   // Helper function to get effective item name
   const getEffectiveName = () => {
@@ -56,10 +61,10 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
   
   // Helper function to get item image URL
   const getImageUrl = () => {
-    if ('imageUri' in item) {
-      return (item as WardrobeItem).imageUri;
-    }
-    return (item as ClothingItem).imageUrl;
+    // processed fallback (supports camel + snake)
+    const processed = (item as any).processedImageUri || (item as any).processed_image_uri;
+    const original = (item as any).imageUri || (item as any).image_uri || (item as ClothingItem).imageUrl;
+    return processed || original;
   };
   
   // Helper function to get item colors
@@ -116,7 +121,23 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
 
   const lastWornStatus = getLastWornStatus();
 
+  const runAnalysis = useCallback(async () => {
+    try {
+      if (analyzing) return;
+      setAnalyzing(true);
+      const { runAiAnalysisWithSession } = await import('@/services/api/aiAnalysisClient');
+      const result = await runAiAnalysisWithSession(item.id, getImageUrl());
+      setAnalysis(result.analysis);
+      onAnalysisApplied?.(item.id, { processedImageUri: result.cloudUrl, aiAnalysisData: result.analysis });
+      setShowAnalysisModal(true);
+      import('@/services/wardrobeRepo').then(m => m.applyAnalysisToItem(item.id, { cloudUrl: result.cloudUrl, analysis: result.analysis }).catch(()=>{}));
+    } catch {
+      alert('Analysis failed, please try again.');
+    } finally { setAnalyzing(false); }
+  }, [analyzing, item.id, onAnalysisApplied]);
+
   return (
+    <>
     <TouchableOpacity
       style={styles.card}
       onPress={onPress}
@@ -147,6 +168,9 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
             <Text style={styles.wearCountText}>{(item as ClothingItem).wearCount}×</Text>
           </View>
         )}
+        <TouchableOpacity style={styles.analyzeBtn} onPress={runAnalysis} disabled={analyzing}>
+          <Ionicons name={analyzing ? 'sync' : 'flask'} size={14} color="#FFFFFF" />
+        </TouchableOpacity>
       </View>
 
       {/* Item Info */}
@@ -188,6 +212,31 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
         </View>
       </View>
     </TouchableOpacity>
+    {showAnalysisModal && (
+      <View style={styles.analysisModalOverlay}>
+        <View style={styles.analysisModal}>
+          <TouchableOpacity style={styles.closeModal} onPress={() => setShowAnalysisModal(false)}>
+            <Ionicons name="close" size={18} color="#333" />
+          </TouchableOpacity>
+          <Image source={{ uri: getImageUrl() }} style={styles.analysisImage} />
+          {analysis && (
+            <View style={styles.analysisContent}>
+              <View style={styles.badgesRow}>
+                {analysis.mainCategory && <Text style={styles.badge}>{analysis.mainCategory}</Text>}
+                {analysis.subCategory && <Text style={styles.badgeSecondary}>{analysis.subCategory}</Text>}
+              </View>
+              <View style={styles.colorsRow}>
+                {(analysis.dominantColors || []).map((c: string, i: number) => <View key={i} style={[styles.analysisColorDot, { backgroundColor: c }]} />)}
+              </View>
+              <View style={styles.tagsWrap}>
+                {(analysis.detectedTags || []).map((t: string) => <Text key={t} style={styles.tagPill}>{t}</Text>)}
+              </View>
+            </View>
+          )}
+        </View>
+      </View>
+    )}
+    </>
   );
 };
 
@@ -335,4 +384,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 1,
   },
+  analyzeBtn: { position: 'absolute', top: 8, right: 8, backgroundColor: '#111827', padding: 6, borderRadius: 16, opacity: 0.9 },
+  analysisModalOverlay: { position: 'absolute', top:0,left:0,right:0,bottom:0, backgroundColor:'rgba(0,0,0,0.4)', justifyContent:'center', alignItems:'center' },
+  analysisModal: { width:'80%', backgroundColor:'#FFFFFF', borderRadius:16, padding:16 },
+  closeModal: { position:'absolute', top:8, right:8 },
+  analysisImage: { width:'100%', height:200, borderRadius:12, marginBottom:12 },
+  analysisContent: { gap:12 },
+  badgesRow: { flexDirection:'row', gap:8 },
+  badge: { backgroundColor:'#111827', color:'#fff', paddingHorizontal:8, paddingVertical:4, borderRadius:8, fontSize:12 },
+  badgeSecondary: { backgroundColor:'#E5E7EB', color:'#374151', paddingHorizontal:8, paddingVertical:4, borderRadius:8, fontSize:12 },
+  colorsRow: { flexDirection:'row', gap:6 },
+  analysisColorDot: { width:14, height:14, borderRadius:7, borderWidth:1, borderColor:'#fff' },
+  tagsWrap: { flexDirection:'row', flexWrap:'wrap', gap:6 },
+  tagPill: { backgroundColor:'#F3F4F6', color:'#111827', paddingHorizontal:10, paddingVertical:4, borderRadius:20, fontSize:11 }
 });

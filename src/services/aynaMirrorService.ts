@@ -12,8 +12,38 @@ import {
 } from '@/types/aynaMirror';
 import { EnhancedWardrobeService, enhancedWardrobeService } from '@/services/enhancedWardrobeService';
 import { intelligenceService } from '@/services/intelligenceService';
-import { weatherService } from '@/services/weatherService';
-import { errorHandlingService } from '@/services/errorHandlingService';
+// Dynamic import helpers to reduce circular dependency surface
+let _weatherService: any;
+async function getWeatherService() {
+  if (!_weatherService) {
+    const mod: any = await import('./weatherService');
+    _weatherService = mod.weatherService || mod.WeatherService;
+  }
+  return _weatherService;
+}
+// Sync accessor (uses require) for non-async call sites
+function getWeatherServiceSync() {
+  if (!_weatherService) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const mod = require('./weatherService');
+    _weatherService = (mod as any).weatherService || (mod as any).WeatherService;
+  }
+  return _weatherService;
+}
+let _errorHandlingService: any;
+async function getErrorHandlingService() {
+  if (!_errorHandlingService) {
+    if (process.env.NODE_ENV === 'test') {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const mod = require('./errorHandlingService');
+      _errorHandlingService = mod.errorHandlingService || (mod.ErrorHandlingService?.getInstance?.());
+    } else {
+      const mod: any = await import('./errorHandlingService');
+      _errorHandlingService = mod.errorHandlingService || (mod.ErrorHandlingService?.getInstance?.());
+    }
+  }
+  return _errorHandlingService;
+}
 import { PerformanceOptimizationService } from '@/services/performanceOptimizationService';
 import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
@@ -75,7 +105,8 @@ export class AynaMirrorService {
    * This is the main entry point for the 6 AM daily ritual
    */
   static async generateDailyRecommendations(userId: string): Promise<DailyRecommendations> {
-    return await errorHandlingService.executeWithRetry(
+  const errSvc = await getErrorHandlingService();
+  return await errSvc.executeWithRetry(
       async () => {
         logInDev('[AynaMirrorService] Generating daily recommendations for user:', userId);
 
@@ -84,7 +115,7 @@ export class AynaMirrorService {
   // retrieval path below now handles all cases consistently.
 
         // Try to get cached recommendations first using performance optimization service
-        const cachedRecommendations = await PerformanceOptimizationService.getCachedRecommendations(userId);
+  const cachedRecommendations = await PerformanceOptimizationService.getCachedRecommendations(userId);
         if (cachedRecommendations && this.isCacheValid(cachedRecommendations.generatedAt)) {
           logInDev('[AynaMirrorService] Using cached recommendations');
           return cachedRecommendations;
@@ -170,8 +201,8 @@ export class AynaMirrorService {
         // Save to cache (and DB outside tests)
         await Promise.all([
           ((process.env.NODE_ENV as any) === 'test' ? Promise.resolve() : this.saveDailyRecommendations(dailyRecommendations)),
-          errorHandlingService.cacheRecommendations(userId, dailyRecommendations),
-          errorHandlingService.cacheWardrobeData(userId, wardrobe)
+          (await getErrorHandlingService()).cacheRecommendations(userId, dailyRecommendations),
+          (await getErrorHandlingService()).cacheWardrobeData(userId, wardrobe)
         ]);
 
         // In tests, make a lightweight, no-op supabase call so integration spies see at least one DB interaction
@@ -260,7 +291,7 @@ export class AynaMirrorService {
         // Rethrow to propagate the failure to executeWithRetry
         throw error;
       }
-      const cachedWardrobe = await errorHandlingService.getCachedWardrobeData(userId);
+  const cachedWardrobe = await (await getErrorHandlingService()).getCachedWardrobeData(userId);
       if (cachedWardrobe) {
         return cachedWardrobe;
       }
@@ -302,7 +333,7 @@ export class AynaMirrorService {
       errorInDev('[AynaMirrorService] Failed to build context, using fallback:', error);
       
       // Get weather with fallback
-      const weather = await errorHandlingService.handleWeatherServiceError(userId);
+  const weather = await (await getErrorHandlingService()).handleWeatherServiceError(userId);
       
       return {
         userId,
@@ -418,7 +449,7 @@ export class AynaMirrorService {
       return recs;
     } catch (error) {
       errorInDev('[AynaMirrorService] AI recommendations failed, using rule-based fallback:', error);
-      return await errorHandlingService.handleAIServiceError(wardrobe, context.weather, context.userId);
+  return await (await getErrorHandlingService()).handleAIServiceError(wardrobe, context.weather, context.userId);
     }
   }
 
@@ -792,7 +823,7 @@ export class AynaMirrorService {
         }
       }
       // Use WeatherService for sophisticated weather appropriateness analysis
-  const appropriatenessScore = weatherService.analyzeWeatherAppropriatenessForItem(
+  const appropriatenessScore = getWeatherServiceSync().analyzeWeatherAppropriatenessForItem(
         { category: item.category, tags: item.tags },
         weather
       );
@@ -1102,7 +1133,7 @@ export class AynaMirrorService {
     try {
       // Use WeatherService to calculate overall outfit weather score
       const outfitScore = items.reduce((totalScore, item) => {
-  const itemScore = weatherService.analyzeWeatherAppropriatenessForItem(
+  const itemScore = getWeatherServiceSync().analyzeWeatherAppropriatenessForItem(
           { category: item.category, tags: item.tags },
           weather
         );
@@ -1474,10 +1505,10 @@ export class AynaMirrorService {
       // Get weather context using WeatherService (use getCurrentWeather for test mocks)
       const weather = await (process.env.NODE_ENV === 'test'
         ? this.awaitWithTestBudget<WeatherContext>(
-            weatherService.getCurrentWeather(userId),
-            async () => await errorHandlingService.handleWeatherServiceError(userId)
+      (await getWeatherService()).getCurrentWeather(userId),
+      async () => await (await getErrorHandlingService()).handleWeatherServiceError(userId)
           )
-        : weatherService.getCurrentWeather(userId));
+    : (await getWeatherService()).getCurrentWeather(userId));
       
       // Get calendar context (placeholder for now)
       const calendar = await this.getCalendarContext(userId);
@@ -1518,11 +1549,11 @@ export class AynaMirrorService {
     try {
       if (process.env.NODE_ENV === 'test') {
         return await this.awaitWithTestBudget<WeatherContext>(
-          weatherService.getCurrentWeather(userId),
-          async () => await errorHandlingService.handleWeatherServiceError(userId || '')
+      (await getWeatherService()).getCurrentWeather(userId),
+      async () => await (await getErrorHandlingService()).handleWeatherServiceError(userId || '')
         );
       }
-      return await weatherService.getCurrentWeather(userId);
+    return await (await getWeatherService()).getCurrentWeather(userId);
     } catch (error) {
       errorInDev('[AynaMirrorService] Failed to get weather context:', error);
       
@@ -1872,7 +1903,7 @@ export class AynaMirrorService {
       if (process.env.NODE_ENV !== 'test') {
         try {
           const wardrobe = await enhancedWardrobeService.getUserWardrobe(feedback.userId);
-          await errorHandlingService.cacheWardrobeData(feedback.userId, wardrobe);
+          await (await getErrorHandlingService()).cacheWardrobeData(feedback.userId, wardrobe);
         } catch (e) {
           errorInDev('[AynaMirrorService] Non-fatal: wardrobe cache refresh failed', e);
         }

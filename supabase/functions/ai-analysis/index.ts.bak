@@ -1,0 +1,141 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0?target=deno&dts";
+import { corsHeaders } from "../_shared/cors.ts";
+
+const ALLOWLIST = (Deno.env.get("AI_IMAGE_HOST_ALLOWLIST") ??
+  "sntlqqerajehwgmjbkgw.supabase.co,placehold.co,images.unsplash.com,i.imgur.com,res.cloudinary.com")
+  .split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  const json = (status: number, body: unknown) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...corsHeaders, "content-type": "application/json" },
+    });
+
+  try {
+    // --- ENV
+    const supabaseUrl   = Deno.env.get("SUPABASE_URL")!;
+    const anon          = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const cloudName     = Deno.env.get("CLOUDINARY_CLOUD_NAME")!;
+    const uploadPreset  = Deno.env.get("CLOUDINARY_UPLOAD_PRESET")!;
+
+    // --- AUTH (JWT'yi header'dan al)
+    const authHeader = req.headers.get("authorization") ?? req.headers.get("Authorization") ?? "";
+    const jwt = authHeader.replace(/^Bearer\s+/i, "").trim();
+
+    const supabase = createClient(supabaseUrl, anon, {
+      global: { headers: { Authorization: authHeader } }, // 'A' bÃ¼yÃ¼k olmalÄ±
+    });
+
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(jwt);
+    if (authErr || !user) {
+      return json(401, { ok: false, stage: "auth", message: "Auth session missing or invalid", detail: authErr?.message ?? null });
+    }
+
+    // --- INPUT
+    const { imageUrl, itemId } = await req.json().catch(() => ({}));
+    if (!imageUrl || !itemId) {
+      return json(400, { ok: false, stage: "input", message: "Missing required fields", need: ["imageUrl", "itemId"] });
+    }
+
+    // --- ALLOWLIST
+    const u = new URL(imageUrl);
+    const hostAllowed = ALLOWLIST.some(h => u.hostname.toLowerCase().endsWith(h));
+    if (!hostAllowed) {
+      return json(400, { ok: false, stage: "allowlist", message: "Image host not allowed", host: u.hostname, allowlist: ALLOWLIST });
+    }
+
+    // --- OWNERSHIP
+    const { data: row, error: rowErr } = await supabase
+      .from("wardrobe_items")
+      .select("id,user_id")
+      .eq("id", itemId)
+      .maybeSingle();
+
+    if (rowErr)   return json(500, { ok: false, stage: "ownership_select", message: "DB select failed", detail: rowErr.message });
+    if (!row)     return json(404, { ok: false, stage: "ownership", message: "Item not found" });
+    if (row.user_id !== user.id) {
+      return json(403, { ok: false, stage: "ownership", message: "Forbidden: not your item", itemUserId: row.user_id, me: user.id });
+    }
+
+    // --- CLOUDINARY UPLOAD (unsigned)
+    const form = new FormData();
+    form.append("file", imageUrl);
+    form.append("upload_preset", uploadPreset);
+    // preset tarafÄ±nda zaten 'wardrobe/' klasÃ¶rÃ¼ ayarlÄ±; istersen ayrÄ±ca ÅŸunu da ekleyebilirsin:
+    // form.append("folder", "wardrobe");
+    // renk paleti (opsiyonel, Cloudinary destekliyor)
+    form.append("colors", "true");
+
+    const cldUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+    const cldResp = await fetch(cldUrl, { method: "POST", body: form });
+    const cldData = await cldResp.json();
+
+    if (!cldResp.ok) {
+      return json(cldResp.status, { ok: false, stage: "cloudinary_upload", message: "Upload failed", detail: cldData });
+    }
+
+    const secureUrl = cldData.secure_url as string | undefined;
+
+    // --- Basit analiz (mock)
+    const dominantColors = Array.isArray(cldData.colors)
+      ? (cldData.colors as Array<[string, number]>).map(([hex]) => hex)
+      : ["#000000", "#FFFFFF"];
+
+    const analysis = {
+      mainCategory: "tops",
+      subCategory:  "t-shirt",
+      dominantColors,
+      detectedTags: ["t-shirt", "casual", "basic"],
+      cloudinary: {
+        public_id: cldData.public_id,
+        width:     cldData.width,
+        height:    cldData.height,
+        format:    cldData.format,
+        secure_url: secureUrl,
+      }
+    };
+
+    // --- DB update
+    const upd = await supabase
+      .from("wardrobe_items")
+      .update({
+        processed_image_uri: secureUrl ?? imageUrl,
+        ai_analysis_data: analysis,
+      })
+      .eq("id", itemId)
+      .eq("user_id", user.id);
+
+    if (upd.error) {
+      return json(500, { ok: false, stage: "update", message: "DB update failed", detail: upd.error.message });
+    }
+
+    return json(200, { ok: true, stage: "done", user: user.id, itemId, imageHost: u.hostname, processed_image_uri: secureUrl ?? imageUrl, analysis });
+  } catch (e) {
+    const msg = (e as Error)?.message ?? String(e);
+    return json(500, { ok: false, stage: "unhandled", message: msg });
+  }
+});
+
+
+  // --- Cloudinary unsigned upload (minimal) ---
+  const cloudName    = Deno.env.get("CLOUDINARY_CLOUD_NAME")!;
+  const uploadPreset = Deno.env.get("CLOUDINARY_UPLOAD_PRESET")!;
+  const formData = new FormData();
+  formData.append("file", imageUrl);              // public storage URL
+  formData.append("upload_preset", uploadPreset); // preset: aynamoda_preset
+  const cloudUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+  const upRes = await fetch(cloudUrl, { method: "POST", body: formData });
+  const upJson = await upRes.json();
+
+  if (!upRes.ok) {
+    throw new Error("Cloudinary upload failed: " + JSON.stringify(upJson));
+  }
+
+  const cdnUrl = upJson.secure_url as string; // Cloudinary'deki nihai URL
+
+

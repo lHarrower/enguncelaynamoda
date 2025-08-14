@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
+import { z } from 'https://esm.sh/zod@3.23.8';
 import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req: Request) => {
@@ -39,21 +40,31 @@ serve(async (req: Request) => {
       throw new Error('Unauthorized');
     }
     
-    // Parse request body
-  const { itemId, name, tags, colors, category, subcategory } = await req.json();
-    
-    if (!itemId) {
-      throw new Error('itemId is required');
+    // Parse & validate request body
+    const raw = await req.json().catch(() => ({}));
+    const InputSchema = z.object({
+      itemId: z.string().uuid(),
+      name: z.string().min(1).max(120).optional(),
+      tags: z.array(z.string().min(1).max(40)).max(25).optional(),
+      colors: z.array(z.string().regex(/^#?[0-9a-f]{3,8}$/i)).max(12).optional(),
+      category: z.string().min(1).max(50).optional(),
+      subcategory: z.string().min(1).max(50).optional(),
+    });
+    const parsed = InputSchema.safeParse(raw);
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'validation_error', detail: parsed.error.flatten() }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+    const { itemId, name, tags, colors, category, subcategory } = parsed.data;
     
-    // Validate that at least one field is being updated
+    // Ensure at least one field present besides id
     if (!name && !tags && !colors && !category && !subcategory) {
-      throw new Error('At least one field must be provided for update');
-    }
-    
-    // Validate dominantColors format if provided
-    if (colors && !Array.isArray(colors)) {
-      throw new Error('colors must be an array of strings');
+      return new Response(
+        JSON.stringify({ error: 'no_update_fields', message: 'At least one updatable field is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
     
     // First, verify that the user owns this item

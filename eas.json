@@ -1,53 +1,18 @@
-{
-  "cli": {
-    "version": ">= 16.13.3",
-    "appVersionSource": "remote"
-  },
+﻿{
+  "cli": { "version": ">= 16.0.0", "appVersionSource": "remote" },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "env": {
-  "NODE_ENV": "development"
-      }
-    },
-    "preview": {
-      "distribution": "internal",
-      "env": {
-  "NODE_ENV": "staging",
-  "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "@preview_GOOGLE_IOS_CLIENT_ID",
-  "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "@preview_GOOGLE_ANDROID_CLIENT_ID"
-      },
-      "android": {
-        "buildType": "apk"
-      }
+      "channel": "development",
+      "android": { "buildType": "apk" },
+      "ios": { "simulator": false }
     },
     "production": {
-      "autoIncrement": true,
-      "env": {
-  "NODE_ENV": "production",
-  "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "@prod_GOOGLE_IOS_CLIENT_ID",
-  "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "@prod_GOOGLE_ANDROID_CLIENT_ID"
-      },
-      "android": {
-        "buildType": "aab"
-      },
-      "ios": {
-        "bundleIdentifier": "com.guiprohuso.aynamoda"
-      }
+      "channel": "production",
+      "android": { "buildType": "app-bundle" },
+      "ios": {}
     }
   },
-  "submit": {
-    "production": {
-      "android": {
-        "serviceAccountKeyPath": "./android-service-account.json",
-        "track": "internal"
-      },
-      "ios": {
-        "appleId": "your-apple-id@example.com",
-        "ascAppId": "your-app-store-connect-app-id",
-        "appleTeamId": "your-apple-team-id"
-      }
-    }
-  }
+  "submit": { "production": {} }
 }

@@ -3,7 +3,12 @@ import { View, Text, StyleSheet, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
-import * as Notifications from 'expo-notifications';
+// P0 Notifications: convert static import to dynamic lazy import for performance & policy compliance
+let Notifications: any;
+async function loadNotifications() {
+  if (!Notifications) Notifications = await import('expo-notifications');
+  return Notifications;
+}
 import { DesignSystem } from '@/theme/DesignSystem';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,11 +26,12 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
     setIsRequesting(true);
     
     try {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      const N = await loadNotifications();
+      const { status: existingStatus } = await N.getPermissionsAsync();
       let finalStatus = existingStatus;
 
       if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
+        const { status } = await N.requestPermissionsAsync();
         finalStatus = status;
       }
 

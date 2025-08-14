@@ -6,19 +6,19 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
     "app/**/*.tsx",
     "src/**/*.ts",
-    "src/**/*.tsx",
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "src/**/*.tsx"
   ],
   "exclude": [
-  "__tests__/**",
-  "src/__tests__/**",
+    "__tests__/**",
+    "src/__tests__/**",
     "supabase/functions/**",
     "node_modules/**"
   ]

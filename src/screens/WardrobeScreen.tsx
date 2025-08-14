@@ -479,6 +479,9 @@ export const WardrobeScreen: React.FC = () => {
               <WardrobeItemCard
                 item={item}
                 onPress={() => handleItemPress(item)}
+                onAnalysisApplied={(id, update) => {
+                  setItems(prev => prev.map(i => i.id === id ? { ...i, ...('processedImageUri' in update ? { processedImageUri: update.processedImageUri } : {}), ...('aiAnalysisData' in update ? { aiAnalysisData: update.aiAnalysisData } : {}) } as any : i));
+                }}
               />
             )}
             keyExtractor={(item) => item.id}

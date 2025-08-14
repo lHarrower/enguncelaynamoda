@@ -1,0 +1,206 @@
+# ================================
+# AYNAMODA E2E AI-ANALYSIS SMOKE
+# ================================
+$ErrorActionPreference = "Stop"
+
+# ==== CONSTS (projene göre sabit) ====
+$SUPA_URL = "https://sntlqqerajehwgmjbkgw.supabase.co"
+$FN_URL   = "https://sntlqqerajehwgmjbkgw.functions.supabase.co/ai-analysis"
+$BUCKET   = "wardrobe"
+$TEST_IMG_PUBLIC = "$SUPA_URL/storage/v1/object/public/$BUCKET/test.png"
+
+# ==== Helpers ====
+function Read-Secret($prompt){
+  $sec = Read-Host $prompt -AsSecureString
+  [Runtime.InteropServices.Marshal]::PtrToStringAuto(
+    [Runtime.InteropServices.Marshal]::SecureStringToBSTR($sec)
+  )
+}
+function Read-ErrBody($err){
+  $r=$err.Exception.Response
+  if($r){$rd=New-Object IO.StreamReader($r.GetResponseStream()); return $rd.ReadToEnd()}
+  return ""
+}
+function Show-Step($t){ Write-Host "`n=== $t ===" -ForegroundColor Cyan }
+function Show-Ok($t){ Write-Host $t -ForegroundColor Green }
+function Show-Warn($t){ Write-Host $t -ForegroundColor Yellow }
+function Show-Err($t){ Write-Host $t -ForegroundColor Red }
+
+# ==== Step 0: Keys & inputs ====
+Show-Step "0) Keys and Inputs"
+$SERVICE = Read-Secret "Paste SERVICE_ROLE key"
+$ANON    = Read-Secret "Paste ANON key"
+if(-not $SERVICE -or -not $ANON){ Show-Err "Keys missing"; exit 1 }
+
+$SMOKE_EMAIL = Read-Host "Smoke user email (e.g. hkillibacak0+smoke-YYYYMMDDHHmmss@gmail.com)"
+if([string]::IsNullOrWhiteSpace($SMOKE_EMAIL)){ Show-Err "Email required"; exit 1 }
+$STAMP = Get-Date -Format "yyyyMMddHHmmss"
+$NEW_PASSWORD = "Smoke!" + $STAMP
+
+Show-Ok "SUPA_URL: $SUPA_URL"
+Show-Ok "FN_URL:   $FN_URL"
+Show-Ok "TEST_IMG: $TEST_IMG_PUBLIC"
+Show-Ok "Smoke email: $SMOKE_EMAIL"
+
+# ==== Admin headers ====
+$adminHeaders = @{
+  apikey         = $SERVICE
+  Authorization  = "Bearer $SERVICE"
+  "Content-Type" = "application/json"
+}
+
+# ==== Step 1: Upsert user (create or reset password) ====
+Show-Step "1) Admin: upsert smoke user"
+$uid = $null
+try {
+  # Try find
+  $find = Invoke-RestMethod -Uri "$SUPA_URL/auth/v1/admin/users?email=$([uri]::EscapeDataString($SMOKE_EMAIL))&apikey=$SERVICE" `
+    -Headers $adminHeaders -Method GET
+  if($find.users -and $find.users.Count -gt 0){
+    $uid = $find.users[0].id
+    Show-Warn "User exists: $uid  -> will reset password"
+  } else {
+    Show-Warn "User not found; will create"
+  }
+} catch {
+  Show-Err "Admin find failed: $(Read-ErrBody $_)"
+  exit 1
+}
+
+if(-not $uid){
+  # Create
+  try {
+    $createBody = @{ email=$SMOKE_EMAIL; password=$NEW_PASSWORD; email_confirm=$true } | ConvertTo-Json
+    $created = Invoke-RestMethod -Uri "$SUPA_URL/auth/v1/admin/users?apikey=$SERVICE" `
+      -Headers $adminHeaders -Method POST -Body $createBody
+    $uid = $created.id
+    Show-Ok "Created user id: $uid"
+  } catch {
+    Show-Err "Admin create failed: $(Read-ErrBody $_)"
+    exit 1
+  }
+} else {
+  # Reset password
+  try {
+    $patchBody = @{ password=$NEW_PASSWORD } | ConvertTo-Json
+    $patched = Invoke-RestMethod -Uri "$SUPA_URL/auth/v1/admin/users/$uid?apikey=$SERVICE" `
+      -Headers $adminHeaders -Method PATCH -Body $patchBody
+    Show-Ok "Password reset OK for $uid"
+  } catch {
+    Show-Err "Password reset failed: $(Read-ErrBody $_)"
+    exit 1
+  }
+}
+
+# ==== Step 2: Password login (anon) ====
+Show-Step "2) Password login"
+try {
+  $loginBody = @{ email=$SMOKE_EMAIL; password=$NEW_PASSWORD } | ConvertTo-Json
+  $login = Invoke-RestMethod -Uri "$SUPA_URL/auth/v1/token?grant_type=password" `
+    -Method POST -Headers @{ apikey=$ANON; "Content-Type"="application/json" } -Body $loginBody
+  $TOKEN = $login.access_token
+  if(-not $TOKEN){ throw "No access_token" }
+  Show-Ok ("Token prefix: " + $TOKEN.Substring(0,20) + "…")
+  Show-Ok ("Auth user id: " + $login.user.id)
+} catch {
+  Show-Err "Login failed: $(Read-ErrBody $_)"
+  exit 1
+}
+
+# ==== Step 3: Ensure storage bucket and test image ====
+Show-Step "3) Ensure storage bucket & upload test.png"
+# Make 1x1 PNG
+$bytes = [Convert]::FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/w8AAoMBgWgq8P0AAAAASUVORK5CYII=")
+$fn = "test.png"; [IO.File]::WriteAllBytes($fn,$bytes)
+
+# Create bucket (idempotent: if exists returns 409; ignore)
+try {
+  Invoke-RestMethod -Uri "$SUPA_URL/storage/v1/bucket" -Method POST `
+    -Headers $adminHeaders `
+    -Body (@{ name=$BUCKET; public=$true } | ConvertTo-Json) | Out-Null
+} catch {
+  $b = Read-ErrBody $_
+  if(-not ($b -match "Bucket already exists" -or $b -match "exists" -or $b -match "409")){ Show-Err "Bucket create: $b"; exit 1 }
+}
+# Upload (service role to bypass RLS)
+try {
+  Invoke-RestMethod -Uri "$SUPA_URL/storage/v1/object/$BUCKET/$fn" -Method POST `
+    -Headers @{ "Authorization"="Bearer $SERVICE"; "apikey"=$SERVICE; "Content-Type"="image/png" } `
+    -InFile $fn | Out-Null
+  Show-Ok "Uploaded: $TEST_IMG_PUBLIC"
+} catch {
+  Show-Err "Upload failed: $(Read-ErrBody $_)"
+  exit 1
+}
+
+# ==== Step 4: Ensure wardrobe item (list or insert) ====
+Show-Step "4) Ensure wardrobe_items row"
+$headersUser = @{
+  apikey         = $ANON
+  Authorization  = "Bearer $TOKEN"
+  "Content-Type" = "application/json"
+  Prefer         = "return=representation"
+}
+
+$itemId = $null
+try {
+  $items = Invoke-RestMethod -Uri "$SUPA_URL/rest/v1/wardrobe_items?user_id=eq.$uid&select=id,image_uri,processed_image_uri,category,ai_analysis_data&order=created_at.desc&limit=1" `
+    -Headers $headersUser -Method GET
+  if($items -and $items.Count -gt 0){ $itemId = $items[0].id }
+} catch {
+  Show-Err "List failed: $(Read-ErrBody $_)"
+}
+
+if(-not $itemId){
+  $payload = @(
+    @{
+      user_id             = $uid
+      image_uri           = $TEST_IMG_PUBLIC
+      processed_image_uri = $TEST_IMG_PUBLIC
+      category            = "tops"
+      colors              = @("#000000")
+      tags                = @("smoke","test")
+      name                = "smoke item"
+      brand               = "SmokeTest"
+    }
+  ) | ConvertTo-Json
+  try {
+    $insert = Invoke-RestMethod -Uri "$SUPA_URL/rest/v1/wardrobe_items" -Headers $headersUser -Method POST -Body $payload
+    $itemId = $insert[0].id
+    Show-Ok "Inserted itemId: $itemId"
+  } catch {
+    Show-Err "Insert failed: $(Read-ErrBody $_)"
+    exit 1
+  }
+} else {
+  Show-Ok "Reusing itemId: $itemId"
+}
+
+# ==== Step 5: Smoke ai-analysis ====
+Show-Step "5) Call ai-analysis"
+$invokeBody = @{ itemId = $itemId; imageUrl = $TEST_IMG_PUBLIC } | ConvertTo-Json
+try {
+  $resp = Invoke-RestMethod -Uri $FN_URL -Method POST `
+    -Headers @{ Authorization="Bearer $TOKEN"; apikey=$ANON; "Content-Type"="application/json" } `
+    -Body $invokeBody
+  Show-Ok "[ANALYSIS]"
+  $resp | ConvertTo-Json -Depth 8
+} catch {
+  Show-Err "[ANALYSIS ERROR]"
+  $body = Read-ErrBody $_
+  if([string]::IsNullOrWhiteSpace($body)){ $_ | Format-List * -Force }
+  else { $body | Write-Host }
+  exit 1
+}
+
+# ==== Step 6: Verify DB updated ====
+Show-Step "6) Verify ai_analysis_data in DB"
+try {
+  $row = Invoke-RestMethod -Uri "$SUPA_URL/rest/v1/wardrobe_items?id=eq.$itemId&select=id,ai_analysis_data" `
+    -Headers $headersUser -Method GET
+  $row | ConvertTo-Json -Depth 8
+  Show-Ok "Done."
+} catch {
+  Show-Err "Verify failed: $(Read-ErrBody $_)"
+  exit 1
+}

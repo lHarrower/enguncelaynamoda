@@ -1,8 +1,8 @@
 // AYNA Mirror Notification Service
 // Precise timing and delivery system for the daily confidence ritual
 
-import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import * as Application from 'expo-application';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { 
@@ -12,16 +12,65 @@ import {
 } from '@/types/aynaMirror';
 import { errorHandlingService } from '@/services/errorHandlingService';
 
-// Configure notification behavior
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+// Lazy notifications module loader
+let _notifications: any; let _notificationsConfigured = false;
+async function loadNotifications() {
+  if (!_notifications) {
+    _notifications = await import('expo-notifications');
+  }
+  if (!_notificationsConfigured) {
+    try {
+      _notifications.setNotificationHandler?.({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: false,
+          shouldShowBanner: true,
+          shouldShowList: true,
+        }),
+      });
+    } catch {}
+    _notificationsConfigured = true;
+  }
+  return _notifications;
+}
+
+// Detect Expo Go (SDK 53+ removed remote push)
+const isExpoGo = !Application.applicationId || Application.applicationId === 'host.exp.Exponent';
+
+export async function getPushTokenSafely(retries = 3): Promise<string | null> {
+  // P0 Notifications: add retry/backoff & skip on Expo Go
+  try {
+    if (isExpoGo) return null;
+    const Notifications = await loadNotifications();
+    const settings = await Notifications.getPermissionsAsync();
+    let status = settings.status;
+    if (status !== 'granted') {
+      const req = await Notifications.requestPermissionsAsync();
+      status = req.status;
+    }
+    if (status !== 'granted') return null;
+    let lastErr: any;
+    for (let attempt = 0; attempt < retries; attempt++) {
+      try {
+        const token = await Notifications.getExpoPushTokenAsync();
+        return token.data ?? null;
+      } catch (e) {
+        lastErr = e;
+        await new Promise(r => setTimeout(r, (attempt + 1) * 400));
+      }
+    }
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.warn('[notifications] push token acquisition failed after retries', lastErr?.message);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+// (Handler configured lazily via loadNotifications())
 
 export interface NotificationPayload {
   type: 'daily_mirror' | 'feedback_prompt' | 're_engagement';
@@ -62,7 +111,8 @@ class NotificationService {
       // Request permissions with error handling
       let finalStatus = 'denied';
       try {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  const Notifications = await loadNotifications();
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
         finalStatus = existingStatus;
 
         if (existingStatus !== 'granted') {
@@ -81,35 +131,28 @@ class NotificationService {
         return false;
       }
 
-      // Get push token for remote notifications with enhanced error handling
+      // Get push token using safe helper (skips Expo Go)
       if (Device.isDevice) {
-        try {
-          const tokenResponse = await Notifications.getExpoPushTokenAsync();
-          this.notificationToken = tokenResponse.data;
-        } catch (tokenError) {
-          // Silently handle token errors in development
-          this.notificationToken = null;
-        }
+        this.notificationToken = await getPushTokenSafely();
       }
 
       // Configure notification channels for Android
       if (Platform.OS === 'android') {
-        await Notifications.setNotificationChannelAsync('ayna-mirror', {
+  const Notifications = await loadNotifications();
+  await Notifications.setNotificationChannelAsync('ayna-mirror', {
           name: 'AYNA Mirror',
           importance: Notifications.AndroidImportance.HIGH,
           vibrationPattern: [0, 250, 250, 250],
           lightColor: '#FF231F7C',
           sound: 'default',
         });
-
-        await Notifications.setNotificationChannelAsync('feedback', {
+  await Notifications.setNotificationChannelAsync('feedback', {
           name: 'Outfit Feedback',
           importance: Notifications.AndroidImportance.DEFAULT,
           vibrationPattern: [0, 250],
           sound: 'default',
         });
-
-        await Notifications.setNotificationChannelAsync('re-engagement', {
+  await Notifications.setNotificationChannelAsync('re-engagement', {
           name: 'Re-engagement',
           importance: Notifications.AndroidImportance.LOW,
           sound: 'default',
@@ -148,7 +191,8 @@ class NotificationService {
         );
 
         // Schedule the notification
-        const notificationId = await Notifications.scheduleNotificationAsync({
+  const Notifications = await loadNotifications();
+  const notificationId = await Notifications.scheduleNotificationAsync({
           content: {
             title: "Your AYNA Mirror is ready ✨",
             body: "3 confidence-building outfits await you. Start your day feeling ready for anything.",
@@ -218,7 +262,8 @@ class NotificationService {
       const promptTime = new Date();
       promptTime.setHours(promptTime.getHours() + delayHours);
 
-      const notificationId = await Notifications.scheduleNotificationAsync({
+  const Notifications = await loadNotifications();
+  const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title: "How did your outfit make you feel? 💫",
           body: "Your feedback helps AYNA learn your style. It takes just 30 seconds.",
@@ -267,7 +312,8 @@ class NotificationService {
     try {
       const messages = this.getReEngagementMessage(daysSinceLastUse);
       
-      const notificationId = await Notifications.scheduleNotificationAsync({
+  const Notifications = await loadNotifications();
+  const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title: messages.title,
           body: messages.body,
@@ -366,7 +412,8 @@ class NotificationService {
       const scheduledNotifications = await this.getScheduledNotifications(userId);
       
       for (const notification of scheduledNotifications) {
-        await Notifications.cancelScheduledNotificationAsync(notification.id);
+  const Notifications = await loadNotifications();
+  await Notifications.cancelScheduledNotificationAsync(notification.id);
       }
 
       // Clear from storage
@@ -388,7 +435,8 @@ class NotificationService {
       const notificationsToCancel = scheduledNotifications.filter(n => n.type === type);
       
       for (const notification of notificationsToCancel) {
-        await Notifications.cancelScheduledNotificationAsync(notification.id);
+  const Notifications = await loadNotifications();
+  await Notifications.cancelScheduledNotificationAsync(notification.id);
       }
 
       // Update storage
@@ -526,7 +574,8 @@ class NotificationService {
    */
   async areNotificationsEnabled(): Promise<boolean> {
     try {
-      const { status } = await Notifications.getPermissionsAsync();
+  const Notifications = await loadNotifications();
+  const { status } = await Notifications.getPermissionsAsync();
       return status === 'granted';
     } catch (error) {
       // Failed to check notification permissions

@@ -1,16 +1,22 @@
 // Notification Handler Service
 // Handles deep linking and notification responses for AYNA Mirror
 
-import * as Notifications from 'expo-notifications';
+// P0 Notifications: convert static expo-notifications import to dynamic lazy loader to reduce startup & comply with lazy policy
+let Notifications: any;
+async function ensureNotifications() {
+  if (!Notifications) {
+    Notifications = await import('expo-notifications');
+  }
+  return Notifications;
+}
 import { router } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
 import { logInDev, errorInDev } from '@/utils/consoleSuppress';
 
-export interface NotificationResponse {
-  notification: Notifications.Notification;
-  actionIdentifier: string;
-}
+// Minimal runtime-safe structural types (avoids compile-time dependency on module namespace)
+export interface NotificationEnvelope { request: { content: { data: any } } }
+export interface NotificationResponse { notification: NotificationEnvelope; actionIdentifier: string; }
 
 class NotificationHandler {
   private static instance: NotificationHandler;
@@ -33,10 +39,11 @@ class NotificationHandler {
 
     try {
       // Handle notification responses (when user taps notification)
-      Notifications.addNotificationResponseReceivedListener(this.handleNotificationResponse);
+  const N = await ensureNotifications();
+  N.addNotificationResponseReceivedListener(this.handleNotificationResponse);
 
       // Handle notifications received while app is in foreground
-      Notifications.addNotificationReceivedListener(this.handleNotificationReceived);
+  N.addNotificationReceivedListener(this.handleNotificationReceived);
 
       // Handle deep links from notifications
       Linking.addEventListener('url', this.handleDeepLink);
@@ -86,7 +93,7 @@ class NotificationHandler {
   /**
    * Handle notification received while app is in foreground
    */
-  private handleNotificationReceived = (notification: Notifications.Notification): void => {
+  private handleNotificationReceived = (notification: NotificationEnvelope): void => {
     try {
       const data = notification.request.content.data;
       logInDev('Notification received in foreground:', data);

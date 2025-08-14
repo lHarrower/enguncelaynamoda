@@ -4,7 +4,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/config/supabaseClient';
 import { logInDev, errorInDev } from '@/utils/consoleSuppress';
-import { AynaMirrorService as AynaSvcStatic } from '@/services/aynaMirrorService';
 import {
   DailyRecommendations,
   WardrobeItem,
@@ -12,15 +11,9 @@ import {
   UserPreferences
 } from '../types/aynaMirror';
 
-// Lightweight shim in case dynamic import returns unexpected shape in tests
-// Will be unused in normal runtime, but prevents undefined access under certain jest mocks
-const AynaMirrorServiceShim = {
-  async generateDailyRecommendations(userId: string): Promise<DailyRecommendations> {
-    const mod: any = await import('@/services/aynaMirrorService');
-    const svc = mod.AynaMirrorService || mod.default || mod.aynaMirrorService;
-    return svc.generateDailyRecommendations(userId);
-  }
-};
+// NOTE: Intentionally avoid static import of AynaMirrorService to break circular dependency:
+// aynaMirrorService -> performanceOptimizationService -> aynaMirrorService.
+// We will lazy-load it only when pre-generation is invoked.
 
 // ============================================================================
 // CACHE KEYS AND CONFIGURATION
@@ -103,15 +96,10 @@ export class PerformanceOptimizationService {
         return;
       }
 
-      // Prefer static import (mock-friendly); fallback to dynamic if unavailable
-      let recommendations: DailyRecommendations;
-      if (AynaSvcStatic && typeof (AynaSvcStatic as any).generateDailyRecommendations === 'function') {
-        recommendations = await (AynaSvcStatic as any).generateDailyRecommendations(userId);
-      } else {
-        const mod: any = await import('@/services/aynaMirrorService');
-        const target = (mod && mod.AynaMirrorService) || mod?.default || mod?.aynaMirrorService || AynaMirrorServiceShim;
-        recommendations = await target.generateDailyRecommendations(userId);
-      }
+  // Dynamic import to avoid require cycle
+  const mod: any = await import('@/services/aynaMirrorService');
+  const target = (mod && mod.AynaMirrorService) || mod?.default || mod?.aynaMirrorService;
+  const recommendations: DailyRecommendations = await target.generateDailyRecommendations(userId);
       
       // Cache the recommendations
       await this.cacheRecommendations(userId, recommendations, tomorrowKey);
