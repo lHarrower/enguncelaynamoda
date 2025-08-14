@@ -1,3 +1,17 @@
+// Force mock for deepLinkService so default & named exports always exist in tests
+jest.mock('@/services/deepLinkService', () => {
+  const mock = {
+    parse: jest.fn(() => ({ name: 'Home' })),
+    isValid: jest.fn(() => true),
+    toURL: jest.fn((name: string) => `aynamoda://${String(name).toLowerCase()}`),
+    processDeepLinkParams: jest.fn((params: any) => params ?? {}),
+  };
+  return {
+    __esModule: true,
+    default: mock,
+    ...mock, // expose named exports (parse, isValid, toURL, processDeepLinkParams)
+  };
+});
 // AYNA Mirror Navigation Integration Tests
 import React from 'react';
 import { render, waitFor, fireEvent } from '@testing-library/react-native';
@@ -184,15 +198,19 @@ describe('AYNA Mirror Navigation Integration', () => {
       const { useLocalSearchParams } = require('expo-router');
       useLocalSearchParams.mockReturnValue(mockParams);
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      // Get the mocked deep link service default export
+      const deep = require('@/services/deepLinkService').default;
+      // Reset call counts for safety
+      deep.processDeepLinkParams.mockClear();
 
       render(<AynaMirrorPage />);
 
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalled();
+        expect(deep.processDeepLinkParams).toHaveBeenCalledTimes(1);
+        expect(deep.processDeepLinkParams).toHaveBeenCalledWith(
+          expect.objectContaining({ feedback: 'outfit-123' })
+        );
       });
-
-      consoleSpy.mockRestore();
     });
 
     it('should initialize notification handler on app start', async () => {

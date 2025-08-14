@@ -1,0 +1,23 @@
+appId: com.aynamoda.app
+name: AYNA Moda Smoke (Analyze Flow)
+---
+- launchApp
+- deeplink: aynamoda://test
+- tapOn: "Wardrobe"
+- tapOn: "Analyze"
+- assertVisible: "Analyze" # Modal header or persistent analyze text
+- back
+- relaunchApp
+- tapOn: "Wardrobe"
+- assertVisible: "Analyze"appId: com.aynamoda.app
+name: AYNA Moda Smoke
+---
+- launchApp
+- deeplink: aynamoda://test
+- tapOn: "Wardrobe"
+- tapOn: "Analyze"
+- assertVisible: "Analyzing"
+- back
+- relaunchApp
+- tapOn: "Wardrobe"
+- assertVisible: "Analyze"

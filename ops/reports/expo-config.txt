@@ -1,0 +1,39 @@
+﻿env: load .env
+env: export EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID
+
+{
+  name: [32m'aynamoda'[39m,
+  slug: [32m'aynamoda'[39m,
+  version: [32m'1.0.1'[39m,
+  scheme: [32m'aynamoda'[39m,
+  plugins: [
+    [
+      [32m'@sentry/react-native/expo'[39m,
+      {
+        organization: [32m'your-org'[39m,
+        project: [32m'aynamoda'[39m
+      }
+    ]
+  ],
+  runtimeVersion: [32m'1.0.1'[39m,
+  description: [90mundefined[39m,
+  sdkVersion: [32m'53.0.0'[39m,
+  platforms: [
+    [32m'ios'[39m,
+    [32m'android'[39m,
+    [32m'web'[39m
+  ],
+  updates: {
+    url: [32m'https://u.expo.dev/3b04f89d-193b-4a40-a5a7-6af7007e0c54'[39m
+  },
+  extra: {
+    eas: {
+      projectId: [32m'3b04f89d-193b-4a40-a5a7-6af7007e0c54'[39m
+    },
+    google: {
+      iosClientId: [90mundefined[39m,
+      androidClientId: [90mundefined[39m
+    }
+  }
+}
+

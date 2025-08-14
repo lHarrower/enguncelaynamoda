@@ -332,10 +332,12 @@ describe('EnhancedWardrobeService', () => {
 
       const result = await service.getNeglectedItems(userId, daysSince);
 
-      expect(mockSupabaseRpc).toHaveBeenCalledWith('get_neglected_items', {
+      expect(mockSupabaseRpc).toHaveBeenCalledWith('get_neglected_items', expect.objectContaining({
         user_uuid: userId,
-        days_threshold: daysSince
-      });
+        days_threshold: daysSince,
+        p_user_id: userId,
+        p_days_since: daysSince,
+      }));
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('item-1');
     });

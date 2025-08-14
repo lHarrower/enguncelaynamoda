@@ -16,7 +16,16 @@ import { errorHandlingService } from '@/services/errorHandlingService';
 let _notifications: any; let _notificationsConfigured = false;
 async function loadNotifications() {
   if (!_notifications) {
-    _notifications = await import('expo-notifications');
+    if (process.env.NODE_ENV === 'test') {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        _notifications = require('expo-notifications');
+      } catch {
+        _notifications = await import('expo-notifications');
+      }
+    } else {
+      _notifications = await import('expo-notifications');
+    }
   }
   if (!_notificationsConfigured) {
     try {

@@ -1,0 +1,23 @@
+{
+  "envSample": "ops/env/.env.sample",
+  "expoConfigSnapshot": "ops/reports/expo-config.json",
+  "expoDoctorReport": "ops/reports/expo-doctor.txt",
+  "sourcemapScript": "ops/scripts/upload-sourcemaps-android.sh",
+  "versionBumpScript": "ops/scripts/version-bump.ts",
+  "privacyPolicy": "PRIVACY_POLICY.md",
+  "dataSafetyForm": "DATA_SAFETY_FORM.md",
+  "consentNotices": "CONSENT_NOTICES.md",
+  "logRedactionChecklist": "LOG_REDACTION_CHECKLIST.md",
+  "releaseRunbook": "RELEASE_RUNBOOK.md",
+  "rollbackPlaybook": "ROLLBACK_PLAYBOOK.md",
+  "goNoGoChecklist": "GO_NO-GO_CHECKLIST.md",
+  "qaChecklist": "QA_CHECKLIST.md",
+  "testCredentialsTemplate": "TEST_CREDENTIALS_TEMPLATE.md",
+  "changelog": "CHANGELOG.md",
+  "releaseNotes": "RELEASE_NOTES.md",
+  "whatsNew": "WHATS_NEW.txt",
+  "smokeSpec": "ops/e2e/maestro/aynamoda.smoke.yaml",
+  "a11ySmoke": "ops/A11Y_SMOKE.md",
+  "sentryDsnWarning": "ops/warnings/SENTRY_DSN_MISSING.md",
+  "pendingBuildReport": "ops/reports/last-build.json (to be generated after EAS build)"
+}

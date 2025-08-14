@@ -1,181 +1,248 @@
 /**
- * Deep Link Service
- * Handles deep link navigation and parameter processing
+ * Deep Link parsing & generation service
+ * Public named export: parseDeepLink(url)
+ * Default export: { parse, isValid, toURL, processDeepLinkParams }
+ *
+ * Rules:
+ * - Scheme must be aynamoda:// (case-insensitive)
+ * - Allowed hosts: item, home, settings, promo
+ * - item requires id param
+ * - Fallback: { name: 'Home' } on any invalid condition
+ * - All params URL-decoded
  */
+import { logger } from '@/utils/logger';
 
-import { router } from 'expo-router';
-import { analyticsService } from './analyticsService';
+export interface DeepLinkResult {
+  name: string;
+  params?: Record<string, string | number | boolean | null | undefined>;
+}
 
-interface DeepLinkParams {
+type AllowedHost = 'item' | 'home' | 'settings' | 'promo';
+
+interface HostRouteConfig {
+  routeName: string;
+  requires?: Array<{ key: string }>;
+}
+
+const SCHEME = 'aynamoda://';
+
+const HOST_ROUTE_MAP: Record<AllowedHost, HostRouteConfig> = {
+  item: { routeName: 'Item', requires: [{ key: 'id' }] },
+  home: { routeName: 'Home' },
+  settings: { routeName: 'Settings' },
+  promo: { routeName: 'Promo' },
+};
+
+const FALLBACK: DeepLinkResult = { name: 'Home' };
+
+/**
+ * Parse query string into a param record with URL decoding.
+ */
+function parseQueryParams(query: string): Record<string, string> {
+  if (!query) return {};
+  return query
+    .replace(/^\?/, '')
+    .split('&')
+    .filter(Boolean)
+    .reduce<Record<string, string>>((acc, pair) => {
+      const [rawK, rawV = ''] = pair.split('=');
+      try {
+        const k = decodeURIComponent(rawK);
+        const v = decodeURIComponent(rawV);
+        acc[k] = v;
+      } catch {
+        // Skip malformed components silently
+      }
+      return acc;
+    }, {});
+}
+
+/**
+ * Internal core parser (no logging).
+ */
+function coreParse(url: string): DeepLinkResult {
+  if (typeof url !== 'string' || !url) return FALLBACK;
+
+  const lower = url.toLowerCase();
+  if (!lower.startsWith(SCHEME)) {
+    return FALLBACK;
+  }
+
+  const withoutScheme = url.slice(SCHEME.length);
+
+  const firstSepIdx = withoutScheme.search(/[/?]/);
+  const hostRaw =
+    firstSepIdx === -1 ? withoutScheme : withoutScheme.slice(0, firstSepIdx);
+  const host = hostRaw.toLowerCase() as AllowedHost;
+
+  if (!Object.prototype.hasOwnProperty.call(HOST_ROUTE_MAP, host)) {
+    return FALLBACK;
+  }
+
+  let query = '';
+  const qIndex = withoutScheme.indexOf('?');
+  if (qIndex >= 0) {
+    query = withoutScheme.slice(qIndex);
+  }
+
+  const params = parseQueryParams(query);
+  const cfg = HOST_ROUTE_MAP[host];
+
+  if (cfg.requires) {
+    for (const req of cfg.requires) {
+      if (!params[req.key]) {
+        return FALLBACK;
+      }
+    }
+  }
+
+  return Object.keys(params).length
+    ? { name: cfg.routeName, params }
+    : { name: cfg.routeName };
+}
+
+/**
+ * Public API: Parse a deep link URL string into a route + params.
+ * Fallbacks to { name: 'Home' } when invalid.
+ */
+export function parseDeepLink(url: string): DeepLinkResult {
+  const result = coreParse(url);
+  if (result === FALLBACK) {
+    logger?.warn?.('deep_link_invalid', {
+      url,
+      reason: 'invalid_scheme_host_or_params',
+    });
+  } else {
+    logger?.info?.('deep_link_parsed', {
+      url,
+      name: result.name,
+      hasParams: Boolean(result.params && Object.keys(result.params).length),
+    });
+  }
+  return result;
+}
+
+/**
+ * Validate a deep link without returning parsed params.
+ * Valid only if parsing did not yield the shared FALLBACK reference.
+ */
+function isValid(url: string): boolean {
+  return coreParse(url) !== FALLBACK;
+}
+
+/**
+ * Generate a deep link URL for a given route name and optional params.
+ * Unknown names fallback to home.
+ */
+function toURL(
+  name: string,
+  params?: Record<string, string | number | boolean | null | undefined>
+): string {
+  const entry = (Object.entries(HOST_ROUTE_MAP) as Array<
+    [AllowedHost, HostRouteConfig]
+  >).find(([, cfg]) => cfg.routeName === name);
+  const host: AllowedHost = entry ? entry[0] : 'home';
+
+  let query = '';
+  if (params && Object.keys(params).length) {
+    const qp = Object.entries(params)
+      .filter(([, v]) => v !== undefined)
+      .map(
+        ([k, v]) =>
+          `${encodeURIComponent(k)}=${encodeURIComponent(
+            v === null ? '' : String(v)
+          )}`
+      )
+      .join('&');
+    if (qp) query = `?${qp}`;
+  }
+  return `${SCHEME}${host}${query}`;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Backward-compatible deep link params adapter                               */
+/* -------------------------------------------------------------------------- */
+
+export type DeepLinkInput = {
   feedback?: string;
   outfit?: string;
   item?: string;
-  screen?: string;
-  action?: string;
+  [key: string]: unknown;
+};
+
+export type DeepLinkNormalized = {
+  feedback?: string;
+  outfitId?: string;
+  itemId?: string;
+  extras?: Record<string, unknown>;
+};
+
+/**
+ * Normalize legacy / raw deep link param objects to consistent shape.
+ * - Trims & URL-decodes string fields
+ * - Renames outfit -> outfitId, item -> itemId
+ * - Collects unknown keys into extras
+ * - Returns {} if nothing useful
+ */
+export function processDeepLinkParams(
+  input?: DeepLinkInput | null
+): DeepLinkNormalized {
+  if (!input || typeof input !== 'object') return {};
+
+  const out: DeepLinkNormalized = {};
+  const extras: Record<string, unknown> = {};
+
+  const decodeValue = (val: string): string => {
+    const trimmed = val.trim();
+    if (!trimmed) return '';
+    try {
+      return decodeURIComponent(trimmed);
+    } catch {
+      return trimmed;
+    }
+  };
+
+  if (typeof input.feedback === 'string') {
+    const v = decodeValue(input.feedback);
+    if (v) out.feedback = v;
+  }
+  if (typeof input.outfit === 'string') {
+    const v = decodeValue(input.outfit);
+    if (v) out.outfitId = v;
+  }
+  if (typeof input.item === 'string') {
+    const v = decodeValue(input.item);
+    if (v) out.itemId = v;
+  }
+
+  for (const [k, v] of Object.entries(input)) {
+    if (k === 'feedback' || k === 'outfit' || k === 'item') continue;
+    if (v !== undefined) extras[k] = v;
+  }
+
+  if (Object.keys(extras).length) out.extras = extras;
+
+  const hasUseful =
+    !!out.feedback ||
+    !!out.outfitId ||
+    !!out.itemId ||
+    (out.extras ? Object.keys(out.extras).length > 0 : false);
+
+  logger?.info?.('deep_link_params_processed', {
+    hasFeedback: !!out.feedback,
+    hasOutfitId: !!out.outfitId,
+    hasItemId: !!out.itemId,
+  });
+
+  return hasUseful ? out : {};
 }
 
-class DeepLinkService {
-  /**
-   * Handle feedback deep link
-   */
-  handleFeedbackLink(feedbackType: string): void {
-    try {
-      analyticsService.trackEvent('deep_link_feedback', {
-        feedback_type: feedbackType,
-        timestamp: new Date().toISOString()
-      });
+// Default export (stable public API)
+const deepLinkAPI = {
+  parse: parseDeepLink,
+  isValid,
+  toURL,
+  processDeepLinkParams,
+};
 
-      switch (feedbackType) {
-        case 'outfit_rating':
-          // Navigate to outfit rating screen or show modal
-          this.showFeedbackModal('outfit');
-          break;
-        case 'style_preference':
-          // Navigate to style preference screen
-          this.showFeedbackModal('style');
-          break;
-        case 'general':
-          // Show general feedback form
-          this.showFeedbackModal('general');
-          break;
-        default:
-          console.log('Unknown feedback type:', feedbackType);
-      }
-    } catch (error) {
-      console.error('DeepLink: Failed to handle feedback link', error);
-    }
-  }
-
-  /**
-   * Handle outfit deep link
-   */
-  handleOutfitLink(outfitId: string): void {
-    try {
-      analyticsService.trackEvent('deep_link_outfit', {
-        outfit_id: outfitId,
-        timestamp: new Date().toISOString()
-      });
-
-      // Navigate to specific outfit
-  router.push((`/outfit/${outfitId}` as unknown) as any);
-    } catch (error) {
-      console.error('DeepLink: Failed to handle outfit link', error);
-    }
-  }
-
-  /**
-   * Handle wardrobe item deep link
-   */
-  handleItemLink(itemId: string): void {
-    try {
-      analyticsService.trackEvent('deep_link_item', {
-        item_id: itemId,
-        timestamp: new Date().toISOString()
-      });
-
-      // Navigate to specific wardrobe item
-      router.push(`/wardrobe?item=${itemId}`);
-    } catch (error) {
-      console.error('DeepLink: Failed to handle item link', error);
-    }
-  }
-
-  /**
-   * Handle screen navigation deep link
-   */
-  handleScreenLink(screenName: string, action?: string): void {
-    try {
-      analyticsService.trackEvent('deep_link_screen', {
-        screen_name: screenName,
-        action: action,
-        timestamp: new Date().toISOString()
-      });
-
-      switch (screenName) {
-        case 'wardrobe':
-          router.push('/wardrobe');
-          break;
-        case 'favorites':
-          router.push(('/favorites' as unknown) as any);
-          break;
-        case 'ayna-mirror':
-          router.push('/ayna-mirror');
-          break;
-        case 'home':
-          router.push('/');
-          break;
-        default:
-          console.log('Unknown screen:', screenName);
-      }
-    } catch (error) {
-      console.error('DeepLink: Failed to handle screen link', error);
-    }
-  }
-
-  /**
-   * Process all deep link parameters
-   */
-  processDeepLinkParams(params: DeepLinkParams): void {
-    try {
-      // Track deep link usage
-      analyticsService.trackEvent('deep_link_accessed', {
-        params: JSON.stringify(params),
-        timestamp: new Date().toISOString()
-      });
-
-      // Handle each parameter type
-      if (params.feedback) {
-        this.handleFeedbackLink(params.feedback);
-      }
-
-      if (params.outfit) {
-        this.handleOutfitLink(params.outfit);
-      }
-
-      if (params.item) {
-        this.handleItemLink(params.item);
-      }
-
-      if (params.screen) {
-        this.handleScreenLink(params.screen, params.action);
-      }
-    } catch (error) {
-      console.error('DeepLink: Failed to process parameters', error);
-    }
-  }
-
-  /**
-   * Show feedback modal (placeholder implementation)
-   */
-  private showFeedbackModal(type: string): void {
-    // In a real app, this would show a modal or navigate to feedback screen
-    console.log(`Showing ${type} feedback modal`);
-    
-    // Future implementation:
-    // - Show modal with feedback form
-    // - Navigate to dedicated feedback screen
-    // - Trigger in-app notification
-  }
-
-  /**
-   * Generate deep link URL for sharing
-   */
-  generateDeepLink(type: string, id: string): string {
-    const baseUrl = 'aynamoda://'; // App scheme
-    
-    switch (type) {
-      case 'outfit':
-        return `${baseUrl}outfit/${id}`;
-      case 'item':
-        return `${baseUrl}item/${id}`;
-      case 'feedback':
-        return `${baseUrl}feedback/${id}`;
-      default:
-        return baseUrl;
-    }
-  }
-}
-
-// Export singleton instance
-export const deepLinkService = new DeepLinkService();
-export default deepLinkService;
+export default deepLinkAPI;

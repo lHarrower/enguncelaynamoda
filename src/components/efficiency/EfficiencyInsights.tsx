@@ -12,7 +12,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useEfficiencyScore } from '@/hooks/useEfficiencyScore';
 import { EfficiencyScore, EfficiencyMetrics } from '@/services/efficiencyScoreService';
-import { PieChart } from 'react-native-chart-kit';
+// Replaced react-native-chart-kit with Victory wrapper
+import PieChartWrapper from '@/components/charts/LineChart';
 
 const { width } = Dimensions.get('window');
 const chartConfig = {
@@ -278,38 +279,38 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
   const renderBreakdownTab = () => {
     if (!currentScore) return null;
 
-    const breakdownData = [
+  const breakdownData = [
       {
         name: 'Utilization',
-        population: currentScore.breakdown.utilization,
+    score: currentScore.breakdown.utilization,
         color: '#6366F1',
         legendFontColor: '#1E293B',
         legendFontSize: 12
       },
       {
         name: 'Cost Efficiency',
-        population: currentScore.breakdown.costEfficiency,
+    score: currentScore.breakdown.costEfficiency,
         color: '#10B981',
         legendFontColor: '#1E293B',
         legendFontSize: 12
       },
       {
         name: 'Sustainability',
-        population: currentScore.breakdown.sustainability,
+    score: currentScore.breakdown.sustainability,
         color: '#F59E0B',
         legendFontColor: '#1E293B',
         legendFontSize: 12
       },
       {
         name: 'Versatility',
-        population: currentScore.breakdown.versatility,
+    score: currentScore.breakdown.versatility,
         color: '#EF4444',
         legendFontColor: '#1E293B',
         legendFontSize: 12
       },
       {
         name: 'Curation',
-        population: currentScore.breakdown.curation,
+    score: currentScore.breakdown.curation,
         color: '#8B5CF6',
         legendFontColor: '#1E293B',
         legendFontSize: 12
@@ -321,16 +322,11 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
         {/* Breakdown Chart */}
         <View style={styles.chartContainer}>
           <Text style={styles.chartTitle}>Score Breakdown</Text>
-          <PieChart
-            data={breakdownData}
+          <PieChartWrapper
+            data={breakdownData.map(d => ({ name: d.name, score: d.score, color: d.color }))}
             width={width - 40}
             height={220}
-            chartConfig={chartConfig}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            center={[10, 10]}
-            absolute
+            accessibilityLabel="Score breakdown chart"
           />
         </View>
 

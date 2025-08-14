@@ -1,0 +1,30 @@
+﻿Unused dependencies
+* @expo-google-fonts/karla
+* @expo-google-fonts/manrope
+* @react-native-google-signin/google-signin
+* @react-native-masked-view/masked-view
+* @react-native-seoul/masonry-list
+* date-fns
+* expo-av
+* expo-crypto
+* expo-dev-client
+* expo-navigation-bar
+* expo-updates
+* expo-video
+* react-dom
+* react-native-svg
+Unused devDependencies
+* @sentry/cli
+* @types/jest
+* eas-cli
+* jest-environment-jsdom
+* jsdom
+* metro-react-native-babel-preset
+* ts-jest
+* typescript
+Missing dependencies
+* eslint-config-prettier: .\.eslintrc.js
+* @expo/config-types: .\app.config.ts
+* jsr:@supabase: .\supabase\functions\ai-proxy\index.ts
+* @react-navigation/native: .\src\__tests__\utils\testUtils.tsx
+* expo-application: .\src\services\notificationService.ts

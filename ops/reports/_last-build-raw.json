@@ -1,0 +1,42 @@
+﻿{
+  "id": "9dc902d0-b0ae-4372-8bdb-ff1e502613d2",
+  "status": "FINISHED",
+  "platform": "ANDROID",
+  "artifacts": {
+    "buildUrl": "https://expo.dev/artifacts/eas/ku595pjWtqRbktnT7oJrSb.aab",
+    "applicationArchiveUrl": "https://expo.dev/artifacts/eas/ku595pjWtqRbktnT7oJrSb.aab"
+  },
+  "initiatingActor": {
+    "id": "a83c3f3c-b0b4-48d5-b2db-7ef65598c04e",
+    "displayName": "guiprohuso"
+  },
+  "project": {
+    "id": "3b04f89d-193b-4a40-a5a7-6af7007e0c54",
+    "name": "aynamoda",
+    "slug": "aynamoda",
+    "ownerAccount": {
+      "id": "a66fee96-5cf8-4917-af77-ee6b32c3c0c6",
+      "name": "guiprohuso"
+    }
+  },
+  "channel": "production",
+  "distribution": "STORE",
+  "buildProfile": "production",
+  "sdkVersion": "53.0.0",
+  "appVersion": "1.0.0",
+  "appBuildVersion": "2",
+  "runtimeVersion": "1.0.1",
+  "gitCommitHash": "986b36e2adc5d7a16822e01910579209c6c5aeca",
+  "gitCommitMessage": "chore(release): strengthen sentry init with release and dist",
+  "priority": "NORMAL",
+  "createdAt": "2025-08-14T11:48:30.060Z",
+  "updatedAt": "2025-08-14T12:43:41.199Z",
+  "completedAt": "2025-08-14T12:43:32.685Z",
+  "expirationDate": "2025-09-13T11:48:30.133Z",
+  "isForIosSimulator": false,
+  "metrics": {
+    "buildWaitTime": 264,
+    "buildQueueTime": 2724381,
+    "buildDuration": 577657
+  }
+}
