@@ -1,0 +1,155 @@
+name: Unified Audit Pipeline
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * *'
+
+concurrency:
+  group: audit-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  pr_static:
+    name: PR Static Audit (Fast Lane)
+    if: github.event_name == 'pull_request'
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install deps
+        run: npm ci
+      - name: PR Audit (light)
+        run: npm run audit:pr
+      - name: Upload Static Audit Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-static-${{ github.run_id }}
+          path: audit/out
+
+  full_audit:
+    name: Full Audit (Push / Nightly)
+    if: github.event_name != 'pull_request'
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install deps
+        run: npm ci
+      - name: Install Supplementary Tools
+        shell: pwsh
+        run: |
+          npm install --no-save cyclonedx-npm license-checker
+          pip install --disable-pip-version-check --no-cache-dir semgrep || echo 'Semgrep install skipped'
+          echo 'Attempting osv-scanner install'
+          curl -sSfL https://github.com/google/osv-scanner/releases/latest/download/osv-scanner_windows_amd64.exe -o osv-scanner.exe || echo 'OSV download skipped'
+          echo 'Attempting gitleaks install'
+          (iwr https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_windows_x64.zip -OutFile gitleaks.zip) || echo 'gitleaks download skipped'
+          if(Test-Path gitleaks.zip){Expand-Archive gitleaks.zip -DestinationPath . -Force}
+          $env:PATH+=";${PWD}"
+      - name: Full Audit
+        run: npm run audit:full
+      - name: Upload Full Audit Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-full-${{ github.run_id }}
+          path: audit/out
+
+  performance_audit:
+    name: Performance Monitoring
+    if: github.event_name != 'pull_request'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build web version for Lighthouse
+        run: |
+          npm run build:web || echo "Web build not available, skipping Lighthouse audit"
+      - name: Start development server
+        run: |
+          npm run dev &
+          sleep 10
+        shell: bash
+      - name: Wait for server to be ready
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done' || echo "Server not ready, continuing with available tests"
+        shell: bash
+      - name: Run Lighthouse CI
+        run: |
+          npx @lhci/cli autorun || echo "Lighthouse CI completed with warnings"
+      - name: Run comprehensive performance audit
+        run: |
+          npm run audit:perf || echo "Performance audit completed with warnings"
+      - name: Upload Performance Audit Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-audit-${{ github.run_id }}
+          path: |
+            audit/out/perf
+            audit/out/lighthouse-ci
+      - name: Comment Performance Results on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            try {
+              const perfSummaryPath = path.join('audit', 'out', 'perf', 'perf-summary.json');
+              if (fs.existsSync(perfSummaryPath)) {
+                const summary = JSON.parse(fs.readFileSync(perfSummaryPath, 'utf8'));
+                
+                const comment = `## 🚀 Performance Audit Results
+                
+                **Startup Performance:**
+                - P50: ${summary.metrics.startupP50}ms
+                - P95: ${summary.metrics.startupP95}ms
+                
+                **Web Performance:**
+                - Lighthouse Score: ${summary.metrics.lighthousePerformance}
+                - Frame Drop: ${summary.metrics.jsFrameDropPct}%
+                
+                **Bundle Size:**
+                - Web: ${summary.metrics.bundleSizeWeb} bytes
+                
+                ${summary.recommendations.length > 0 ? 
+                  `**Recommendations:**\n${summary.recommendations.map(r => `- ${r}`).join('\n')}` : 
+                  '✅ No performance issues detected'
+                }
+                
+                _Performance audit completed at ${summary.timestamp}_`;
+                
+                github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: comment
+                });
+              }
+            } catch (error) {
+              console.log('Performance summary not available:', error.message);
+            }

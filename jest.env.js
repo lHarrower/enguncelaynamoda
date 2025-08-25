@@ -17,11 +17,9 @@ console.warn = (...args) => {
   const message = args[0];
   if (
     typeof message === 'string' &&
-    (
-      message.includes('Warning: EXPO_PUBLIC_SUPABASE_ANON_KEY seems too short') ||
+    (message.includes('Warning: EXPO_PUBLIC_SUPABASE_ANON_KEY seems too short') ||
       message.includes('Running in development mode with invalid Supabase config') ||
-      message.includes('ReactNativeFiberHostComponent')
-    )
+      message.includes('ReactNativeFiberHostComponent'))
   ) {
     return;
   }
@@ -33,10 +31,8 @@ console.error = (...args) => {
   const message = args[0];
   if (
     typeof message === 'string' &&
-    (
-      message.includes('Supabase configuration error') ||
-      message.includes('Missing required environment variables')
-    )
+    (message.includes('Supabase configuration error') ||
+      message.includes('Missing required environment variables'))
   ) {
     return;
   }

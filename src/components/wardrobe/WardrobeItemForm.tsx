@@ -1,24 +1,24 @@
 // Enhanced Wardrobe Item Form with AI Naming
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
+  Modal,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  Modal,
-  Alert,
-  Dimensions,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/theme/DesignSystem';
+
 import { supabase } from '@/config/supabaseClient';
-import { WardrobeItem, ItemCategory } from '@/types/aynaMirror';
-import { AINameGenerator } from '../naming/AINameGenerator';
 import { useAINaming } from '@/hooks/useAINaming';
 import { enhancedWardrobeService } from '@/services/enhancedWardrobeService';
-import { logInDev, errorInDev } from '@/utils/consoleSuppress';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { ItemCategory, WardrobeItem } from '@/types/aynaMirror';
+import { errorInDev } from '@/utils/consoleSuppress';
+
+import { AINameGenerator } from '../naming/AINameGenerator';
 
 interface WardrobeItemFormProps {
   item?: Partial<WardrobeItem>;
@@ -29,12 +29,12 @@ interface WardrobeItemFormProps {
 
 const CATEGORIES: ItemCategory[] = [
   'tops',
-  'bottoms', 
+  'bottoms',
   'dresses',
   'shoes',
   'accessories',
   'outerwear',
-  'activewear'
+  'activewear',
 ];
 
 const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '6', '7', '8', '9', '10', '11', '12'];
@@ -43,24 +43,24 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
   item,
   onSave,
   onCancel,
-  isEditing = false
+  isEditing = false,
 }) => {
   const { getEffectiveName } = useAINaming();
-  
+
   const [formData, setFormData] = useState({
     name: item?.name || '',
     aiGeneratedName: item?.aiGeneratedName || '',
     nameOverride: item?.nameOverride || false,
-    category: item?.category || 'tops' as ItemCategory,
+    category: item?.category || ('tops' as ItemCategory),
     subcategory: item?.subcategory || '',
     colors: item?.colors || [],
     brand: item?.brand || '',
     size: item?.size || '',
-  purchaseDate: item?.purchaseDate ? new Date((item as any).purchaseDate).toISOString().slice(0, 10) : '',
-  purchasePrice: typeof item?.purchasePrice === 'number' ? (item?.purchasePrice as number) : 0,
+    purchaseDate: item?.purchaseDate ? new Date(item.purchaseDate).toISOString().slice(0, 10) : '',
+    purchasePrice: typeof item?.purchasePrice === 'number' ? item?.purchasePrice : 0,
     tags: item?.tags || [],
     notes: item?.notes || '',
-    imageUri: item?.imageUri || ''
+    imageUri: item?.imageUri || '',
   });
 
   const [newColor, setNewColor] = useState('');
@@ -78,59 +78,59 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
   }, [isEditing, formData.imageUri, formData.name, formData.aiGeneratedName]);
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // If user manually enters a name, mark as override
     if (field === 'name' && value.trim()) {
-      setFormData(prev => ({ ...prev, nameOverride: true }));
+      setFormData((prev) => ({ ...prev, nameOverride: true }));
       setUseAIName(false);
     }
   };
 
   const handleSelectChange = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleAddColor = () => {
     if (newColor.trim() && !formData.colors.includes(newColor.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        colors: [...prev.colors, newColor.trim()]
+        colors: [...prev.colors, newColor.trim()],
       }));
       setNewColor('');
     }
   };
 
   const handleRemoveColor = (colorToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      colors: prev.colors.filter(color => color !== colorToRemove)
+      colors: prev.colors.filter((color) => color !== colorToRemove),
     }));
   };
 
   const handleAddTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, newTag.trim()]
+        tags: [...prev.tags, newTag.trim()],
       }));
       setNewTag('');
     }
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
   };
 
   const handleAINameSelected = (name: string, isAIGenerated: boolean) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       name: isAIGenerated ? '' : name,
       aiGeneratedName: isAIGenerated ? name : prev.aiGeneratedName,
-      nameOverride: !isAIGenerated
+      nameOverride: !isAIGenerated,
     }));
     setUseAIName(isAIGenerated);
     setShowAINaming(false);
@@ -162,10 +162,13 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
         brand: formData.brand || undefined,
         size: formData.size || undefined,
         purchaseDate: formData.purchaseDate ? new Date(formData.purchaseDate) : undefined,
-        purchasePrice: typeof formData.purchasePrice === 'number' ? formData.purchasePrice : parseFloat(String(formData.purchasePrice)) || undefined,
+        purchasePrice:
+          typeof formData.purchasePrice === 'number'
+            ? formData.purchasePrice
+            : parseFloat(String(formData.purchasePrice)) || undefined,
         tags: formData.tags,
         notes: formData.notes || undefined,
-        imageUri: formData.imageUri
+        imageUri: formData.imageUri,
       };
 
       if (isEditing && item?.id) {
@@ -181,10 +184,12 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
             colors: itemData.colors,
             brand: itemData.brand,
             size: itemData.size,
-            purchase_date: itemData.purchaseDate ? (itemData.purchaseDate as Date).toISOString().slice(0, 10) : undefined,
+            purchase_date: itemData.purchaseDate
+              ? itemData.purchaseDate.toISOString().slice(0, 10)
+              : undefined,
             purchase_price: itemData.purchasePrice,
             tags: itemData.tags,
-            notes: itemData.notes
+            notes: itemData.notes,
           })
           .eq('id', item.id);
 
@@ -195,33 +200,38 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
         onSave(itemData as WardrobeItem);
       } else {
         // Create new item
-        const newItemData = await enhancedWardrobeService.saveClothingItem({
-          image_uri: itemData.imageUri!,
-          processed_image_uri: itemData.imageUri!, // Assuming same for now
-          category: itemData.category!,
-          subcategory: itemData.subcategory,
-          colors: itemData.colors!,
-          brand: itemData.brand,
-          size: itemData.size,
-          purchase_date: itemData.purchaseDate ? (itemData.purchaseDate as Date).toISOString().slice(0, 10) : undefined,
-          purchase_price: itemData.purchasePrice,
-          tags: itemData.tags,
-          notes: itemData.notes,
-          name: itemData.name,
-          ai_generated_name: itemData.aiGeneratedName,
-          name_override: itemData.nameOverride
-        }, false); // Don't auto-generate AI name since we handle it manually
+        const newItemData = await enhancedWardrobeService.saveClothingItem(
+          {
+            image_uri: itemData.imageUri!,
+            processed_image_uri: itemData.imageUri!, // Assuming same for now
+            category: itemData.category!,
+            subcategory: itemData.subcategory,
+            colors: itemData.colors!,
+            brand: itemData.brand,
+            size: itemData.size,
+            purchase_date: itemData.purchaseDate
+              ? itemData.purchaseDate.toISOString().slice(0, 10)
+              : undefined,
+            purchase_price: itemData.purchasePrice,
+            tags: itemData.tags,
+            notes: itemData.notes,
+            name: itemData.name,
+            ai_generated_name: itemData.aiGeneratedName,
+            name_override: itemData.nameOverride,
+          },
+          false,
+        ); // Don't auto-generate AI name since we handle it manually
 
         onSave({
           ...itemData,
           id: newItemData.id,
           userId: newItemData.user_id,
           createdAt: new Date(newItemData.created_at),
-          updatedAt: new Date(newItemData.updated_at)
+          updatedAt: new Date(newItemData.updated_at),
         } as WardrobeItem);
       }
     } catch (err) {
-      errorInDev('Error saving item:', err);
+      errorInDev('Error saving item:', err instanceof Error ? err : String(err));
       setError(err instanceof Error ? err.message : 'Failed to save item');
     } finally {
       setIsSaving(false);
@@ -241,9 +251,7 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.title}>
-          {isEditing ? 'Edit Item' : 'Add New Item'}
-        </Text>
+        <Text style={styles.title}>{isEditing ? 'Edit Item' : 'Add New Item'}</Text>
 
         {error && (
           <View style={styles.errorContainer}>
@@ -269,6 +277,9 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
               <TouchableOpacity
                 style={styles.aiButton}
                 onPress={() => setShowAINaming(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Generate AI name"
+                accessibilityHint="Tap to generate an AI-powered name for this item"
               >
                 <Ionicons name="sparkles" size={20} color={DesignSystem.colors.primary[500]} />
               </TouchableOpacity>
@@ -294,7 +305,9 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
             style={styles.textInput}
             placeholder="Enter a custom name or use AI suggestion"
             value={formData.name}
-            onChangeText={(text) => setFormData(prev => ({ ...prev, name: text }))}
+            onChangeText={(text) => setFormData((prev) => ({ ...prev, name: text }))}
+            accessibilityLabel="Item name"
+            accessibilityHint="Enter the name of your wardrobe item"
           />
         </View>
 
@@ -305,11 +318,23 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
           <View style={styles.row}>
             <View style={styles.halfWidth}>
               <Text style={styles.label}>Category</Text>
-              <TouchableOpacity style={styles.picker}>
+              <TouchableOpacity
+                style={styles.picker}
+                accessibilityRole="button"
+                accessibilityLabel={`Category: ${formData.category ? (formData.category || '').charAt(0).toUpperCase() + (formData.category || '').slice(1) : 'Select category'}`}
+                accessibilityHint="Tap to select a category for this item"
+              >
                 <Text style={styles.pickerText}>
-                  {formData.category ? formData.category.charAt(0).toUpperCase() + formData.category.slice(1) : 'Select Category'}
+                  {formData.category
+                    ? (formData.category || '').charAt(0).toUpperCase() +
+                      (formData.category || '').slice(1)
+                    : 'Select Category'}
                 </Text>
-                <Ionicons name="chevron-down" size={20} color={DesignSystem.colors.text.secondary} />
+                <Ionicons
+                  name="chevron-down"
+                  size={20}
+                  color={DesignSystem.colors.text.secondary}
+                />
               </TouchableOpacity>
             </View>
 
@@ -319,7 +344,7 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
                 style={styles.textInput}
                 placeholder="e.g., T-shirt, Jeans, Sneakers"
                 value={formData.subcategory}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, subcategory: text }))}
+                onChangeText={(text) => setFormData((prev) => ({ ...prev, subcategory: text }))}
               />
             </View>
           </View>
@@ -330,17 +355,24 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
               <TextInput
                 style={styles.textInput}
                 value={formData.brand}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, brand: text }))}
+                onChangeText={(text) => setFormData((prev) => ({ ...prev, brand: text }))}
               />
             </View>
 
             <View style={styles.halfWidth}>
               <Text style={styles.label}>Size</Text>
-              <TouchableOpacity style={styles.picker}>
-                <Text style={styles.pickerText}>
-                  {formData.size || 'Select Size'}
-                </Text>
-                <Ionicons name="chevron-down" size={20} color={DesignSystem.colors.text.secondary} />
+              <TouchableOpacity
+                style={styles.picker}
+                accessibilityRole="button"
+                accessibilityLabel={`Size selector: ${formData.size || 'No size selected'}`}
+                accessibilityHint="Tap to select a size for this item"
+              >
+                <Text style={styles.pickerText}>{formData.size || 'Select Size'}</Text>
+                <Ionicons
+                  name="chevron-down"
+                  size={20}
+                  color={DesignSystem.colors.text.secondary}
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -351,7 +383,7 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
               <TextInput
                 style={styles.textInput}
                 value={formData.purchaseDate}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, purchaseDate: text }))}
+                onChangeText={(text) => setFormData((prev) => ({ ...prev, purchaseDate: text }))}
                 placeholder="YYYY-MM-DD"
               />
             </View>
@@ -361,7 +393,9 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
               <TextInput
                 style={styles.textInput}
                 value={String(formData.purchasePrice)}
-                onChangeText={(text) => setFormData(prev => ({ ...prev, purchasePrice: parseFloat(text) || 0 }))}
+                onChangeText={(text) =>
+                  setFormData((prev) => ({ ...prev, purchasePrice: parseFloat(text) || 0 }))
+                }
                 placeholder="$0.00"
                 keyboardType="numeric"
               />
@@ -375,7 +409,12 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
               {formData.colors.map((color, index) => (
                 <View key={index} style={styles.chip}>
                   <Text style={styles.chipText}>{color}</Text>
-                  <TouchableOpacity onPress={() => handleRemoveColor(color)}>
+                  <TouchableOpacity
+                    onPress={() => handleRemoveColor(color)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remove ${color} color`}
+                    accessibilityHint="Tap to remove this color from the item"
+                  >
                     <Ionicons name="close" size={16} color={DesignSystem.colors.text.secondary} />
                   </TouchableOpacity>
                 </View>
@@ -389,7 +428,13 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
                 onChangeText={setNewColor}
                 onSubmitEditing={handleAddColor}
               />
-              <TouchableOpacity style={styles.addButton} onPress={handleAddColor}>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={handleAddColor}
+                accessibilityRole="button"
+                accessibilityLabel="Add color"
+                accessibilityHint="Tap to add the entered color to the item"
+              >
                 <Ionicons name="add" size={20} color={DesignSystem.colors.primary[500]} />
                 <Text style={styles.addButtonText}>Add</Text>
               </TouchableOpacity>
@@ -403,7 +448,12 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
               {formData.tags.map((tag, index) => (
                 <View key={index} style={styles.chip}>
                   <Text style={styles.chipText}>{tag}</Text>
-                  <TouchableOpacity onPress={() => handleRemoveTag(tag)}>
+                  <TouchableOpacity
+                    onPress={() => handleRemoveTag(tag)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Remove ${tag} tag`}
+                    accessibilityHint="Tap to remove this tag from the item"
+                  >
                     <Ionicons name="close" size={16} color={DesignSystem.colors.text.secondary} />
                   </TouchableOpacity>
                 </View>
@@ -417,7 +467,13 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
                 onChangeText={setNewTag}
                 onSubmitEditing={handleAddTag}
               />
-              <TouchableOpacity style={styles.addButton} onPress={handleAddTag}>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={handleAddTag}
+                accessibilityRole="button"
+                accessibilityLabel="Add tag"
+                accessibilityHint="Tap to add the entered tag to the item"
+              >
                 <Ionicons name="add" size={20} color={DesignSystem.colors.primary[500]} />
                 <Text style={styles.addButtonText}>Add</Text>
               </TouchableOpacity>
@@ -430,7 +486,7 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
             <TextInput
               style={[styles.textInput, styles.textArea]}
               value={formData.notes}
-              onChangeText={(text) => setFormData(prev => ({ ...prev, notes: text }))}
+              onChangeText={(text) => setFormData((prev) => ({ ...prev, notes: text }))}
               placeholder="Any additional notes about this item..."
               multiline
               numberOfLines={3}
@@ -440,18 +496,34 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
 
         {/* Actions */}
         <View style={styles.actions}>
-          <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={onCancel}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel"
+            accessibilityHint="Tap to cancel and discard changes"
+          >
             <Ionicons name="close" size={20} color={DesignSystem.colors.text.secondary} />
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.saveButton, isSaving && styles.saveButtonDisabled]} 
+          <TouchableOpacity
+            style={[styles.saveButton, isSaving && styles.saveButtonDisabled]}
             onPress={handleSave}
             disabled={isSaving}
+            accessibilityRole="button"
+            accessibilityLabel={isSaving ? 'Saving...' : isEditing ? 'Update Item' : 'Save Item'}
+            accessibilityHint={
+              isSaving
+                ? 'Please wait while saving'
+                : isEditing
+                  ? 'Tap to update the wardrobe item'
+                  : 'Tap to save the new wardrobe item'
+            }
+            accessibilityState={{ disabled: isSaving }}
           >
             <Ionicons name="save" size={20} color="white" />
             <Text style={styles.saveButtonText}>
-              {isSaving ? 'Saving...' : (isEditing ? 'Update Item' : 'Save Item')}
+              {isSaving ? 'Saving...' : isEditing ? 'Update Item' : 'Save Item'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -467,7 +539,12 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Generate AI Name</Text>
-            <TouchableOpacity onPress={() => setShowAINaming(false)}>
+            <TouchableOpacity
+              onPress={() => setShowAINaming(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close AI naming modal"
+              accessibilityHint="Tap to close the AI name generator modal"
+            >
               <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
             </TouchableOpacity>
           </View>
@@ -476,7 +553,7 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
               imageUri: formData.imageUri,
               category: formData.category,
               colors: formData.colors,
-              brand: formData.brand
+              brand: formData.brand,
             }}
             onNameSelected={handleAINameSelected}
             initialName={formData.name}
@@ -488,89 +565,71 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
+  actions: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.md,
+    justifyContent: 'flex-end',
+    marginTop: DesignSystem.spacing.lg,
+  },
+  addButton: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.primary[500] + '20',
+    borderRadius: DesignSystem.borderRadius.md,
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+  },
+  addButtonText: {
+    color: DesignSystem.colors.primary[500],
+    fontWeight: '500',
+  },
+  addInput: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
+  },
+  addRow: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.sm,
+  },
+  aiButton: {
+    backgroundColor: DesignSystem.colors.primary[500] + '20',
+    borderRadius: DesignSystem.borderRadius.full,
+    padding: DesignSystem.spacing.sm,
+  },
+  cancelButton: {
+    alignItems: 'center',
+    borderColor: DesignSystem.colors.border.primary,
+    borderRadius: DesignSystem.borderRadius.md,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+  },
+  cancelButtonText: {
+    color: DesignSystem.colors.text.secondary,
+    fontWeight: '500',
   },
   card: {
     backgroundColor: DesignSystem.colors.background.secondary,
-    margin: DesignSystem.spacing.md,
     borderRadius: DesignSystem.borderRadius.lg,
+    margin: DesignSystem.spacing.md,
     padding: DesignSystem.spacing.lg,
-  ...DesignSystem.shadows.soft,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: DesignSystem.colors.text.primary,
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  errorContainer: {
-    backgroundColor: DesignSystem.colors.error.main + '20',
-    padding: DesignSystem.spacing.md,
-    borderRadius: DesignSystem.borderRadius.md,
-    marginBottom: DesignSystem.spacing.md,
-  },
-  errorText: {
-    color: DesignSystem.colors.error.main,
-    fontSize: 14,
-  },
-  imageContainer: {
-    alignItems: 'center',
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  imagePaper: {
-    width: 200,
-    height: 200,
-    backgroundColor: DesignSystem.colors.background.tertiary,
-    borderRadius: DesignSystem.borderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  nameSection: {
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  nameHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: DesignSystem.spacing.md,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: DesignSystem.colors.text.primary,
-  },
-  aiButton: {
-    padding: DesignSystem.spacing.sm,
-    borderRadius: DesignSystem.borderRadius.full,
-  backgroundColor: DesignSystem.colors.primary[500] + '20',
-  },
-  currentNameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: DesignSystem.spacing.md,
-    flexWrap: 'wrap',
-  },
-  currentNameLabel: {
-    fontSize: 14,
-    color: DesignSystem.colors.text.secondary,
-    marginRight: DesignSystem.spacing.sm,
-  },
-  currentName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: DesignSystem.colors.text.primary,
-    marginRight: DesignSystem.spacing.sm,
+    ...DesignSystem.shadows.soft,
   },
   chip: {
-    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: DesignSystem.colors.primary[500],
+    borderRadius: DesignSystem.borderRadius.full,
+    flexDirection: 'row',
+    margin: 2,
     paddingHorizontal: DesignSystem.spacing.sm,
     paddingVertical: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.borderRadius.full,
-    margin: 2,
+  },
+  chipContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: DesignSystem.spacing.md,
   },
   chipSecondary: {
     backgroundColor: DesignSystem.colors.secondary[500],
@@ -580,111 +639,119 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '500',
   },
-  divider: {
-    height: 1,
-  backgroundColor: DesignSystem.colors.border.primary,
-    marginVertical: DesignSystem.spacing.lg,
-  },
-  formSection: {
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  row: {
-    flexDirection: 'row',
-    marginBottom: DesignSystem.spacing.md,
-    gap: DesignSystem.spacing.md,
-  },
-  halfWidth: {
+  container: {
+    backgroundColor: DesignSystem.colors.background.primary,
     flex: 1,
   },
-  label: {
+  currentName: {
+    color: DesignSystem.colors.text.primary,
     fontSize: 16,
     fontWeight: '500',
-    color: DesignSystem.colors.text.primary,
-    marginBottom: DesignSystem.spacing.xs,
+    marginRight: DesignSystem.spacing.sm,
   },
-  textInput: {
-    borderWidth: 1,
-  borderColor: DesignSystem.colors.border.primary,
-    borderRadius: DesignSystem.borderRadius.md,
-    padding: DesignSystem.spacing.md,
-    fontSize: 16,
-    color: DesignSystem.colors.text.primary,
-    backgroundColor: DesignSystem.colors.background.primary,
-  },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  picker: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  currentNameContainer: {
     alignItems: 'center',
-    borderWidth: 1,
-  borderColor: DesignSystem.colors.border.primary,
-    borderRadius: DesignSystem.borderRadius.md,
-    padding: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.background.primary,
-  },
-  pickerText: {
-    fontSize: 16,
-    color: DesignSystem.colors.text.primary,
-  },
-  section: {
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  chipContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginBottom: DesignSystem.spacing.md,
   },
-  addRow: {
-    flexDirection: 'row',
-    gap: DesignSystem.spacing.sm,
+  currentNameLabel: {
+    color: DesignSystem.colors.text.secondary,
+    fontSize: 14,
+    marginRight: DesignSystem.spacing.sm,
   },
-  addInput: {
+  divider: {
+    backgroundColor: DesignSystem.colors.border.primary,
+    height: 1,
+    marginVertical: DesignSystem.spacing.lg,
+  },
+  errorContainer: {
+    backgroundColor: DesignSystem.colors.error.main + '20',
+    borderRadius: DesignSystem.borderRadius.md,
+    marginBottom: DesignSystem.spacing.md,
+    padding: DesignSystem.spacing.md,
+  },
+  errorText: {
+    color: DesignSystem.colors.error.main,
+    fontSize: 14,
+  },
+  formSection: {
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  halfWidth: {
     flex: 1,
   },
-  addButton: {
-    flexDirection: 'row',
+  imageContainer: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.primary[500] + '20',
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  imagePaper: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.tertiary,
     borderRadius: DesignSystem.borderRadius.md,
-    gap: DesignSystem.spacing.xs,
+    height: 200,
+    justifyContent: 'center',
+    width: 200,
   },
-  addButtonText: {
-    color: DesignSystem.colors.primary[500],
+  label: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: 16,
     fontWeight: '500',
+    marginBottom: DesignSystem.spacing.xs,
   },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: DesignSystem.spacing.md,
-    marginTop: DesignSystem.spacing.lg,
+  modalContainer: {
+    backgroundColor: DesignSystem.colors.background.primary,
+    flex: 1,
   },
-  cancelButton: {
-    flexDirection: 'row',
+  modalHeader: {
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
+    borderBottomColor: DesignSystem.colors.border.primary,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: DesignSystem.spacing.lg,
+  },
+  modalTitle: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  nameHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: DesignSystem.spacing.md,
+  },
+  nameSection: {
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  picker: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderColor: DesignSystem.colors.border.primary,
     borderRadius: DesignSystem.borderRadius.md,
     borderWidth: 1,
-  borderColor: DesignSystem.colors.border.primary,
-    gap: DesignSystem.spacing.xs,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: DesignSystem.spacing.md,
   },
-  cancelButtonText: {
-    color: DesignSystem.colors.text.secondary,
-    fontWeight: '500',
+  pickerText: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
   },
   saveButton: {
-    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: DesignSystem.colors.primary[500],
+    borderRadius: DesignSystem.borderRadius.md,
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.xs,
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.md,
-    borderRadius: DesignSystem.borderRadius.md,
-    gap: DesignSystem.spacing.xs,
   },
   saveButtonDisabled: {
     opacity: 0.6,
@@ -693,21 +760,35 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: '500',
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
+  section: {
+    marginBottom: DesignSystem.spacing.lg,
   },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: DesignSystem.spacing.lg,
-    borderBottomWidth: 1,
-  borderBottomColor: DesignSystem.colors.border.primary,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  sectionTitle: {
     color: DesignSystem.colors.text.primary,
+    fontSize: 18,
+    fontWeight: '600',
   },
-}) as any;
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  textInput: {
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderColor: DesignSystem.colors.border.primary,
+    borderRadius: DesignSystem.borderRadius.md,
+    borderWidth: 1,
+    color: DesignSystem.colors.text.primary,
+    fontSize: 16,
+    padding: DesignSystem.spacing.md,
+  },
+  title: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  modal: {
+    backgroundColor: DesignSystem.colors.background.overlay,
+    padding: DesignSystem.spacing.large,
+  },
+});

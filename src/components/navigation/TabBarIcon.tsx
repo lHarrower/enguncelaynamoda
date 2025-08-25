@@ -1,18 +1,18 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { StyleSheet, View, ViewStyle } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface TabBarIconProps {
   name: React.ComponentProps<typeof Ionicons>['name'];
   color: string;
   focused?: boolean;
-  style?: any;
-  [key: string]: any;
+  style?: ViewStyle;
+  [key: string]: unknown;
 }
 
 export function TabBarIcon({ name, color, focused = false, style, ...rest }: TabBarIconProps) {
-  
   return (
     <View style={[styles.container, focused && styles.focusedContainer]}>
       {/* Subtle glow effect for focused state */}
@@ -27,7 +27,7 @@ export function TabBarIcon({ name, color, focused = false, style, ...rest }: Tab
           ]}
         />
       )}
-      
+
       <Ionicons
         name={name}
         size={24}
@@ -40,7 +40,7 @@ export function TabBarIcon({ name, color, focused = false, style, ...rest }: Tab
         ]}
         {...rest}
       />
-      
+
       {/* Parisian luxury indicator dot */}
       {focused && (
         <View
@@ -67,25 +67,25 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.1 }],
   },
   glow: {
-    position: 'absolute',
-    width: 32,
-    height: 32,
     borderRadius: 16,
+    elevation: 4,
+    height: 32,
     opacity: 0.15,
+    position: 'absolute',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 4,
+    width: 32,
   },
   icon: {
     marginBottom: -3,
   },
   indicator: {
-    position: 'absolute',
-    bottom: -8,
-    width: 4,
-    height: 4,
     borderRadius: 2,
+    bottom: -8,
+    height: 4,
     opacity: 0.8,
+    position: 'absolute',
+    width: 4,
   },
 });

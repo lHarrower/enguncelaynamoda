@@ -10,12 +10,12 @@ module.exports = function (api) {
         {
           root: ['./'],
           alias: {
-            '@/*': './src/*',
+            '@': './src',
           },
         },
       ],
-      // IMPORTANT: react-native-reanimated/plugin must be the last plugin.
       'react-native-reanimated/plugin',
+      '@babel/plugin-transform-class-static-block',
     ],
   };
 };

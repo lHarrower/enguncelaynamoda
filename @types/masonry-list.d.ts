@@ -7,4 +7,4 @@ declare module '@react-native-seoul/masonry-list' {
   }
 
   export default class MasonryList<T> extends React.Component<MasonryListProps<T>> {}
-} 
+}

@@ -1,13 +1,14 @@
 /**
  * Button Component Styles
  * Part of AYNAMODA Unified Design System
- * 
+ *
  * Provides consistent button styling with primary, secondary, and luxury variants
  * Following Digital Zen Garden philosophy with premium feel
  */
 
-import { ViewStyle, TextStyle } from 'react-native';
-import { UNIFIED_COLORS, TYPOGRAPHY, BORDER_RADIUS, ELEVATION, SPACING } from '@/theme/tokens';
+import { TextStyle, ViewStyle } from 'react-native';
+
+import { BORDER_RADIUS, ELEVATION, SPACING, TYPOGRAPHY, UNIFIED_COLORS } from '@/theme/tokens';
 
 export const BUTTON_VARIANTS = {
   // Primary button - Main call-to-action
@@ -22,27 +23,27 @@ export const BUTTON_VARIANTS = {
       justifyContent: 'center',
       alignItems: 'center',
     } as ViewStyle,
-    
+
     text: {
       ...TYPOGRAPHY.button.medium,
       fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.inverse,
       textAlign: 'center',
     } as TextStyle,
-    
+
     // Pressed state
     pressed: {
       backgroundColor: UNIFIED_COLORS.text.secondary,
       ...ELEVATION.medium,
     } as ViewStyle,
-    
+
     // Disabled state
     disabled: {
       backgroundColor: UNIFIED_COLORS.text.tertiary,
       ...ELEVATION.none,
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Secondary button - Alternative actions
   secondary: {
     container: {
@@ -56,30 +57,30 @@ export const BUTTON_VARIANTS = {
       justifyContent: 'center',
       alignItems: 'center',
     } as ViewStyle,
-    
+
     text: {
       ...TYPOGRAPHY.button.medium,
       fontFamily: TYPOGRAPHY.fontFamily.body,
       color: UNIFIED_COLORS.text.primary,
       textAlign: 'center',
     } as TextStyle,
-    
+
     // Pressed state
     pressed: {
       backgroundColor: UNIFIED_COLORS.background.secondary,
       borderColor: UNIFIED_COLORS.text.secondary,
     } as ViewStyle,
-    
+
     // Disabled state
     disabled: {
       borderColor: UNIFIED_COLORS.text.tertiary,
     } as ViewStyle,
-    
+
     disabledText: {
       color: UNIFIED_COLORS.text.tertiary,
-    } as TextStyle
+    } as TextStyle,
   },
-  
+
   // Luxury button - Premium actions
   luxury: {
     container: {
@@ -94,7 +95,7 @@ export const BUTTON_VARIANTS = {
       borderWidth: 1,
       borderColor: UNIFIED_COLORS.gold[700],
     } as ViewStyle,
-    
+
     text: {
       ...TYPOGRAPHY.button.medium,
       fontFamily: TYPOGRAPHY.fontFamily.accent,
@@ -102,21 +103,21 @@ export const BUTTON_VARIANTS = {
       textAlign: 'center',
       fontWeight: '600',
     } as TextStyle,
-    
+
     // Pressed state
     pressed: {
       backgroundColor: UNIFIED_COLORS.gold[700],
       ...ELEVATION.floating,
     } as ViewStyle,
-    
+
     // Disabled state
     disabled: {
       backgroundColor: UNIFIED_COLORS.gold[100],
       borderColor: UNIFIED_COLORS.gold[300],
       ...ELEVATION.none,
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Ghost button - Minimal style
   ghost: {
     container: {
@@ -128,7 +129,7 @@ export const BUTTON_VARIANTS = {
       justifyContent: 'center',
       alignItems: 'center',
     } as ViewStyle,
-    
+
     text: {
       ...TYPOGRAPHY.body.medium,
       fontFamily: TYPOGRAPHY.fontFamily.body,
@@ -136,18 +137,18 @@ export const BUTTON_VARIANTS = {
       textAlign: 'center',
       fontWeight: '500',
     } as TextStyle,
-    
+
     // Pressed state
     pressed: {
       backgroundColor: UNIFIED_COLORS.background.secondary,
     } as ViewStyle,
-    
+
     // Disabled state
     disabled: {
       opacity: 0.5,
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Small button variant
   small: {
     container: {
@@ -156,13 +157,13 @@ export const BUTTON_VARIANTS = {
       minHeight: 32,
       borderRadius: BORDER_RADIUS.md,
     } as ViewStyle,
-    
+
     text: {
       ...TYPOGRAPHY.body.small,
       fontWeight: '600',
-    } as TextStyle
+    } as TextStyle,
   },
-  
+
   // Large button variant
   large: {
     container: {
@@ -171,19 +172,19 @@ export const BUTTON_VARIANTS = {
       minHeight: 56,
       borderRadius: BORDER_RADIUS.xl,
     } as ViewStyle,
-    
+
     text: {
       ...TYPOGRAPHY.scale.h3,
       fontWeight: '600',
-    } as TextStyle
-  }
+    } as TextStyle,
+  },
 } as const;
 
 // Button size modifiers
 export const BUTTON_SIZES = {
   small: BUTTON_VARIANTS.small,
   medium: {}, // Default size, no modifications needed
-  large: BUTTON_VARIANTS.large
+  large: BUTTON_VARIANTS.large,
 } as const;
 
 // Export for easy access

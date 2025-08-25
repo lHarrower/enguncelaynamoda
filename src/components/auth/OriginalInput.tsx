@@ -1,40 +1,43 @@
 /**
  * Original Input Component
- * 
+ *
  * A reusable input component that matches the original AynaModa login design.
  * Features clean styling, icon support, and proper focus states.
  */
 
-import React, { useState, forwardRef } from 'react';
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  Text,
-  TextInputProps,
-  ViewStyle,
-  Animated,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { forwardRef, useState } from 'react';
 import {
-  originalLoginStyles,
-  ORIGINAL_COLORS,
-  ORIGINAL_DIMENSIONS,
+  Animated,
+  NativeSyntheticEvent,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputFocusEventData,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+
+import {
   ACCESSIBILITY_LABELS,
   ORIGINAL_ANIMATIONS,
+  ORIGINAL_COLORS,
+  ORIGINAL_DIMENSIONS,
+  originalLoginStyles,
 } from '@/components/auth/originalLoginStyles';
-import { InputComponentProps, DEFAULT_PROPS } from '@/types/componentProps';
+import { DEFAULT_PROPS, InputComponentProps } from '@/types/componentProps';
 
 export interface OriginalInputProps extends Omit<InputComponentProps, 'variant' | 'size'> {
   /** Custom container style */
   containerStyle?: ViewStyle;
-  
+
   /** Whether the input is currently focused (controlled) */
   focused?: boolean;
-  
+
   /** Callback when focus state changes */
   onFocusChange?: (focused: boolean) => void;
-  
+
   /** Original theme variant */
   variant?: 'default' | 'focused' | 'error';
 }
@@ -63,7 +66,7 @@ export const OriginalInput = forwardRef<TextInput, OriginalInputProps>(
       variant = 'default',
       ...textInputProps
     },
-    ref
+    ref,
   ) => {
     const [internalFocused, setInternalFocused] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -71,7 +74,7 @@ export const OriginalInput = forwardRef<TextInput, OriginalInputProps>(
 
     const isFocused = controlledFocused !== undefined ? controlledFocused : internalFocused;
 
-    const handleFocus = (e: any) => {
+    const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       if (controlledFocused === undefined) {
         setInternalFocused(true);
       }
@@ -86,7 +89,7 @@ export const OriginalInput = forwardRef<TextInput, OriginalInputProps>(
       }).start();
     };
 
-    const handleBlur = (e: any) => {
+    const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       if (controlledFocused === undefined) {
         setInternalFocused(false);
       }
@@ -111,7 +114,7 @@ export const OriginalInput = forwardRef<TextInput, OriginalInputProps>(
     });
 
     return (
-      <View style={[containerStyle]}>
+      <View style={containerStyle}>
         {/* Label */}
         {label && (
           <Text style={[originalLoginStyles.subtitle, { marginBottom: 8, textAlign: 'left' }]}>
@@ -147,9 +150,7 @@ export const OriginalInput = forwardRef<TextInput, OriginalInputProps>(
             onFocus={handleFocus}
             onBlur={handleBlur}
             accessibilityLabel={
-              isPassword 
-                ? ACCESSIBILITY_LABELS.passwordInput 
-                : ACCESSIBILITY_LABELS.emailInput
+              isPassword ? ACCESSIBILITY_LABELS.passwordInput : ACCESSIBILITY_LABELS.emailInput
             }
             {...textInputProps}
           />
@@ -173,19 +174,21 @@ export const OriginalInput = forwardRef<TextInput, OriginalInputProps>(
 
         {/* Error Message */}
         {error && (
-          <Animated.View
-            style={{
-              opacity: 1,
-            }}
-          >
+          <Animated.View style={styles.errorContainer}>
             <Text style={originalLoginStyles.errorText}>{error}</Text>
           </Animated.View>
         )}
       </View>
     );
-  }
+  },
 );
 
 OriginalInput.displayName = 'OriginalInput';
+
+const styles = StyleSheet.create({
+  errorContainer: {
+    opacity: 1,
+  },
+});
 
 export default OriginalInput;

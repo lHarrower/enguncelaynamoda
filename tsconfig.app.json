@@ -1,0 +1,30 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": true,
+    "module": "ESNext",
+    "tsBuildInfoFile": "./node_modules/.cache/tsbuildinfo.app"
+  },
+  "include": [
+    "src/**/*",
+    "app/**/*",
+    "index.ts",
+    "index.tsx",
+    "App.tsx",
+    "*.config.ts",
+    "*.config.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "android",
+    "ios",
+    ".expo",
+    "dist",
+    "build",
+    "coverage",
+    "__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
+}

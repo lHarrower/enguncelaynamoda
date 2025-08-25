@@ -1,20 +1,15 @@
+import { BlurView } from 'expo-blur';
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  ViewStyle,
-  TouchableOpacity,
-  StyleProp,
-} from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
+import { StyleProp, StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
   withSpring,
   withTiming,
-  interpolate,
 } from 'react-native-reanimated';
-import { BlurView } from 'expo-blur';
+
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
@@ -46,7 +41,7 @@ const PremiumCard: React.FC<PremiumCardProps> = ({
 
   const handlePressIn = () => {
     if (interactive) {
-  scale.value = withSpring(0.98, DesignSystem.animations.spring.smooth);
+      scale.value = withSpring(0.98, DesignSystem.animations.spring.smooth);
       elevation.value = withTiming(1.5, { duration: 200 });
       if (variant === 'luxury') {
         glowIntensity.value = withTiming(1, { duration: 200 });
@@ -65,17 +60,9 @@ const PremiumCard: React.FC<PremiumCardProps> = ({
   };
 
   const animatedStyle = useAnimatedStyle(() => {
-    const shadowOpacity = interpolate(
-      elevation.value,
-      [1, 1.5],
-      [0.1, 0.2]
-    );
+    const shadowOpacity = interpolate(elevation.value, [1, 1.5], [0.1, 0.2]);
 
-    const luxuryGlow = interpolate(
-      glowIntensity.value,
-      [0, 1],
-      [0, 0.3]
-    );
+    const luxuryGlow = interpolate(glowIntensity.value, [0, 1], [0, 0.3]);
 
     return {
       transform: [{ scale: scale.value }],
@@ -130,36 +117,26 @@ const PremiumCard: React.FC<PremiumCardProps> = ({
   };
 
   const renderCard = () => {
-    const cardContent = (
-  <View style={[getContentStyle(), contentStyle] as any}>
-        {children}
-      </View>
-    );
+    const cardContent = <View style={[getContentStyle(), contentStyle]}>{children}</View>;
 
     if (variant === 'glass') {
       return (
-        <BlurView
-          intensity={80}
-          tint="light"
-          style={[getCardStyle(), style]}
-        >
-          <View style={[
-            StyleSheet.absoluteFill,
-            { 
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: DesignSystem.borderRadius[borderRadius],
-            }
-          ]} />
+        <BlurView intensity={80} tint="light" style={[getCardStyle(), style]}>
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: DesignSystem.borderRadius[borderRadius],
+              },
+            ]}
+          />
           {cardContent}
         </BlurView>
       );
     }
 
-    return (
-      <View style={[getCardStyle(), style]}>
-        {cardContent}
-      </View>
-    );
+    return <View style={[getCardStyle(), style]}>{cardContent}</View>;
   };
 
   if (interactive && onPress) {
@@ -176,11 +153,7 @@ const PremiumCard: React.FC<PremiumCardProps> = ({
     );
   }
 
-  return (
-    <AnimatedView style={animatedStyle}>
-      {renderCard()}
-    </AnimatedView>
-  );
+  return <AnimatedView style={animatedStyle}>{renderCard()}</AnimatedView>;
 };
 
 export default PremiumCard;

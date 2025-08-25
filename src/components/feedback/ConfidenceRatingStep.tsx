@@ -1,13 +1,8 @@
-import React, { useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ConfidenceRatingStepProps {
@@ -17,11 +12,31 @@ interface ConfidenceRatingStepProps {
 }
 
 const CONFIDENCE_LABELS = [
-  { rating: 1, label: 'Not confident', emoji: '😔', description: 'I felt unsure about this outfit' },
-  { rating: 2, label: 'Slightly confident', emoji: '😐', description: 'It was okay, but not my best' },
-  { rating: 3, label: 'Moderately confident', emoji: '🙂', description: 'I felt good wearing this' },
+  {
+    rating: 1,
+    label: 'Not confident',
+    emoji: '😔',
+    description: 'I felt unsure about this outfit',
+  },
+  {
+    rating: 2,
+    label: 'Slightly confident',
+    emoji: '😐',
+    description: 'It was okay, but not my best',
+  },
+  {
+    rating: 3,
+    label: 'Moderately confident',
+    emoji: '🙂',
+    description: 'I felt good wearing this',
+  },
   { rating: 4, label: 'Very confident', emoji: '😊', description: 'I felt great and stylish' },
-  { rating: 5, label: 'Extremely confident', emoji: '🤩', description: 'I felt absolutely amazing!' },
+  {
+    rating: 5,
+    label: 'Extremely confident',
+    emoji: '🤩',
+    description: 'I felt absolutely amazing!',
+  },
 ];
 
 export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
@@ -29,7 +44,7 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
   currentRating,
   onRatingChange,
 }) => {
-  const effectiveRating = typeof rating === 'number' ? rating : (currentRating || 0);
+  const effectiveRating = typeof rating === 'number' ? rating : currentRating || 0;
   const starAnimations = useRef(Array.from({ length: 5 }, () => new Animated.Value(1))).current;
   const pulseAnimation = useRef(new Animated.Value(1)).current;
 
@@ -68,14 +83,14 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
         }),
       ]).start();
     }
-  }, [effectiveRating]);
+  }, [effectiveRating, pulseAnimation, starAnimations]);
 
   const handleStarPress = (starRating: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onRatingChange(starRating);
   };
 
-  const selectedLabel = CONFIDENCE_LABELS.find(label => label.rating === effectiveRating);
+  const selectedLabel = CONFIDENCE_LABELS.find((label) => label.rating === effectiveRating);
 
   return (
     <View
@@ -88,7 +103,7 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
         { name: 'increment', label: 'Increase rating' },
         { name: 'decrement', label: 'Decrease rating' },
       ]}
-      onAccessibilityAction={(event: any) => {
+      onAccessibilityAction={(event) => {
         switch (event.nativeEvent.actionName) {
           case 'increment':
             onRatingChange(Math.min(5, (effectiveRating || 0) + 1));
@@ -103,22 +118,22 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
       <View style={styles.starsContainer}>
         {Array.from({ length: 5 }, (_, index) => {
           const starNumber = index + 1;
-      const isSelected = starNumber <= effectiveRating;
-          
+          const isSelected = starNumber <= effectiveRating;
+
           return (
             <TouchableOpacity
               key={starNumber}
               onPress={() => handleStarPress(starNumber)}
               style={styles.starButton}
               activeOpacity={0.7}
-      accessible
-      accessibilityRole="button"
-      accessibilityLabel={`${starNumber} out of 5 stars${isSelected ? ', selected' : ''}`}
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel={`${starNumber} out of 5 stars${isSelected ? ', selected' : ''}`}
             >
               <Animated.View
                 style={[
                   styles.starWrapper,
-                  {
+                  starAnimations[index] && {
                     transform: [{ scale: starAnimations[index] }],
                   },
                 ]}
@@ -126,7 +141,11 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
                 <Ionicons
                   name={isSelected ? 'star' : 'star-outline'}
                   size={40}
-                  color={isSelected ? (DesignSystem.colors.sage?.[500] || DesignSystem.colors.neutral[700]) : DesignSystem.colors.neutral[400]}
+                  color={
+                    isSelected
+                      ? DesignSystem.colors.sage?.[500] || DesignSystem.colors.neutral[700]
+                      : DesignSystem.colors.neutral[400]
+                  }
                 />
               </Animated.View>
             </TouchableOpacity>
@@ -135,7 +154,7 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
       </View>
 
       {/* Rating Feedback */}
-  {effectiveRating > 0 && selectedLabel && (
+      {effectiveRating > 0 && selectedLabel && (
         <Animated.View
           style={[
             styles.feedbackContainer,
@@ -151,19 +170,18 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
       )}
 
       {/* Confidence Affirmations */}
-  {effectiveRating >= 4 && (
+      {effectiveRating >= 4 && (
         <View style={styles.affirmationContainer}>
           <Text style={styles.affirmationText}>
-    {effectiveRating === 5 
-              ? "You're absolutely radiant! ✨" 
-              : "You're looking fantastic! 💫"
-            }
+            {effectiveRating === 5
+              ? "You're absolutely radiant! ✨"
+              : "You're looking fantastic! 💫"}
           </Text>
         </View>
       )}
 
       {/* Encouragement for lower ratings */}
-  {effectiveRating > 0 && effectiveRating <= 2 && (
+      {effectiveRating > 0 && effectiveRating <= 2 && (
         <View style={styles.encouragementContainer}>
           <Text style={styles.encouragementText}>
             Every outfit is a learning experience. Your style journey continues! 🌱
@@ -172,7 +190,7 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
       )}
 
       {/* Instructions */}
-  {effectiveRating === 0 && (
+      {effectiveRating === 0 && (
         <View style={styles.instructionsContainer}>
           <Text style={styles.instructionsText}>
             Tap the stars to rate how confident you felt in this outfit
@@ -184,16 +202,69 @@ export const ConfidenceRatingStep: React.FC<ConfidenceRatingStepProps> = ({
 };
 
 const styles = StyleSheet.create({
+  affirmationContainer: {
+    backgroundColor: DesignSystem.colors.primary[500] + '20',
+    borderRadius: 12,
+    marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  affirmationText: {
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.primary[500],
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   container: {
     alignItems: 'center',
     paddingVertical: 20,
   },
-  starsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  emoji: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  encouragementContainer: {
+    backgroundColor: DesignSystem.colors.neutral[50],
+    borderRadius: 12,
+    marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  encouragementText: {
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.neutral[600],
+    fontStyle: 'italic',
+    textAlign: 'center',
+  },
+  feedbackContainer: {
     alignItems: 'center',
-    marginBottom: 32,
-    gap: 8,
+    backgroundColor: DesignSystem.colors.neutral[50],
+    borderRadius: 16,
+    marginBottom: 24,
+    minWidth: 280,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+  },
+  instructionsContainer: {
+    paddingHorizontal: 20,
+  },
+  instructionsText: {
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.neutral[400],
+    fontStyle: 'italic',
+    textAlign: 'center',
+  },
+  ratingDescription: {
+    ...DesignSystem.typography.body2,
+    color: DesignSystem.colors.neutral[600],
+    fontStyle: 'italic',
+    textAlign: 'center',
+  },
+  ratingLabel: {
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.neutral[900],
+    marginBottom: 4,
+    textAlign: 'center',
   },
   starButton: {
     padding: 8,
@@ -202,64 +273,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  feedbackContainer: {
+  starsContainer: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.neutral[50],
-    borderRadius: 16,
-    paddingVertical: 20,
-    paddingHorizontal: 24,
-    marginBottom: 24,
-    minWidth: 280,
-  },
-  emoji: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  ratingLabel: {
-    ...DesignSystem.typography.heading.h3,
-    color: DesignSystem.colors.neutral[900],
-    marginBottom: 4,
-    textAlign: 'center',
-  },
-  ratingDescription: {
-    ...DesignSystem.typography.body2,
-    color: DesignSystem.colors.neutral[600],
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  affirmationContainer: {
-    backgroundColor: DesignSystem.colors.primary[500] + '20',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
-  affirmationText: {
-  ...DesignSystem.typography.body1,
-    color: DesignSystem.colors.primary[500],
-    textAlign: 'center',
-    fontWeight: '600',
-  },
-  encouragementContainer: {
-    backgroundColor: DesignSystem.colors.neutral[50],
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
-  encouragementText: {
-  ...DesignSystem.typography.body2,
-    color: DesignSystem.colors.neutral[600],
-    textAlign: 'center',
-    fontStyle: 'italic',
-  },
-  instructionsContainer: {
-    paddingHorizontal: 20,
-  },
-  instructionsText: {
-  ...DesignSystem.typography.body2,
-    color: DesignSystem.colors.neutral[400],
-    textAlign: 'center',
-    fontStyle: 'italic',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
+    marginBottom: 32,
   },
 });

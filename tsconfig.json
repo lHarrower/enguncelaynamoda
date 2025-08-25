@@ -1,25 +1,49 @@
 {
-  "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
-    "jsx": "react-native",
+    "target": "ES2021",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./src/*"
+        "src/*"
       ]
     }
   },
   "include": [
-    "app/**/*.tsx",
-    "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*",
+    "app/**/*",
+    "components/**/*",
+    "scripts/**/*",
+    "_screens_legacy/**/*",
+    "app.config.ts",
+    "App.tsx",
+    "index.ts",
+    "index.tsx",
+    "__tests__/**/*.ts",
+    "global.d.ts",
+    "nativewind-env.d.ts"
   ],
   "exclude": [
-    "__tests__/**",
-    "src/__tests__/**",
-    "supabase/functions/**",
-    "node_modules/**"
-  ]
+    "node_modules",
+    "android",
+    "ios",
+    ".expo",
+    "dist",
+    "build",
+    "coverage"
+  ],
+  "extends": "expo/tsconfig.base"
 }

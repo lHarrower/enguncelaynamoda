@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/theme/DesignSystem';
+import React, { useState } from 'react';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+
 import ZenCard from '@/components/common/ZenCard';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - (DesignSystem.spacing.xl * 3)) / 2;
+const CARD_WIDTH = (width - DesignSystem.spacing.xl * 3) / 2;
 
 interface Product {
   id: string;
@@ -44,11 +45,7 @@ export default function ZenProductCard({
   };
 
   return (
-    <ZenCard
-      onPress={onPress}
-      style={styles.card}
-      variant="elevated"
-    >
+    <ZenCard onPress={onPress} style={styles.card} variant="elevated">
       <View style={styles.imageContainer}>
         {!imageError ? (
           <Image
@@ -60,14 +57,10 @@ export default function ZenProductCard({
           />
         ) : (
           <View style={styles.imagePlaceholder}>
-            <Ionicons 
-              name="image-outline" 
-              size={32} 
-              color={DesignSystem.colors.neutral[300]} 
-            />
+            <Ionicons name="image-outline" size={32} color={DesignSystem.colors.neutral[300]} />
           </View>
         )}
-        
+
         {!imageLoaded && !imageError && (
           <View style={styles.imageLoader}>
             <View style={styles.shimmer} />
@@ -79,13 +72,14 @@ export default function ZenProductCard({
             style={styles.likeButton}
             onPress={onLike}
             activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={isLiked ? 'Unlike product' : 'Like product'}
+            accessibilityHint={`Tap to ${isLiked ? 'remove from' : 'add to'} favorites`}
+            accessibilityState={{ selected: isLiked }}
           >
-            <Animated.View
-              entering={FadeIn.duration(200)}
-              exiting={FadeOut.duration(200)}
-            >
+            <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(200)}>
               <Ionicons
-                name={isLiked ? "heart" : "heart-outline"}
+                name={isLiked ? 'heart' : 'heart-outline'}
                 size={20}
                 color={isLiked ? DesignSystem.colors.sage[500] : DesignSystem.colors.text.inverse}
               />
@@ -101,87 +95,85 @@ export default function ZenProductCard({
         <Text style={styles.name} numberOfLines={2}>
           {product.name}
         </Text>
-        <Text style={styles.price}>
-          {product.price}
-        </Text>
+        <Text style={styles.price}>{product.price}</Text>
       </View>
     </ZenCard>
   );
 }
 
 const styles = StyleSheet.create({
+  brand: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    letterSpacing: 0.8,
+    marginBottom: DesignSystem.spacing.xs,
+    textTransform: 'uppercase',
+  },
   card: {
-    width: CARD_WIDTH,
-    padding: 0,
-    marginBottom: DesignSystem.spacing.md,
     backgroundColor: DesignSystem.colors.background.secondary,
     borderRadius: DesignSystem.borderRadius.lg,
+    marginBottom: DesignSystem.spacing.md,
     overflow: 'hidden',
-  },
-  imageContainer: {
-    height: CARD_WIDTH * 1.3,
-    backgroundColor: DesignSystem.colors.sage[100],
-    borderTopLeftRadius: DesignSystem.borderRadius.lg,
-    borderTopRightRadius: DesignSystem.borderRadius.lg,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  imagePlaceholder: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: DesignSystem.colors.sage[100],
-  },
-  imageLoader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: DesignSystem.colors.sage[100],
-  },
-  shimmer: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.sage[50],
-    opacity: 0.6,
-  },
-  likeButton: {
-    position: 'absolute',
-    top: DesignSystem.spacing.sm,
-    right: DesignSystem.spacing.sm,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...DesignSystem.elevation.soft,
+    padding: 0,
+    width: CARD_WIDTH,
   },
   content: {
     padding: DesignSystem.spacing.md,
   },
-  brand: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.secondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginBottom: DesignSystem.spacing.xs,
+  image: {
+    height: '100%',
+    width: '100%',
+  },
+  imageContainer: {
+    backgroundColor: DesignSystem.colors.sage[100],
+    borderTopLeftRadius: DesignSystem.borderRadius.lg,
+    borderTopRightRadius: DesignSystem.borderRadius.lg,
+    height: CARD_WIDTH * 1.3,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  imageLoader: {
+    backgroundColor: DesignSystem.colors.sage[100],
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  imagePlaceholder: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.sage[100],
+    flex: 1,
+    justifyContent: 'center',
+  },
+  likeButton: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 16,
+    height: 32,
+    justifyContent: 'center',
+    position: 'absolute',
+    right: DesignSystem.spacing.sm,
+    top: DesignSystem.spacing.sm,
+    width: 32,
+    ...DesignSystem.elevation.soft,
   },
   name: {
-  ...DesignSystem.typography.body.small,
+    ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.primary,
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     lineHeight: 18,
     marginBottom: DesignSystem.spacing.xs,
   },
   price: {
-  ...DesignSystem.typography.body.small,
+    ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.primary,
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
+  },
+  shimmer: {
+    backgroundColor: DesignSystem.colors.sage[50],
+    flex: 1,
+    opacity: 0.6,
   },
 });

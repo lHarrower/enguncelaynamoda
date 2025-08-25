@@ -1,28 +1,33 @@
 /**
  * Standardized Input Component
- * 
+ *
  * A reusable input component that follows AYNAMODA's design system
  * and implements the standardized InputComponentProps interface.
  */
 
-import React, { useState, forwardRef, useImperativeHandle, useRef } from 'react';
-import {
-  TextInput,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Animated,
-  ViewStyle,
-  TextStyle,
-  TextInputProps,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { InputComponentProps, DEFAULT_PROPS } from '@/types/componentProps';
-import { DesignSystem } from '@/theme/DesignSystem';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import {
+  Animated,
+  NativeSyntheticEvent,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputFocusEventData,
+  TextInputProps,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 
-export interface StandardInputProps extends Omit<InputComponentProps, 'variant'>, Omit<TextInputProps, 'style'> {
+import { DesignSystem } from '@/theme/DesignSystem';
+import { DEFAULT_PROPS, InputComponentProps } from '@/types/componentProps';
+
+export interface StandardInputProps
+  extends Omit<InputComponentProps, 'variant'>,
+    Omit<TextInputProps, 'style'> {
   /** Input variant style */
   variant?: 'default' | 'outlined' | 'filled' | 'glass' | 'minimal';
   /** Left icon name */
@@ -88,13 +93,13 @@ const StandardInput = forwardRef<StandardInputRef, StandardInputProps>(
       onBlur,
       ...textInputProps
     },
-    ref
+    ref,
   ) => {
     const [internalFocused, setInternalFocused] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const inputRef = useRef<TextInput>(null);
     const focusAnimation = useRef(new Animated.Value(0)).current;
-    
+
     const focused = controlledFocused !== undefined ? controlledFocused : internalFocused;
 
     // Expose methods via ref
@@ -114,19 +119,19 @@ const StandardInput = forwardRef<StandardInputRef, StandardInputProps>(
       }).start();
     }, [focused, focusAnimation]);
 
-    const handleFocus = (e: any) => {
+    const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       if (controlledFocused === undefined) {
         setInternalFocused(true);
       }
       onFocusChange?.(true);
       onFocus?.(e);
-      
+
       if (hapticFeedback === 'light') {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
     };
 
-    const handleBlur = (e: any) => {
+    const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
       if (controlledFocused === undefined) {
         setInternalFocused(false);
       }
@@ -207,11 +212,11 @@ const StandardInput = forwardRef<StandardInputRef, StandardInputProps>(
     });
 
     const iconSize = size === 'small' ? 16 : size === 'medium' ? 20 : 24;
-    const iconColor = disabled 
-      ? DesignSystem.colors.text.disabled 
-      : focused 
-      ? DesignSystem.colors.sage[500] 
-      : DesignSystem.colors.text.secondary;
+    const iconColor = disabled
+      ? DesignSystem.colors.text.disabled
+      : focused
+        ? DesignSystem.colors.sage[500]
+        : DesignSystem.colors.text.secondary;
 
     return (
       <View style={[getContainerStyles(), containerStyle]} testID={testID}>
@@ -223,8 +228,8 @@ const StandardInput = forwardRef<StandardInputRef, StandardInputProps>(
             </Text>
           </View>
         )}
-        
-        <Animated.View 
+
+        <Animated.View
           style={[
             getInputWrapperStyles(),
             inputWrapperStyle,
@@ -232,14 +237,9 @@ const StandardInput = forwardRef<StandardInputRef, StandardInputProps>(
           ]}
         >
           {leftIcon && (
-            <Ionicons
-              name={leftIcon}
-              size={iconSize}
-              color={iconColor}
-              style={styles.leftIcon}
-            />
+            <Ionicons name={leftIcon} size={iconSize} color={iconColor} style={styles.leftIcon} />
           )}
-          
+
           <TextInput
             ref={inputRef}
             style={[getInputStyles(), inputStyle]}
@@ -252,76 +252,127 @@ const StandardInput = forwardRef<StandardInputRef, StandardInputProps>(
             placeholderTextColor={DesignSystem.colors.text.placeholder}
             {...textInputProps}
           />
-          
+
           {(rightIcon || isPassword) && (
             <TouchableOpacity
               onPress={handleRightIconPress}
               style={styles.rightIconContainer}
               disabled={disabled}
+              accessibilityRole="button"
+              accessibilityLabel={
+                isPassword ? (showPassword ? 'Hide password' : 'Show password') : 'Action button'
+              }
+              accessibilityHint={isPassword ? 'Toggles password visibility' : 'Performs action'}
             >
               <Ionicons
-                name={
-                  isPassword 
-                    ? (showPassword ? 'eye-off' : 'eye')
-                    : rightIcon!
-                }
+                name={isPassword ? (showPassword ? 'eye-off' : 'eye') : rightIcon!}
                 size={iconSize}
                 color={iconColor}
               />
             </TouchableOpacity>
           )}
         </Animated.View>
-        
-        {hint && !error && (
-          <Text style={[styles.hint, hintStyle]}>
-            {hint}
-          </Text>
-        )}
-        
-        {error && (
-          <Text style={[styles.error, errorStyle]}>
-            {error}
-          </Text>
-        )}
+
+        {hint && !error && <Text style={[styles.hint, hintStyle]}>{hint}</Text>}
+
+        {error && <Text style={[styles.error, errorStyle]}>{error}</Text>}
       </View>
     );
-  }
+  },
 );
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
   },
-  container_small: {
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  container_medium: {
-    marginBottom: DesignSystem.spacing.md,
-  },
-  container_large: {
-    marginBottom: DesignSystem.spacing.lg,
-  },
   containerDisabled: {
     opacity: 0.6,
   },
   containerError: {},
   containerFocused: {},
-  labelContainer: {
-    marginBottom: DesignSystem.spacing.xs,
+  container_large: {
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  container_medium: {
+    marginBottom: DesignSystem.spacing.md,
+  },
+  container_small: {
+    marginBottom: DesignSystem.spacing.sm,
+  },
+  error: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.error[500],
+    marginTop: DesignSystem.spacing.xs,
+  },
+  hint: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    marginTop: DesignSystem.spacing.xs,
+  },
+  input: {
+    flex: 1,
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
+  },
+  inputDisabled: {
+    color: DesignSystem.colors.text.disabled,
+  },
+  inputWrapper: {
+    alignItems: 'center',
+    borderRadius: DesignSystem.radius.md,
+    flexDirection: 'row',
+  },
+  inputWrapper_default: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderColor: DesignSystem.colors.border.primary,
+    borderWidth: 1,
+  },
+  inputWrapper_filled: {
+    backgroundColor: DesignSystem.colors.background.tertiary,
+    borderWidth: 0,
+  },
+  inputWrapper_glass: {
+    backgroundColor: DesignSystem.colors.background.glass,
+    borderColor: DesignSystem.colors.border.glass,
+    borderWidth: 1,
+  },
+  inputWrapper_minimal: {
+    backgroundColor: 'transparent',
+    borderBottomColor: DesignSystem.colors.border.primary,
+    borderBottomWidth: 1,
+    borderRadius: 0,
+    borderWidth: 0,
+  },
+  inputWrapper_outlined: {
+    backgroundColor: 'transparent',
+    borderColor: DesignSystem.colors.border.primary,
+    borderWidth: 2,
+  },
+  input_large: {
+    ...DesignSystem.typography.body.large,
+    minHeight: 52,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+  },
+  input_medium: {
+    ...DesignSystem.typography.body.medium,
+    minHeight: 44,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+  },
+  input_small: {
+    ...DesignSystem.typography.body.small,
+    minHeight: 36,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   label: {
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     fontWeight: '500',
   },
-  label_small: {
-    ...DesignSystem.typography.body.small,
-  },
-  label_medium: {
-    ...DesignSystem.typography.body.medium,
-  },
-  label_large: {
-    ...DesignSystem.typography.body.large,
+  labelContainer: {
+    marginBottom: DesignSystem.spacing.xs,
   },
   labelDisabled: {
     color: DesignSystem.colors.text.disabled,
@@ -332,83 +383,25 @@ const styles = StyleSheet.create({
   labelFocused: {
     color: DesignSystem.colors.sage[500],
   },
-  required: {
-    color: DesignSystem.colors.error[500],
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: DesignSystem.radius.md,
-  },
-  inputWrapper_default: {
-    backgroundColor: DesignSystem.colors.background.secondary,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
-  },
-  inputWrapper_outlined: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: DesignSystem.colors.border.primary,
-  },
-  inputWrapper_filled: {
-    backgroundColor: DesignSystem.colors.background.tertiary,
-    borderWidth: 0,
-  },
-  inputWrapper_glass: {
-    backgroundColor: DesignSystem.colors.background.glass,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.glass,
-  },
-  inputWrapper_minimal: {
-    backgroundColor: 'transparent',
-    borderWidth: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border.primary,
-    borderRadius: 0,
-  },
-  input: {
-    flex: 1,
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.primary,
-  },
-  input_small: {
-    ...DesignSystem.typography.body.small,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.xs,
-    minHeight: 36,
-  },
-  input_medium: {
-    ...DesignSystem.typography.body.medium,
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
-    minHeight: 44,
-  },
-  input_large: {
+  label_large: {
     ...DesignSystem.typography.body.large,
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    minHeight: 52,
   },
-  inputDisabled: {
-    color: DesignSystem.colors.text.disabled,
+  label_medium: {
+    ...DesignSystem.typography.body.medium,
+  },
+  label_small: {
+    ...DesignSystem.typography.body.small,
   },
   leftIcon: {
     marginLeft: DesignSystem.spacing.sm,
     marginRight: DesignSystem.spacing.xs,
   },
-  rightIconContainer: {
-    padding: DesignSystem.spacing.xs,
-    marginRight: DesignSystem.spacing.xs,
-  },
-  hint: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.secondary,
-    marginTop: DesignSystem.spacing.xs,
-  },
-  error: {
-    ...DesignSystem.typography.scale.caption,
+  required: {
     color: DesignSystem.colors.error[500],
-    marginTop: DesignSystem.spacing.xs,
+  },
+  rightIconContainer: {
+    marginRight: DesignSystem.spacing.xs,
+    padding: DesignSystem.spacing.xs,
   },
 });
 

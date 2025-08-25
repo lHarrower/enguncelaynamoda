@@ -1,22 +1,23 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ViewStyle,
-  TextStyle,
   ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
   withSpring,
   withTiming,
-  interpolate,
 } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
@@ -52,7 +53,7 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
   const glowIntensity = useSharedValue(0);
 
   const handlePressIn = () => {
-  scale.value = withSpring(0.96, DesignSystem.animations.spring.smooth);
+    scale.value = withSpring(0.96, DesignSystem.animations.spring.smooth);
     opacity.value = withTiming(0.8, { duration: 150 });
     if (variant === 'luxury') {
       glowIntensity.value = withTiming(1, { duration: 200 });
@@ -68,11 +69,7 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
   };
 
   const animatedStyle = useAnimatedStyle(() => {
-    const shadowOpacity = interpolate(
-      glowIntensity.value,
-      [0, 1],
-      [0.1, 0.3]
-    );
+    const shadowOpacity = interpolate(glowIntensity.value, [0, 1], [0.1, 0.3]);
 
     return {
       transform: [{ scale: scale.value }],
@@ -185,7 +182,7 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
       large: 24,
       hero: 28,
     };
-    return iconSizes[size];
+    return iconSizes[size] ?? 20;
   };
 
   const getIconColor = (): string => {
@@ -196,35 +193,32 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
       glass: DesignSystem.colors.text.primary,
       luxury: DesignSystem.colors.text.primary,
     };
-    return variantIconColors[variant];
+    return variantIconColors[variant] ?? DesignSystem.colors.text.primary;
   };
 
   const renderContent = () => {
     if (loading) {
       return (
-        <ActivityIndicator 
-          color={getIconColor()} 
-          size={size === 'small' ? 'small' : 'small'} 
-        />
+        <ActivityIndicator color={getIconColor()} size={size === 'small' ? 'small' : 'small'} />
       );
     }
 
     return (
       <View style={styles.contentContainer}>
         {icon && iconPosition === 'left' && (
-          <Ionicons 
-            name={icon} 
-            size={getIconSize()} 
-            color={getIconColor()} 
+          <Ionicons
+            name={icon}
+            size={getIconSize()}
+            color={getIconColor()}
             style={styles.iconLeft}
           />
         )}
         <Text style={getTextStyle()}>{title}</Text>
         {icon && iconPosition === 'right' && (
-          <Ionicons 
-            name={icon} 
-            size={getIconSize()} 
-            color={getIconColor()} 
+          <Ionicons
+            name={icon}
+            size={getIconSize()}
+            color={getIconColor()}
             style={styles.iconRight}
           />
         )}
@@ -240,6 +234,10 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
       onPressOut={handlePressOut}
       disabled={disabled || loading}
       activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityHint={`Premium ${variant} button${loading ? ', loading' : ''}${disabled ? ', disabled' : ''}`}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
     >
       {renderContent()}
     </AnimatedTouchableOpacity>
@@ -248,8 +246,8 @@ const PremiumButton: React.FC<PremiumButtonProps> = ({
 
 const styles = StyleSheet.create({
   contentContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'center',
   },
   iconLeft: {

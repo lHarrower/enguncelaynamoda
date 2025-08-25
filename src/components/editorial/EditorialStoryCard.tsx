@@ -1,20 +1,9 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  interpolate,
-} from 'react-native-reanimated';
-import { DesignSystem } from '@/theme/DesignSystem';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+
 import { EditorialStory } from '@/data/editorialContent';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
 const cardWidth = screenWidth * 0.8;
@@ -39,19 +28,13 @@ const getCategoryColor = (category: EditorialStory['category']) => {
   }
 };
 
-export const EditorialStoryCard: React.FC<EditorialStoryCardProps> = ({
-  story,
-  onPress,
-}) => {
+export const EditorialStoryCard: React.FC<EditorialStoryCardProps> = ({ story, onPress }) => {
   const scale = useSharedValue(1);
   const translateY = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [
-        { scale: scale.value },
-        { translateY: translateY.value },
-      ],
+      transform: [{ scale: scale.value }, { translateY: translateY.value }] as any,
     };
   });
 
@@ -77,22 +60,17 @@ export const EditorialStoryCard: React.FC<EditorialStoryCardProps> = ({
           <Image source={{ uri: story.image }} style={styles.image} />
           <View style={styles.overlay} />
           <View style={styles.categoryBadge}>
-            <Text
-              style={[
-                styles.categoryText,
-                { color: getCategoryColor(story.category) },
-              ]}
-            >
+            <Text style={[styles.categoryText, { color: getCategoryColor(story.category) }]}>
               {story.category.toUpperCase()}
             </Text>
           </View>
         </View>
-        
+
         <View style={styles.content}>
           <Text style={styles.subtitle}>{story.subtitle}</Text>
           <Text style={styles.title}>{story.title}</Text>
           <Text style={styles.excerpt}>{story.excerpt}</Text>
-          
+
           <View style={styles.meta}>
             <Text style={styles.author}>By {story.author}</Text>
             <Text style={styles.readTime}>{story.readTime}</Text>
@@ -104,39 +82,19 @@ export const EditorialStoryCard: React.FC<EditorialStoryCardProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: cardWidth,
-    backgroundColor: DesignSystem.colors.background.primary,
-    borderRadius: DesignSystem.radius.lg,
-    overflow: 'hidden',
-    ...DesignSystem.elevation.soft,
-    marginBottom: DesignSystem.spacing.md,
-  },
-  imageContainer: {
-    position: 'relative',
-    height: 200,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+  author: {
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.primary,
+    fontWeight: '500',
   },
   categoryBadge: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
     backgroundColor: DesignSystem.colors.background.primary,
+    borderRadius: DesignSystem.radius.full,
+    left: 12,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: DesignSystem.radius.full,
+    position: 'absolute',
+    top: 12,
     ...DesignSystem.elevation.soft,
   },
   categoryText: {
@@ -144,40 +102,60 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 0.5,
   },
+  container: {
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderRadius: DesignSystem.radius.lg,
+    overflow: 'hidden',
+    width: cardWidth,
+    ...DesignSystem.elevation.soft,
+    marginBottom: DesignSystem.spacing.md,
+  },
   content: {
     padding: DesignSystem.spacing.lg,
   },
-  subtitle: {
-  ...DesignSystem.typography.body.small,
-    color: DesignSystem.colors.text.secondary,
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  title: {
-    ...DesignSystem.typography.scale.h2,
-    color: DesignSystem.colors.text.primary,
-    marginBottom: 12,
-    lineHeight: 32,
-  },
   excerpt: {
-  ...DesignSystem.typography.body.medium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     lineHeight: 24,
     marginBottom: 16,
   },
+  image: {
+    height: '100%',
+    resizeMode: 'cover',
+    width: '100%',
+  },
+  imageContainer: {
+    height: 200,
+    position: 'relative',
+  },
   meta: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
-  author: {
-  ...DesignSystem.typography.body.small,
-    fontWeight: '500',
-    color: DesignSystem.colors.text.primary,
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
   readTime: {
-  ...DesignSystem.typography.body.small,
+    ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.tertiary,
+  },
+  subtitle: {
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
+    letterSpacing: 0.5,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+  },
+  title: {
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
+    lineHeight: 32,
+    marginBottom: 12,
   },
 });

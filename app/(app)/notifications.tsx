@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '@shopify/restyle';
-import { DesignSystemType } from '@/theme/DesignSystem';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { DesignSystemType } from '@/theme/DesignSystem';
 // REMOVED: import { useTheme } from '@/context/ThemeContext';
 
 export default function NotificationsScreen() {
@@ -10,10 +11,10 @@ export default function NotificationsScreen() {
   const { colors } = theme;
 
   return (
-  <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background.primary }]}>
       <View style={styles.content}>
-    <Text style={[styles.title, { color: colors.text.primary }]}>Notifications</Text>
-    <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
+        <Text style={[styles.title, { color: colors.text.primary }]}>Notifications</Text>
+        <Text style={[styles.subtitle, { color: colors.text.secondary }]}>
           This feature is coming soon
         </Text>
       </View>
@@ -26,18 +27,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
+  },
+  subtitle: {
+    fontSize: 16,
+    textAlign: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
   },
 });

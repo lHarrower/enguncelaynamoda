@@ -1,18 +1,14 @@
 // Discover Screen - The New Paradigm for Interaction
 // Complete Discovery Engine with Tinder-style swipe mechanism
 
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  Alert,
-} from 'react-native';
+import React, { useState } from 'react';
+import { Alert, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DesignSystem } from '@/theme/DesignSystem';
+
 import DiscoveryEngine from '@/components/discovery/DiscoveryEngine';
 import { supabase } from '@/config/supabaseClient';
+import { logger } from '@/lib/logger';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ProductItem {
   id: string;
@@ -29,8 +25,8 @@ interface ProductItem {
 
 export default function DiscoverScreen() {
   const insets = useSafeAreaInsets();
-  const [likedItems, setLikedItems] = useState<ProductItem[]>([]);
-  const [dislikedItems, setDislikedItems] = useState<ProductItem[]>([]);
+  const [_likedItems, setLikedItems] = useState<ProductItem[]>([]);
+  const [_dislikedItems, setDislikedItems] = useState<ProductItem[]>([]);
   const [favoriteBoutiques, setFavoriteBoutiques] = useState<string[]>([]);
 
   // Sample discovery items - discounted products from various boutiques
@@ -41,7 +37,8 @@ export default function DiscoverScreen() {
       brand: 'Luxury Atelier',
       price: 89,
       originalPrice: 145,
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
       boutique: 'Madison Avenue Boutique',
       category: 'accessories',
       colors: ['blue', 'gold', 'white'],
@@ -53,7 +50,8 @@ export default function DiscoverScreen() {
       brand: 'Urban Elegance',
       price: 245,
       originalPrice: 380,
-      image: 'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=400&h=600&fit=crop&q=80',
       boutique: 'Executive Style Co.',
       category: 'outerwear',
       colors: ['navy', 'black'],
@@ -65,7 +63,8 @@ export default function DiscoverScreen() {
       brand: 'Bohemian Dreams',
       price: 125,
       originalPrice: 195,
-      image: 'https://images.unsplash.com/photo-1594619336195-39a8f2712533?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1594619336195-39a8f2712533?w=400&h=600&fit=crop&q=80',
       boutique: 'Boutique Bella',
       category: 'dresses',
       colors: ['pink', 'green', 'cream'],
@@ -77,7 +76,8 @@ export default function DiscoverScreen() {
       brand: 'Artisan Footwear',
       price: 165,
       originalPrice: 220,
-      image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=600&fit=crop&q=80',
       boutique: 'Sole Society',
       category: 'shoes',
       colors: ['brown', 'black'],
@@ -89,7 +89,8 @@ export default function DiscoverScreen() {
       brand: 'Cozy Luxe',
       price: 98,
       originalPrice: 140,
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
       boutique: 'Madison Avenue Boutique',
       category: 'knitwear',
       colors: ['cream', 'beige'],
@@ -101,7 +102,8 @@ export default function DiscoverScreen() {
       brand: 'Jewelry Atelier',
       price: 75,
       originalPrice: 120,
-      image: 'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=400&h=600&fit=crop&q=80',
       boutique: 'Gilded Gallery',
       category: 'jewelry',
       colors: ['gold'],
@@ -113,7 +115,8 @@ export default function DiscoverScreen() {
       brand: 'Modern Minimalist',
       price: 110,
       originalPrice: 160,
-      image: 'https://images.unsplash.com/photo-1594619336195-39a8f2712533?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1594619336195-39a8f2712533?w=400&h=600&fit=crop&q=80',
       boutique: 'Executive Style Co.',
       category: 'bottoms',
       colors: ['black', 'navy'],
@@ -125,7 +128,8 @@ export default function DiscoverScreen() {
       brand: 'Heritage Collection',
       price: 185,
       originalPrice: 275,
-      image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=600&fit=crop&q=80',
       boutique: 'Boutique Bella',
       category: 'bags',
       colors: ['burgundy', 'brown'],
@@ -136,35 +140,40 @@ export default function DiscoverScreen() {
   // Handle like action - learn user preferences
   const handleLike = (item: ProductItem) => {
     // Add to liked items
-    setLikedItems(prev => [item, ...prev]);
-    
+    setLikedItems((prev) => [item, ...prev]);
+
     // Update machine learning algorithm
-    updateUserPreferences(item, 'like');
-    
+    updateUserPreferences(item, 'like').catch((err) => {
+      logger.error('updateUserPreferences like failed', { err, context: 'DiscoverScreen' });
+    });
+
     // Check if we should show similar items
-    if (Math.random() > 0.7) { // 30% chance to show similar items
+    if (Math.random() > 0.7) {
+      // 30% chance to show similar items
       showSimilarItems(item);
     }
   };
 
   const handleDislike = (item: ProductItem) => {
     // Add to disliked items
-    setDislikedItems(prev => [item, ...prev]);
-    
+    setDislikedItems((prev) => [item, ...prev]);
+
     // Update machine learning algorithm
-    updateUserPreferences(item, 'dislike');
+    updateUserPreferences(item, 'dislike').catch((err) => {
+      logger.error('updateUserPreferences dislike failed', { err, context: 'DiscoverScreen' });
+    });
   };
 
   const handleBoutiqueFavorite = (boutique: string) => {
     // Add to favorite boutiques
     if (!favoriteBoutiques.includes(boutique)) {
-      setFavoriteBoutiques(prev => [...prev, boutique]);
-      
+      setFavoriteBoutiques((prev) => [...prev, boutique]);
+
       // Show notification
       Alert.alert(
-        "Boutique Favorited",
+        'Boutique Favorited',
         `You'll now receive notifications when ${boutique} adds new items!`,
-        [{ text: "Great!" }]
+        [{ text: 'Great!' }],
       );
     }
   };
@@ -172,49 +181,54 @@ export default function DiscoverScreen() {
   // Helper functions
   const updateUserPreferences = async (item: ProductItem, action: 'like' | 'dislike') => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        return;
+      }
+
       // Log the interaction in the database
-      const { error } = await supabase
-        .from('product_interactions')
-        .insert({
-          user_id: user.id,
-          product_id: item.id,
-          interaction_type: action,
-          interaction_date: new Date().toISOString(),
-          product_category: item.category,
-          product_colors: item.colors,
-          product_style: item.style
-        });
-        
-      if (error) throw error;
-      
-      console.log(`User preference updated: ${action} for ${item.title}`);
+      const { error } = await supabase.from('product_interactions').insert({
+        user_id: user.id,
+        product_id: item.id,
+        interaction_type: action,
+        interaction_date: new Date().toISOString(),
+        product_category: item.category,
+        product_colors: item.colors,
+        product_style: item.style,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      logger.info(`User preference updated: ${action} for ${item.title}`);
     } catch (error) {
-      console.error('Error updating user preferences:', error);
+      logger.error('Error updating user preferences', { error, context: 'DiscoverScreen' });
     }
   };
 
   const showSimilarItems = (item: ProductItem) => {
     // In a real implementation, this would fetch similar items from the API
     Alert.alert(
-      "Similar Items",
+      'Similar Items',
       `We found 5 items similar to "${item.title}" that you might like!`,
-      [{ text: "Show Me", onPress: () => {} }, { text: "Later", style: "cancel" }]
+      [
+        { text: 'Show Me', onPress: () => {} },
+        { text: 'Later', style: 'cancel' },
+      ],
     );
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={DesignSystem.colors.background.primary} />
-      
+
       {/* Header */}
       <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <Text style={styles.headerTitle}>Discover</Text>
-        <Text style={styles.headerSubtitle}>
-          Swipe right to love, left to pass
-        </Text>
+        <Text style={styles.headerSubtitle}>Swipe right to love, left to pass</Text>
       </View>
 
       {/* Discovery Engine */}
@@ -231,26 +245,26 @@ export default function DiscoverScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: DesignSystem.colors.background.primary,
+    flex: 1,
+  },
+  discoveryEngine: {
+    flex: 1,
   },
   header: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    marginBottom: DesignSystem.spacing.lg,
     alignItems: 'center',
+    marginBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
+  },
+  headerSubtitle: {
+    ...DesignSystem.typography.body1,
+    color: DesignSystem.colors.text.secondary,
+    textAlign: 'center',
   },
   headerTitle: {
     ...DesignSystem.typography.scale.hero,
     color: DesignSystem.colors.text.primary,
     fontSize: 32,
     marginBottom: 8,
-  },
-  headerSubtitle: {
-  ...DesignSystem.typography.body1,
-    color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-  },
-  discoveryEngine: {
-    flex: 1,
   },
 });

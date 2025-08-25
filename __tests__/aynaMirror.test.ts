@@ -1,20 +1,19 @@
 // AYNA Mirror Data Models and Services Test
 // Basic validation tests for the core data structures and service interfaces
 
-import { 
-  WardrobeItem, 
-  DailyRecommendations, 
+import {
+  WardrobeItem,
+  DailyRecommendations,
   OutfitRecommendation,
   WeatherContext,
-  ItemCategory 
+  ItemCategory,
 } from '../src/types/aynaMirror';
 import { EnhancedWardrobeService } from '../src/services/enhancedWardrobeService';
 import { AynaMirrorService } from '../src/services/aynaMirrorService';
 
-describe('AYNA Mirror Data Models', () => {
-  
-  describe('WardrobeItem Interface', () => {
-    it('should have all required properties for intelligence features', () => {
+describe('AYNA Mirror Veri Modelleri', () => {
+  describe('WardrobeItem Arayüzü', () => {
+    it('zeka özellikleri için gerekli tüm özelliklere sahip olmalı', () => {
       const mockItem: WardrobeItem = {
         id: 'test-id',
         userId: 'user-123',
@@ -30,12 +29,12 @@ describe('AYNA Mirror Data Models', () => {
           lastWorn: new Date(),
           averageRating: 4.2,
           complimentsReceived: 2,
-          costPerWear: 12.50
+          costPerWear: 12.5,
         },
         styleCompatibility: {},
         confidenceHistory: [],
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       // Verify all intelligence features are present
@@ -46,8 +45,8 @@ describe('AYNA Mirror Data Models', () => {
     });
   });
 
-  describe('DailyRecommendations Interface', () => {
-    it('should structure daily recommendations correctly', () => {
+  describe('DailyRecommendations Arayüzü', () => {
+    it('günlük önerileri doğru şekilde yapılandırmalı', () => {
       const mockRecommendations: DailyRecommendations = {
         id: 'daily-123',
         userId: 'user-123',
@@ -58,9 +57,9 @@ describe('AYNA Mirror Data Models', () => {
           condition: 'sunny',
           humidity: 45,
           location: 'Test City',
-          timestamp: new Date()
+          timestamp: new Date(),
         },
-        generatedAt: new Date()
+        generatedAt: new Date(),
       };
 
       expect(mockRecommendations.weatherContext).toBeDefined();
@@ -69,20 +68,18 @@ describe('AYNA Mirror Data Models', () => {
     });
   });
 
-  describe('OutfitRecommendation Interface', () => {
-    it('should include confidence features', () => {
+  describe('OutfitRecommendation Arayüzü', () => {
+    it('güven özelliklerini içermeli', () => {
       const mockOutfit: OutfitRecommendation = {
         id: 'outfit-123',
         dailyRecommendationId: 'daily-123',
         items: [],
         confidenceNote: 'You look amazing today!',
-        quickActions: [
-          { type: 'wear', label: 'Wear This', icon: 'checkmark' }
-        ],
+        quickActions: [{ type: 'wear', label: 'Wear This', icon: 'checkmark' }],
         confidenceScore: 4.5,
         reasoning: ['Perfect for the weather', 'Colors complement each other'],
         isQuickOption: true,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       expect(mockOutfit.confidenceNote).toBeDefined();
@@ -93,10 +90,9 @@ describe('AYNA Mirror Data Models', () => {
   });
 });
 
-describe('Enhanced Wardrobe Service', () => {
-  
-  describe('Service Interface', () => {
-    it('should have all required intelligence methods', () => {
+describe('Gelişmiş Gardırop Servisi', () => {
+  describe('Servis Arayüzü', () => {
+    it('gerekli tüm zeka metodlarına sahip olmalı', () => {
       // Verify that the service instance has all expected methods
       const service = new EnhancedWardrobeService();
       expect(typeof service.trackItemUsage).toBe('function');
@@ -109,29 +105,28 @@ describe('Enhanced Wardrobe Service', () => {
       expect(typeof service.getWardrobeUtilizationStats).toBe('function');
     });
 
-    it('should suggest appropriate tags for different item categories', async () => {
+    it('farklı öğe kategorileri için uygun etiketler önermeli', async () => {
       const service = new EnhancedWardrobeService();
       const topItem = { category: 'tops' as ItemCategory, colors: ['black'] };
       const tags = await service.suggestItemTags(topItem);
-      
+
       expect(tags).toContain('casual');
       expect(tags).toContain('everyday');
     });
 
-    it('should suggest tags based on colors', async () => {
+    it('renklere dayalı etiketler önermeli', async () => {
       const service = new EnhancedWardrobeService();
       const brightItem = { category: 'tops' as ItemCategory, colors: ['#FFFF00', '#FF0000'] };
       const tags = await service.suggestItemTags(brightItem);
-      
+
       expect(tags).toContain('bright');
     });
   });
 });
 
-describe('AYNA Mirror Service', () => {
-  
-  describe('Service Interface', () => {
-    it('should have all core daily ritual methods', () => {
+describe('AYNA Mirror Servisi', () => {
+  describe('Servis Arayüzü', () => {
+    it('temel günlük ritüel metodlarına sahip olmalı', () => {
       expect(typeof AynaMirrorService.generateDailyRecommendations).toBe('function');
       expect(typeof AynaMirrorService.scheduleNextMirrorSession).toBe('function');
       expect(typeof AynaMirrorService.generateConfidenceNote).toBe('function');
@@ -140,26 +135,28 @@ describe('AYNA Mirror Service', () => {
     });
   });
 
-  describe('Confidence Note Generation', () => {
-    it('should generate encouraging confidence notes', async () => {
+  describe('Güven Notu Oluşturma', () => {
+    it('cesaret verici güven notları oluşturmalı', async () => {
       const mockOutfit = {
-        items: [{
-          id: 'item-1',
-          category: 'tops' as ItemCategory,
-          colors: ['blue'],
-          usageStats: { averageRating: 4.5 } as any
-        }] as WardrobeItem[]
+        items: [
+          {
+            id: 'item-1',
+            category: 'tops' as ItemCategory,
+            colors: ['blue'],
+            usageStats: { averageRating: 4.5 } as any,
+          },
+        ] as WardrobeItem[],
       };
 
       const mockContext = {
         weather: { condition: 'sunny', temperature: 75 } as WeatherContext,
-        userPreferences: { notificationTime: new Date() } as any
+        userPreferences: { notificationTime: new Date() } as any,
       } as any;
 
       const note = await AynaMirrorService.generateConfidenceNote(
-        mockOutfit, 
-        mockContext, 
-        'casual'
+        mockOutfit,
+        mockContext,
+        'casual',
       );
 
       expect(typeof note).toBe('string');
@@ -169,40 +166,39 @@ describe('AYNA Mirror Service', () => {
   });
 });
 
-describe('Database Schema Validation', () => {
-  
-  describe('Required Tables', () => {
-    it('should define all required table structures', () => {
+describe('Veritabanı Şema Doğrulaması', () => {
+  describe('Gerekli Tablolar', () => {
+    it('gerekli tüm tablo yapılarını tanımlamalı', () => {
       // This test validates that our migration files define the correct structure
       // In a real environment, this would connect to a test database
-      
+
       const requiredTables = [
         'wardrobe_items',
-        'daily_recommendations', 
+        'daily_recommendations',
         'outfit_recommendations',
         'outfit_feedback',
-        'user_preferences'
+        'user_preferences',
       ];
 
       // For now, just verify the table names are documented
-      requiredTables.forEach(tableName => {
+      requiredTables.forEach((tableName) => {
         expect(tableName).toMatch(/^[a-z_]+$/); // Valid SQL table name format
       });
     });
   });
 
-  describe('Database Functions', () => {
-    it('should define required database functions', () => {
+  describe('Veritabanı Fonksiyonları', () => {
+    it('gerekli veritabanı fonksiyonlarını tanımlamalı', () => {
       const requiredFunctions = [
         'track_item_usage',
         'get_wardrobe_utilization_stats',
         'update_item_confidence_score',
         'get_neglected_items',
-        'calculate_item_compatibility'
+        'calculate_item_compatibility',
       ];
 
       // Verify function names follow SQL conventions
-      requiredFunctions.forEach(functionName => {
+      requiredFunctions.forEach((functionName) => {
         expect(functionName).toMatch(/^[a-z_]+$/);
       });
     });

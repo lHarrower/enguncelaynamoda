@@ -62,6 +62,7 @@ auth.users (Supabase Auth)
 ## Security
 
 All tables have Row Level Security (RLS) enabled with policies that ensure:
+
 - Users can only access their own data
 - Proper authentication is required for all operations
 - Data integrity is maintained through foreign key constraints
@@ -69,6 +70,7 @@ All tables have Row Level Security (RLS) enabled with policies that ensure:
 ## Performance
 
 Indexes are created on frequently queried columns:
+
 - User ID fields for fast user-specific queries
 - Date fields for time-based queries
 - Usage tracking fields for analytics queries

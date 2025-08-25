@@ -1,19 +1,21 @@
 /**
  * Grid Layout System
  * Part of AYNAMODA Unified Design System
- * 
+ *
  * Provides traditional grid layouts for product listings and galleries
  * Responsive, accessible, and optimized for fashion content
  * Following Digital Zen Garden philosophy with clean, organized structures
  */
 
-import { ViewStyle, Dimensions } from 'react-native';
-import { SPACING, BORDER_RADIUS, ELEVATION, UNIFIED_COLORS } from '@/theme/tokens';
+import { Dimensions, ViewStyle } from 'react-native';
+
+import { BORDER_RADIUS, ELEVATION, SPACING, UNIFIED_COLORS } from '@/theme/tokens';
+
 import { logInDev } from '../../utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 const GRID_PADDING = SPACING.md;
-const AVAILABLE_WIDTH = screenWidth - (GRID_PADDING * 2);
+const AVAILABLE_WIDTH = screenWidth - GRID_PADDING * 2;
 
 export const GRID_LAYOUTS = {
   // Standard product grid
@@ -23,7 +25,7 @@ export const GRID_LAYOUTS = {
       paddingHorizontal: GRID_PADDING,
       paddingVertical: SPACING.lg,
     } as ViewStyle,
-    
+
     // Two column grid
     twoColumn: {
       flexDirection: 'row',
@@ -31,7 +33,7 @@ export const GRID_LAYOUTS = {
       justifyContent: 'space-between',
       gap: SPACING.md,
     } as ViewStyle,
-    
+
     // Three column grid
     threeColumn: {
       flexDirection: 'row',
@@ -39,34 +41,34 @@ export const GRID_LAYOUTS = {
       justifyContent: 'space-between',
       gap: SPACING.sm,
     } as ViewStyle,
-    
+
     // Single column (list view)
     singleColumn: {
       gap: SPACING.lg,
     } as ViewStyle,
-    
+
     // Grid item base styles
     gridItem: {
       backgroundColor: UNIFIED_COLORS.background.elevated,
       borderRadius: BORDER_RADIUS.lg,
       ...ELEVATION.soft,
       overflow: 'hidden',
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Masonry-style grid (Pinterest-like)
   masonryGrid: {
     container: {
       flex: 1,
       paddingHorizontal: GRID_PADDING,
     } as ViewStyle,
-    
+
     // Column wrapper
     column: {
       flex: 1,
       paddingHorizontal: SPACING.xs,
     } as ViewStyle,
-    
+
     // Masonry item
     masonryItem: {
       backgroundColor: UNIFIED_COLORS.background.elevated,
@@ -74,16 +76,16 @@ export const GRID_LAYOUTS = {
       ...ELEVATION.soft,
       marginBottom: SPACING.md,
       overflow: 'hidden',
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Gallery grid with aspect ratios
   galleryGrid: {
     container: {
       flex: 1,
       paddingHorizontal: GRID_PADDING,
     } as ViewStyle,
-    
+
     // Square aspect ratio (1:1)
     square: {
       aspectRatio: 1,
@@ -92,49 +94,49 @@ export const GRID_LAYOUTS = {
       ...ELEVATION.soft,
       overflow: 'hidden',
     } as ViewStyle,
-    
+
     // Portrait aspect ratio (3:4)
     portrait: {
-      aspectRatio: 3/4,
+      aspectRatio: 3 / 4,
       backgroundColor: UNIFIED_COLORS.background.elevated,
       borderRadius: BORDER_RADIUS.lg,
       ...ELEVATION.soft,
       overflow: 'hidden',
     } as ViewStyle,
-    
+
     // Landscape aspect ratio (4:3)
     landscape: {
-      aspectRatio: 4/3,
+      aspectRatio: 4 / 3,
       backgroundColor: UNIFIED_COLORS.background.elevated,
       borderRadius: BORDER_RADIUS.lg,
       ...ELEVATION.soft,
       overflow: 'hidden',
     } as ViewStyle,
-    
+
     // Wide aspect ratio (16:9)
     wide: {
-      aspectRatio: 16/9,
+      aspectRatio: 16 / 9,
       backgroundColor: UNIFIED_COLORS.background.elevated,
       borderRadius: BORDER_RADIUS.lg,
       ...ELEVATION.soft,
       overflow: 'hidden',
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Staggered grid for dynamic layouts
   staggeredGrid: {
     container: {
       flex: 1,
       paddingHorizontal: GRID_PADDING,
     } as ViewStyle,
-    
+
     // Row with mixed sizes
     staggeredRow: {
       flexDirection: 'row',
       gap: SPACING.md,
       marginBottom: SPACING.md,
     } as ViewStyle,
-    
+
     // Large item (2/3 width)
     largeItem: {
       flex: 2,
@@ -143,7 +145,7 @@ export const GRID_LAYOUTS = {
       ...ELEVATION.medium,
       overflow: 'hidden',
     } as ViewStyle,
-    
+
     // Small item (1/3 width)
     smallItem: {
       flex: 1,
@@ -151,8 +153,8 @@ export const GRID_LAYOUTS = {
       borderRadius: BORDER_RADIUS.lg,
       ...ELEVATION.soft,
       overflow: 'hidden',
-    } as ViewStyle
-  }
+    } as ViewStyle,
+  },
 } as const;
 
 // Grid item sizes for different layouts
@@ -162,24 +164,24 @@ export const GRID_SIZES = {
     width: (AVAILABLE_WIDTH - SPACING.md) / 2,
     minHeight: 200,
   },
-  
+
   // Three column grid item widths
   threeColumn: {
-    width: (AVAILABLE_WIDTH - (SPACING.sm * 2)) / 3,
+    width: (AVAILABLE_WIDTH - SPACING.sm * 2) / 3,
     minHeight: 150,
   },
-  
+
   // Single column (full width)
   singleColumn: {
     width: AVAILABLE_WIDTH,
     minHeight: 120,
   },
-  
+
   // Masonry column widths
   masonryColumn: {
     twoColumn: (AVAILABLE_WIDTH - SPACING.xs) / 2,
-    threeColumn: (AVAILABLE_WIDTH - (SPACING.xs * 2)) / 3,
-  }
+    threeColumn: (AVAILABLE_WIDTH - SPACING.xs * 2) / 3,
+  },
 } as const;
 
 // Grid spacing configurations
@@ -190,27 +192,27 @@ export const GRID_SPACING = {
     vertical: SPACING.sm,
     padding: SPACING.sm,
   },
-  
+
   // Normal spacing for balanced layouts
   normal: {
     horizontal: SPACING.sm,
     vertical: SPACING.md,
     padding: SPACING.md,
   },
-  
+
   // Loose spacing for premium feel
   loose: {
     horizontal: SPACING.md,
     vertical: SPACING.lg,
     padding: SPACING.lg,
   },
-  
+
   // Luxury spacing for high-end layouts
   luxury: {
     horizontal: SPACING.lg,
     vertical: SPACING.xl,
     padding: SPACING.xl,
-  }
+  },
 } as const;
 
 // Grid interaction states
@@ -222,7 +224,7 @@ export const GRID_INTERACTIONS = {
       borderWidth: 0,
       transform: [{ scale: 1 }],
     } as ViewStyle,
-    
+
     // Hovered/focused state
     focused: {
       ...ELEVATION.medium,
@@ -230,7 +232,7 @@ export const GRID_INTERACTIONS = {
       borderWidth: 2,
       borderColor: UNIFIED_COLORS.sage[300],
     } as ViewStyle,
-    
+
     // Selected state
     selected: {
       ...ELEVATION.high,
@@ -239,14 +241,14 @@ export const GRID_INTERACTIONS = {
       borderColor: UNIFIED_COLORS.sage[500],
       backgroundColor: UNIFIED_COLORS.sage[100],
     } as ViewStyle,
-    
+
     // Pressed state
     pressed: {
       transform: [{ scale: 0.98 }],
       ...ELEVATION.none,
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Multi-select mode
   multiSelect: {
     // Selection indicator overlay
@@ -262,15 +264,15 @@ export const GRID_INTERACTIONS = {
       alignItems: 'center',
       zIndex: 10,
     } as ViewStyle,
-    
+
     // Unselected indicator
     unselected: {
       backgroundColor: 'transparent',
       borderWidth: 2,
       borderColor: UNIFIED_COLORS.background.elevated,
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Loading states
   loading: {
     // Skeleton placeholder
@@ -278,13 +280,13 @@ export const GRID_INTERACTIONS = {
       backgroundColor: UNIFIED_COLORS.neutral[100],
       opacity: 0.7,
     } as ViewStyle,
-    
+
     // Shimmer effect container
     shimmer: {
       overflow: 'hidden',
       backgroundColor: UNIFIED_COLORS.neutral[50],
-    } as ViewStyle
-  }
+    } as ViewStyle,
+  },
 } as const;
 
 // Grid header and footer components
@@ -296,15 +298,15 @@ export const GRID_COMPONENTS = {
       paddingVertical: SPACING.lg,
       backgroundColor: UNIFIED_COLORS.background.primary,
     } as ViewStyle,
-    
+
     // Header with action button
     withAction: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Load more footer
   loadMore: {
     container: {
@@ -312,13 +314,13 @@ export const GRID_COMPONENTS = {
       paddingVertical: SPACING.xl,
       alignItems: 'center',
     } as ViewStyle,
-    
+
     // Loading indicator
     loading: {
       paddingVertical: SPACING.lg,
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Empty state
   emptyState: {
     container: {
@@ -327,9 +329,9 @@ export const GRID_COMPONENTS = {
       alignItems: 'center',
       paddingHorizontal: SPACING.xl,
       paddingVertical: SPACING.xxl,
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Filter bar
   filterBar: {
     container: {
@@ -339,13 +341,13 @@ export const GRID_COMPONENTS = {
       borderBottomWidth: 1,
       borderBottomColor: UNIFIED_COLORS.neutral[200],
     } as ViewStyle,
-    
+
     // Filter chips container
     chips: {
       flexDirection: 'row',
       gap: SPACING.sm,
-    } as ViewStyle
-  }
+    } as ViewStyle,
+  },
 } as const;
 
 // Animation configurations for grid layouts
@@ -360,7 +362,7 @@ export const GRID_ANIMATIONS = {
       initialOpacity: 0,
       initialTransform: [{ translateY: 20 }],
     },
-    
+
     // Scale in animation
     scaleIn: {
       duration: 300,
@@ -368,28 +370,28 @@ export const GRID_ANIMATIONS = {
       initialOpacity: 0,
       initialTransform: [{ scale: 0.8 }],
     },
-    
+
     // Slide up animation
     slideUp: {
       duration: 500,
       easing: 'easeOutCubic',
       initialOpacity: 0,
       initialTransform: [{ translateY: 50 }],
-    }
+    },
   },
-  
+
   // Layout change animations
   layoutChange: {
     duration: 400,
     easing: 'easeInOutQuart',
   },
-  
+
   // Selection animations
   selection: {
     duration: 200,
     easing: 'easeOutCubic',
   },
-  
+
   // Scroll animations
   scroll: {
     // Parallax effect
@@ -397,14 +399,14 @@ export const GRID_ANIMATIONS = {
       factor: 0.5,
       easing: 'linear',
     },
-    
+
     // Reveal on scroll
     reveal: {
       threshold: 0.1,
       duration: 600,
       easing: 'easeOutQuart',
-    }
-  }
+    },
+  },
 } as const;
 
 // Responsive breakpoints for grid layouts
@@ -414,61 +416,75 @@ export const GRID_BREAKPOINTS = {
     columns: 2,
     spacing: GRID_SPACING.tight,
   },
-  
+
   medium: {
     maxWidth: 768,
     columns: 3,
     spacing: GRID_SPACING.normal,
   },
-  
+
   large: {
     maxWidth: 1024,
     columns: 4,
     spacing: GRID_SPACING.loose,
   },
-  
+
   xlarge: {
     maxWidth: Infinity,
     columns: 5,
     spacing: GRID_SPACING.luxury,
-  }
+  },
 } as const;
 
 // Helper functions
 export const getGridItemWidth = (columns: number, spacing: number = SPACING.md) => {
-  return (AVAILABLE_WIDTH - (spacing * (columns - 1))) / columns;
+  return (AVAILABLE_WIDTH - spacing * (columns - 1)) / columns;
 };
 
-export const getGridColumns = (screenWidth: number) => {
+export const getGridColumns = (viewportWidth: number) => {
   // Defensive check to prevent undefined access
   if (!GRID_BREAKPOINTS || !GRID_BREAKPOINTS.medium) {
     logInDev('GRID_BREAKPOINTS not properly initialized');
     return 2; // fallback
   }
-  
-  if (screenWidth <= GRID_BREAKPOINTS.small.maxWidth) return GRID_BREAKPOINTS.small.columns;
-  if (screenWidth <= GRID_BREAKPOINTS.medium.maxWidth) return GRID_BREAKPOINTS.medium.columns;
-  if (screenWidth <= GRID_BREAKPOINTS.large.maxWidth) return GRID_BREAKPOINTS.large.columns;
+
+  if (viewportWidth <= GRID_BREAKPOINTS.small.maxWidth) {
+    return GRID_BREAKPOINTS.small.columns;
+  }
+  if (viewportWidth <= GRID_BREAKPOINTS.medium.maxWidth) {
+    return GRID_BREAKPOINTS.medium.columns;
+  }
+  if (viewportWidth <= GRID_BREAKPOINTS.large.maxWidth) {
+    return GRID_BREAKPOINTS.large.columns;
+  }
   return GRID_BREAKPOINTS.xlarge.columns;
 };
 
-export const getGridSpacing = (screenWidth: number) => {
+export const getGridSpacing = (viewportWidth: number) => {
   // Defensive check to prevent undefined access
   if (!GRID_BREAKPOINTS || !GRID_BREAKPOINTS.medium) {
     logInDev('GRID_BREAKPOINTS not properly initialized');
     return GRID_SPACING.normal; // fallback
   }
-  
-  if (screenWidth <= GRID_BREAKPOINTS.small.maxWidth) return GRID_BREAKPOINTS.small.spacing;
-  if (screenWidth <= GRID_BREAKPOINTS.medium.maxWidth) return GRID_BREAKPOINTS.medium.spacing;
-  if (screenWidth <= GRID_BREAKPOINTS.large.maxWidth) return GRID_BREAKPOINTS.large.spacing;
+
+  if (viewportWidth <= GRID_BREAKPOINTS.small.maxWidth) {
+    return GRID_BREAKPOINTS.small.spacing;
+  }
+  if (viewportWidth <= GRID_BREAKPOINTS.medium.maxWidth) {
+    return GRID_BREAKPOINTS.medium.spacing;
+  }
+  if (viewportWidth <= GRID_BREAKPOINTS.large.maxWidth) {
+    return GRID_BREAKPOINTS.large.spacing;
+  }
   return GRID_BREAKPOINTS.xlarge.spacing;
 };
 
 // Masonry layout helper
 export const getMasonryItemHeight = (index: number, baseHeight: number = 200) => {
-  const variations = [1, 1.2, 0.8, 1.5, 0.9, 1.3, 1.1];
-  return baseHeight * variations[index % variations.length];
+  const variations = [1, 1.2, 0.8, 1.5, 0.9, 1.3, 1.1] as const;
+  const safeIdx = variations.length ? index % variations.length : 0;
+  const factor = variations[safeIdx] ?? 1;
+  return baseHeight * factor;
 };
 
 // Export for easy access

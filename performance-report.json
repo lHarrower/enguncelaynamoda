@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-08-22T13:24:44.491Z",
+  "bundleSize": {
+    "android": {
+      "totalSize": 0,
+      "formattedSize": "0 Bytes"
+    },
+    "nodeModules": {
+      "totalSize": 609715190,
+      "formattedSize": "581.47 MB"
+    }
+  },
+  "buildTime": null,
+  "testExecutionTime": {
+    "duration": 6019,
+    "formattedDuration": "6.019s"
+  },
+  "lintTime": {
+    "duration": 12560,
+    "formattedDuration": "12.56s",
+    "note": "Completed (may have warnings/errors)"
+  },
+  "typeCheckTime": null,
+  "summary": {
+    "totalBundleSize": 609715190,
+    "measurementDate": "2025-08-22T13:25:17.577Z",
+    "status": "completed"
+  }
+}

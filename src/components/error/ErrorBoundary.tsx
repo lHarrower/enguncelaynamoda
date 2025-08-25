@@ -1,8 +1,16 @@
 // Error Boundary - React error boundary components with graceful recovery
-import React, { Component, ReactNode, ErrorInfo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import errorHandler, { AppError, ErrorCategory, ErrorSeverity, RecoveryAction } from '../../utils/ErrorHandler';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+
+import { errorInDev, warnInDev } from '../../utils/consoleSuppress';
+import errorHandler, {
+  AppError,
+  ErrorCategory,
+  ErrorSeverity,
+  RecoveryAction,
+} from '../../utils/ErrorHandler';
 
 /**
  * Error boundary state
@@ -31,71 +39,61 @@ interface ErrorBoundaryProps {
  * Main Error Boundary Component
  */
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  private retryTimeoutId: NodeJS.Timeout | null = null;
-  
+  private retryTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    
+
     this.state = {
       hasError: false,
       error: null,
       errorInfo: null,
-      retryCount: 0
+      retryCount: 0,
     };
   }
-  
+
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     return {
-      hasError: true
+      hasError: true,
     };
   }
-  
+
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     const { onError, category = ErrorCategory.UI, level = 'component' } = this.props;
-    
+
     // Determine severity based on level
     const severity = this.getSeverityFromLevel(level);
-    
+
     // Create structured error
-    const appError = errorHandler.createError(
-      error,
-      category,
-      severity,
-      {
-        screen: 'ErrorBoundary',
-        action: 'componentDidCatch',
-        additionalData: {
-          componentStack: errorInfo.componentStack,
-          level,
-          retryCount: this.state.retryCount
-        }
+    const appError = errorHandler.createError(error, category, severity, {
+      screen: 'ErrorBoundary',
+      action: 'componentDidCatch',
+      additionalData: {
+        componentStack: errorInfo.componentStack || null,
+        level,
+        retryCount: this.state.retryCount,
       },
-      {
-        isRecoverable: level !== 'critical',
-        retryable: this.props.enableRetry !== false,
-        reportable: severity === ErrorSeverity.HIGH || severity === ErrorSeverity.CRITICAL
-      }
-    );
-    
+    });
+
     // Handle the error
     errorHandler.handleError(appError);
-    
+
     // Update state
     this.setState({
       error: appError,
-      errorInfo
+      errorInfo,
     });
-    
+
     // Call custom error handler
     onError?.(appError, errorInfo);
   }
-  
+
   componentWillUnmount() {
     if (this.retryTimeoutId) {
       clearTimeout(this.retryTimeoutId);
     }
   }
-  
+
   private getSeverityFromLevel(level: string): ErrorSeverity {
     switch (level) {
       case 'critical':
@@ -107,50 +105,50 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         return ErrorSeverity.MEDIUM;
     }
   }
-  
+
   private handleRetry = () => {
     const { maxRetries = 3 } = this.props;
-    
+
     if (this.state.retryCount >= maxRetries) {
-      console.warn('Max retry attempts reached');
+      warnInDev('Max retry attempts reached');
       return;
     }
-    
-    this.setState(prevState => ({
+
+    this.setState((prevState) => ({
       hasError: false,
       error: null,
       errorInfo: null,
-      retryCount: prevState.retryCount + 1
+      retryCount: prevState.retryCount + 1,
     }));
   };
-  
+
   private handleRecoveryAction = (action: RecoveryAction) => {
     try {
       action.action();
-      
+
       // Reset error state if it's a retry action
       if (action.strategy === 'retry') {
         this.handleRetry();
       }
     } catch (recoveryError) {
-      console.error('Recovery action failed:', recoveryError);
+      errorInDev('Recovery action failed:', String(recoveryError));
     }
   };
-  
+
   render() {
     const { hasError, error } = this.state;
     const { children, fallback, enableRetry = true, maxRetries = 3 } = this.props;
-    
+
     if (hasError && error) {
       // Use custom fallback if provided
       if (fallback) {
         return fallback(error, this.handleRetry);
       }
-      
+
       // Get recovery actions
       const recoveryActions = errorHandler.getRecoveryActions(error);
       const canRetry = enableRetry && this.state.retryCount < maxRetries;
-      
+
       return (
         <ErrorFallback
           error={error}
@@ -162,7 +160,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         />
       );
     }
-    
+
     return children;
   }
 }
@@ -185,28 +183,23 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   onRecoveryAction,
   canRetry,
   retryCount,
-  maxRetries
+  maxRetries,
 }) => {
   return (
     <View style={styles.container}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Error Icon */}
         <View style={styles.iconContainer}>
           <Text style={styles.errorIcon}>⚠️</Text>
         </View>
-        
+
         {/* Error Message */}
         <Text style={styles.title}>
           {error.severity === ErrorSeverity.CRITICAL ? 'Critical Error' : 'Something went wrong'}
         </Text>
-        
-        <Text style={styles.message}>
-          {error.userMessage}
-        </Text>
-        
+
+        <Text style={styles.message}>{error.userMessage}</Text>
+
         {/* Error Details (for development) */}
         {__DEV__ && (
           <View style={styles.debugContainer}>
@@ -214,13 +207,13 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
             <Text style={styles.debugText}>ID: {error.id}</Text>
             <Text style={styles.debugText}>Category: {error.category}</Text>
             <Text style={styles.debugText}>Severity: {error.severity}</Text>
-            <Text style={styles.debugText}>Retries: {retryCount}/{maxRetries}</Text>
-            {error.message && (
-              <Text style={styles.debugText}>Technical: {error.message}</Text>
-            )}
+            <Text style={styles.debugText}>
+              Retries: {retryCount}/{maxRetries}
+            </Text>
+            {error.message && <Text style={styles.debugText}>Technical: {error.message}</Text>}
           </View>
         )}
-        
+
         {/* Recovery Actions */}
         <View style={styles.actionsContainer}>
           {recoveryActions.map((action, index) => (
@@ -229,22 +222,30 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
               style={[
                 styles.actionButton,
                 action.primary && styles.primaryActionButton,
-                !canRetry && action.strategy === 'retry' && styles.disabledButton
+                !canRetry && action.strategy === 'retry' && styles.disabledButton,
               ]}
               onPress={() => onRecoveryAction(action)}
               disabled={!canRetry && action.strategy === 'retry'}
+              accessibilityRole="button"
+              accessibilityLabel={action.label}
+              accessibilityHint={
+                action.primary ? 'Primary recovery action' : 'Secondary recovery action'
+              }
+              accessibilityState={{ disabled: !canRetry && action.strategy === 'retry' }}
             >
-              <Text style={[
-                styles.actionButtonText,
-                action.primary && styles.primaryActionButtonText,
-                !canRetry && action.strategy === 'retry' && styles.disabledButtonText
-              ]}>
+              <Text
+                style={[
+                  styles.actionButtonText,
+                  action.primary && styles.primaryActionButtonText,
+                  !canRetry && action.strategy === 'retry' && styles.disabledButtonText,
+                ]}
+              >
                 {action.label}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
-        
+
         {/* Retry Information */}
         {!canRetry && retryCount >= maxRetries && (
           <Text style={styles.retryInfo}>
@@ -303,58 +304,53 @@ export const NetworkErrorBoundary: React.FC<Omit<ErrorBoundaryProps, 'category'>
  */
 export function withErrorBoundary<P extends object>(
   WrappedComponent: React.ComponentType<P>,
-  errorBoundaryProps?: Partial<ErrorBoundaryProps>
+  errorBoundaryProps?: Partial<ErrorBoundaryProps>,
 ) {
   const WithErrorBoundaryComponent = (props: P) => (
     <ErrorBoundary {...errorBoundaryProps}>
       <WrappedComponent {...props} />
     </ErrorBoundary>
   );
-  
-  WithErrorBoundaryComponent.displayName = 
-    `withErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name})`;
-  
+
+  WithErrorBoundaryComponent.displayName = `withErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name})`;
+
   return WithErrorBoundaryComponent;
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
+  actionButton: {
     alignItems: 'center',
-    padding: DesignSystem.spacing.lg,
-    minHeight: '100%',
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderColor: DesignSystem.colors.border.primary,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
   },
-  iconContainer: {
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  errorIcon: {
-    fontSize: 64,
-    textAlign: 'center',
-  },
-  title: {
-    ...DesignSystem.typography.heading.h2,
+  actionButtonText: {
+    ...DesignSystem.typography.button.medium,
     color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing.md,
   },
-  message: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing.xl,
-    lineHeight: 24,
+  actionsContainer: {
+    gap: DesignSystem.spacing.md,
+    width: '100%',
+  },
+  container: {
+    backgroundColor: DesignSystem.colors.background.primary,
+    flex: 1,
   },
   debugContainer: {
     backgroundColor: DesignSystem.colors.background.secondary,
-    padding: DesignSystem.spacing.md,
     borderRadius: 8,
     marginBottom: DesignSystem.spacing.lg,
+    padding: DesignSystem.spacing.md,
     width: '100%',
+  },
+  debugText: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: 'monospace',
+    marginBottom: DesignSystem.spacing.xs / 2,
   },
   debugTitle: {
     ...DesignSystem.typography.scale.caption,
@@ -362,48 +358,52 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: DesignSystem.spacing.xs,
   },
-  debugText: {
-    ...DesignSystem.typography.scale.caption,
+  disabledButton: {
+    opacity: 0.6,
+  },
+  disabledButtonText: {
+    color: DesignSystem.colors.text.disabled,
+  },
+  errorIcon: {
+    fontSize: 64,
+    textAlign: 'center',
+  },
+  iconContainer: {
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  message: {
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
-    marginBottom: DesignSystem.spacing.xs / 2,
-    fontFamily: 'monospace',
-  },
-  actionsContainer: {
-    width: '100%',
-    gap: DesignSystem.spacing.md,
-  },
-  actionButton: {
-    backgroundColor: DesignSystem.colors.background.secondary,
-    paddingVertical: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.lg,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
+    lineHeight: 24,
+    marginBottom: DesignSystem.spacing.xl,
+    textAlign: 'center',
   },
   primaryActionButton: {
     backgroundColor: DesignSystem.colors.primary[500],
     borderColor: DesignSystem.colors.primary[500],
   },
-  disabledButton: {
-  opacity: 0.6,
-  },
-  actionButtonText: {
-    ...DesignSystem.typography.button.medium,
-    color: DesignSystem.colors.text.primary,
-  },
   primaryActionButtonText: {
     color: DesignSystem.colors.text.inverse,
-  },
-  disabledButtonText: {
-    color: DesignSystem.colors.text.disabled,
   },
   retryInfo: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-    marginTop: DesignSystem.spacing.md,
     fontStyle: 'italic',
+    marginTop: DesignSystem.spacing.md,
+    textAlign: 'center',
+  },
+  scrollContent: {
+    alignItems: 'center',
+    flexGrow: 1,
+    justifyContent: 'center',
+    minHeight: '100%',
+    padding: DesignSystem.spacing.lg,
+  },
+  title: {
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.error.main,
+    marginBottom: DesignSystem.spacing.md,
+    textAlign: 'center',
   },
 });
 

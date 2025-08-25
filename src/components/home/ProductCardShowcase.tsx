@@ -1,26 +1,20 @@
 /**
  * Product Card Showcase
- * 
+ *
  * A showcase component demonstrating the vertical product cards
  * with swipe functionality and premium styling.
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  ScrollView,
-  Text,
-  StyleSheet,
-  Dimensions,
-  Alert,
-} from 'react-native';
-import { VerticalProductCard, ProductCardData } from '@/components/home/VerticalProductCard';
+import { Alert, Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native';
+
 import {
   ORIGINAL_COLORS,
-  ORIGINAL_TYPOGRAPHY,
   ORIGINAL_SPACING,
-  ORIGINAL_BORDER_RADIUS,
+  ORIGINAL_TYPOGRAPHY,
 } from '@/components/auth/originalLoginStyles';
+import { ProductCardData, VerticalProductCard } from '@/components/home/VerticalProductCard';
+import { logInDev } from '@/utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -67,34 +61,24 @@ export const ProductCardShowcase: React.FC = () => {
   const [products, setProducts] = useState(SAMPLE_PRODUCTS);
 
   const handleCardPress = (product: ProductCardData) => {
-    Alert.alert(
-      'Ürün Detayı',
-      `${product.title} detaylarını görüntüle?`,
-      [
-        { text: 'İptal', style: 'cancel' },
-        { text: 'Görüntüle', onPress: () => console.log('Navigate to product:', product.id) },
-      ]
-    );
+    Alert.alert('Ürün Detayı', `${product.title} detaylarını görüntüle?`, [
+      { text: 'İptal', style: 'cancel' },
+      { text: 'Görüntüle', onPress: () => logInDev('Navigate to product:', product.id) },
+    ]);
   };
 
   const handleLike = (product: ProductCardData) => {
-    setProducts(prev =>
-      prev.map(p =>
-        p.id === product.id ? { ...p, isLiked: product.isLiked } : p
-      )
+    setProducts((prev) =>
+      prev.map((p) => (p.id === product.id ? { ...p, isLiked: product.isLiked } : p)),
     );
   };
 
   const handleSwipe = (direction: 'left' | 'right', product: ProductCardData) => {
     const action = direction === 'right' ? 'beğenildi' : 'geçildi';
-    Alert.alert(
-      'Kaydırma Aksiyonu',
-      `${product.title} ${action}!`,
-      [{ text: 'Tamam' }]
-    );
-    
+    Alert.alert('Kaydırma Aksiyonu', `${product.title} ${action}!`, [{ text: 'Tamam' }]);
+
     // In a real app, you might remove the card or load new ones
-    console.log(`Product ${product.id} swiped ${direction}`);
+    logInDev(`Product ${product.id} swiped ${direction}`);
   };
 
   return (
@@ -121,77 +105,75 @@ export const ProductCardShowcase: React.FC = () => {
             onPress={handleCardPress}
             onLike={handleLike}
             onSwipe={handleSwipe}
-            style={[
+            style={StyleSheet.flatten([
               styles.card,
-              index === 0 && styles.firstCard,
-              index === products.length - 1 && styles.lastCard,
-            ]}
+              ...(index === 0 ? [styles.firstCard] : []),
+              ...(index === products.length - 1 ? [styles.lastCard] : []),
+            ])}
           />
         ))}
       </ScrollView>
 
       {/* Footer Info */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Kartları sağa kaydırarak beğen, sola kaydırarak geç
-        </Text>
+        <Text style={styles.footerText}>Kartları sağa kaydırarak beğen, sola kaydırarak geç</Text>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: ORIGINAL_COLORS.background,
+  card: {
+    marginHorizontal: 12,
   },
-  
+
+  container: {
+    backgroundColor: ORIGINAL_COLORS.background,
+    flex: 1,
+  },
+
+  firstCard: {
+    marginLeft: ORIGINAL_SPACING.containerHorizontal,
+  },
+
+  footer: {
+    alignItems: 'center',
+    paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
+    paddingVertical: 20,
+  },
+
+  footerText: {
+    ...ORIGINAL_TYPOGRAPHY.secondary,
+    fontSize: 14,
+    textAlign: 'center',
+  },
+
   header: {
+    alignItems: 'center',
+    paddingBottom: 24,
     paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
     paddingTop: 20,
-    paddingBottom: 24,
-    alignItems: 'center',
   },
-  
+
+  headerSubtitle: {
+    ...ORIGINAL_TYPOGRAPHY.subtitle,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+
   headerTitle: {
     ...ORIGINAL_TYPOGRAPHY.title,
     fontSize: 28,
     marginBottom: 8,
     textAlign: 'center',
   },
-  
-  headerSubtitle: {
-    ...ORIGINAL_TYPOGRAPHY.subtitle,
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  
-  scrollContainer: {
-    paddingVertical: 20,
-  },
-  
-  card: {
-    marginHorizontal: 12,
-  },
-  
-  firstCard: {
-    marginLeft: ORIGINAL_SPACING.containerHorizontal,
-  },
-  
+
   lastCard: {
     marginRight: ORIGINAL_SPACING.containerHorizontal,
   },
-  
-  footer: {
-    paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
+
+  scrollContainer: {
     paddingVertical: 20,
-    alignItems: 'center',
-  },
-  
-  footerText: {
-    ...ORIGINAL_TYPOGRAPHY.secondary,
-    textAlign: 'center',
-    fontSize: 14,
   },
 });
 

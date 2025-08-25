@@ -1,18 +1,19 @@
 /**
  * ItemDetailsForm Organism
- * 
+ *
  * A complex form component that combines multiple molecules and atoms
  * to create a complete clothing item details input interface.
  */
 
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import { BaseComponentProps } from '@/types/componentProps';
-import { DesignSystem } from '@/theme/DesignSystem';
-import FormField from '@/components/molecules/FormField';
-import Card from '@/components/molecules/Card';
+import { ScrollView, StyleSheet, View } from 'react-native';
+
 import Button from '@/components/atoms/Button';
 import Text from '@/components/atoms/Text';
+import Card from '@/components/molecules/Card';
+import FormField from '@/components/molecules/FormField';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { BaseComponentProps } from '@/types/componentProps';
 
 export interface ClothingItemSubmission {
   name: string;
@@ -44,12 +45,12 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
   loading = false,
   categories = ['Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories'],
   subcategories = {
-    'Tops': ['T-Shirt', 'Blouse', 'Sweater', 'Tank Top'],
-    'Bottoms': ['Jeans', 'Trousers', 'Skirt', 'Shorts'],
-    'Dresses': ['Casual', 'Formal', 'Cocktail', 'Maxi'],
-    'Outerwear': ['Jacket', 'Coat', 'Blazer', 'Cardigan'],
-    'Shoes': ['Sneakers', 'Heels', 'Flats', 'Boots'],
-    'Accessories': ['Bag', 'Jewelry', 'Scarf', 'Hat']
+    Tops: ['T-Shirt', 'Blouse', 'Sweater', 'Tank Top'],
+    Bottoms: ['Jeans', 'Trousers', 'Skirt', 'Shorts'],
+    Dresses: ['Casual', 'Formal', 'Cocktail', 'Maxi'],
+    Outerwear: ['Jacket', 'Coat', 'Blazer', 'Cardigan'],
+    Shoes: ['Sneakers', 'Heels', 'Flats', 'Boots'],
+    Accessories: ['Bag', 'Jewelry', 'Scarf', 'Hat'],
   },
   colors = ['Black', 'White', 'Gray', 'Navy', 'Brown', 'Beige', 'Red', 'Blue', 'Green', 'Pink'],
   sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
@@ -70,19 +71,21 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof ClothingItemSubmission, string>>>({});
-  const [touched, setTouched] = useState<Partial<Record<keyof ClothingItemSubmission, boolean>>>({});
+  const [touched, setTouched] = useState<Partial<Record<keyof ClothingItemSubmission, boolean>>>(
+    {},
+  );
 
   const updateField = (field: keyof ClothingItemSubmission, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
   const markFieldTouched = (field: keyof ClothingItemSubmission) => {
-    setTouched(prev => ({ ...prev, [field]: true }));
+    setTouched((prev) => ({ ...prev, [field]: true }));
   };
 
   const validateForm = (): boolean => {
@@ -126,11 +129,17 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
   const availableSubcategories = formData.category ? subcategories[formData.category] || [] : [];
 
   return (
-    <Card variant="default" padding="large" style={StyleSheet.flatten([styles.container, style])} testID={testID} {...props}>
+    <Card
+      variant="default"
+      padding="large"
+      style={StyleSheet.flatten([styles.container, style])}
+      testID={testID}
+      {...props}
+    >
       <Text variant="headline" weight="bold" style={styles.title}>
         Add Clothing Item
       </Text>
-      
+
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <FormField
           label="Item Name"
@@ -250,7 +259,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
             disabled={loading}
           />
         )}
-        
+
         <Button
           title="Add Item"
           variant="primary"
@@ -265,37 +274,37 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    maxHeight: '90%',
-  },
-  
-  title: {
-    marginBottom: DesignSystem.spacing.lg,
-    textAlign: 'center',
-  },
-  
-  scrollView: {
-    flex: 1,
-    marginBottom: DesignSystem.spacing.md,
-  },
-  
   buttonContainer: {
+    borderTopColor: DesignSystem.colors.neutral[200],
+    borderTopWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingTop: DesignSystem.spacing.md,
-    borderTopWidth: 1,
-  borderTopColor: DesignSystem.colors.neutral[200],
   },
-  
+
   cancelButton: {
     flex: 1,
     marginRight: DesignSystem.spacing.sm,
   },
-  
+
+  container: {
+    flex: 1,
+    maxHeight: '90%',
+  },
+
+  scrollView: {
+    flex: 1,
+    marginBottom: DesignSystem.spacing.md,
+  },
+
   submitButton: {
     flex: 1,
     marginLeft: DesignSystem.spacing.sm,
+  },
+
+  title: {
+    marginBottom: DesignSystem.spacing.lg,
+    textAlign: 'center',
   },
 });
 

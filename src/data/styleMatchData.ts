@@ -39,4 +39,4 @@ export const styleMatchData = [
     discount: '30% OFF',
     image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80',
   },
-]; 
+];

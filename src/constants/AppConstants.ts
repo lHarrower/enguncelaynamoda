@@ -1,7 +1,7 @@
 // App-wide constants to improve maintainability and consistency
 
 // Animation and Timing Constants
-export const ANIMATION_DURATIONS = {
+export const ANIMATION_DURATION = {
   QUICK: 300,
   NORMAL: 500,
   SLOW: 800,
@@ -17,7 +17,7 @@ export const TIMEOUTS = {
 } as const;
 
 // UI Dimensions
-export const DIMENSIONS = {
+export const UI_DIMENSIONS = {
   AVATAR_SIZE: 80,
   AVATAR_SIZE_SMALL: 40,
   FAB_SIZE: 60,
@@ -48,7 +48,7 @@ export const SPACING = {
   xxxl: 64,
   huge: 80,
   massive: 120,
-  editorial: 160,   // For editorial layouts with lots of breathing room
+  editorial: 160, // For editorial layouts with lots of breathing room
 } as const;
 
 // API Endpoints and Models
@@ -82,13 +82,13 @@ export const SUCCESS_MESSAGES = {
 } as const;
 
 // Validation Rules
-export const VALIDATION = {
+export const VALIDATION_RULES = {
   MIN_PASSWORD_LENGTH: 6,
   MAX_PASSWORD_LENGTH: 100,
   MIN_NAME_LENGTH: 2,
   MAX_NAME_LENGTH: 50,
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  PHONE_REGEX: /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{4,6}$/,
+  PHONE_REGEX: /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{4,6}$/,
 } as const;
 
 // Image Configuration
@@ -101,7 +101,7 @@ export const IMAGE_CONFIG = {
 } as const;
 
 // Categories
-export const WARDROBE_CATEGORIES = [
+export const CATEGORIES = [
   'All',
   'Tops',
   'Bottoms',
@@ -112,7 +112,7 @@ export const WARDROBE_CATEGORIES = [
 ] as const;
 
 // Colors for AI Analysis
-export const AI_COLORS = [
+export const COLORS = [
   'black',
   'white',
   'gray',
@@ -137,7 +137,7 @@ export const AI_COLORS = [
 export const TYPOGRAPHY = {
   // Primary Font - Inter (clean, modern, highly legible)
   fontFamily: 'Inter_400Regular',
-  
+
   // Font Weights
   weights: {
     light: '300',
@@ -146,46 +146,61 @@ export const TYPOGRAPHY = {
     semibold: '600',
     bold: '700',
   },
-  
+
   // Font Sizes - Minimal scale, generous spacing
   sizes: {
     // Display
-    hero: 32,          // Editorial headlines
-    title: 24,         // Page titles
-    
+    hero: 32, // Editorial headlines
+    title: 24, // Page titles
+
     // Content
-    heading: 20,       // Section headings
-    subheading: 18,    // Subheadings
-    body: 16,          // Main body text
-    bodySmall: 14,     // Secondary body text
-    
+    heading: 20, // Section headings
+    subheading: 18, // Subheadings
+    body: 16, // Main body text
+    bodySmall: 14, // Secondary body text
+
     // UI
-    button: 16,        // Button text
-    label: 14,         // Form labels
-    caption: 12,       // Captions, metadata
-    tiny: 10,          // Smallest text
+    button: 16, // Button text
+    label: 14, // Form labels
+    caption: 12, // Captions, metadata
+    tiny: 10, // Smallest text
   },
-  
+
   // Line Heights - Generous for readability
   lineHeights: {
-    hero: 36,          // 1.125x
-    title: 28,         // 1.17x
-    heading: 24,       // 1.2x
-    subheading: 22,    // 1.22x
-    body: 24,          // 1.5x
-    bodySmall: 20,     // 1.43x
-    button: 20,        // 1.25x
-    label: 18,         // 1.29x
-    caption: 16,       // 1.33x
-    tiny: 14,          // 1.4x
+    hero: 36, // 1.125x
+    title: 28, // 1.17x
+    heading: 24, // 1.2x
+    subheading: 22, // 1.22x
+    body: 24, // 1.5x
+    bodySmall: 20, // 1.43x
+    button: 20, // 1.25x
+    label: 18, // 1.29x
+    caption: 16, // 1.33x
+    tiny: 14, // 1.4x
   },
-  
+
   // Letter Spacing - Minimal, clean
   letterSpacing: {
-    tight: -0.3,       // For large text
-    normal: 0,         // Default
-    wide: 0.5,         // For emphasis
-    wider: 1,          // For buttons/labels
+    tight: -0.3, // For large text
+    normal: 0, // Default
+    wide: 0.5, // For emphasis
+    wider: 1, // For buttons/labels},
+  },
+
+  // Color harmony and seasonal preferences
+  COLOR_HARMONY_RULES: {
+    complementary: ['red-green', 'blue-orange', 'yellow-purple'],
+    analogous: ['red-orange-yellow', 'blue-green-purple', 'yellow-green-blue'],
+    triadic: ['red-blue-yellow', 'orange-green-purple'],
+    neutral: ['black', 'white', 'gray', 'grey', 'beige', 'navy', 'brown'],
+  },
+
+  SEASONAL_COLOR_PREFERENCES: {
+    spring: ['pastels', 'bright', 'warm'],
+    summer: ['cool', 'muted', 'soft'],
+    autumn: ['warm', 'rich', 'earthy'],
+    winter: ['cool', 'bold', 'dramatic'],
   },
 };
 
@@ -198,7 +213,7 @@ export const SEMANTIC_TYPOGRAPHY = {
     lineHeight: 52,
     letterSpacing: -0.5,
   },
-  
+
   // Product
   productTitle: {
     fontFamily: 'Inter_400Regular',
@@ -212,7 +227,7 @@ export const SEMANTIC_TYPOGRAPHY = {
     lineHeight: 24,
     letterSpacing: 0,
   },
-  
+
   // Navigation
   tabLabel: {
     fontFamily: 'Inter_500Medium',
@@ -220,7 +235,7 @@ export const SEMANTIC_TYPOGRAPHY = {
     lineHeight: 16,
     letterSpacing: 1,
   },
-  
+
   // Buttons
   buttonPrimary: {
     fontFamily: 'Inter_600SemiBold',
@@ -234,7 +249,7 @@ export const SEMANTIC_TYPOGRAPHY = {
     lineHeight: 20,
     letterSpacing: 0,
   },
-  
+
   // Forms
   inputLabel: {
     fontFamily: 'Inter_500Medium',
@@ -248,7 +263,7 @@ export const SEMANTIC_TYPOGRAPHY = {
     lineHeight: 24,
     letterSpacing: 0,
   },
-  
+
   // Content
   pageTitle: {
     fontFamily: 'Inter_700Bold',
@@ -354,8 +369,128 @@ export const ANIMATIONS = {
   },
 };
 
+// Intelligence Service Configuration
+export const INTELLIGENCE_CONFIG = {
+  // Outfit Generation Limits
+  OUTFIT_GENERATION: {
+    DRESS_COMBINATIONS: {
+      TEST: 8,
+      PRODUCTION: 50,
+    },
+    TRIPLE_COMBINATIONS: {
+      TEST: 8,
+      PRODUCTION: 50,
+    },
+    PAIR_FALLBACK: {
+      TEST: 8,
+      PRODUCTION: 10,
+    },
+    FINAL_LIMIT: {
+      TEST: 8,
+      PRODUCTION: 20,
+    },
+  },
+
+  // Scoring Weights
+  SCORING_WEIGHTS: {
+    COMPATIBILITY: 0.3,
+    CONFIDENCE: 0.4,
+    WEATHER: 0.2,
+    OCCASION: 0.1,
+
+    // Compatibility Sub-weights
+    COLOR_HARMONY: 0.4,
+    STYLE_CONSISTENCY: 0.3,
+    CATEGORY_BALANCE: 0.2,
+    FORMALITY_CONSISTENCY: 0.1,
+
+    // Satisfaction Weights
+    COLOR_ALIGNMENT: 0.3,
+    STYLE_ALIGNMENT: 0.3,
+    PATTERN_ALIGNMENT: 0.4,
+  },
+
+  // Temperature Thresholds (Celsius)
+  TEMPERATURE_THRESHOLDS: {
+    FREEZING: 0,
+    COLD: 10,
+    COOL: 20,
+    MILD: 25,
+    WARM: 30,
+  },
+
+  // Confidence Scores
+  CONFIDENCE: {
+    BASE: 0.5,
+    MINIMUM: 0.1,
+    MAXIMUM: 1.0,
+    NEUTRAL: 0.5,
+    HIGH_THRESHOLD: 0.8,
+  },
+
+  // Usage Statistics
+  USAGE_STATS: {
+    MAX_USAGE_BONUS: 0.25,
+    REDISCOVERY_BONUS: 0.1,
+    HIGH_RATING_THRESHOLD: 3.3,
+    AVERAGE_WEARS_DIVISOR: 12,
+    TOTAL_DAYS_ACTIVE: 30,
+    REDISCOVERY_MULTIPLIER: 0.1,
+    REDISCOVERY_CAP: 0.2,
+  },
+
+  // Weather Compatibility Adjustments
+  WEATHER_ADJUSTMENTS: {
+    RAIN_BONUS: 0.2,
+    RAIN_PENALTY: 0.3,
+    SNOW_BONUS: 0.3,
+    SNOW_PENALTY: 0.4,
+    WIND_BONUS: 0.1,
+    WIND_PENALTY: 0.2,
+    WATERPROOF_BONUS: 0.2,
+    DELICATE_PENALTY: 0.3,
+    SNOW_WATERPROOF_BONUS: 0.3,
+    SNOW_NON_WATERPROOF_PENALTY: 0.4,
+    WIND_RESISTANT_BONUS: 0.1,
+    LOOSE_WIND_PENALTY: 0.2,
+  },
+
+  // Style Compatibility Matrix
+  STYLE_COMPATIBILITY: {
+    casual: { casual: 1.0, business: 0.3, formal: 0.1, athletic: 0.7 },
+    business: { casual: 0.3, business: 1.0, formal: 0.8, athletic: 0.1 },
+    formal: { casual: 0.1, business: 0.8, formal: 1.0, athletic: 0.0 },
+    athletic: { casual: 0.7, business: 0.1, formal: 0.0, athletic: 1.0 },
+  },
+
+  // Color Harmony Rules
+  COLOR_HARMONY: {
+    NEUTRAL_BOOST: 0.99,
+    COMPLEMENTARY_SCORE: 0.9,
+    ANALOGOUS_SCORE: 0.85,
+    TRIADIC_SCORE: 0.8,
+    MONOCHROMATIC_SCORE: 0.92,
+    CLASHING_PENALTY: 0.6,
+    SINGLE_COLOR_SCORE: 0.9,
+    DEFAULT_HARMONY: 0.8,
+  },
+
+  // Category Balance
+  CATEGORY_BALANCE: {
+    OPTIMAL_SCORE: 1.0,
+    SINGLE_CATEGORY_PENALTY: 0.3,
+    TOO_MANY_PENALTY: 0.6,
+  },
+
+  // Dataset Analysis Thresholds
+  DATASET_THRESHOLDS: {
+    SMALL_DATASET_MULTIPLIER: 0.15,
+    MEDIUM_DATASET_MULTIPLIER: 0.1,
+  },
+} as const;
+
 // App Metadata
-export const APP_INFO = {
+export const APP_METADATA = {
   NAME: 'AYNAMODA',
   VERSION: '1.0.0',
   TAGLINE: 'Effortless Style',
@@ -363,7 +498,7 @@ export const APP_INFO = {
 } as const;
 
 // Feature Flags
-export const FEATURES = {
+export const FEATURE_FLAGS = {
   GOOGLE_AUTH: true,
   APPLE_AUTH: true,
   FACEBOOK_AUTH: false,

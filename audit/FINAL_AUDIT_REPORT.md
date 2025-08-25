@@ -72,7 +72,7 @@ Evidence artifacts: see `audit/REPO_TREE_FULL.txt`, `audit/MIGRATIONS_LIST.txt` 
   - `verify_jwt = true` configured via per-function `config.toml` for sensitive endpoints (e.g., `ai-proxy`, `edit-wardrobe-item`, `analyze-products`, `ai-analysis`).
   - Authorization: functions require `Authorization: Bearer` and validate user ownership before updates.
   - CORS: centralized and restricted via `ALLOWED_ORIGIN` env in production.
-  - SSRF: fetches of `image_url` restricted/validated to trusted origins (e.g., Supabase Storage). 
+  - SSRF: fetches of `image_url` restricted/validated to trusted origins (e.g., Supabase Storage).
 
 - Database/RLS
   - RLS enabled across user-scoped tables; hardening migration ensures coverage for efficiency tables.
@@ -126,7 +126,7 @@ Evidence artifacts: see `audit/REPO_TREE_FULL.txt`, `audit/MIGRATIONS_LIST.txt` 
 
 - Snapshot schema (requires psql env configured)
   - psql "$env:SUPABASE_DB_URL" -c "\dt+" | Out-File .\audit\DB_TABLES.txt -Encoding utf8
-  - psql "$env:SUPABASE_DB_URL" -c "\df+ public.*" | Out-File .\audit\DB_FUNCTIONS.txt -Encoding utf8
+  - psql "$env:SUPABASE_DB_URL" -c "\df+ public.\*" | Out-File .\audit\DB_FUNCTIONS.txt -Encoding utf8
 
 - Check function source
   - psql "$env:SUPABASE_DB_URL" -c "SELECT proname, pg_get_functiondef(oid) FROM pg_proc JOIN pg_namespace n ON n.oid = pronamespace WHERE n.nspname='public' AND proname='calculate_item_compatibility';" | Out-File .\audit\FUNC_calc_compat.sql -Encoding utf8

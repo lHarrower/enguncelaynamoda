@@ -2,56 +2,72 @@
 // A 3D-like floating object that users swipe to rotate, revealing different facets
 // Inspired by Gucci Hunt experience - playful, tactile, rewarding
 
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   Dimensions,
-  TouchableOpacity,
   Image,
   ImageBackground,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  useAnimatedGestureHandler,
-  withTiming,
-  withRepeat,
-  withSequence,
   interpolate,
   runOnJS,
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
 } from 'react-native-reanimated';
-import { PanGestureHandler, PanGestureHandlerGestureEvent } from 'react-native-gesture-handler';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
+
 import { DesignSystem } from '@/theme/DesignSystem';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 
 const { width, height } = Dimensions.get('window');
 const TOTEM_SIZE = width * 0.85;
 
-interface TotemFacet {
+interface ComponentItem {
+  image: string;
+  label: string;
+}
+
+interface TotemFacetContent {
+  items?: ComponentItem[];
+  message?: string;
+  outfit?: { image: string; title: string; description: string };
+  mood?: { color: string; emotion: string; description: string };
+  image?: string;
+  title?: string;
+  subtitle?: string;
+  confidence?: number;
+  gradient?: readonly [string, string, ...string[]];
+  emoji?: string;
+  description?: string;
+}
+
+export interface TotemFacet {
   id: string;
   type: 'outfit' | 'whisper' | 'components' | 'mood';
   title: string;
-  content: any;
+  content: TotemFacetContent;
 }
 
 interface InteractiveTotemProps {
   facets: TotemFacet[];
   onFacetChange?: (facetId: string) => void;
-  style?: any;
+  style?: ViewStyle;
 }
 
-const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
-  facets,
-  onFacetChange,
-  style,
-}) => {
+const InteractiveTotem: React.FC<InteractiveTotemProps> = ({ facets, onFacetChange, style }) => {
   const [currentFacetIndex, setCurrentFacetIndex] = useState(0);
-  
+
   // Animation values for 3D-like rotation and floating
   const rotationY = useSharedValue(0);
   const rotationX = useSharedValue(0);
@@ -66,7 +82,7 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
     onStart: () => {
       // Haptic feedback on touch start
       runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Light);
-      
+
       // Lift the totem
       scale.value = withTiming(1.05, { duration: 200 });
       elevation.value = withTiming(24, { duration: 200 });
@@ -82,28 +98,36 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
       scale.value = withTiming(1, { duration: 400 });
       elevation.value = withTiming(8, { duration: 400 });
       glassOpacity.value = withTiming(0.06, { duration: 400 });
-      
+
       // Determine facet change based on swipe direction
       const swipeThreshold = 80;
       let newFacetIndex = currentFacetIndex;
-      
+
       if (Math.abs(event.translationX) > swipeThreshold) {
         if (event.translationX > 0) {
           // Swipe right - next facet
-          newFacetIndex = (currentFacetIndex + 1) % facets.length;
+          newFacetIndex = facets.length > 0 ? (currentFacetIndex + 1) % facets.length : 0;
         } else {
           // Swipe left - previous facet
-          newFacetIndex = currentFacetIndex === 0 ? facets.length - 1 : currentFacetIndex - 1;
+          newFacetIndex =
+            facets.length === 0
+              ? 0
+              : currentFacetIndex === 0
+                ? facets.length - 1
+                : currentFacetIndex - 1;
         }
-        
+
         // Haptic feedback for facet change
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
         runOnJS(setCurrentFacetIndex)(newFacetIndex);
-        if (onFacetChange) {
-          runOnJS(onFacetChange)(facets[newFacetIndex].id);
+        if (onFacetChange && facets[newFacetIndex]) {
+          const facet = facets[newFacetIndex];
+          if (facet) {
+            runOnJS(onFacetChange)(facet.id);
+          }
         }
       }
-      
+
       // Smooth rotation back to center
       rotationY.value = withTiming(0, { duration: 800 });
       rotationX.value = withTiming(0, { duration: 800 });
@@ -114,24 +138,18 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
   useEffect(() => {
     // Floating animation - like the totem is levitating
     atmosphericFloat.value = withRepeat(
-      withSequence(
-        withTiming(1.02, { duration: 4000 }),
-        withTiming(0.98, { duration: 4000 })
-      ),
+      withSequence(withTiming(1.02, { duration: 4000 }), withTiming(0.98, { duration: 4000 })),
       -1,
-      true
+      true,
     );
-    
+
     // Liquid gold shimmer effect
     liquidGoldShimmer.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 3000 }),
-        withTiming(0, { duration: 3000 })
-      ),
+      withSequence(withTiming(1, { duration: 3000 }), withTiming(0, { duration: 3000 })),
       -1,
-      true
+      true,
     );
-  }, []);
+  }, [atmosphericFloat, liquidGoldShimmer]);
 
   // Animated styles
   const totemStyle = useAnimatedStyle(() => {
@@ -167,25 +185,17 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
       style={styles.facetContent}
       imageStyle={styles.facetImage}
     >
-      <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.8)']}
-        style={styles.facetGradient}
-      >
+      <LinearGradient colors={['transparent', 'rgba(0,0,0,0.8)']} style={styles.facetGradient}>
         <View style={styles.outfitInfo}>
           <Text style={styles.outfitTitle}>{facet.content.title}</Text>
           <Text style={styles.outfitSubtitle}>{facet.content.subtitle}</Text>
           <View style={styles.confidenceIndicator}>
             <View style={styles.confidenceBar}>
-              <View 
-                style={[
-                  styles.confidenceFill, 
-                  { width: `${facet.content.confidence}%` }
-                ]} 
+              <View
+                style={[styles.confidenceFill, { width: `${facet.content.confidence ?? 0}%` }]}
               />
             </View>
-            <Text style={styles.confidenceText}>
-              {facet.content.confidence}% Confidence Match
-            </Text>
+            <Text style={styles.confidenceText}>{facet.content.confidence}% Confidence Match</Text>
           </View>
         </View>
       </LinearGradient>
@@ -196,10 +206,10 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
     <BlurView intensity={60} style={styles.facetContent}>
       <Animated.View style={[styles.whisperGlass, glassStyle]}>
         <View style={styles.whisperContent}>
-          <Ionicons 
-            name="sparkles" 
-            size={32} 
-            color={DesignSystem.colors.text.accent} 
+          <Ionicons
+            name="sparkles"
+            size={32}
+            color={DesignSystem.colors.text.accent}
             style={styles.whisperIcon}
           />
           <Text style={styles.whisperTitle}>Confidence Whisper</Text>
@@ -214,7 +224,7 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
     <View style={styles.facetContent}>
       <BlurView intensity={40} style={styles.componentsBlur}>
         <View style={styles.componentsGrid}>
-          {facet.content.items.map((item: any, index: number) => (
+          {facet.content.items?.map((item: ComponentItem, index: number) => (
             <View key={index} style={styles.componentItem}>
               <Image source={{ uri: item.image }} style={styles.componentImage} />
               <Text style={styles.componentLabel}>{item.label}</Text>
@@ -227,20 +237,27 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
 
   const renderMoodFacet = (facet: TotemFacet) => (
     <LinearGradient
-      colors={facet.content.gradient}
+      colors={
+        (facet.content.gradient as readonly [string, string, ...string[]]) ||
+        (['#000', '#333'] as const)
+      }
       style={styles.facetContent}
     >
       <View style={styles.moodContent}>
         <Text style={styles.moodEmoji}>{facet.content.emoji}</Text>
-        <Text style={styles.moodTitle}>{facet.content.mood}</Text>
-        <Text style={styles.moodDescription}>{facet.content.description}</Text>
+        <Text style={styles.moodTitle}>{facet.content.mood?.emotion || facet.title}</Text>
+        <Text style={styles.moodDescription}>
+          {facet.content.description || facet.content.mood?.description}
+        </Text>
       </View>
     </LinearGradient>
   );
 
   const renderCurrentFacet = () => {
     const facet = facets[currentFacetIndex];
-    if (!facet) return null;
+    if (!facet) {
+      return null;
+    }
 
     switch (facet.type) {
       case 'outfit':
@@ -275,34 +292,33 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({
               end={{ x: 1, y: 1 }}
             />
           </Animated.View>
-          
+
           {/* Current Facet Content */}
           {renderCurrentFacet()}
-          
+
           {/* Interaction Hint */}
           <View style={styles.interactionHint}>
-            <Ionicons 
-              name="swap-horizontal-outline" 
-              size={16} 
-              color={DesignSystem.colors.text.tertiary} 
+            <Ionicons
+              name="swap-horizontal-outline"
+              size={16}
+              color={DesignSystem.colors.text.tertiary}
             />
             <Text style={styles.hintText}>Swipe to explore facets</Text>
           </View>
         </Animated.View>
       </PanGestureHandler>
-      
+
       {/* Facet Indicators */}
       <View style={styles.indicators}>
         {facets.map((_, index) => (
           <TouchableOpacity
             key={index}
-            style={[
-              styles.indicator,
-              index === currentFacetIndex && styles.activeIndicator
-            ]}
+            style={[styles.indicator, index === currentFacetIndex && styles.activeIndicator]}
             onPress={() => {
-              setCurrentFacetIndex(index);
-              onFacetChange?.(facets[index].id);
+              if (facets[index]) {
+                setCurrentFacetIndex(index);
+                onFacetChange?.(facets[index].id);
+              }
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
           />
@@ -319,29 +335,29 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   totem: {
-    width: TOTEM_SIZE,
-    height: TOTEM_SIZE,
     borderRadius: 32,
+    height: TOTEM_SIZE,
+    width: TOTEM_SIZE,
     ...DesignSystem.elevation.high,
     backgroundColor: DesignSystem.colors.background.glass,
     overflow: 'hidden',
     position: 'relative',
   },
   shimmerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
     bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
     zIndex: 2,
   },
   shimmerGradient: {
-    flex: 1,
     borderRadius: 32,
+    flex: 1,
   },
   facetContent: {
-    flex: 1,
     borderRadius: 32,
+    flex: 1,
   },
   facetImage: {
     borderRadius: 32,
@@ -351,7 +367,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     padding: 24,
   },
-  
+
   // Outfit Facet Styles
   outfitInfo: {
     alignItems: 'flex-start',
@@ -359,8 +375,8 @@ const styles = StyleSheet.create({
   outfitTitle: {
     ...DesignSystem.typography.heading.h1,
     color: DesignSystem.colors.text.primary,
-    marginBottom: 8,
     fontSize: 32,
+    marginBottom: 8,
   },
   outfitSubtitle: {
     ...DesignSystem.typography.scale.caption,
@@ -371,33 +387,33 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   confidenceBar: {
-    height: 4,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 2,
+    height: 4,
     marginBottom: 8,
     overflow: 'hidden',
   },
   confidenceFill: {
-    height: '100%',
     backgroundColor: DesignSystem.colors.sage[500],
     borderRadius: 2,
+    height: '100%',
   },
   confidenceText: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.accent,
   },
-  
+
   // Whisper Facet Styles
   whisperGlass: {
-    flex: 1,
     borderRadius: 32,
+    flex: 1,
     ...DesignSystem.elevation.soft,
     backgroundColor: DesignSystem.colors.background.glass,
   },
   whisperContent: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     padding: 32,
   },
   whisperIcon: {
@@ -406,34 +422,34 @@ const styles = StyleSheet.create({
   whisperTitle: {
     ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.accent,
-    textAlign: 'center',
-    marginBottom: 16,
     fontSize: 18,
+    marginBottom: 16,
+    textAlign: 'center',
   },
   whisperText: {
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
-    marginBottom: 16,
     lineHeight: 24,
+    marginBottom: 16,
+    textAlign: 'center',
   },
   whisperSignature: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
-  
+
   // Components Facet Styles
   componentsBlur: {
-    flex: 1,
     borderRadius: 32,
+    flex: 1,
   },
   componentsGrid: {
+    alignItems: 'center',
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
-    alignItems: 'center',
     padding: 24,
   },
   componentItem: {
@@ -441,22 +457,22 @@ const styles = StyleSheet.create({
     margin: 12,
   },
   componentImage: {
-    width: 60,
-    height: 60,
     borderRadius: 12,
+    height: 60,
     marginBottom: 8,
+    width: 60,
   },
   componentLabel: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
-  
+
   // Mood Facet Styles
   moodContent: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     padding: 32,
   },
   moodEmoji: {
@@ -466,50 +482,50 @@ const styles = StyleSheet.create({
   moodTitle: {
     ...DesignSystem.typography.heading.h1,
     color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
-    marginBottom: 12,
     fontSize: 28,
+    marginBottom: 12,
+    textAlign: 'center',
   },
   moodDescription: {
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
-  
+
   // Interaction Elements
   interactionHint: {
-    position: 'absolute',
-    bottom: 16,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    marginHorizontal: 24,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
     borderRadius: 16,
+    bottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    left: 0,
+    marginHorizontal: 24,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    position: 'absolute',
+    right: 0,
   },
   hintText: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
-    marginLeft: 6,
     fontSize: 10,
+    marginLeft: 6,
   },
-  
+
   // Indicators
   indicators: {
     flexDirection: 'row',
-    marginTop: 24,
     gap: 12,
+    marginTop: 24,
   },
   indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
     backgroundColor: DesignSystem.colors.text.tertiary,
+    borderRadius: 4,
+    height: 8,
     opacity: 0.3,
+    width: 8,
   },
   activeIndicator: {
     backgroundColor: DesignSystem.colors.text.accent,

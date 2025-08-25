@@ -10,11 +10,13 @@
  * - Fallback: { name: 'Home' } on any invalid condition
  * - All params URL-decoded
  */
-import { logger } from '@/utils/logger';
+import { logger } from '../utils/logger';
 
 export interface DeepLinkResult {
   name: string;
   params?: Record<string, string | number | boolean | null | undefined>;
+  /** Internal validity marker (not part of public API docs). */
+  __valid?: true;
 }
 
 type AllowedHost = 'item' | 'home' | 'settings' | 'promo';
@@ -33,13 +35,16 @@ const HOST_ROUTE_MAP: Record<AllowedHost, HostRouteConfig> = {
   promo: { routeName: 'Promo' },
 };
 
+// Fallback singleton (no __valid flag) distinguished from successful parses.
 const FALLBACK: DeepLinkResult = { name: 'Home' };
 
 /**
  * Parse query string into a param record with URL decoding.
  */
 function parseQueryParams(query: string): Record<string, string> {
-  if (!query) return {};
+  if (!query) {
+    return {};
+  }
   return query
     .replace(/^\?/, '')
     .split('&')
@@ -47,6 +52,9 @@ function parseQueryParams(query: string): Record<string, string> {
     .reduce<Record<string, string>>((acc, pair) => {
       const [rawK, rawV = ''] = pair.split('=');
       try {
+        if (rawK === undefined) {
+          return acc;
+        } // safety guard
         const k = decodeURIComponent(rawK);
         const v = decodeURIComponent(rawV);
         acc[k] = v;
@@ -61,7 +69,9 @@ function parseQueryParams(query: string): Record<string, string> {
  * Internal core parser (no logging).
  */
 function coreParse(url: string): DeepLinkResult {
-  if (typeof url !== 'string' || !url) return FALLBACK;
+  if (typeof url !== 'string' || !url) {
+    return FALLBACK;
+  }
 
   const lower = url.toLowerCase();
   if (!lower.startsWith(SCHEME)) {
@@ -71,8 +81,7 @@ function coreParse(url: string): DeepLinkResult {
   const withoutScheme = url.slice(SCHEME.length);
 
   const firstSepIdx = withoutScheme.search(/[/?]/);
-  const hostRaw =
-    firstSepIdx === -1 ? withoutScheme : withoutScheme.slice(0, firstSepIdx);
+  const hostRaw = firstSepIdx === -1 ? withoutScheme : withoutScheme.slice(0, firstSepIdx);
   const host = hostRaw.toLowerCase() as AllowedHost;
 
   if (!Object.prototype.hasOwnProperty.call(HOST_ROUTE_MAP, host)) {
@@ -96,9 +105,11 @@ function coreParse(url: string): DeepLinkResult {
     }
   }
 
-  return Object.keys(params).length
+  const base: DeepLinkResult = Object.keys(params).length
     ? { name: cfg.routeName, params }
     : { name: cfg.routeName };
+  base.__valid = true; // explicit marker for validity checks
+  return base;
 }
 
 /**
@@ -127,7 +138,8 @@ export function parseDeepLink(url: string): DeepLinkResult {
  * Valid only if parsing did not yield the shared FALLBACK reference.
  */
 function isValid(url: string): boolean {
-  return coreParse(url) !== FALLBACK;
+  const parsed = coreParse(url);
+  return parsed.__valid === true; // explicit flag instead of reference identity
 }
 
 /**
@@ -136,11 +148,11 @@ function isValid(url: string): boolean {
  */
 function toURL(
   name: string,
-  params?: Record<string, string | number | boolean | null | undefined>
+  params?: Record<string, string | number | boolean | null | undefined>,
 ): string {
-  const entry = (Object.entries(HOST_ROUTE_MAP) as Array<
-    [AllowedHost, HostRouteConfig]
-  >).find(([, cfg]) => cfg.routeName === name);
+  const entry = (Object.entries(HOST_ROUTE_MAP) as Array<[AllowedHost, HostRouteConfig]>).find(
+    ([, cfg]) => cfg.routeName === name,
+  );
   const host: AllowedHost = entry ? entry[0] : 'home';
 
   let query = '';
@@ -148,13 +160,12 @@ function toURL(
     const qp = Object.entries(params)
       .filter(([, v]) => v !== undefined)
       .map(
-        ([k, v]) =>
-          `${encodeURIComponent(k)}=${encodeURIComponent(
-            v === null ? '' : String(v)
-          )}`
+        ([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v === null ? '' : String(v))}`,
       )
       .join('&');
-    if (qp) query = `?${qp}`;
+    if (qp) {
+      query = `?${qp}`;
+    }
   }
   return `${SCHEME}${host}${query}`;
 }
@@ -184,17 +195,19 @@ export type DeepLinkNormalized = {
  * - Collects unknown keys into extras
  * - Returns {} if nothing useful
  */
-export function processDeepLinkParams(
-  input?: DeepLinkInput | null
-): DeepLinkNormalized {
-  if (!input || typeof input !== 'object') return {};
+export function processDeepLinkParams(input?: DeepLinkInput | null): DeepLinkNormalized {
+  if (!input || typeof input !== 'object') {
+    return {};
+  }
 
   const out: DeepLinkNormalized = {};
   const extras: Record<string, unknown> = {};
 
   const decodeValue = (val: string): string => {
     const trimmed = val.trim();
-    if (!trimmed) return '';
+    if (!trimmed) {
+      return '';
+    }
     try {
       return decodeURIComponent(trimmed);
     } catch {
@@ -204,23 +217,35 @@ export function processDeepLinkParams(
 
   if (typeof input.feedback === 'string') {
     const v = decodeValue(input.feedback);
-    if (v) out.feedback = v;
+    if (v) {
+      out.feedback = v;
+    }
   }
   if (typeof input.outfit === 'string') {
     const v = decodeValue(input.outfit);
-    if (v) out.outfitId = v;
+    if (v) {
+      out.outfitId = v;
+    }
   }
   if (typeof input.item === 'string') {
     const v = decodeValue(input.item);
-    if (v) out.itemId = v;
+    if (v) {
+      out.itemId = v;
+    }
   }
 
   for (const [k, v] of Object.entries(input)) {
-    if (k === 'feedback' || k === 'outfit' || k === 'item') continue;
-    if (v !== undefined) extras[k] = v;
+    if (k === 'feedback' || k === 'outfit' || k === 'item') {
+      continue;
+    }
+    if (v !== undefined) {
+      extras[k] = v;
+    }
   }
 
-  if (Object.keys(extras).length) out.extras = extras;
+  if (Object.keys(extras).length) {
+    out.extras = extras;
+  }
 
   const hasUseful =
     !!out.feedback ||

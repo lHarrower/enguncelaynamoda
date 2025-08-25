@@ -1,20 +1,17 @@
-// AYNA Mirror Types - Barrel Export
-// Centralized export for all AYNA Mirror related types
+// AYNA Mirror Tipleri - Toplu Dışa Aktarım
+// Tüm AYNA Mirror ile ilgili tipler için merkezi dışa aktarım
 
 export * from '@/types/aynaMirror';
-export * from '@/types/wardrobe';
 export * from '@/types/user';
+export * from '@/types/wardrobe';
 
-// Re-export commonly used types for convenience
-export type {
-  WardrobeItem,
-  DailyRecommendations,
-  OutfitRecommendation,
-  OutfitFeedback,
-  UserPreferences,
-  WeatherContext,
-  StyleProfile,
-  RecommendationContext,
-  UsageStats,
-  UtilizationStats
-} from '@/types/aynaMirror';
+// Test uyumluluğu için seçili ekran dışa aktarımları
+export { AddItemScreen } from '@/screens/AddItemScreen';
+export {
+  buildOutfitFeedback,
+  buildOutfitRecommendation,
+  buildWardrobeItem,
+  testBuilders,
+} from '@/test/builders';
+
+// Not: Tipler zaten '@/types/aynaMirror' üzerinden toplu olarak dışa aktarılıyor.

@@ -3,24 +3,39 @@ import { Easing } from 'react-native';
 
 /**
  * AYNAMODA Animation System
- * 
+ *
  * Philosophy: "Digital Zen Garden" - Movements should feel organic, natural, and purposeful.
  * Every animation should enhance user understanding, not distract from it.
- * 
+ *
  * Inspired by:
  * - Natural phenomena (water flow, wind, organic growth)
  * - Luxury brand motion (smooth, confident, refined)
  * - Wellness apps (calm, soothing, mindful)
  */
 
+// Animation configuration interfaces
+export interface AnimationConfig {
+  duration?: number;
+  easing?: (t: number) => number;
+  useNativeDriver?: boolean;
+  delay?: number;
+}
+
+export interface StaggerConfig {
+  delay: number;
+  maxDelay: number;
+}
+
+type EasingFunction = (t: number) => number;
+
 // Fallback easing functions for test environment
 const createFallbackEasing = () => ({
-  bezier: (x1: number, y1: number, x2: number, y2: number) => (t: number) => t,
+  bezier: (_x1: number, _y1: number, _x2: number, _y2: number) => (t: number) => t,
   linear: (t: number) => t,
   ease: (t: number) => t,
-  in: (easing: any) => (t: number) => t,
-  out: (easing: any) => (t: number) => t,
-  inOut: (easing: any) => (t: number) => t,
+  in: (_easing: EasingFunction) => (t: number) => t,
+  out: (_easing: EasingFunction) => (t: number) => t,
+  inOut: (_easing: EasingFunction) => (t: number) => t,
 });
 
 // Use actual Easing or fallback for tests
@@ -34,18 +49,18 @@ export const TIMING = {
   // Micro-interactions (buttons, toggles, small UI elements)
   instant: 150,
   quick: 200,
-  
+
   // Standard transitions (screen changes, modal appearances)
   standard: 300,
   comfortable: 400,
-  
+
   // Complex animations (onboarding, major state changes)
   deliberate: 500,
   thoughtful: 700,
-  
+
   // Zen moments (loading states, meditation-like pauses)
   zen: 1000,
-  sanctuary: 1500
+  sanctuary: 1500,
 } as const;
 
 // ============================================================================
@@ -55,34 +70,34 @@ export const TIMING = {
 export const EASING = {
   // Standard easing - smooth and natural
   standard: EasingAPI.bezier(0.4, 0.0, 0.2, 1),
-  
+
   // Entrance animations - confident arrival
   enter: EasingAPI.bezier(0.0, 0.0, 0.2, 1),
-  
+
   // Exit animations - graceful departure
   exit: EasingAPI.bezier(0.4, 0.0, 1, 1),
-  
+
   // Organic curves - inspired by nature
   organic: {
-    gentle: EasingAPI.bezier(0.25, 0.46, 0.45, 0.94),    // Like a gentle breeze
-    flowing: EasingAPI.bezier(0.23, 1, 0.32, 1),          // Like water flowing
-    bouncy: EasingAPI.bezier(0.68, -0.55, 0.265, 1.55),   // Like a soft bounce
-    elastic: EasingAPI.bezier(0.175, 0.885, 0.32, 1.275)  // Like elastic material
+    gentle: EasingAPI.bezier(0.25, 0.46, 0.45, 0.94), // Like a gentle breeze
+    flowing: EasingAPI.bezier(0.23, 1, 0.32, 1), // Like water flowing
+    bouncy: EasingAPI.bezier(0.68, -0.55, 0.265, 1.55), // Like a soft bounce
+    elastic: EasingAPI.bezier(0.175, 0.885, 0.32, 1.275), // Like elastic material
   },
-  
+
   // Luxury curves - refined and sophisticated
   luxury: {
-    smooth: EasingAPI.bezier(0.645, 0.045, 0.355, 1),     // Ultra-smooth luxury
-    confident: EasingAPI.bezier(0.23, 1, 0.320, 1),       // Confident and assured
-    elegant: EasingAPI.bezier(0.165, 0.84, 0.44, 1)       // Elegant and refined
+    smooth: EasingAPI.bezier(0.645, 0.045, 0.355, 1), // Ultra-smooth luxury
+    confident: EasingAPI.bezier(0.23, 1, 0.32, 1), // Confident and assured
+    elegant: EasingAPI.bezier(0.165, 0.84, 0.44, 1), // Elegant and refined
   },
-  
+
   // Wellness curves - calm and soothing
   wellness: {
-    calm: EasingAPI.bezier(0.25, 0.1, 0.25, 1),          // Calm and steady
-    soothing: EasingAPI.bezier(0.4, 0.0, 0.6, 1),         // Soothing transition
-    mindful: EasingAPI.bezier(0.0, 0.0, 0.58, 1)          // Mindful and present
-  }
+    calm: EasingAPI.bezier(0.25, 0.1, 0.25, 1), // Calm and steady
+    soothing: EasingAPI.bezier(0.4, 0.0, 0.6, 1), // Soothing transition
+    mindful: EasingAPI.bezier(0.0, 0.0, 0.58, 1), // Mindful and present
+  },
 } as const;
 
 // ============================================================================
@@ -94,29 +109,29 @@ export const SPRING = {
   gentle: {
     damping: 20,
     stiffness: 300,
-    mass: 1
+    mass: 1,
   },
-  
+
   // Bouncy springs for playful interactions
   bouncy: {
     damping: 15,
     stiffness: 400,
-    mass: 1
+    mass: 1,
   },
-  
+
   // Smooth springs for luxury feel
   smooth: {
     damping: 25,
     stiffness: 200,
-    mass: 1
+    mass: 1,
   },
-  
+
   // Quick springs for responsive feedback
   quick: {
     damping: 18,
     stiffness: 500,
-    mass: 0.8
-  }
+    mass: 0.8,
+  },
 } as const;
 
 // ============================================================================
@@ -129,99 +144,99 @@ export const ANIMATIONS = {
     in: {
       duration: TIMING.standard,
       easing: EASING.enter,
-      useNativeDriver: true
+      useNativeDriver: true,
     },
     out: {
       duration: TIMING.quick,
       easing: EASING.exit,
-      useNativeDriver: true
-    }
+      useNativeDriver: true,
+    },
   },
-  
+
   // Scale animations
   scale: {
     in: {
       duration: TIMING.standard,
       easing: EASING.organic.gentle,
-      useNativeDriver: true
+      useNativeDriver: true,
     },
     out: {
       duration: TIMING.quick,
       easing: EASING.exit,
-      useNativeDriver: true
+      useNativeDriver: true,
     },
     press: {
       duration: TIMING.instant,
       easing: EASING.standard,
-      useNativeDriver: true
-    }
+      useNativeDriver: true,
+    },
   },
-  
+
   // Slide animations
   slide: {
     up: {
       duration: TIMING.comfortable,
       easing: EASING.luxury.elegant,
-      useNativeDriver: true
+      useNativeDriver: true,
     },
     down: {
       duration: TIMING.standard,
       easing: EASING.exit,
-      useNativeDriver: true
+      useNativeDriver: true,
     },
     left: {
       duration: TIMING.standard,
       easing: EASING.organic.flowing,
-      useNativeDriver: true
+      useNativeDriver: true,
     },
     right: {
       duration: TIMING.standard,
       easing: EASING.organic.flowing,
-      useNativeDriver: true
-    }
+      useNativeDriver: true,
+    },
   },
-  
+
   // Rotation animations
   rotate: {
     gentle: {
       duration: TIMING.deliberate,
       easing: EASING.wellness.calm,
-      useNativeDriver: true
+      useNativeDriver: true,
     },
     quick: {
       duration: TIMING.standard,
       easing: EASING.standard,
-      useNativeDriver: true
-    }
+      useNativeDriver: true,
+    },
   },
-  
+
   // Loading animations
   loading: {
     pulse: {
       duration: TIMING.zen,
       easing: EASING.wellness.soothing,
-      useNativeDriver: true
+      useNativeDriver: true,
     },
     shimmer: {
       duration: TIMING.thoughtful,
       easing: EASING.luxury.smooth,
-      useNativeDriver: true
-    }
+      useNativeDriver: true,
+    },
   },
-  
+
   // Gesture animations
   gesture: {
     swipe: {
       duration: TIMING.standard,
       easing: EASING.organic.flowing,
-      useNativeDriver: true
+      useNativeDriver: true,
     },
     drag: {
       duration: TIMING.quick,
       easing: EASING.standard,
-      useNativeDriver: true
-    }
-  }
+      useNativeDriver: true,
+    },
+  },
 } as const;
 
 // ============================================================================
@@ -232,26 +247,26 @@ export const STAGGER = {
   // List item animations
   list: {
     delay: 50,
-    maxDelay: 300
+    maxDelay: 300,
   },
-  
+
   // Grid item animations
   grid: {
     delay: 75,
-    maxDelay: 400
+    maxDelay: 400,
   },
-  
+
   // Card animations
   cards: {
     delay: 100,
-    maxDelay: 500
+    maxDelay: 500,
   },
-  
+
   // Onboarding step animations
   onboarding: {
     delay: 200,
-    maxDelay: 800
-  }
+    maxDelay: 800,
+  },
 } as const;
 
 // ============================================================================
@@ -263,16 +278,16 @@ export const ACCESSIBILITY = {
   reducedMotion: {
     duration: TIMING.instant,
     easing: EasingAPI.linear,
-    useNativeDriver: true
+    useNativeDriver: true,
   },
-  
+
   // High contrast mode adjustments
   highContrast: {
     // Disable subtle animations that might be hard to see
     disableSubtle: true,
     // Increase animation contrast
-    enhanceVisibility: true
-  }
+    enhanceVisibility: true,
+  },
 } as const;
 
 // ============================================================================
@@ -285,9 +300,9 @@ export const PERFORMANCE = {
     // Properties that can use native driver
     supported: ['opacity', 'transform'],
     // Properties that cannot use native driver
-    unsupported: ['backgroundColor', 'width', 'height']
+    unsupported: ['backgroundColor', 'width', 'height'],
   },
-  
+
   // 60fps optimization settings
   optimization: {
     // Use layout animations sparingly
@@ -295,8 +310,8 @@ export const PERFORMANCE = {
     // Prefer transform over layout changes
     preferTransform: true,
     // Batch animations when possible
-    batchAnimations: true
-  }
+    batchAnimations: true,
+  },
 } as const;
 
 // ============================================================================
@@ -308,26 +323,23 @@ export const PERFORMANCE = {
  */
 export const createStaggeredAnimation = (
   items: number,
-  baseAnimation: any,
-  staggerConfig = STAGGER.list
-) => {
+  baseAnimation: AnimationConfig,
+  staggerConfig: StaggerConfig = STAGGER.list,
+): AnimationConfig[] => {
   const count = Math.max(0, Math.floor(items));
   return Array.from({ length: count }).map((_, index) => ({
     ...baseAnimation,
-    delay: Math.min(index * staggerConfig.delay, staggerConfig.maxDelay)
+    delay: Math.min(index * staggerConfig.delay, staggerConfig.maxDelay),
   }));
 };
 
 /**
  * Creates a spring animation with organic feel
  */
-export const createOrganicSpring = (
-  toValue: number,
-  config = SPRING.gentle
-) => ({
+export const createOrganicSpring = (toValue: number, config = SPRING.gentle) => ({
   toValue,
   ...config,
-  useNativeDriver: true
+  useNativeDriver: true,
 });
 
 /**
@@ -336,25 +348,25 @@ export const createOrganicSpring = (
 export const createLuxuryTiming = (
   toValue: number,
   duration = TIMING.standard,
-  easing = EASING.luxury.elegant
+  easing = EASING.luxury.elegant,
 ) => ({
   toValue,
   duration,
   easing,
-  useNativeDriver: true
+  useNativeDriver: true,
 });
 
 /**
  * Checks if reduced motion is preferred and returns appropriate animation
  */
 export const getAccessibleAnimation = (
-  normalAnimation: any,
-  reducedMotionPreferred: boolean = false
-) => {
+  normalAnimation: AnimationConfig,
+  reducedMotionPreferred: boolean = false,
+): AnimationConfig => {
   if (reducedMotionPreferred) {
     return {
       ...normalAnimation,
-      ...ACCESSIBILITY.reducedMotion
+      ...ACCESSIBILITY.reducedMotion,
     };
   }
   return normalAnimation;
@@ -368,37 +380,35 @@ export const SEQUENCES = {
   // Screen entrance sequence
   screenEnter: [
     { property: 'opacity', from: 0, to: 1, ...ANIMATIONS.fade.in },
-    { property: 'translateY', from: 20, to: 0, ...ANIMATIONS.slide.up }
+    { property: 'translateY', from: 20, to: 0, ...ANIMATIONS.slide.up },
   ],
-  
+
   // Screen exit sequence
   screenExit: [
     { property: 'opacity', from: 1, to: 0, ...ANIMATIONS.fade.out },
-    { property: 'translateY', from: 0, to: -20, ...ANIMATIONS.slide.up }
+    { property: 'translateY', from: 0, to: -20, ...ANIMATIONS.slide.up },
   ],
-  
+
   // Modal appearance sequence
   modalEnter: [
     { property: 'opacity', from: 0, to: 1, ...ANIMATIONS.fade.in },
-    { property: 'scale', from: 0.9, to: 1, ...ANIMATIONS.scale.in }
+    { property: 'scale', from: 0.9, to: 1, ...ANIMATIONS.scale.in },
   ],
-  
+
   // Modal dismissal sequence
   modalExit: [
     { property: 'opacity', from: 1, to: 0, ...ANIMATIONS.fade.out },
-    { property: 'scale', from: 1, to: 0.9, ...ANIMATIONS.scale.out }
+    { property: 'scale', from: 1, to: 0.9, ...ANIMATIONS.scale.out },
   ],
-  
+
   // Button press feedback
-  buttonPress: [
-    { property: 'scale', from: 1, to: 0.95, ...ANIMATIONS.scale.press }
-  ],
-  
+  buttonPress: [{ property: 'scale', from: 1, to: 0.95, ...ANIMATIONS.scale.press }],
+
   // Card hover/focus effect
   cardHover: [
     { property: 'scale', from: 1, to: 1.02, ...ANIMATIONS.scale.in },
-    { property: 'translateY', from: 0, to: -2, duration: TIMING.standard }
-  ]
+    { property: 'translateY', from: 0, to: -2, duration: TIMING.standard },
+  ],
 } as const;
 
 // ============================================================================
@@ -414,12 +424,12 @@ export const AnimationSystem = {
   accessibility: ACCESSIBILITY,
   performance: PERFORMANCE,
   sequences: SEQUENCES,
-  
+
   // Utility functions
   createStaggeredAnimation,
   createOrganicSpring,
   createLuxuryTiming,
-  getAccessibleAnimation
+  getAccessibleAnimation,
 } as const;
 
 export default AnimationSystem;

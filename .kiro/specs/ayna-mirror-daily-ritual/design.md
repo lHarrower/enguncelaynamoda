@@ -18,7 +18,7 @@ graph TB
         WM[Wardrobe Manager]
         FC[Feedback Collector]
     end
-    
+
     subgraph "Service Layer"
         AS[AYNA Service]
         WS[Weather Service]
@@ -26,34 +26,34 @@ graph TB
         NS[Notification Service]
         IS[Intelligence Service]
     end
-    
+
     subgraph "Data Layer (Supabase)"
         WD[(Wardrobe Data)]
         PD[(Preference Data)]
         OD[(Outfit Data)]
         FD[(Feedback Data)]
     end
-    
+
     subgraph "External APIs"
         WA[Weather API]
         CA[Calendar API]
         PN[Push Notifications]
     end
-    
+
     UI --> AS
     NC --> NS
     WM --> WS
     FC --> AS
-    
+
     AS --> WD
     AS --> PD
     AS --> OD
     AS --> FD
-    
+
     NS --> PN
     AS --> WA
     AS --> CA
-    
+
     IS --> AS
 ```
 
@@ -74,36 +74,36 @@ The central orchestrator that coordinates all components to deliver the daily co
 ```typescript
 interface AynaMirrorService {
   // Core daily ritual
-  generateDailyRecommendations(userId: string): Promise<DailyRecommendations>
-  scheduleNextMirrorSession(userId: string): Promise<void>
-  
+  generateDailyRecommendations(userId: string): Promise<DailyRecommendations>;
+  scheduleNextMirrorSession(userId: string): Promise<void>;
+
   // Recommendation intelligence
-  createOutfitRecommendation(context: RecommendationContext): Promise<OutfitRecommendation>
-  generateConfidenceNote(outfit: Outfit, userHistory: UserHistory): Promise<string>
-  
+  createOutfitRecommendation(context: RecommendationContext): Promise<OutfitRecommendation>;
+  generateConfidenceNote(outfit: Outfit, userHistory: UserHistory): Promise<string>;
+
   // Learning and adaptation
-  processUserFeedback(feedback: OutfitFeedback): Promise<void>
-  updateUserPreferences(userId: string, feedback: OutfitFeedback): Promise<void>
+  processUserFeedback(feedback: OutfitFeedback): Promise<void>;
+  updateUserPreferences(userId: string, feedback: OutfitFeedback): Promise<void>;
 }
 
 interface DailyRecommendations {
-  id: string
-  userId: string
-  date: Date
-  recommendations: OutfitRecommendation[]
-  weatherContext: WeatherContext
-  calendarContext?: CalendarContext
-  generatedAt: Date
+  id: string;
+  userId: string;
+  date: Date;
+  recommendations: OutfitRecommendation[];
+  weatherContext: WeatherContext;
+  calendarContext?: CalendarContext;
+  generatedAt: Date;
 }
 
 interface OutfitRecommendation {
-  id: string
-  items: WardrobeItem[]
-  confidenceNote: string
-  quickActions: QuickAction[]
-  confidenceScore: number
-  reasoning: string[]
-  isQuickOption: boolean
+  id: string;
+  items: WardrobeItem[];
+  confidenceNote: string;
+  quickActions: QuickAction[];
+  confidenceScore: number;
+  reasoning: string[];
+  isQuickOption: boolean;
 }
 ```
 
@@ -114,33 +114,36 @@ AI-powered personalization engine that learns user preferences and style pattern
 ```typescript
 interface IntelligenceService {
   // Style learning
-  analyzeUserStyleProfile(userId: string): Promise<StyleProfile>
-  updateStylePreferences(userId: string, feedback: OutfitFeedback): Promise<void>
-  
+  analyzeUserStyleProfile(userId: string): Promise<StyleProfile>;
+  updateStylePreferences(userId: string, feedback: OutfitFeedback): Promise<void>;
+
   // Recommendation algorithms
-  generateStyleRecommendations(wardrobe: WardrobeItem[], context: RecommendationContext): Promise<OutfitRecommendation[]>
-  calculateOutfitCompatibility(items: WardrobeItem[]): Promise<number>
-  
+  generateStyleRecommendations(
+    wardrobe: WardrobeItem[],
+    context: RecommendationContext,
+  ): Promise<OutfitRecommendation[]>;
+  calculateOutfitCompatibility(items: WardrobeItem[]): Promise<number>;
+
   // Confidence scoring
-  calculateConfidenceScore(outfit: Outfit, userHistory: UserHistory): Promise<number>
-  predictUserSatisfaction(outfit: Outfit, userProfile: StyleProfile): Promise<number>
+  calculateConfidenceScore(outfit: Outfit, userHistory: UserHistory): Promise<number>;
+  predictUserSatisfaction(outfit: Outfit, userProfile: StyleProfile): Promise<number>;
 }
 
 interface StyleProfile {
-  userId: string
-  preferredColors: string[]
-  preferredStyles: string[]
-  bodyTypePreferences: string[]
-  occasionPreferences: Record<string, number>
-  confidencePatterns: ConfidencePattern[]
-  lastUpdated: Date
+  userId: string;
+  preferredColors: string[];
+  preferredStyles: string[];
+  bodyTypePreferences: string[];
+  occasionPreferences: Record<string, number>;
+  confidencePatterns: ConfidencePattern[];
+  lastUpdated: Date;
 }
 
 interface ConfidencePattern {
-  itemCombination: string[]
-  averageRating: number
-  contextFactors: string[]
-  emotionalResponse: string[]
+  itemCombination: string[];
+  averageRating: number;
+  contextFactors: string[];
+  emotionalResponse: string[];
 }
 ```
 
@@ -151,35 +154,35 @@ Extended wardrobe service with intelligence features for the AYNA Mirror system.
 ```typescript
 interface EnhancedWardrobeService extends WardrobeService {
   // Usage tracking
-  trackItemUsage(itemId: string, outfitId: string): Promise<void>
-  getItemUsageStats(itemId: string): Promise<UsageStats>
-  getNeglectedItems(userId: string, daysSince: number): Promise<WardrobeItem[]>
-  
+  trackItemUsage(itemId: string, outfitId: string): Promise<void>;
+  getItemUsageStats(itemId: string): Promise<UsageStats>;
+  getNeglectedItems(userId: string, daysSince: number): Promise<WardrobeItem[]>;
+
   // Smart categorization
-  categorizeItemAutomatically(imageUri: string): Promise<ItemCategory>
-  extractItemColors(imageUri: string): Promise<string[]>
-  suggestItemTags(item: WardrobeItem): Promise<string[]>
-  
+  categorizeItemAutomatically(imageUri: string): Promise<ItemCategory>;
+  extractItemColors(imageUri: string): Promise<string[]>;
+  suggestItemTags(item: WardrobeItem): Promise<string[]>;
+
   // Cost-per-wear tracking
-  calculateCostPerWear(itemId: string): Promise<number>
-  getWardrobeUtilizationStats(userId: string): Promise<UtilizationStats>
+  calculateCostPerWear(itemId: string): Promise<number>;
+  getWardrobeUtilizationStats(userId: string): Promise<UtilizationStats>;
 }
 
 interface UsageStats {
-  itemId: string
-  totalWears: number
-  lastWorn: Date | null
-  averageRating: number
-  complimentsReceived: number
-  costPerWear: number
+  itemId: string;
+  totalWears: number;
+  lastWorn: Date | null;
+  averageRating: number;
+  complimentsReceived: number;
+  costPerWear: number;
 }
 
 interface UtilizationStats {
-  totalItems: number
-  activeItems: number
-  neglectedItems: number
-  averageCostPerWear: number
-  utilizationPercentage: number
+  totalItems: number;
+  activeItems: number;
+  neglectedItems: number;
+  averageCostPerWear: number;
+  utilizationPercentage: number;
 }
 ```
 
@@ -190,24 +193,27 @@ Precise timing and delivery system for the daily confidence ritual.
 ```typescript
 interface NotificationService {
   // Daily ritual scheduling
-  scheduleDailyMirrorNotification(userId: string, preferences: NotificationPreferences): Promise<void>
-  cancelScheduledNotifications(userId: string): Promise<void>
-  
+  scheduleDailyMirrorNotification(
+    userId: string,
+    preferences: NotificationPreferences,
+  ): Promise<void>;
+  cancelScheduledNotifications(userId: string): Promise<void>;
+
   // Adaptive timing
-  optimizeNotificationTiming(userId: string, engagementHistory: EngagementHistory): Promise<Date>
-  handleTimezoneChange(userId: string, newTimezone: string): Promise<void>
-  
+  optimizeNotificationTiming(userId: string, engagementHistory: EngagementHistory): Promise<Date>;
+  handleTimezoneChange(userId: string, newTimezone: string): Promise<void>;
+
   // Feedback prompts
-  scheduleFeedbackPrompt(userId: string, outfitId: string, delay: number): Promise<void>
-  sendReEngagementMessage(userId: string, daysSinceLastUse: number): Promise<void>
+  scheduleFeedbackPrompt(userId: string, outfitId: string, delay: number): Promise<void>;
+  sendReEngagementMessage(userId: string, daysSinceLastUse: number): Promise<void>;
 }
 
 interface NotificationPreferences {
-  preferredTime: Date
-  timezone: string
-  enableWeekends: boolean
-  enableQuickOptions: boolean
-  confidenceNoteStyle: 'encouraging' | 'witty' | 'poetic'
+  preferredTime: Date;
+  timezone: string;
+  enableWeekends: boolean;
+  enableQuickOptions: boolean;
+  confidenceNoteStyle: 'encouraging' | 'witty' | 'poetic';
 }
 ```
 
@@ -218,30 +224,30 @@ Beautiful, intuitive interface for capturing user responses that fuel the learni
 ```typescript
 interface FeedbackCollector {
   // Rating collection
-  collectConfidenceRating(outfitId: string): Promise<number>
-  collectEmotionalResponse(outfitId: string): Promise<EmotionalResponse>
-  collectSocialFeedback(outfitId: string): Promise<SocialFeedback>
-  
+  collectConfidenceRating(outfitId: string): Promise<number>;
+  collectEmotionalResponse(outfitId: string): Promise<EmotionalResponse>;
+  collectSocialFeedback(outfitId: string): Promise<SocialFeedback>;
+
   // Contextual feedback
-  collectOccasionFeedback(outfitId: string, occasion: string): Promise<void>
-  collectComfortFeedback(outfitId: string): Promise<ComfortRating>
+  collectOccasionFeedback(outfitId: string, occasion: string): Promise<void>;
+  collectComfortFeedback(outfitId: string): Promise<ComfortRating>;
 }
 
 interface OutfitFeedback {
-  outfitId: string
-  userId: string
-  confidenceRating: number
-  emotionalResponse: EmotionalResponse
-  socialFeedback?: SocialFeedback
-  occasion?: string
-  comfort: ComfortRating
-  timestamp: Date
+  outfitId: string;
+  userId: string;
+  confidenceRating: number;
+  emotionalResponse: EmotionalResponse;
+  socialFeedback?: SocialFeedback;
+  occasion?: string;
+  comfort: ComfortRating;
+  timestamp: Date;
 }
 
 interface EmotionalResponse {
-  primary: 'confident' | 'comfortable' | 'stylish' | 'powerful' | 'creative'
-  intensity: number
-  additionalEmotions: string[]
+  primary: 'confident' | 'comfortable' | 'stylish' | 'powerful' | 'creative';
+  intensity: number;
+  additionalEmotions: string[];
 }
 ```
 
@@ -252,62 +258,62 @@ interface EmotionalResponse {
 ```typescript
 // Enhanced wardrobe item with intelligence features
 interface WardrobeItem {
-  id: string
-  userId: string
-  imageUri: string
-  processedImageUri: string
-  category: ItemCategory
-  subcategory?: string
-  colors: string[]
-  brand?: string
-  size?: string
-  purchaseDate?: Date
-  purchasePrice?: number
-  tags: string[]
-  notes?: string
-  
+  id: string;
+  userId: string;
+  imageUri: string;
+  processedImageUri: string;
+  category: ItemCategory;
+  subcategory?: string;
+  colors: string[];
+  brand?: string;
+  size?: string;
+  purchaseDate?: Date;
+  purchasePrice?: number;
+  tags: string[];
+  notes?: string;
+
   // Intelligence features
-  usageStats: UsageStats
-  styleCompatibility: Record<string, number>
-  confidenceHistory: ConfidenceRating[]
-  lastWorn?: Date
-  createdAt: Date
-  updatedAt: Date
+  usageStats: UsageStats;
+  styleCompatibility: Record<string, number>;
+  confidenceHistory: ConfidenceRating[];
+  lastWorn?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Daily outfit recommendations
 interface Outfit {
-  id: string
-  userId: string
-  items: WardrobeItem[]
-  occasion?: string
-  weatherContext: WeatherContext
-  confidenceScore: number
-  userRating?: number
-  wornDate?: Date
-  feedback?: OutfitFeedback
-  createdAt: Date
+  id: string;
+  userId: string;
+  items: WardrobeItem[];
+  occasion?: string;
+  weatherContext: WeatherContext;
+  confidenceScore: number;
+  userRating?: number;
+  wornDate?: Date;
+  feedback?: OutfitFeedback;
+  createdAt: Date;
 }
 
 // Weather context for recommendations
 interface WeatherContext {
-  temperature: number
-  condition: 'sunny' | 'cloudy' | 'rainy' | 'snowy' | 'windy'
-  humidity: number
-  location: string
-  timestamp: Date
+  temperature: number;
+  condition: 'sunny' | 'cloudy' | 'rainy' | 'snowy' | 'windy';
+  humidity: number;
+  location: string;
+  timestamp: Date;
 }
 
 // User preferences and learning data
 interface UserPreferences {
-  userId: string
-  notificationTime: Date
-  timezone: string
-  stylePreferences: StyleProfile
-  privacySettings: PrivacySettings
-  engagementHistory: EngagementHistory
-  createdAt: Date
-  updatedAt: Date
+  userId: string;
+  notificationTime: Date;
+  timezone: string;
+  stylePreferences: StyleProfile;
+  privacySettings: PrivacySettings;
+  engagementHistory: EngagementHistory;
+  createdAt: Date;
+  updatedAt: Date;
 }
 ```
 
@@ -402,13 +408,13 @@ The system is designed to provide value even when external services are unavaila
 
 ```typescript
 interface ErrorRecoveryService {
-  handleWeatherServiceError(userId: string): Promise<WeatherContext>
-  handleAIServiceError(context: RecommendationContext): Promise<OutfitRecommendation[]>
-  handleNotificationError(userId: string, notification: NotificationPayload): Promise<void>
-  
+  handleWeatherServiceError(userId: string): Promise<WeatherContext>;
+  handleAIServiceError(context: RecommendationContext): Promise<OutfitRecommendation[]>;
+  handleNotificationError(userId: string, notification: NotificationPayload): Promise<void>;
+
   // Offline capabilities
-  getCachedRecommendations(userId: string): Promise<DailyRecommendations | null>
-  syncPendingFeedback(): Promise<void>
+  getCachedRecommendations(userId: string): Promise<DailyRecommendations | null>;
+  syncPendingFeedback(): Promise<void>;
 }
 ```
 
@@ -449,16 +455,16 @@ interface ErrorRecoveryService {
 ```typescript
 interface PerformanceOptimization {
   // Caching strategies
-  cacheUserRecommendations(userId: string, recommendations: DailyRecommendations): Promise<void>
-  getCachedRecommendations(userId: string): Promise<DailyRecommendations | null>
-  
+  cacheUserRecommendations(userId: string, recommendations: DailyRecommendations): Promise<void>;
+  getCachedRecommendations(userId: string): Promise<DailyRecommendations | null>;
+
   // Background processing
-  preGenerateRecommendations(userId: string): Promise<void>
-  processUserFeedbackAsync(feedback: OutfitFeedback): Promise<void>
-  
+  preGenerateRecommendations(userId: string): Promise<void>;
+  processUserFeedbackAsync(feedback: OutfitFeedback): Promise<void>;
+
   // Resource management
-  optimizeImageStorage(imageUri: string): Promise<string>
-  cleanupOldRecommendations(olderThanDays: number): Promise<void>
+  optimizeImageStorage(imageUri: string): Promise<string>;
+  cleanupOldRecommendations(olderThanDays: number): Promise<void>;
 }
 ```
 
@@ -475,10 +481,10 @@ interface PerformanceOptimization {
 
 ```typescript
 interface PrivacyService {
-  encryptWardrobeImage(imageUri: string): Promise<string>
-  anonymizeStyleData(userId: string): Promise<AnonymizedStyleData>
-  handleDataDeletionRequest(userId: string): Promise<void>
-  auditDataAccess(userId: string, accessType: string): Promise<void>
+  encryptWardrobeImage(imageUri: string): Promise<string>;
+  anonymizeStyleData(userId: string): Promise<AnonymizedStyleData>;
+  handleDataDeletionRequest(userId: string): Promise<void>;
+  auditDataAccess(userId: string, accessType: string): Promise<void>;
 }
 ```
 

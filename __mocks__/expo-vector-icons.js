@@ -3,7 +3,11 @@ const { Text } = require('react-native');
 
 function IconMock(props) {
   const { name = 'icon', size = 16, color = 'black' } = props;
-  return React.createElement(Text, { accessibilityLabel: `icon-${name}`, style: { fontSize: size, color } }, '');
+  return React.createElement(
+    Text,
+    { accessibilityLabel: `icon-${name}`, style: { fontSize: size, color } },
+    '',
+  );
 }
 
 module.exports = {

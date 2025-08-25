@@ -1,27 +1,50 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  Animated,
-  ScrollView,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  interpolate,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+
+import { warnInDev } from '../../utils/consoleSuppress';
 
 const { width, height } = Dimensions.get('window');
 
+interface StyleDNA {
+  style_energy?: { value: string };
+  color_palette?: { value: string };
+  [key: string]: any;
+}
+
+interface OutfitItem {
+  type: string;
+  name: string;
+  color: string;
+}
+
+interface Outfit {
+  id: string;
+  name: string;
+  description: string;
+  items: OutfitItem[];
+  confidence: number;
+  styleMatch: string;
+}
+
 interface WelcomeGiftProps {
-  styleDNA: any;
+  styleDNA: StyleDNA;
   onComplete: () => void;
-  onOutfitSelect: (outfit: any, feedback: string) => void;
+  onOutfitSelect: (outfit: Outfit, feedback: string) => void;
 }
 
 // Generate personalized outfits based on Style DNA
-const generatePersonalizedOutfits = (styleDNA: any) => {
+const generatePersonalizedOutfits = (styleDNA: StyleDNA): Outfit[] => {
   const outfits = [
     {
       id: 'outfit_1',
@@ -30,10 +53,10 @@ const generatePersonalizedOutfits = (styleDNA: any) => {
       items: [
         { type: 'top', name: 'Silk Blouse', color: '#F8E8E7' },
         { type: 'bottom', name: 'Tailored Trousers', color: '#2C3E50' },
-        { type: 'accessory', name: 'Gold Pendant', color: '#D4A574' }
+        { type: 'accessory', name: 'Gold Pendant', color: '#D4A574' },
       ],
       confidence: 95,
-      styleMatch: 'Perfect match for your calm strength energy'
+      styleMatch: 'Perfect match for your calm strength energy',
     },
     {
       id: 'outfit_2',
@@ -42,10 +65,10 @@ const generatePersonalizedOutfits = (styleDNA: any) => {
       items: [
         { type: 'dress', name: 'Midi Dress', color: '#7BA7BC' },
         { type: 'jacket', name: 'Structured Blazer', color: '#2C3E50' },
-        { type: 'accessory', name: 'Leather Belt', color: '#8B7355' }
+        { type: 'accessory', name: 'Leather Belt', color: '#8B7355' },
       ],
       confidence: 92,
-      styleMatch: 'Reflects your preference for timeless elegance'
+      styleMatch: 'Reflects your preference for timeless elegance',
     },
     {
       id: 'outfit_3',
@@ -54,11 +77,11 @@ const generatePersonalizedOutfits = (styleDNA: any) => {
       items: [
         { type: 'top', name: 'Cashmere Sweater', color: '#E6D7D3' },
         { type: 'bottom', name: 'Wide-leg Pants', color: '#B8956A' },
-        { type: 'accessory', name: 'Delicate Bracelet', color: '#D4A574' }
+        { type: 'accessory', name: 'Delicate Bracelet', color: '#D4A574' },
       ],
       confidence: 89,
-      styleMatch: 'Honors your love for soft, luxurious textures'
-    }
+      styleMatch: 'Honors your love for soft, luxurious textures',
+    },
   ];
 
   return outfits;
@@ -67,111 +90,124 @@ const generatePersonalizedOutfits = (styleDNA: any) => {
 export default function WelcomeGift({ styleDNA, onComplete, onOutfitSelect }: WelcomeGiftProps) {
   const [currentPhase, setCurrentPhase] = useState<'intro' | 'reveal' | 'selection'>('intro');
   const [selectedOutfit, setSelectedOutfit] = useState<string | null>(null);
-  
-  const giftBoxAnim = useRef(new Animated.Value(0)).current;
-  const outfitsAnim = useRef(new Animated.Value(0)).current;
-  const sparkleAnim = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  const giftBoxAnim = useSharedValue(0);
+  const outfitsAnim = useSharedValue(0);
+  const sparkleAnim = useSharedValue(0);
+  const fadeAnim = useSharedValue(1);
 
   const outfits = generatePersonalizedOutfits(styleDNA);
 
+  // Animated styles
+  const sparkleStyle = useAnimatedStyle(() => {
+    return {
+      opacity: sparkleAnim.value,
+      transform: [
+        {
+          scale: interpolate(sparkleAnim.value, [0, 1], [0.8, 1.2]),
+        },
+      ],
+    };
+  });
+
+  const giftBoxRevealStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: interpolate(giftBoxAnim.value, [0, 0.5, 1], [1, 1.3, 0]),
+        },
+        {
+          rotateY: `${interpolate(giftBoxAnim.value, [0, 1], [0, 180])}deg`,
+        },
+      ] as any,
+      opacity: interpolate(giftBoxAnim.value, [0, 0.8, 1], [1, 1, 0]),
+    };
+  });
+
+  const outfitsRevealStyle = useAnimatedStyle(() => {
+    return {
+      opacity: outfitsAnim.value,
+      transform: [
+        {
+          translateY: interpolate(outfitsAnim.value, [0, 1], [50, 0]),
+        },
+      ],
+    };
+  });
+
+  const handleRevealGift = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    runOnJS(setCurrentPhase)('reveal');
+
+    // Gift box opening animation
+    giftBoxAnim.value = withTiming(1, { duration: 800 }, () => {
+      outfitsAnim.value = withTiming(1, { duration: 1000 }, () => {
+        runOnJS(setCurrentPhase)('selection');
+      });
+    });
+  }, [giftBoxAnim, outfitsAnim]);
+
   useEffect(() => {
     // Start sparkle animation
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(sparkleAnim, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(sparkleAnim, {
-          toValue: 0,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
+    sparkleAnim.value = withSequence(
+      withTiming(1, { duration: 2000 }),
+      withTiming(0, { duration: 2000 }),
+    );
 
     // Auto-advance to reveal phase
     setTimeout(() => {
       handleRevealGift();
     }, 3000);
-  }, []);
+  }, [handleRevealGift, sparkleAnim]);
 
-  const handleRevealGift = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    setCurrentPhase('reveal');
-
-    // Gift box opening animation
-    Animated.sequence([
-      Animated.timing(giftBoxAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(outfitsAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      })
-    ]).start(() => {
-      setCurrentPhase('selection');
-    });
-  };
-
-  const handleOutfitSelect = (outfit: any) => {
+  const handleOutfitSelect = (outfit: Outfit) => {
     setSelectedOutfit(outfit.id);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     // Generate personalized feedback
     const feedback = generatePersonalizedFeedback(outfit, styleDNA);
-    
+
     setTimeout(() => {
       onOutfitSelect(outfit, feedback);
     }, 1000);
   };
 
-  const generatePersonalizedFeedback = (outfit: any, styleDNA: any) => {
-    const energyType = styleDNA.style_energy?.value || 'calm_strength';
+  const generatePersonalizedFeedback = (outfit: Outfit, styleDNA: StyleDNA): string => {
+    const energyType = (styleDNA.style_energy?.value || 'calm_strength') as
+      | 'calm_strength'
+      | 'creative_spark'
+      | 'warm_approachable'
+      | 'bold_magnetic';
     const colorPalette = styleDNA.color_palette?.value || 'soft_elegance';
-    
-    const feedbackMap: Record<string, string> = {
-      'calm_strength': 'Excellent choice! We noted that you prefer a "Calm & Strong" presence. You\'ll see more sophisticated, confidence-building pieces like this in your future recommendations.',
-      'creative_spark': 'Perfect selection! Your creative energy shines through. We\'ll curate more artistic, unique pieces that express your individual flair.',
-      'warm_approachable': 'Beautiful choice! Your warm, approachable style is noted. Expect more inviting, elegant pieces that draw people to your positive energy.',
-      'bold_magnetic': 'Stunning selection! Your bold, magnetic presence is clear. We\'ll show you more striking pieces that command attention and turn heads.'
+
+    const feedbackMap: Record<
+      'calm_strength' | 'creative_spark' | 'warm_approachable' | 'bold_magnetic',
+      string
+    > = {
+      calm_strength:
+        'Excellent choice! We noted that you prefer a "Calm & Strong" presence. You\'ll see more sophisticated, confidence-building pieces like this in your future recommendations.',
+      creative_spark:
+        "Perfect selection! Your creative energy shines through. We'll curate more artistic, unique pieces that express your individual flair.",
+      warm_approachable:
+        'Beautiful choice! Your warm, approachable style is noted. Expect more inviting, elegant pieces that draw people to your positive energy.',
+      bold_magnetic:
+        "Stunning selection! Your bold, magnetic presence is clear. We'll show you more striking pieces that command attention and turn heads.",
     };
 
-    return feedbackMap[energyType] || feedbackMap.calm_strength;
+    return feedbackMap[energyType];
   };
 
   const renderIntroPhase = () => (
     <View style={styles.introContainer}>
-      <Animated.View
-        style={[
-          styles.sparkleContainer,
-          {
-            opacity: sparkleAnim,
-            transform: [
-              {
-                scale: sparkleAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0.8, 1.2],
-                }),
-              },
-            ],
-          },
-        ]}
-      >
+      <Animated.View style={[styles.sparkleContainer, sparkleStyle]}>
         <Text style={styles.sparkleText}>✨</Text>
       </Animated.View>
-      
-      <Text style={styles.welcomeTitle}>
-        We are thrilled to know you!
-      </Text>
-      
+
+      <Text style={styles.welcomeTitle}>We are thrilled to know you!</Text>
+
       <Text style={styles.welcomeSubtitle}>
-        As a welcome gift, we've prepared the first three combinations showcasing the potential of your wardrobe, specially curated according to your unique Style DNA.
+        As a welcome gift, we&apos;ve prepared the first three combinations showcasing the potential of
+        your wardrobe, specially curated according to your unique Style DNA.
       </Text>
 
       <View style={styles.giftBoxContainer}>
@@ -183,50 +219,11 @@ export default function WelcomeGift({ styleDNA, onComplete, onOutfitSelect }: We
 
   const renderRevealPhase = () => (
     <View style={styles.revealContainer}>
-      <Animated.View
-        style={[
-          styles.giftBoxReveal,
-          {
-            transform: [
-              {
-                scale: giftBoxAnim.interpolate({
-                  inputRange: [0, 0.5, 1],
-                  outputRange: [1, 1.3, 0],
-                }),
-              },
-              {
-                rotateY: giftBoxAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0deg', '180deg'],
-                }),
-              },
-            ],
-            opacity: giftBoxAnim.interpolate({
-              inputRange: [0, 0.8, 1],
-              outputRange: [1, 1, 0],
-            }),
-          },
-        ]}
-      >
+      <Animated.View style={[styles.giftBoxReveal, giftBoxRevealStyle]}>
         <Text style={styles.giftBoxLarge}>🎁</Text>
       </Animated.View>
 
-      <Animated.View
-        style={[
-          styles.outfitsReveal,
-          {
-            opacity: outfitsAnim,
-            transform: [
-              {
-                translateY: outfitsAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [50, 0],
-                }),
-              },
-            ],
-          },
-        ]}
-      >
+      <Animated.View style={[styles.outfitsReveal, outfitsRevealStyle]}>
         <Text style={styles.revealTitle}>Your Style DNA Combinations</Text>
         <Text style={styles.revealSubtitle}>Crafted exclusively for you</Text>
       </Animated.View>
@@ -250,10 +247,7 @@ export default function WelcomeGift({ styleDNA, onComplete, onOutfitSelect }: We
               opacity: outfitsAnim,
               transform: [
                 {
-                  translateY: outfitsAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [100 + (index * 20), 0],
-                  }),
+                  translateY: interpolate(outfitsAnim.value, [0, 1], [100 + index * 20, 0]),
                 },
               ],
             },
@@ -283,15 +277,10 @@ export default function WelcomeGift({ styleDNA, onComplete, onOutfitSelect }: We
             <View style={styles.outfitDetails}>
               <Text style={styles.outfitName}>{outfit.name}</Text>
               <Text style={styles.outfitDescription}>{outfit.description}</Text>
-              
+
               <View style={styles.confidenceContainer}>
                 <View style={styles.confidenceBar}>
-                  <View
-                    style={[
-                      styles.confidenceFill,
-                      { width: `${outfit.confidence}%` }
-                    ]}
-                  />
+                  <View style={[styles.confidenceFill, { width: `${outfit.confidence}%` }]} />
                 </View>
                 <Text style={styles.confidenceText}>{outfit.confidence}% Style Match</Text>
               </View>
@@ -313,11 +302,11 @@ export default function WelcomeGift({ styleDNA, onComplete, onOutfitSelect }: We
         style={styles.continueButton}
         onPress={onComplete}
         activeOpacity={0.8}
+        accessibilityRole="button"
+        accessibilityLabel="Begin My Style Journey"
+        accessibilityHint="Complete the welcome process and start using the app"
       >
-        <LinearGradient
-          colors={['#D4A574', '#B8956A']}
-          style={styles.continueGradient}
-        >
+        <LinearGradient colors={['#D4A574', '#B8956A']} style={styles.continueGradient}>
           <Text style={styles.continueText}>Begin My Style Journey</Text>
           <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
         </LinearGradient>
@@ -326,10 +315,7 @@ export default function WelcomeGift({ styleDNA, onComplete, onOutfitSelect }: We
   );
 
   return (
-    <LinearGradient
-      colors={['#F8F6F0', '#FFFFFF', '#F8F6F0']}
-      style={styles.container}
-    >
+    <LinearGradient colors={['#F8F6F0', '#FFFFFF', '#F8F6F0']} style={styles.container}>
       {currentPhase === 'intro' && renderIntroPhase()}
       {currentPhase === 'reveal' && renderRevealPhase()}
       {currentPhase === 'selection' && renderSelectionPhase()}
@@ -343,7 +329,23 @@ export default function WelcomeGift({ styleDNA, onComplete, onOutfitSelect }: We
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (styleObj: Record<string, any>) => {
+  try {
+    return StyleSheet.create(styleObj);
+  } catch (error) {
+    warnInDev('StyleSheet.create failed, using fallback styles:', error);
+    // Return a safe fallback with basic styles
+    return {
+      container: { flex: 1 },
+      gradient: { flex: 1 },
+      scrollView: { flex: 1 },
+      content: { padding: 20 },
+      ...styleObj,
+    };
+  }
+};
+
+const styles = createStyles({
   container: {
     flex: 1,
     paddingTop: 60,

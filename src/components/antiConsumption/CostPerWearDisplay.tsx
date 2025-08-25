@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { useSafeTheme } from '@/hooks/useSafeTheme';
 import { antiConsumptionService, CostPerWearData } from '@/services/antiConsumptionService';
 import { DesignSystem } from '@/theme/DesignSystem';
+
 import { errorInDev } from '../../utils/consoleSuppress';
 
 interface CostPerWearDisplayProps {
@@ -31,23 +28,23 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadCostPerWearData();
-  }, [itemId]);
-
-  const loadCostPerWearData = async () => {
+  const loadCostPerWearData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await antiConsumptionService.calculateCostPerWear(itemId);
       setCostData(data);
-    } catch (err) {
+    } catch (err: unknown) {
       setError('Failed to load cost data');
-      errorInDev('Error loading cost per wear data:', err);
+      errorInDev('Error loading cost per wear data:', err instanceof Error ? err : String(err));
     } finally {
       setLoading(false);
     }
-  };
+  }, [itemId]);
+
+  useEffect(() => {
+    void loadCostPerWearData();
+  }, [itemId, loadCostPerWearData]);
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
@@ -60,15 +57,23 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
 
   const getCostPerWearColor = (costPerWear: number, purchasePrice: number): string => {
     const ratio = costPerWear / purchasePrice;
-    if (ratio <= 0.1) return DesignSystem.colors.success[500]; // Excellent value
-    if (ratio <= 0.25) return DesignSystem.colors.warning[500]; // Good value
+    if (ratio <= 0.1) {
+      return DesignSystem.colors.success[500];
+    } // Excellent value
+    if (ratio <= 0.25) {
+      return DesignSystem.colors.warning[500];
+    } // Good value
     return DesignSystem.colors.error[500]; // Poor value
   };
 
   const getCostPerWearLabel = (costPerWear: number, purchasePrice: number): string => {
     const ratio = costPerWear / purchasePrice;
-    if (ratio <= 0.1) return 'Excellent Value';
-    if (ratio <= 0.25) return 'Good Value';
+    if (ratio <= 0.1) {
+      return 'Excellent Value';
+    }
+    if (ratio <= 0.25) {
+      return 'Good Value';
+    }
     return 'Consider More Wear';
   };
 
@@ -93,10 +98,14 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
 
   if (compact) {
     return (
-      <TouchableOpacity 
-        style={styles.compactContainer} 
+      <TouchableOpacity
+        style={styles.compactContainer}
         onPress={onPress}
         disabled={!onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`Cost per wear: ${formatCurrency(costData.costPerWear)}`}
+        accessibilityHint="Tap to view detailed cost analysis"
+        accessibilityState={{ disabled: !onPress }}
       >
         <View style={styles.compactContent}>
           <Text style={styles.compactLabel}>Cost/Wear</Text>
@@ -112,10 +121,14 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
   }
 
   return (
-    <TouchableOpacity 
-      style={styles.container} 
+    <TouchableOpacity
+      style={styles.container}
       onPress={onPress}
       disabled={!onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Cost per wear analysis: ${formatCurrency(costData.costPerWear)} - ${costLabel}`}
+      accessibilityHint="Tap to view more detailed cost analysis and recommendations"
+      accessibilityState={{ disabled: !onPress }}
     >
       <View style={styles.header}>
         <View style={styles.iconContainer}>
@@ -128,9 +141,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
         <Text style={[styles.costPerWear, { color: costColor }]}>
           {formatCurrency(costData.costPerWear)}
         </Text>
-        <Text style={[styles.costLabel, { color: costColor }]}>
-          {costLabel}
-        </Text>
+        <Text style={[styles.costLabel, { color: costColor }]}>{costLabel}</Text>
       </View>
 
       <View style={styles.details}>
@@ -149,9 +160,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
         {showProjected && costData.projectedCostPerWear !== costData.costPerWear && (
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Projected Cost/Wear:</Text>
-            <Text style={styles.detailValue}>
-              {formatCurrency(costData.projectedCostPerWear)}
-            </Text>
+            <Text style={styles.detailValue}>{formatCurrency(costData.projectedCostPerWear)}</Text>
           </View>
         )}
       </View>
@@ -159,9 +168,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
       {costData.totalWears === 0 && (
         <View style={styles.encouragement}>
           <Ionicons name="shirt-outline" size={16} color={DesignSystem.colors.warning[500]} />
-          <Text style={styles.encouragementText}>
-            Wear this item to improve its value!
-          </Text>
+          <Text style={styles.encouragementText}>Wear this item to improve its value!</Text>
         </View>
       )}
 
@@ -169,7 +176,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
         <View style={styles.celebration}>
           <Ionicons name="trophy-outline" size={16} color={DesignSystem.colors.success[500]} />
           <Text style={styles.celebrationText}>
-            Amazing! You've maximized this item's value.
+            {"Amazing! You've maximized this item's value."}
           </Text>
         </View>
       )}
@@ -184,134 +191,140 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
   );
 };
 
-const createStyles = (colors: any) => StyleSheet.create({
-  container: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 8,
-  },
-  compactContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: colors.background.secondary,
-    borderRadius: 8,
-    padding: 12,
-    marginVertical: 4,
-  },
-  compactContent: {
-    flex: 1,
-  },
-  compactLabel: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    marginBottom: 2,
-  },
-  compactValue: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  loadingText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textAlign: 'center',
-  },
-  errorText: {
-    fontSize: 14,
-    color: colors.semantic.error,
-    textAlign: 'center',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: `${DesignSystem.colors.primary[500]}20`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  mainMetric: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  costPerWear: {
-    fontSize: 32,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  costLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  details: {
-    marginBottom: 16,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  detailLabel: {
-    fontSize: 14,
-    color: colors.text.secondary,
-  },
-  detailValue: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text.primary,
-  },
-  encouragement: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: `${colors.semantic.warning}20`,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  encouragementText: {
-    fontSize: 14,
-    color: colors.semantic.warning,
-    marginLeft: 8,
-    flex: 1,
-  },
-  celebration: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: `${colors.semantic.success}20`,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  celebrationText: {
-    fontSize: 14,
-    color: colors.semantic.success,
-    marginLeft: 8,
-    flex: 1,
-  },
-  actionHint: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: DesignSystem.colors.neutral[200],
-  },
-  actionHintText: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    marginRight: 4,
-  },
-});
+const createStyles = (colors: {
+  background: { secondary: string };
+  text: { primary: string; secondary: string };
+  semantic: { error: string; warning: string; success: string };
+}) =>
+  StyleSheet.create({
+    actionHint: {
+      alignItems: 'center',
+      borderTopColor: `${colors.text.secondary}20`,
+      borderTopWidth: 1,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginTop: 12,
+      paddingTop: 12,
+    },
+    actionHintText: {
+      color: colors.text.secondary,
+      fontSize: 12,
+      marginRight: 4,
+    },
+    celebration: {
+      alignItems: 'center',
+      backgroundColor: `${DesignSystem.colors.success[500]}10`,
+      borderRadius: 8,
+      flexDirection: 'row',
+      marginTop: 8,
+      padding: 12,
+    },
+    celebrationText: {
+      color: DesignSystem.colors.success[500],
+      flex: 1,
+      fontSize: 14,
+      marginLeft: 8,
+    },
+    compactContainer: {
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 8,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginVertical: 4,
+      padding: 12,
+    },
+    compactContent: {
+      flex: 1,
+    },
+
+    compactLabel: {
+      color: colors.text.secondary,
+      fontSize: 12,
+      marginBottom: 2,
+    },
+    compactValue: {
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    container: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      marginVertical: 8,
+      padding: 16,
+    },
+    costLabel: {
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    costPerWear: {
+      fontSize: 32,
+      fontWeight: '700',
+      marginBottom: 4,
+    },
+    detailLabel: {
+      color: colors.text.secondary,
+      fontSize: 14,
+    },
+    detailRow: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 8,
+    },
+    detailValue: {
+      color: colors.text.primary,
+      fontSize: 14,
+      fontWeight: '500',
+    },
+    details: {
+      marginBottom: 16,
+    },
+    encouragement: {
+      alignItems: 'center',
+      backgroundColor: `${DesignSystem.colors.warning[500]}10`,
+      borderRadius: 8,
+      flexDirection: 'row',
+      marginTop: 8,
+      padding: 12,
+    },
+    encouragementText: {
+      color: DesignSystem.colors.warning[500],
+      flex: 1,
+      fontSize: 14,
+      marginLeft: 8,
+    },
+    errorText: {
+      color: colors.semantic.error,
+      fontSize: 14,
+      textAlign: 'center',
+    },
+    header: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      marginBottom: 16,
+    },
+    iconContainer: {
+      alignItems: 'center',
+      backgroundColor: `${DesignSystem.colors.primary[500]}20`,
+      borderRadius: 16,
+      height: 32,
+      justifyContent: 'center',
+      marginRight: 12,
+      width: 32,
+    },
+    loadingText: {
+      color: colors.text.secondary,
+      fontSize: 14,
+      textAlign: 'center',
+    },
+    mainMetric: {
+      alignItems: 'center',
+      marginBottom: 20,
+    },
+    title: {
+      color: colors.text.primary,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });

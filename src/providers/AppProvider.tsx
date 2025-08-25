@@ -1,61 +1,45 @@
 // src/providers/AppProvider.tsx
 
+import { ThemeProvider } from '@shopify/restyle';
+import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { ThemeProvider } from '@shopify/restyle';
-import { ThemeProvider as NavigationThemeProvider, DefaultTheme } from '@react-navigation/native';
-import * as SplashScreen from 'expo-splash-screen';
-import {
-  useFonts,
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-} from '@expo-google-fonts/inter';
-import {
-  PlayfairDisplay_400Regular,
-  PlayfairDisplay_500Medium,
-  PlayfairDisplay_600SemiBold,
-  PlayfairDisplay_700Bold,
-} from '@expo-google-fonts/playfair-display';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { RestyleTheme, UNIFIED_COLORS } from '@/theme/DesignSystem';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { ErrorBoundary } from '@/components/error/ErrorBoundary';
+import { RestyleTheme } from '@/theme/DesignSystem';
+import { warnInDev } from '@/utils/consoleSuppress';
 
 // Create a safe theme that ensures compatibility with expo-router's ContextNavigator
 const safeTheme = {
   ...RestyleTheme,
   colors: {
     ...RestyleTheme.colors,
-    // Provide primary as simple string for expo-router compatibility
-    primary: UNIFIED_COLORS.primary[500],
-    // Keep indexed structure for other components
-    primaryIndexed: UNIFIED_COLORS.primary,
-    // Ensure all required color properties exist
-    background: RestyleTheme.colors?.background || UNIFIED_COLORS.background.primary,
-    text: RestyleTheme.colors?.text || UNIFIED_COLORS.text.primary,
-    card: RestyleTheme.colors?.card || UNIFIED_COLORS.background.secondary,
-    border: RestyleTheme.colors?.border || UNIFIED_COLORS.border.primary,
-    notification: RestyleTheme.colors?.notification || UNIFIED_COLORS.primary[500]
-  }
-};
-
-// Create React Navigation compatible theme for expo-router with static values
-const navigationTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '#B8A082',
+    // Hardcoded values for Android compatibility
+    primary: '#5C8A5C',
     background: '#FAF9F6',
-    card: '#F8F7F4',
     text: '#212529',
+    card: '#F8F7F4',
     border: '#E5E7EB',
-    notification: '#B8A082',
+    notification: '#EF4444',
+    error: '#EF4444',
+    tint: '#5C8A5C',
+    surface: '#FEFEFE',
   },
 };
-import { AuthProvider } from '@/context/AuthContext';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
+// Use expo-google-fonts hook correctly at the top level
+import { Inter_400Regular, Inter_600SemiBold, useFonts } from '@expo-google-fonts/inter';
+import {
+  PlayfairDisplay_400Regular,
+  PlayfairDisplay_700Bold,
+} from '@expo-google-fonts/playfair-display';
 import { StatusBar } from 'expo-status-bar';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 import { NetworkErrorBoundary } from '@/components/error/NetworkErrorBoundary';
+import { AuthProvider } from '@/context/AuthContext';
+import { KVKKProvider } from '@/contexts/KVKKContext';
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -63,27 +47,28 @@ interface AppProviderProps {
 
 export function AppProvider({ children }: AppProviderProps) {
   const [appIsReady, setAppIsReady] = useState(false);
-
-  const [fontsLoaded] = useFonts({
+  // Load fonts using the hook (must be called unconditionally at top level)
+  const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
-    Inter_500Medium,
     Inter_600SemiBold,
-    Inter_700Bold,
     PlayfairDisplay_400Regular,
-    PlayfairDisplay_500Medium,
-    PlayfairDisplay_600SemiBold,
     PlayfairDisplay_700Bold,
   });
+
+  useEffect(() => {
+    if (fontError) {
+      warnInDev('Font loading error:', fontError);
+    }
+  }, [fontError]);
 
   useEffect(() => {
     async function prepare() {
       try {
         // Keep the splash screen visible while we fetch resources
         await SplashScreen.preventAutoHideAsync();
-        
-        // Pre-load fonts, make any API calls you need to do here
-        // Artificially delay for demo purposes
-        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Reduced delay for better performance
+        await new Promise((resolve) => setTimeout(resolve, 500));
       } catch (e) {
         // Warning suppressed
       } finally {
@@ -102,16 +87,18 @@ export function AppProvider({ children }: AppProviderProps) {
   }, [appIsReady, fontsLoaded]);
 
   // Always provide the theme, even during loading
-  const content = !fontsLoaded || !appIsReady ? (
+  const content = !appIsReady ? (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      {/* Loading state */}
+      {/* Minimal loading state for better performance */}
     </View>
   ) : (
     <NetworkErrorBoundary>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <AuthProvider>
-          <StatusBar style="dark" backgroundColor={safeTheme.colors.background} />
-          {children}
+          <KVKKProvider>
+            <StatusBar style="dark" />
+            {children}
+          </KVKKProvider>
         </AuthProvider>
       </GestureHandlerRootView>
     </NetworkErrorBoundary>
@@ -119,11 +106,9 @@ export function AppProvider({ children }: AppProviderProps) {
 
   return (
     <ErrorBoundary>
-      <NavigationThemeProvider value={navigationTheme}>
-        <ThemeProvider theme={safeTheme}>
-          {content}
-        </ThemeProvider>
-      </NavigationThemeProvider>
+      <SafeAreaProvider>
+        <ThemeProvider theme={safeTheme}>{content}</ThemeProvider>
+      </SafeAreaProvider>
     </ErrorBoundary>
   );
 }

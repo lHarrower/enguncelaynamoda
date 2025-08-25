@@ -1,14 +1,11 @@
-import React, { useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+import { IoniconsName } from '@/types/icons';
+
 import { ComfortRating } from '../../types/aynaMirror';
 
 interface ComfortRatingStepProps {
@@ -25,7 +22,7 @@ const COMFORT_CATEGORIES = [
     color: '#4ECDC4',
     descriptions: [
       'Very uncomfortable',
-      'Somewhat uncomfortable', 
+      'Somewhat uncomfortable',
       'Neutral',
       'Quite comfortable',
       'Extremely comfortable',
@@ -66,10 +63,13 @@ export const ComfortRatingStep: React.FC<ComfortRatingStepProps> = ({
   onComfortRating,
 }) => {
   const categoryAnimations = useRef(
-    COMFORT_CATEGORIES.reduce((acc, category) => {
-      acc[category.key] = new Animated.Value(1);
-      return acc;
-    }, {} as Record<keyof ComfortRating, Animated.Value>)
+    COMFORT_CATEGORIES.reduce(
+      (acc, category) => {
+        acc[category.key] = new Animated.Value(1);
+        return acc;
+      },
+      {} as Record<keyof ComfortRating, Animated.Value>,
+    ),
   ).current;
 
   useEffect(() => {
@@ -90,20 +90,24 @@ export const ComfortRatingStep: React.FC<ComfortRatingStepProps> = ({
         ]).start();
       }
     });
-  }, [comfort]);
+  }, [comfort, categoryAnimations]);
 
   const handleRatingPress = (category: keyof ComfortRating, rating: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onComfortRating(category, rating);
   };
 
-  const renderStarRating = (category: keyof ComfortRating, currentRating: number, color: string) => {
+  const renderStarRating = (
+    category: keyof ComfortRating,
+    currentRating: number,
+    color: string,
+  ) => {
     return (
       <View style={styles.starsContainer}>
         {Array.from({ length: 5 }, (_, index) => {
           const starNumber = index + 1;
           const isSelected = starNumber <= currentRating;
-          
+
           return (
             <TouchableOpacity
               key={starNumber}
@@ -126,11 +130,19 @@ export const ComfortRatingStep: React.FC<ComfortRatingStepProps> = ({
   const getOverallComfortLevel = () => {
     const total = comfort.physical + comfort.emotional + comfort.confidence;
     const average = total / 3;
-    
-    if (average === 0) return null;
-    if (average <= 2) return { level: 'Needs improvement', emoji: '😔', color: '#FF6B6B' };
-    if (average <= 3) return { level: 'Getting there', emoji: '😐', color: '#F7DC6F' };
-    if (average <= 4) return { level: 'Feeling good', emoji: '😊', color: '#4ECDC4' };
+
+    if (average === 0) {
+      return null;
+    }
+    if (average <= 2) {
+      return { level: 'Needs improvement', emoji: '😔', color: '#FF6B6B' };
+    }
+    if (average <= 3) {
+      return { level: 'Getting there', emoji: '😐', color: '#F7DC6F' };
+    }
+    if (average <= 4) {
+      return { level: 'Feeling good', emoji: '😊', color: '#4ECDC4' };
+    }
     return { level: 'Amazing!', emoji: '🤩', color: '#45B7D1' };
   };
 
@@ -141,7 +153,7 @@ export const ComfortRatingStep: React.FC<ComfortRatingStepProps> = ({
       {COMFORT_CATEGORIES.map((category) => {
         const currentRating = comfort[category.key];
         const description = currentRating > 0 ? category.descriptions[currentRating - 1] : '';
-        
+
         return (
           <Animated.View
             key={category.key}
@@ -154,7 +166,7 @@ export const ComfortRatingStep: React.FC<ComfortRatingStepProps> = ({
           >
             <View style={styles.categoryHeader}>
               <View style={[styles.iconContainer, { backgroundColor: category.color + '20' }]}>
-                <Ionicons name={category.icon as any} size={24} color={category.color} />
+                <Ionicons name={category.icon as IoniconsName} size={24} color={category.color} />
               </View>
               <View style={styles.categoryInfo}>
                 <Text style={styles.categoryTitle}>{category.title}</Text>
@@ -165,7 +177,9 @@ export const ComfortRatingStep: React.FC<ComfortRatingStepProps> = ({
             {renderStarRating(category.key, currentRating, category.color)}
 
             {currentRating > 0 && (
-              <View style={[styles.descriptionContainer, { backgroundColor: category.color + '10' }]}>
+              <View
+                style={[styles.descriptionContainer, { backgroundColor: category.color + '10' }]}
+              >
                 <Text style={[styles.descriptionText, { color: category.color }]}>
                   {description}
                 </Text>
@@ -189,7 +203,7 @@ export const ComfortRatingStep: React.FC<ComfortRatingStepProps> = ({
       )}
 
       {/* Instructions */}
-      {Object.values(comfort).every(rating => rating === 0) && (
+      {Object.values(comfort).every((rating) => rating === 0) && (
         <View style={styles.instructionsContainer}>
           <Text style={styles.instructionsText}>
             Rate each aspect of comfort by tapping the stars
@@ -201,30 +215,23 @@ export const ComfortRatingStep: React.FC<ComfortRatingStepProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 10,
-  },
   categoryContainer: {
     backgroundColor: DesignSystem.colors.neutral[50],
     borderRadius: 16,
-    padding: 20,
     marginBottom: 20,
+    padding: 20,
   },
   categoryHeader: {
+    alignItems: 'center',
     flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 16,
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 16,
   },
   categoryInfo: {
     flex: 1,
+  },
+  categorySubtitle: {
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.neutral[600],
   },
   categoryTitle: {
     ...DesignSystem.typography.scale.body1,
@@ -232,54 +239,27 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 2,
   },
-  categorySubtitle: {
-    ...DesignSystem.typography.scale.body2,
-    color: DesignSystem.colors.neutral[600],
-  },
-  starsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 4,
-  },
-  starButton: {
-    padding: 8,
+  container: {
+    paddingVertical: 10,
   },
   descriptionContainer: {
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
     alignItems: 'center',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
   },
   descriptionText: {
     ...DesignSystem.typography.scale.body2,
     fontWeight: '500',
     textAlign: 'center',
   },
-  overallContainer: {
-    borderRadius: 16,
-    paddingVertical: 20,
-    paddingHorizontal: 24,
+  iconContainer: {
     alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 20,
-  },
-  overallEmoji: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  overallTitle: {
-    ...DesignSystem.typography.scale.h3,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  overallSubtitle: {
-    ...DesignSystem.typography.scale.body2,
-    color: DesignSystem.colors.neutral[600],
-    textAlign: 'center',
-    fontStyle: 'italic',
+    borderRadius: 24,
+    height: 48,
+    justifyContent: 'center',
+    marginRight: 16,
+    width: 48,
   },
   instructionsContainer: {
     paddingHorizontal: 20,
@@ -288,7 +268,41 @@ const styles = StyleSheet.create({
   instructionsText: {
     ...DesignSystem.typography.scale.body2,
     color: DesignSystem.colors.neutral[400],
-    textAlign: 'center',
     fontStyle: 'italic',
+    textAlign: 'center',
+  },
+  overallContainer: {
+    alignItems: 'center',
+    borderRadius: 16,
+    marginBottom: 20,
+    marginTop: 8,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+  },
+  overallEmoji: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  overallSubtitle: {
+    ...DesignSystem.typography.scale.body2,
+    color: DesignSystem.colors.neutral[600],
+    fontStyle: 'italic',
+    textAlign: 'center',
+  },
+  overallTitle: {
+    ...DesignSystem.typography.scale.h3,
+    fontWeight: '600',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
+  starButton: {
+    padding: 8,
+  },
+  starsContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 4,
+    justifyContent: 'center',
+    marginBottom: 12,
   },
 });

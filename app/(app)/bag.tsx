@@ -1,55 +1,43 @@
 // app/(app)/bag.tsx
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useSafeTheme } from '@/hooks/useSafeTheme';
-import { DesignSystemType } from '@/theme/DesignSystem';
-import { SEMANTIC_TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '@/constants/AppConstants'; // CORRECTED PATH
+import { BORDER_RADIUS, SEMANTIC_TYPOGRAPHY, SHADOWS, SPACING } from '@/constants/AppConstants'; // CORRECTED PATH
+import { DesignSystem } from '@/theme/DesignSystem';
 
 export default function BagPage() {
-  const theme = useSafeTheme();
-  const { colors } = theme;
-
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: DesignSystem.colors.background.primary }]}
+    >
       <StatusBar style="auto" />
-      
+
       {/* Header */}
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
+        <Text style={[styles.headerTitle, { color: DesignSystem.colors.text.primary }]}>
           Shopping Bag
         </Text>
       </View>
 
       {/* Empty State */}
       <View style={styles.emptyState}>
-        <Ionicons 
-          name="bag-outline" 
-          size={80} 
-          color={colors.textTertiary} 
-        />
-        <Text style={[styles.emptyTitle, { color: colors.text }]}>
+        <Ionicons name="bag-outline" size={80} color={DesignSystem.colors.text.tertiary} />
+        <Text style={[styles.emptyTitle, { color: DesignSystem.colors.text.primary }]}>
           Your bag is empty
         </Text>
-        <Text style={[styles.emptyMessage, { color: colors.textSecondary }]}>
+        <Text style={[styles.emptyMessage, { color: DesignSystem.colors.text.secondary }]}>
           Start shopping to add items to your bag
         </Text>
-        
-        <TouchableOpacity 
-          style={[styles.shopButton, { backgroundColor: theme.colors.primaryIndexed?.[500] || theme.colors.primary }]}
+
+        <TouchableOpacity
+          style={[styles.shopButton, { backgroundColor: DesignSystem.colors.primary[500] }]}
           activeOpacity={0.8}
         >
-          <Text style={[styles.shopButtonText, { color: colors.background }]}>
+          <Text style={[styles.shopButtonText, { color: DesignSystem.colors.neutral[50] }]}>
             Start Shopping
           </Text>
         </TouchableOpacity>
@@ -62,36 +50,36 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
-  },
-  headerTitle: {
-    ...SEMANTIC_TYPOGRAPHY.pageTitle,
+  emptyMessage: {
+    ...SEMANTIC_TYPOGRAPHY.bodyText,
+    marginBottom: SPACING.xl,
     textAlign: 'center',
   },
   emptyState: {
-    flex: 1,
     alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
     paddingHorizontal: SPACING.xl,
   },
   emptyTitle: {
     ...SEMANTIC_TYPOGRAPHY.sectionTitle,
-    marginTop: SPACING.lg,
     marginBottom: SPACING.md,
+    marginTop: SPACING.lg,
   },
-  emptyMessage: {
-    ...SEMANTIC_TYPOGRAPHY.bodyText,
+  header: {
+    borderBottomColor: DesignSystem.colors.border.primary,
+    borderBottomWidth: 1,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+  },
+  headerTitle: {
+    ...SEMANTIC_TYPOGRAPHY.pageTitle,
     textAlign: 'center',
-    marginBottom: SPACING.xl,
   },
   shopButton: {
+    borderRadius: BORDER_RADIUS.small,
     paddingHorizontal: SPACING.xl,
     paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.small,
     ...SHADOWS.subtle,
   },
   shopButtonText: {

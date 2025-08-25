@@ -1,0 +1,17 @@
+{
+  "tables": {
+    "profiles": {
+      "select": ["anon", "authenticated"],
+      "insert": ["authenticated"],
+      "update": ["authenticated"],
+      "delete": []
+    },
+    "wardrobe_items": {
+      "select": ["anon", "authenticated"],
+      "insert": ["authenticated"],
+      "update": ["authenticated"],
+      "delete": []
+    }
+  },
+  "_meta": { "description": "Define allowed roles per action per table for RLS negative testing." }
+}

@@ -1,6 +1,7 @@
 This folder stores audit artifacts generated during the repository audit.
 
 Generated files:
+
 - REPO_TREE_FULL.txt: Full repository file list
 - SCHEMA_SNAPSHOT.sql: Supabase schema snapshot (if CLI configured)
 - MIGRATIONS_LIST.txt: Ordered list of local migrations

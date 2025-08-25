@@ -1,17 +1,11 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+
+import BentoGrid from '@/components/vision/shared/BentoGrid';
+import VisionHomeHeader from '@/components/vision/shared/VisionHomeHeader';
 import { DesignSystem } from '@/theme/DesignSystem';
 import { logInDev } from '@/utils/consoleSuppress';
-import VisionHomeHeader from '@/components/vision/shared/VisionHomeHeader';
-import BentoGrid from '@/components/vision/shared/BentoGrid';
-
-
 
 interface VisionHomeScreenProps {
   onNavigateToWardrobe?: () => void;
@@ -29,16 +23,16 @@ const VisionHomeScreen: React.FC<VisionHomeScreenProps> = ({
       id: 'inspiration',
       title: "Today's Inspiration",
       subtitle: 'Curated just for you',
-      icon: 'sparkles',
-  gradient: [DesignSystem.colors.sage[300], DesignSystem.colors.sage[100]],
+      icon: 'sparkles' as const,
+      gradient: [DesignSystem.colors.sage[300], DesignSystem.colors.sage[100]],
       size: 'hero' as const,
-      onPress: () => logInDev('Today\'s Inspiration pressed'),
+      onPress: () => logInDev("Today's Inspiration pressed"),
     },
     {
       id: 'wardrobe',
       title: 'Quick Style',
-      icon: 'flash',
-  gradient: [DesignSystem.colors.sage[100], DesignSystem.colors.gold[100]],
+      icon: 'flash' as const,
+      gradient: [DesignSystem.colors.sage[100], DesignSystem.colors.gold[100]],
       size: 'small' as const,
       onPress: () => onNavigateToWardrobe?.(),
     },
@@ -46,8 +40,8 @@ const VisionHomeScreen: React.FC<VisionHomeScreenProps> = ({
       id: 'discover',
       title: 'Weather Perfect',
       subtitle: '72°F, Sunny',
-      icon: 'sunny',
-  gradient: [DesignSystem.colors.gold[400], DesignSystem.colors.gold[100]],
+      icon: 'sunny' as const,
+      gradient: [DesignSystem.colors.gold[400], DesignSystem.colors.gold[100]],
       size: 'small' as const,
       onPress: () => onNavigateToDiscover?.(),
     },
@@ -55,8 +49,8 @@ const VisionHomeScreen: React.FC<VisionHomeScreenProps> = ({
       id: 'insights',
       title: 'Wardrobe Insights',
       subtitle: 'Discover hidden gems',
-      icon: 'analytics',
-  gradient: [DesignSystem.colors.gold[100], DesignSystem.colors.neutral.pearl],
+      icon: 'analytics' as const,
+      gradient: [DesignSystem.colors.gold[100], DesignSystem.colors.neutral.pearl],
       size: 'medium' as const,
       onPress: () => logInDev('Wardrobe Insights pressed'),
     },
@@ -65,20 +59,11 @@ const VisionHomeScreen: React.FC<VisionHomeScreenProps> = ({
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={[
-          DesignSystem.colors.gold[100],
-          DesignSystem.colors.neutral.mist,
-        ]}
+        colors={[DesignSystem.colors.gold[100], DesignSystem.colors.neutral.mist]}
         style={styles.backgroundGradient}
       >
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-        >
-          <VisionHomeHeader 
-            userName="Beautiful"
-            onProfilePress={() => onNavigateToProfile?.()}
-          />
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          <VisionHomeHeader userName="Beautiful" onProfilePress={() => onNavigateToProfile?.()} />
           <BentoGrid items={bentoItems} />
         </ScrollView>
       </LinearGradient>
@@ -87,20 +72,20 @@ const VisionHomeScreen: React.FC<VisionHomeScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  
   backgroundGradient: {
     flex: 1,
   },
-  
-  scrollView: {
+
+  container: {
     flex: 1,
   },
-  
+
   scrollContent: {
     paddingBottom: DesignSystem.spacing.sanctuary,
+  },
+
+  scrollView: {
+    flex: 1,
   },
 });
 

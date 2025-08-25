@@ -1,19 +1,14 @@
 // Motion & Interaction Refinement Demo
 // Showcasing the graceful arc physics and synchronized tab animations
 
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  SafeAreaView,
-  StatusBar,
-} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState } from 'react';
+import { Dimensions, SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
+
 import SwipeableCard from '@/components/discovery/SwipeableCard';
 import ElegantTabs from '@/components/luxury/ElegantTabs';
 import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev } from '@/utils/consoleSuppress';
 
 const { width, height } = Dimensions.get('window');
 
@@ -65,12 +60,14 @@ const SwipeDemo = () => (
       Experience the refined swipe interaction with controlled arc trajectory and subtle rotation
     </Text>
     <View style={styles.cardContainer}>
-      <SwipeableCard
-        item={sampleProducts[0]}
-        onSwipeLeft={(item) => console.log('Disliked:', item.title)}
-        onSwipeRight={(item) => console.log('Liked:', item.title)}
-        onLongPress={(item) => console.log('Long pressed:', item.title)}
-      />
+      {sampleProducts[0] && (
+        <SwipeableCard
+          item={sampleProducts[0]}
+          onSwipeLeft={(item) => logInDev('Disliked:', item.title)}
+          onSwipeRight={(item) => logInDev('Liked:', item.title)}
+          onLongPress={(item) => logInDev('Long pressed:', item.title)}
+        />
+      )}
     </View>
   </View>
 );
@@ -103,21 +100,15 @@ const PhysicsDemo = () => (
     <View style={styles.principlesContainer}>
       <View style={styles.principleCard}>
         <Text style={styles.principleTitle}>Graceful Arc</Text>
-        <Text style={styles.principleText}>
-          Y = -0.0008 × X²{'\n'}Creates upward trajectory
-        </Text>
+        <Text style={styles.principleText}>Y = -0.0008 × X²{'\n'}Creates upward trajectory</Text>
       </View>
       <View style={styles.principleCard}>
         <Text style={styles.principleTitle}>Controlled Rotation</Text>
-        <Text style={styles.principleText}>
-          Max 7° rotation{'\n'}Eliminates wobbliness
-        </Text>
+        <Text style={styles.principleText}>Max 7° rotation{'\n'}Eliminates wobbliness</Text>
       </View>
       <View style={styles.principleCard}>
         <Text style={styles.principleTitle}>Physics Flick</Text>
-        <Text style={styles.principleText}>
-          Decay animation{'\n'}Natural momentum
-        </Text>
+        <Text style={styles.principleText}>Decay animation{'\n'}Natural momentum</Text>
       </View>
     </View>
   </View>
@@ -147,13 +138,10 @@ const MotionRefinementDemo: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={DesignSystem.colors.text.primary} />
-      
+
       {/* Header */}
       <LinearGradient
-        colors={[
-          DesignSystem.colors.text.primary,
-          DesignSystem.colors.text.secondary,
-        ]}
+        colors={[DesignSystem.colors.text.primary, DesignSystem.colors.text.secondary]}
         style={styles.header}
       >
         <Text style={styles.headerTitle}>Motion Refinement</Text>
@@ -176,117 +164,117 @@ const MotionRefinementDemo: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  cardContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+
   container: {
-    flex: 1,
     backgroundColor: DesignSystem.colors.background.primary,
-  },
-  
-  header: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.xxxl,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.sage[600],
-  },
-  
-  headerTitle: {
-    ...DesignSystem.typography.scale.h1,
-    color: DesignSystem.colors.text.primary,
-    marginBottom: DesignSystem.spacing.xs,
-  },
-  
-  headerSubtitle: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
-    opacity: 0.8,
-  },
-  
-  tabsWrapper: {
     flex: 1,
-    backgroundColor: DesignSystem.colors.background.secondary,
   },
-  
-  tabs: {
-    backgroundColor: DesignSystem.colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.sage[100],
-  },
-  
-  tabContent: {
-    backgroundColor: DesignSystem.colors.background.secondary,
-  },
-  
+
   demoContainer: {
     flex: 1,
     padding: DesignSystem.spacing.lg,
   },
-  
+
+  demoDescription: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
+    lineHeight: 24,
+    marginBottom: DesignSystem.spacing.lg,
+  },
+
   demoTitle: {
     ...DesignSystem.typography.heading.h2,
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.sm,
   },
-  
-  demoDescription: {
+
+  header: {
+    borderBottomColor: DesignSystem.colors.sage[600],
+    borderBottomWidth: 1,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.xxxl,
+  },
+
+  headerSubtitle: {
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
-    marginBottom: DesignSystem.spacing.lg,
-    lineHeight: 24,
+    opacity: 0.8,
   },
-  
-  cardContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 40,
+
+  headerTitle: {
+    ...DesignSystem.typography.scale.h1,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.xs,
   },
-  
-  tabDemoContent: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  
+
   physicsExplanation: {
     backgroundColor: DesignSystem.colors.sage[100],
     borderRadius: DesignSystem.radius.lg,
     padding: DesignSystem.spacing.lg,
   },
-  
+
+  physicsPoint: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
+    lineHeight: 22,
+    marginBottom: DesignSystem.spacing.sm,
+  },
+
   physicsTitle: {
     ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.md,
   },
-  
-  physicsPoint: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
-    marginBottom: DesignSystem.spacing.sm,
-    lineHeight: 22,
-  },
-  
-  principlesContainer: {
-    flex: 1,
-    gap: DesignSystem.spacing.md,
-  },
-  
+
   principleCard: {
     backgroundColor: DesignSystem.colors.sage[100],
+    borderLeftColor: DesignSystem.colors.sage[500],
+    borderLeftWidth: 4,
     borderRadius: DesignSystem.radius.md,
     padding: DesignSystem.spacing.lg,
-    borderLeftWidth: 4,
-    borderLeftColor: DesignSystem.colors.sage[500],
   },
-  
+
+  principleText: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
+    lineHeight: 20,
+  },
+
   principleTitle: {
     ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.sm,
   },
-  
-  principleText: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
-    lineHeight: 20,
+
+  principlesContainer: {
+    flex: 1,
+    gap: DesignSystem.spacing.md,
+  },
+
+  tabContent: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+  },
+
+  tabDemoContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+
+  tabs: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderBottomColor: DesignSystem.colors.sage[100],
+    borderBottomWidth: 1,
+  },
+
+  tabsWrapper: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+    flex: 1,
   },
 });
 

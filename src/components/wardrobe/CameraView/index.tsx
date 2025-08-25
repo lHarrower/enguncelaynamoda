@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Dimensions } from 'react-native';
-import { Camera, CameraView as ExpoCamera, CameraType, FlashMode } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
+import { Camera, CameraType, CameraView as ExpoCamera, FlashMode } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { errorInDev } from '../../../utils/consoleSuppress';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -18,7 +19,7 @@ const CameraView: React.FC<CameraViewProps> = ({
   onPhotoTaken,
   onGallerySelect,
   onClose,
-  isVisible
+  isVisible,
 }) => {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [hasGalleryPermission, setHasGalleryPermission] = useState<boolean | null>(null);
@@ -27,13 +28,7 @@ const CameraView: React.FC<CameraViewProps> = ({
   const [isCapturing, setIsCapturing] = useState(false);
   const cameraRef = useRef<any>(null);
 
-  useEffect(() => {
-    if (isVisible) {
-      requestPermissions();
-    }
-  }, [isVisible]);
-
-  const requestPermissions = async () => {
+  const requestPermissions = useCallback(async () => {
     try {
       // Request camera permissions
       const cameraPermission = await Camera.requestCameraPermissionsAsync();
@@ -49,27 +44,37 @@ const CameraView: React.FC<CameraViewProps> = ({
           'AYNAMODA needs camera access to help you add items to your wardrobe. Please enable camera permissions in your device settings.',
           [
             { text: 'Cancel', onPress: onClose, style: 'cancel' },
-            { text: 'Open Settings', onPress: () => {
-              // On real device, this would open settings
-              Alert.alert('Info', 'Please enable camera permissions in Settings > AYNAMODA > Camera');
-            }}
-          ]
+            {
+              text: 'Open Settings',
+              onPress: () => {
+                // On real device, this would open settings
+                Alert.alert(
+                  'Info',
+                  'Please enable camera permissions in Settings > AYNAMODA > Camera',
+                );
+              },
+            },
+          ],
         );
       }
     } catch (error) {
-      errorInDev('Error requesting permissions:', error);
+      errorInDev('Error requesting permissions:', error instanceof Error ? error : String(error));
       Alert.alert('Error', 'Unable to request camera permissions. Please try again.');
     }
-  };
+  }, [onClose, setHasCameraPermission, setHasGalleryPermission]);
+
+  useEffect(() => {
+    if (isVisible) {
+      requestPermissions();
+    }
+  }, [isVisible, requestPermissions]);
 
   const handleCameraFlip = () => {
-    setCameraType(current => 
-      current === 'back' ? 'front' : 'back'
-    );
+    setCameraType((current) => (current === 'back' ? 'front' : 'back'));
   };
 
   const handleFlashToggle = () => {
-    setFlashMode(current => {
+    setFlashMode((current) => {
       switch (current) {
         case 'off':
           return 'on';
@@ -84,7 +89,9 @@ const CameraView: React.FC<CameraViewProps> = ({
   };
 
   const handleTakePhoto = async () => {
-    if (!cameraRef.current || isCapturing) return;
+    if (!cameraRef.current || isCapturing) {
+      return;
+    }
 
     try {
       setIsCapturing(true);
@@ -98,7 +105,7 @@ const CameraView: React.FC<CameraViewProps> = ({
         onPhotoTaken(photo.uri);
       }
     } catch (error) {
-      errorInDev('Error taking photo:', error);
+      errorInDev('Error taking photo:', error instanceof Error ? error : String(error));
       Alert.alert('Error', 'Failed to take photo. Please try again.');
     } finally {
       setIsCapturing(false);
@@ -110,7 +117,7 @@ const CameraView: React.FC<CameraViewProps> = ({
       Alert.alert(
         'Gallery Permission Required',
         'Please enable photo library access to select images from your gallery.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
       return;
     }
@@ -127,7 +134,7 @@ const CameraView: React.FC<CameraViewProps> = ({
         onPhotoTaken(result.assets[0].uri);
       }
     } catch (error) {
-      errorInDev('Error selecting from gallery:', error);
+      errorInDev('Error selecting from gallery:', error instanceof Error ? error : String(error));
       Alert.alert('Error', 'Failed to select image from gallery. Please try again.');
     }
   };
@@ -144,7 +151,9 @@ const CameraView: React.FC<CameraViewProps> = ({
     }
   };
 
-  if (!isVisible) return null;
+  if (!isVisible) {
+    return null;
+  }
 
   if (hasCameraPermission === null) {
     return (
@@ -165,10 +174,22 @@ const CameraView: React.FC<CameraViewProps> = ({
           <Text style={styles.permissionText}>
             To add items to your wardrobe, AYNAMODA needs access to your camera.
           </Text>
-          <TouchableOpacity style={styles.permissionButton} onPress={requestPermissions}>
+          <TouchableOpacity
+            style={styles.permissionButton}
+            onPress={requestPermissions}
+            accessibilityRole="button"
+            accessibilityLabel="Enable camera access"
+            accessibilityHint="Tap to grant camera permission for taking photos"
+          >
             <Text style={styles.permissionButtonText}>Enable Camera</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel"
+            accessibilityHint="Tap to close camera view"
+          >
             <Text style={styles.closeButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
@@ -178,24 +199,31 @@ const CameraView: React.FC<CameraViewProps> = ({
 
   return (
     <View style={styles.container}>
-      <ExpoCamera
-        ref={cameraRef}
-        style={styles.camera}
-        facing={cameraType}
-        flash={flashMode}
-      >
+      <ExpoCamera ref={cameraRef} style={styles.camera} facing={cameraType} flash={flashMode}>
         {/* Header Controls */}
         <View style={styles.headerControls}>
-          <TouchableOpacity style={styles.controlButton} onPress={onClose}>
+          <TouchableOpacity
+            style={styles.controlButton}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel="Close camera"
+            accessibilityHint="Tap to close camera view"
+          >
             <Ionicons name="close" size={28} color="#FFFFFF" />
           </TouchableOpacity>
-          
+
           <View style={styles.headerTitle}>
             <Text style={styles.titleText}>Add New Item</Text>
             <Text style={styles.subtitleText}>Center your clothing item</Text>
           </View>
 
-          <TouchableOpacity style={styles.controlButton} onPress={handleFlashToggle}>
+          <TouchableOpacity
+            style={styles.controlButton}
+            onPress={handleFlashToggle}
+            accessibilityRole="button"
+            accessibilityLabel={`Flash ${flashMode === 'off' ? 'off' : flashMode === 'on' ? 'on' : 'auto'}`}
+            accessibilityHint="Tap to toggle camera flash mode"
+          >
             <Ionicons name={getFlashIcon()} size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
@@ -207,18 +235,25 @@ const CameraView: React.FC<CameraViewProps> = ({
 
         {/* Bottom Controls */}
         <View style={styles.bottomControls}>
-          <TouchableOpacity 
-            style={styles.galleryButton} 
+          <TouchableOpacity
+            style={styles.galleryButton}
             onPress={handleGallerySelect}
+            accessibilityRole="button"
+            accessibilityLabel="Select from gallery"
+            accessibilityHint="Tap to choose a photo from your gallery"
           >
             <Ionicons name="images" size={24} color="#FFFFFF" />
             <Text style={styles.controlText}>Gallery</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.captureButton, isCapturing && styles.captureButtonDisabled]}
             onPress={handleTakePhoto}
             disabled={isCapturing}
+            accessibilityRole="button"
+            accessibilityLabel={isCapturing ? 'Taking photo' : 'Take photo'}
+            accessibilityHint="Tap to capture a photo of your clothing item"
+            accessibilityState={{ disabled: isCapturing }}
           >
             <View style={styles.captureButtonInner}>
               {isCapturing ? (
@@ -229,9 +264,12 @@ const CameraView: React.FC<CameraViewProps> = ({
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.flipButton} 
+          <TouchableOpacity
+            style={styles.flipButton}
             onPress={handleCameraFlip}
+            accessibilityRole="button"
+            accessibilityLabel="Flip camera"
+            accessibilityHint="Tap to switch between front and back camera"
           >
             <Ionicons name="camera-reverse" size={24} color="#FFFFFF" />
             <Text style={styles.controlText}>Flip</Text>
@@ -243,46 +281,43 @@ const CameraView: React.FC<CameraViewProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000000',
+  bottomControls: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 40,
+    paddingHorizontal: 30,
+    paddingTop: 20,
   },
   camera: {
     flex: 1,
   },
-  permissionContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  captureButton: {
     alignItems: 'center',
-    backgroundColor: '#F2EFE9',
-    paddingHorizontal: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: '#FFFFFF',
+    borderRadius: 40,
+    borderWidth: 4,
+    height: 80,
+    justifyContent: 'center',
+    width: 80,
   },
-  permissionTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#7A6B56',
-    marginTop: 20,
-    marginBottom: 12,
-    textAlign: 'center',
+  captureButtonDisabled: {
+    opacity: 0.7,
   },
-  permissionText: {
-    fontSize: 16,
-    color: '#B8918F',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 30,
-  },
-  permissionButton: {
+  captureButtonDot: {
     backgroundColor: '#B8918F',
-    paddingHorizontal: 32,
-    paddingVertical: 16,
     borderRadius: 12,
-    marginBottom: 16,
+    height: 24,
+    width: 24,
   },
-  permissionButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
+  captureButtonInner: {
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 30,
+    height: 60,
+    justifyContent: 'center',
+    width: 60,
   },
   closeButton: {
     paddingHorizontal: 32,
@@ -292,72 +327,17 @@ const styles = StyleSheet.create({
     color: '#B8918F',
     fontSize: 16,
   },
-  headerControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+  container: {
+    backgroundColor: '#000000',
+    flex: 1,
   },
   controlButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 22,
+    height: 44,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    alignItems: 'center',
-  },
-  titleText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  subtitleText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    opacity: 0.8,
-    marginTop: 4,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  guidelines: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  guideline: {
-    width: screenWidth * 0.7,
-    height: screenWidth * 0.9,
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
-    borderRadius: 16,
-    borderStyle: 'dashed',
-  },
-  bottomControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 30,
-    paddingBottom: 40,
-    paddingTop: 20,
-  },
-  galleryButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 70,
-  },
-  flipButton: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 70,
+    width: 44,
   },
   controlText: {
     color: '#FFFFFF',
@@ -367,32 +347,90 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  captureButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
+  flipButton: {
     alignItems: 'center',
-    borderWidth: 4,
-    borderColor: '#FFFFFF',
-  },
-  captureButtonDisabled: {
-    opacity: 0.7,
-  },
-  captureButtonInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
+    width: 70,
+  },
+  galleryButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 70,
+  },
+  guideline: {
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: 16,
+    borderStyle: 'dashed',
+    borderWidth: 2,
+    height: screenWidth * 0.9,
+    width: screenWidth * 0.7,
+  },
+  guidelines: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  headerControls: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 50,
+  },
+  headerTitle: {
     alignItems: 'center',
   },
-  captureButtonDot: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  permissionButton: {
     backgroundColor: '#B8918F',
+    borderRadius: 12,
+    marginBottom: 16,
+    paddingHorizontal: 32,
+    paddingVertical: 16,
+  },
+  permissionButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  permissionContainer: {
+    alignItems: 'center',
+    backgroundColor: '#F2EFE9',
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+  },
+  permissionText: {
+    color: '#B8918F',
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  permissionTitle: {
+    color: '#7A6B56',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 12,
+    marginTop: 20,
+    textAlign: 'center',
+  },
+  subtitleText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    marginTop: 4,
+    opacity: 0.8,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  titleText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });
 

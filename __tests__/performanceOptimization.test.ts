@@ -7,7 +7,7 @@ import {
   DailyRecommendations,
   WardrobeItem,
   OutfitFeedback,
-  EmotionalResponse
+  EmotionalResponse,
 } from '@/types/aynaMirror';
 
 // Mock dependencies
@@ -32,9 +32,9 @@ const mockRecommendations: DailyRecommendations = {
     condition: 'sunny',
     humidity: 45,
     location: 'San Francisco',
-    timestamp: new Date()
+    timestamp: new Date(),
   },
-  generatedAt: new Date()
+  generatedAt: new Date(),
 };
 const mockFeedback: OutfitFeedback = {
   outfitId: 'outfit-123',
@@ -43,21 +43,24 @@ const mockFeedback: OutfitFeedback = {
   emotionalResponse: {
     primary: 'confident',
     intensity: 8,
-    additionalEmotions: ['stylish']
+    additionalEmotions: ['stylish'],
+    timestamp: new Date(),
   } as EmotionalResponse,
   comfort: 4,
-  timestamp: new Date()
+  timestamp: new Date(),
+  notes: 'Feeling great in this outfit',
 };
 
-describe('PerformanceOptimizationService', () => {
-
+describe('PerformansOptimizasyonServisi', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(console, 'log').mockImplementation(() => {});
     jest.spyOn(console, 'error').mockImplementation(() => {});
-  // Ensure static method exists on mocked class for call tracking
-  (AynaMirrorService as any).generateDailyRecommendations = jest.fn().mockResolvedValue(mockRecommendations);
-    
+    // Ensure static method exists on mocked class for call tracking
+    (AynaMirrorService as any).generateDailyRecommendations = jest
+      .fn()
+      .mockResolvedValue(mockRecommendations);
+
     // Reset performance metrics
     (PerformanceOptimizationService as any).performanceMetrics = {
       recommendationGenerationTime: [],
@@ -65,7 +68,7 @@ describe('PerformanceOptimizationService', () => {
       databaseQueryTime: [],
       cacheHitRate: 0,
       errorRate: 0,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     };
   });
 
@@ -77,7 +80,7 @@ describe('PerformanceOptimizationService', () => {
   // RECOMMENDATION CACHING TESTS
   // ========================================================================
 
-  describe('Recommendation Caching', () => {
+  describe('Öneri Önbellekleme', () => {
     const mockRecommendations: DailyRecommendations = {
       id: 'rec-123',
       userId: mockUserId,
@@ -88,51 +91,51 @@ describe('PerformanceOptimizationService', () => {
         condition: 'sunny',
         humidity: 45,
         location: 'San Francisco',
-        timestamp: new Date()
+        timestamp: new Date(),
       },
-      generatedAt: new Date()
+      generatedAt: new Date(),
     };
 
-    test('should cache daily recommendations successfully', async () => {
+    test('günlük önerileri başarıyla önbelleğe almalı', async () => {
       mockAsyncStorage.setItem.mockResolvedValue();
 
       await PerformanceOptimizationService.cacheRecommendations(
         mockUserId,
         mockRecommendations,
-        mockDate
+        mockDate,
       );
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         `recommendations_${mockUserId}_${mockDate}`,
-        expect.stringContaining('"data"')
+        expect.stringContaining('"data"'),
       );
     });
 
-    test('should retrieve cached recommendations when valid', async () => {
+    test('geçerli olduğunda önbelleğe alınmış önerileri getirmeli', async () => {
       const cachedData = {
         data: mockRecommendations,
         timestamp: Date.now(),
-        expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 24 hours from now
+        expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours from now
       };
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(cachedData));
 
       const result = await PerformanceOptimizationService.getCachedRecommendations(
         mockUserId,
-        mockDate
+        mockDate,
       );
 
       expect(result).toEqual(mockRecommendations);
       expect(mockAsyncStorage.getItem).toHaveBeenCalledWith(
-        `recommendations_${mockUserId}_${mockDate}`
+        `recommendations_${mockUserId}_${mockDate}`,
       );
     });
 
-    test('should return null for expired cached recommendations', async () => {
+    test('süresi dolmuş önbellek önerileri için null döndürmeli', async () => {
       const expiredCachedData = {
         data: mockRecommendations,
         timestamp: Date.now() - 25 * 60 * 60 * 1000, // 25 hours ago
-        expiresAt: Date.now() - 1 * 60 * 60 * 1000 // 1 hour ago (expired)
+        expiresAt: Date.now() - 1 * 60 * 60 * 1000, // 1 hour ago (expired)
       };
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(expiredCachedData));
@@ -140,37 +143,37 @@ describe('PerformanceOptimizationService', () => {
 
       const result = await PerformanceOptimizationService.getCachedRecommendations(
         mockUserId,
-        mockDate
+        mockDate,
       );
 
       expect(result).toBeNull();
       expect(mockAsyncStorage.removeItem).toHaveBeenCalledWith(
-        `recommendations_${mockUserId}_${mockDate}`
+        `recommendations_${mockUserId}_${mockDate}`,
       );
     });
 
-    test('should pre-generate recommendations for tomorrow', async () => {
+    test('yarın için önerileri önceden oluşturmalı', async () => {
       mockAsyncStorage.getItem.mockResolvedValue(null); // No existing cache
       mockAynaMirrorService.generateDailyRecommendations.mockResolvedValue(mockRecommendations);
       mockAsyncStorage.setItem.mockResolvedValue();
 
-  await PerformanceOptimizationService.preGenerateRecommendations(mockUserId);
-  // Focus on side-effect that caching attempted
-  expect(mockAsyncStorage.setItem).toHaveBeenCalled();
+      await PerformanceOptimizationService.preGenerateRecommendations(mockUserId);
+      // Focus on side-effect that caching attempted
+      expect(mockAsyncStorage.setItem).toHaveBeenCalled();
     });
 
-    test('should skip pre-generation if recommendations already cached', async () => {
+    test('öneriler zaten önbellekte varsa ön-oluşturmayı atlamalı', async () => {
       const existingCache = {
         data: mockRecommendations,
         timestamp: Date.now(),
-        expiresAt: Date.now() + 24 * 60 * 60 * 1000
+        expiresAt: Date.now() + 24 * 60 * 60 * 1000,
       };
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(existingCache));
 
-  await PerformanceOptimizationService.preGenerateRecommendations(mockUserId);
-  // Allow metrics persistence even when skipping core generation
-  expect(mockAsyncStorage.setItem).toHaveBeenCalled();
+      await PerformanceOptimizationService.preGenerateRecommendations(mockUserId);
+      // Allow metrics persistence even when skipping core generation
+      expect(mockAsyncStorage.setItem).toHaveBeenCalled();
     });
   });
 
@@ -178,7 +181,7 @@ describe('PerformanceOptimizationService', () => {
   // WARDROBE DATA CACHING TESTS
   // ========================================================================
 
-  describe('Wardrobe Data Caching', () => {
+  describe('Gardırop Verisi Önbellekleme', () => {
     const mockWardrobeItems: WardrobeItem[] = [
       {
         id: 'item-1',
@@ -194,30 +197,30 @@ describe('PerformanceOptimizationService', () => {
           lastWorn: new Date(),
           averageRating: 4.2,
           complimentsReceived: 2,
-          costPerWear: 12.50
+          costPerWear: 12.5,
         },
         usageCount: 5,
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     ];
 
-    test('should cache wardrobe data successfully', async () => {
+    test('gardırop verisini başarıyla önbelleğe almalı', async () => {
       mockAsyncStorage.setItem.mockResolvedValue();
 
       await PerformanceOptimizationService.cacheWardrobeData(mockUserId, mockWardrobeItems);
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         `wardrobe_${mockUserId}`,
-        expect.stringContaining('"data"')
+        expect.stringContaining('"data"'),
       );
     });
 
-    test('should retrieve cached wardrobe data when valid', async () => {
+    test('geçerli olduğunda önbelleğe alınmış gardırop verisini getirmeli', async () => {
       const cachedData = {
         data: mockWardrobeItems,
         timestamp: Date.now(),
-        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 days from now
+        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7 days from now
       };
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(cachedData));
@@ -227,11 +230,11 @@ describe('PerformanceOptimizationService', () => {
       expect(result).toEqual(mockWardrobeItems);
     });
 
-    test('should return null for expired wardrobe cache', async () => {
+    test('süresi dolmuş gardırop önbelleği için null döndürmeli', async () => {
       const expiredCachedData = {
         data: mockWardrobeItems,
         timestamp: Date.now() - 8 * 24 * 60 * 60 * 1000, // 8 days ago
-        expiresAt: Date.now() - 1 * 24 * 60 * 60 * 1000 // 1 day ago (expired)
+        expiresAt: Date.now() - 1 * 24 * 60 * 60 * 1000, // 1 day ago (expired)
       };
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(expiredCachedData));
@@ -247,8 +250,8 @@ describe('PerformanceOptimizationService', () => {
   // ========================================================================
   // IMAGE OPTIMIZATION TESTS (simplified due to earlier corruption)
   // ========================================================================
-  describe('Image Optimization', () => {
-    test('placeholder image optimization passes', () => {
+  describe('Resim Optimizasyonu', () => {
+    test('yer tutucu resim optimizasyonu geçer', () => {
       expect(true).toBe(true);
     });
   });
@@ -257,7 +260,7 @@ describe('PerformanceOptimizationService', () => {
   // BACKGROUND PROCESSING TESTS
   // ========================================================================
 
-  describe('Background Processing', () => {
+  describe('Arka Plan İşleme', () => {
     const mockFeedback: OutfitFeedback = {
       outfitId: 'outfit-123',
       userId: mockUserId,
@@ -265,24 +268,26 @@ describe('PerformanceOptimizationService', () => {
       emotionalResponse: {
         primary: 'confident',
         intensity: 8,
-        additionalEmotions: ['stylish']
+        additionalEmotions: ['stylish'],
+        timestamp: new Date(),
       } as EmotionalResponse,
       comfort: 4,
-      timestamp: new Date()
+      timestamp: new Date(),
+      notes: 'Feeling great in this outfit',
     };
 
-    test('should queue feedback for background processing', async () => {
+    test('geri bildirimi arka plan işleme için kuyruğa almalı', async () => {
       mockAsyncStorage.setItem.mockResolvedValue();
 
       await PerformanceOptimizationService.queueFeedbackForProcessing(mockFeedback);
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'feedback_processing_queue',
-        expect.stringContaining(mockFeedback.outfitId)
+        expect.stringContaining(mockFeedback.outfitId!),
       );
     });
 
-    test('should restore feedback queue on initialization', async () => {
+    test('başlatmada geri bildirim kuyruğunu geri yüklemeli', async () => {
       const queueData = [mockFeedback];
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(queueData));
 
@@ -292,7 +297,7 @@ describe('PerformanceOptimizationService', () => {
       expect(mockAsyncStorage.getItem).toHaveBeenCalledWith('feedback_processing_queue');
     });
 
-    test('should handle empty feedback queue gracefully', async () => {
+    test('boş geri bildirim kuyruğunu zarif şekilde yönetmeli', async () => {
       mockAsyncStorage.getItem.mockResolvedValue(null);
 
       await PerformanceOptimizationService.restoreFeedbackQueue();
@@ -306,8 +311,8 @@ describe('PerformanceOptimizationService', () => {
   // DATABASE OPTIMIZATION TESTS
   // ========================================================================
 
-  describe('Database Optimization', () => {
-    test('should execute optimized query with caching', async () => {
+  describe('Veritabanı Optimizasyonu', () => {
+    test('önbellekleme ile optimize edilmiş sorguyu çalıştırmalı', async () => {
       const mockQueryFn = jest.fn().mockResolvedValue({ data: 'test-data' });
       const cacheKey = 'test-cache-key';
       const cacheDuration = 60000; // 1 minute
@@ -318,7 +323,7 @@ describe('PerformanceOptimizationService', () => {
       const result = await PerformanceOptimizationService.executeOptimizedQuery(
         mockQueryFn,
         cacheKey,
-        cacheDuration
+        cacheDuration,
       );
 
       expect(mockQueryFn).toHaveBeenCalled();
@@ -326,11 +331,11 @@ describe('PerformanceOptimizationService', () => {
       expect(mockAsyncStorage.setItem).toHaveBeenCalled();
     });
 
-    test('should return cached result when available', async () => {
+    test('mevcut olduğunda önbelleğe alınmış sonucu döndürmeli', async () => {
       const cachedResult = {
         data: { data: 'cached-data' },
         timestamp: Date.now(),
-        expiresAt: Date.now() + 60000
+        expiresAt: Date.now() + 60000,
       };
 
       const mockQueryFn = jest.fn();
@@ -339,15 +344,16 @@ describe('PerformanceOptimizationService', () => {
       const result = await PerformanceOptimizationService.executeOptimizedQuery(
         mockQueryFn,
         'test-cache-key',
-        60000
+        60000,
       );
 
       expect(mockQueryFn).not.toHaveBeenCalled();
       expect(result).toEqual({ data: 'cached-data' });
     });
 
-    test('should retry failed queries with exponential backoff', async () => {
-      const mockQueryFn = jest.fn()
+    test('başarısız sorguları üstel geri çekilme ile yeniden denemeli', async () => {
+      const mockQueryFn = jest
+        .fn()
         .mockRejectedValueOnce(new Error('First failure'))
         .mockRejectedValueOnce(new Error('Second failure'))
         .mockResolvedValueOnce({ data: 'success' });
@@ -363,8 +369,8 @@ describe('PerformanceOptimizationService', () => {
       expect(mockQueryFn).toHaveBeenCalledTimes(3);
       expect(result).toEqual({ data: 'success' });
 
-  const st = (global.setTimeout as unknown) as { mockRestore?: () => void };
-  st.mockRestore && st.mockRestore();
+      const st = global.setTimeout as unknown as { mockRestore?: () => void };
+      st.mockRestore && st.mockRestore();
     });
   });
 
@@ -372,13 +378,13 @@ describe('PerformanceOptimizationService', () => {
   // CLEANUP TESTS
   // ========================================================================
 
-  describe('Cleanup Routines', () => {
-    test('should perform comprehensive cleanup', async () => {
+  describe('Temizlik Rutinleri', () => {
+    test('kapsamlı temizlik gerçekleştirmeli', async () => {
       // Mock Supabase delete operations
       mockSupabase.from.mockReturnValue({
         delete: jest.fn().mockReturnValue({
-          lt: jest.fn().mockResolvedValue({ error: null })
-        })
+          lt: jest.fn().mockResolvedValue({ error: null }),
+        }),
       } as any);
 
       // Mock AsyncStorage operations
@@ -386,15 +392,17 @@ describe('PerformanceOptimizationService', () => {
         'recommendations_user1_2024-01-01',
         'wardrobe_user1',
         'weather_san-francisco',
-        'other_key'
+        'other_key',
       ]);
       mockAsyncStorage.getItem.mockImplementation((key) => {
         if (key.includes('recommendations_') || key.includes('wardrobe_')) {
-          return Promise.resolve(JSON.stringify({
-            data: {},
-            timestamp: Date.now() - 25 * 60 * 60 * 1000, // 25 hours ago
-            expiresAt: Date.now() - 1 * 60 * 60 * 1000 // Expired
-          }));
+          return Promise.resolve(
+            JSON.stringify({
+              data: {},
+              timestamp: Date.now() - 25 * 60 * 60 * 1000, // 25 hours ago
+              expiresAt: Date.now() - 1 * 60 * 60 * 1000, // Expired
+            }),
+          );
         }
         return Promise.resolve(null);
       });
@@ -406,11 +414,11 @@ describe('PerformanceOptimizationService', () => {
       expect(mockAsyncStorage.removeItem).toHaveBeenCalled();
     });
 
-    test('should handle cleanup errors gracefully', async () => {
+    test('temizlik hatalarını zarif şekilde yönetmeli', async () => {
       mockSupabase.from.mockReturnValue({
         delete: jest.fn().mockReturnValue({
-          lt: jest.fn().mockRejectedValue(new Error('Database error'))
-        })
+          lt: jest.fn().mockRejectedValue(new Error('Database error')),
+        }),
       } as any);
 
       // Should not throw error
@@ -422,13 +430,19 @@ describe('PerformanceOptimizationService', () => {
   // PERFORMANCE MONITORING TESTS
   // ========================================================================
 
-  describe('Performance Monitoring', () => {
-    test('should record and retrieve performance metrics', async () => {
+  describe('Performans İzleme', () => {
+    test('performans metriklerini kaydetmeli ve getirmeli', async () => {
       mockAsyncStorage.setItem.mockResolvedValue();
 
       // Record some metrics (using private method via any cast)
-      (PerformanceOptimizationService as any).recordPerformanceMetric('recommendationGenerationTime', 150);
-      (PerformanceOptimizationService as any).recordPerformanceMetric('recommendationGenerationTime', 200);
+      (PerformanceOptimizationService as any).recordPerformanceMetric(
+        'recommendationGenerationTime',
+        150,
+      );
+      (PerformanceOptimizationService as any).recordPerformanceMetric(
+        'recommendationGenerationTime',
+        200,
+      );
       (PerformanceOptimizationService as any).recordPerformanceMetric('imageProcessingTime', 50);
 
       const metrics = PerformanceOptimizationService.getPerformanceMetrics();
@@ -439,10 +453,16 @@ describe('PerformanceOptimizationService', () => {
       expect(metrics.imageProcessingTime).toContain(50);
     });
 
-    test('should calculate performance summary correctly', async () => {
+    test('performans özetini doğru şekilde hesaplamalı', async () => {
       // Record metrics
-      (PerformanceOptimizationService as any).recordPerformanceMetric('recommendationGenerationTime', 100);
-      (PerformanceOptimizationService as any).recordPerformanceMetric('recommendationGenerationTime', 200);
+      (PerformanceOptimizationService as any).recordPerformanceMetric(
+        'recommendationGenerationTime',
+        100,
+      );
+      (PerformanceOptimizationService as any).recordPerformanceMetric(
+        'recommendationGenerationTime',
+        200,
+      );
       (PerformanceOptimizationService as any).recordPerformanceMetric('imageProcessingTime', 50);
       (PerformanceOptimizationService as any).recordPerformanceMetric('imageProcessingTime', 100);
 
@@ -454,7 +474,7 @@ describe('PerformanceOptimizationService', () => {
       expect(summary.errorRate).toBeGreaterThanOrEqual(0);
     });
 
-    test('should track cache hit and miss rates', async () => {
+    test('önbellek isabet ve kaçırma oranlarını takip etmeli', async () => {
       mockAsyncStorage.setItem.mockResolvedValue();
 
       // Record cache hits and misses
@@ -469,14 +489,14 @@ describe('PerformanceOptimizationService', () => {
       expect(metrics.cacheHitRate).toBeLessThanOrEqual(1);
     });
 
-    test('should load performance metrics from storage', async () => {
+    test('performans metriklerini depolamadan yüklemeli', async () => {
       const storedMetrics = {
         recommendationGenerationTime: [100, 150],
         imageProcessingTime: [25, 50],
         databaseQueryTime: [10, 20],
         cacheHitRate: 0.8,
         errorRate: 0.1,
-        lastUpdated: Date.now() - 1000 // 1 second ago
+        lastUpdated: Date.now() - 1000, // 1 second ago
       };
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(storedMetrics));
@@ -488,14 +508,14 @@ describe('PerformanceOptimizationService', () => {
       expect(metrics.cacheHitRate).toBe(0.8);
     });
 
-    test('should ignore old performance metrics', async () => {
+    test('eski performans metriklerini görmezden gelmeli', async () => {
       const oldMetrics = {
         recommendationGenerationTime: [100],
         imageProcessingTime: [25],
         databaseQueryTime: [10],
         cacheHitRate: 0.9,
         errorRate: 0.05,
-        lastUpdated: Date.now() - 25 * 60 * 60 * 1000 // 25 hours ago
+        lastUpdated: Date.now() - 25 * 60 * 60 * 1000, // 25 hours ago
       };
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(oldMetrics));
@@ -512,8 +532,8 @@ describe('PerformanceOptimizationService', () => {
   // INITIALIZATION AND LIFECYCLE TESTS
   // ========================================================================
 
-  describe('Initialization and Lifecycle', () => {
-    test('should initialize service successfully', async () => {
+  describe('Başlatma ve Yaşam Döngüsü', () => {
+    test('servisi başarıyla başlatmalı', async () => {
       mockAsyncStorage.getItem.mockResolvedValue(null);
 
       await PerformanceOptimizationService.initialize();
@@ -521,7 +541,7 @@ describe('PerformanceOptimizationService', () => {
       expect(mockAsyncStorage.getItem).toHaveBeenCalled();
     });
 
-    test('should shutdown service gracefully', async () => {
+    test('servisi zarif şekilde kapatmalı', async () => {
       mockAsyncStorage.setItem.mockResolvedValue();
 
       await PerformanceOptimizationService.shutdown();
@@ -529,7 +549,7 @@ describe('PerformanceOptimizationService', () => {
       expect(mockAsyncStorage.setItem).toHaveBeenCalled();
     });
 
-    test('should handle initialization errors gracefully', async () => {
+    test('başlatma hatalarını zarif şekilde yönetmeli', async () => {
       mockAsyncStorage.getItem.mockRejectedValue(new Error('Storage error'));
 
       // Should not throw error
@@ -541,8 +561,8 @@ describe('PerformanceOptimizationService', () => {
   // INTEGRATION TESTS
   // ========================================================================
 
-  describe('Integration Tests', () => {
-    test('should handle complete recommendation flow with caching', async () => {
+  describe('Entegrasyon Testleri', () => {
+    test('önbellekleme ile tam öneri akışını yönetmeli', async () => {
       // Setup mocks for complete flow
       mockAsyncStorage.getItem.mockResolvedValue(null); // No cache initially
       mockAynaMirrorService.generateDailyRecommendations.mockResolvedValue(mockRecommendations);
@@ -551,11 +571,11 @@ describe('PerformanceOptimizationService', () => {
       // Pre-generate recommendations
       await PerformanceOptimizationService.preGenerateRecommendations(mockUserId);
 
-  // Verify caching attempted
-  expect(mockAsyncStorage.setItem).toHaveBeenCalled();
+      // Verify caching attempted
+      expect(mockAsyncStorage.setItem).toHaveBeenCalled();
     });
 
-    test('should handle feedback processing with database updates', async () => {
+    test('veritabanı güncellemeleri ile geri bildirim işlemeyi yönetmeli', async () => {
       // Setup mocks for feedback processing
       mockAsyncStorage.setItem.mockResolvedValue();
       mockSupabase.from.mockReturnValue({
@@ -563,30 +583,30 @@ describe('PerformanceOptimizationService', () => {
           eq: jest.fn().mockReturnValue({
             single: jest.fn().mockResolvedValue({
               data: { item_ids: ['item-1', 'item-2'] },
-              error: null
-            })
-          })
+              error: null,
+            }),
+          }),
         }),
         update: jest.fn().mockReturnValue({
-          eq: jest.fn().mockResolvedValue({ error: null })
+          eq: jest.fn().mockResolvedValue({ error: null }),
         }),
-        insert: jest.fn().mockResolvedValue({ error: null })
+        insert: jest.fn().mockResolvedValue({ error: null }),
       } as any);
 
       await PerformanceOptimizationService.queueFeedbackForProcessing(mockFeedback);
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'feedback_processing_queue',
-        expect.any(String)
+        expect.any(String),
       );
     });
 
-    test('should maintain performance metrics across operations', async () => {
+    test('işlemler boyunca performans metriklerini korumalı', async () => {
       mockAsyncStorage.setItem.mockResolvedValue();
 
       // Simulate various operations that record metrics
       await PerformanceOptimizationService.optimizeImageLoading('test-image.jpg');
-      
+
       // Check that metrics were recorded
       const summary = PerformanceOptimizationService.getPerformanceSummary();
       expect(summary.avgImageProcessingTime).toBeGreaterThanOrEqual(0);
@@ -597,8 +617,8 @@ describe('PerformanceOptimizationService', () => {
   // PERFORMANCE BENCHMARKS
   // ========================================================================
 
-  describe('Performance Benchmarks', () => {
-    test('recommendation caching should be fast', async () => {
+  describe('Performans Kıyaslamaları', () => {
+    test('öneri önbellekleme hızlı olmalı', async () => {
       mockAsyncStorage.setItem.mockResolvedValue();
 
       const startTime = Date.now();
@@ -609,11 +629,11 @@ describe('PerformanceOptimizationService', () => {
       expect(duration).toBeLessThan(100); // Should complete in under 100ms
     });
 
-    test('cache retrieval should be fast', async () => {
+    test('önbellek getirme hızlı olmalı', async () => {
       const cachedData = {
         data: mockRecommendations,
         timestamp: Date.now(),
-        expiresAt: Date.now() + 24 * 60 * 60 * 1000
+        expiresAt: Date.now() + 24 * 60 * 60 * 1000,
       };
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(cachedData));
@@ -627,7 +647,7 @@ describe('PerformanceOptimizationService', () => {
       expect(result).toBeTruthy();
     });
 
-    test('should handle large wardrobe datasets efficiently', async () => {
+    test('büyük gardırop veri setlerini verimli şekilde yönetmeli', async () => {
       // Create large wardrobe dataset
       const largeWardrobe: WardrobeItem[] = Array.from({ length: 1000 }, (_, i) => ({
         id: `item-${i}`,
@@ -642,11 +662,11 @@ describe('PerformanceOptimizationService', () => {
           lastWorn: null,
           averageRating: 0,
           complimentsReceived: 0,
-          costPerWear: 0
+          costPerWear: 0,
         },
         usageCount: 0,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       }));
 
       mockAsyncStorage.setItem.mockResolvedValue();

@@ -9,12 +9,14 @@ This design document outlines the complete transformation of AynaModa's interfac
 ### Design System Unification
 
 **Current State Analysis:**
+
 - Multiple conflicting themes: PremiumTheme, EditorialTheme, LuxuryTheme, APP_THEME_V2
 - Inconsistent component libraries across screens
 - Mixed design philosophies creating visual discord
 - Fragmented user experience
 
 **Target Architecture:**
+
 - Single source of truth: APP_THEME_V2 (Digital Zen Garden)
 - Unified component library: Zen Components
 - Consistent visual language across all screens
@@ -47,6 +49,7 @@ Zen Component Library
 ### 1. Unified Theme System (APP_THEME_V2)
 
 **Digital Zen Garden Palette:**
+
 ```typescript
 colors: {
   // Organic Base Colors
@@ -54,7 +57,7 @@ colors: {
   sageGreen: { 50-900 gradient for primary actions },
   liquidGold: { 50-900 gradient for accents },
   inkGray: { 50-900 gradient for text hierarchy },
-  
+
   // Emotional Accents
   whisperWhite: '#FEFEFE',
   cloudGray: '#F5F5F7',
@@ -64,6 +67,7 @@ colors: {
 ```
 
 **Typography Hierarchy:**
+
 ```typescript
 typography: {
   fonts: {
@@ -87,9 +91,11 @@ typography: {
 ### 2. Zen Component Library
 
 #### ZenButton
+
 **Purpose:** Universal button component with organic animations
 **Variants:** primary, secondary, ghost, outline
 **Features:**
+
 - Liquid gold gradient for primary actions
 - Sage green accents for secondary actions
 - Organic spring animations (scale + opacity)
@@ -97,9 +103,11 @@ typography: {
 - Accessibility compliant
 
 #### ZenCard
+
 **Purpose:** Universal container with glassmorphism support
 **Variants:** surface, glass, elevated, subtle
 **Features:**
+
 - Organic border radius (20px)
 - Sophisticated elevation system
 - Optional glassmorphism with blur effects
@@ -107,8 +115,10 @@ typography: {
 - Consistent padding and spacing
 
 #### ZenProductCard
+
 **Purpose:** Product display with premium styling
 **Features:**
+
 - Elegant image loading with shimmer
 - Graceful error handling with placeholder
 - Optional like button with heart animation
@@ -118,49 +128,60 @@ typography: {
 ### 3. Screen-Specific Enhancements
 
 #### Home Screen Transformation
+
 **Current Issues:** Mixed PremiumTheme usage, inconsistent styling
 **Design Solution:**
+
 - Hero section with organic glassmorphism overlay
 - Staggered product grid with Zen cards
 - Floating category chips with sage green accents
 - Smooth scroll animations with parallax effects
 
 **Key Improvements:**
+
 ```typescript
 // Before: Mixed theme usage
-backgroundColor: PremiumTheme.colors.background
+backgroundColor: PremiumTheme.colors.background;
 
 // After: Unified theme
-backgroundColor: APP_THEME_V2.semantic.background
+backgroundColor: APP_THEME_V2.semantic.background;
 ```
 
 #### Wardrobe Screen Enhancement
+
 **Current Issues:** Basic grid layout, minimal visual hierarchy
 **Design Solution:**
+
 - Masonry layout for dynamic item sizing
 - Floating action button with liquid gold accent
 - Empty state with encouraging micro-copy
 - Category filtering with smooth transitions
 
 #### Discover Screen Refinement
+
 **Current Issues:** Basic card stack, limited visual feedback
 **Design Solution:**
+
 - Enhanced card stack with depth shadows
 - Organic overlay animations (sage green for like, charcoal for pass)
 - Improved gesture feedback with haptic responses
 - Elegant empty state with sparkle iconography
 
 #### Profile Screen Sophistication
+
 **Current Issues:** Basic list layout, minimal visual interest
 **Design Solution:**
+
 - Elevated user card with avatar shadows
 - Statistics cards with liquid gold accents
 - Grouped settings with subtle dividers
 - Consistent icon treatment with linen backgrounds
 
 #### AYNA Mirror Premium Experience
+
 **Current Issues:** Already uses APP_THEME_V2 but needs component unification
 **Design Solution:**
+
 - Enhanced outfit cards with glassmorphism
 - Confidence notes with sparkle iconography
 - Floating settings button with organic shadows
@@ -169,6 +190,7 @@ backgroundColor: APP_THEME_V2.semantic.background
 ## Data Models
 
 ### Theme Configuration
+
 ```typescript
 interface ZenTheme {
   colors: OrganicPalette;
@@ -182,6 +204,7 @@ interface ZenTheme {
 ```
 
 ### Component Props
+
 ```typescript
 interface ZenButtonProps {
   title: string;
@@ -206,6 +229,7 @@ interface ZenCardProps {
 ## Error Handling
 
 ### Graceful Degradation Strategy
+
 1. **Image Loading Failures**
    - Elegant placeholder with organic iconography
    - Shimmer loading states with linen colors
@@ -222,6 +246,7 @@ interface ZenCardProps {
    - User-friendly error messages with actionable guidance
 
 ### Accessibility Compliance
+
 1. **Screen Reader Support**
    - Semantic labeling for all interactive elements
    - Proper heading hierarchy with typography scale
@@ -240,6 +265,7 @@ interface ZenCardProps {
 ## Testing Strategy
 
 ### Visual Regression Testing
+
 1. **Component Library Testing**
    - Storybook integration for all Zen components
    - Visual diff testing across device sizes
@@ -251,6 +277,7 @@ interface ZenCardProps {
    - Performance impact assessment
 
 ### User Experience Testing
+
 1. **Interaction Testing**
    - Animation smoothness validation
    - Gesture response accuracy
@@ -262,6 +289,7 @@ interface ZenCardProps {
    - Color contrast measurements
 
 ### Performance Testing
+
 1. **Rendering Performance**
    - Component mount/unmount times
    - Animation frame rate consistency
@@ -275,13 +303,16 @@ interface ZenCardProps {
 ## Implementation Phases
 
 ### Phase 1: Foundation (Completed)
+
 ✅ **Core Component Library**
+
 - ZenButton implementation
-- ZenCard implementation  
+- ZenCard implementation
 - ZenProductCard implementation
 - APP_THEME_V2 integration
 
 ✅ **Screen Transformations**
+
 - Home screen conversion
 - Wardrobe screen conversion
 - Discover screen conversion
@@ -289,25 +320,31 @@ interface ZenCardProps {
 - Profile screen conversion
 
 ### Phase 2: Enhancement (Next)
+
 🔄 **Advanced Components**
+
 - ZenInput with floating labels
 - ZenHeader with glassmorphism
 - ZenSection with organic spacing
 - ZenTabBar with liquid animations
 
 🔄 **Navigation Unification**
+
 - Remove EditorialTheme/PremiumTheme dependencies
 - Implement unified navigation styling
 - Add smooth transition animations
 
 ### Phase 3: Polish (Final)
+
 ⏳ **Micro-Interactions**
+
 - Wave of light animations for favorites
 - Organic loading states
 - Contextual haptic feedback
 - Smooth page transitions
 
 ⏳ **Advanced Features**
+
 - Dynamic theme adaptation
 - Seasonal color variations
 - Personalized accent colors
@@ -316,17 +353,20 @@ interface ZenCardProps {
 ## Success Metrics
 
 ### Visual Consistency
+
 - 100% of screens using APP_THEME_V2
 - 0 references to deprecated themes
 - Consistent component usage across features
 
 ### User Experience
+
 - Improved app store ratings (target: 4.8+)
 - Reduced user interface complaints
 - Increased session duration
 - Higher feature discovery rates
 
 ### Technical Performance
+
 - Maintained 60fps animations
 - No increase in bundle size
 - Improved accessibility scores

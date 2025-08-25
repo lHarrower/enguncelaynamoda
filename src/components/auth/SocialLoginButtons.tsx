@@ -1,12 +1,7 @@
 // Social Login Buttons Component
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 export interface SocialLoginButtonsProps {
@@ -25,14 +20,11 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   const { triggerSelection } = useHapticFeedback();
 
   const handleSocialLogin = (provider: string, callback?: () => void) => {
-    triggerSelection();
+    void triggerSelection();
     if (callback) {
       callback();
     } else {
-      Alert.alert(
-        'Coming Soon',
-        `${provider} login will be available in a future update.`
-      );
+      Alert.alert('Coming Soon', `${provider} login will be available in a future update.`);
     }
   };
 
@@ -43,7 +35,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         <Text style={styles.dividerText}>Or continue with</Text>
         <View style={styles.dividerLine} />
       </View>
-      
+
       <View style={styles.buttonsContainer}>
         <TouchableOpacity
           style={[styles.socialButton, disabled && styles.socialButtonDisabled]}
@@ -52,7 +44,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         >
           <Text style={styles.socialButtonText}>Google</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.socialButton, disabled && styles.socialButtonDisabled]}
           onPress={() => handleSocialLogin('Apple', onAppleLogin)}
@@ -60,7 +52,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
         >
           <Text style={styles.socialButtonText}>Apple</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.socialButton, disabled && styles.socialButtonDisabled]}
           onPress={() => handleSocialLogin('Facebook', onFacebookLogin)}
@@ -74,46 +66,46 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
 };
 
 const styles = StyleSheet.create({
+  buttonsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'space-between',
+  },
   container: {
     marginVertical: 24,
   },
   divider: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     marginBottom: 24,
   },
   dividerLine: {
+    backgroundColor: '#E5E7EB',
     flex: 1,
     height: 1,
-    backgroundColor: '#E5E7EB',
   },
   dividerText: {
-    marginHorizontal: 16,
-    fontSize: 14,
     color: '#6B7280',
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
+    fontSize: 14,
+    marginHorizontal: 16,
   },
   socialButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingVertical: 12,
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    borderWidth: 1,
+    flex: 1,
+    paddingVertical: 12,
   },
   socialButtonDisabled: {
     backgroundColor: '#F3F4F6',
     borderColor: '#E5E7EB',
   },
   socialButtonText: {
+    color: '#374151',
     fontSize: 14,
     fontWeight: '500',
-    color: '#374151',
   },
 });
 

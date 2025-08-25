@@ -10,23 +10,23 @@ import { TextStyle, ViewStyle } from 'react-native';
 // The Muted, Cohesive Palette
 export const AuraColors = {
   // Primary: The Foundation
-  vellum: '#F8F7F4',              // Warm, textured off-white - the paper of luxury
-  inkGray: '#333333',             // Deep, confident text - the weight of words
-  
+  vellum: '#F8F7F4', // Warm, textured off-white - the paper of luxury
+  inkGray: '#333333', // Deep, confident text - the weight of words
+
   // Accent: Used Intentionally and Sparingly
-  polishedJade: '#7A9E9F',        // Primary accent - moments of serenity
-  softGold: '#D4AF37',            // Secondary accent - moments of celebration
-  
+  polishedJade: '#7A9E9F', // Primary accent - moments of serenity
+  softGold: '#D4AF37', // Secondary accent - moments of celebration
+
   // Supporting Tones
-  whisper: '#F5F4F2',             // Lighter than vellum - for subtle layers
-  shadow: '#1A1A1A',              // Deeper than ink - for emphasis
+  whisper: '#F5F4F2', // Lighter than vellum - for subtle layers
+  shadow: '#1A1A1A', // Deeper than ink - for emphasis
   mist: 'rgba(51, 51, 51, 0.05)', // Softest gray - for boundaries
-  
+
   // Material Overlays
   frostedGlass: 'rgba(248, 247, 244, 0.85)',
   deepFrost: 'rgba(248, 247, 244, 0.95)',
   veil: 'rgba(248, 247, 244, 0.4)',
-  
+
   // Interaction States
   touchRipple: 'rgba(122, 158, 159, 0.1)',
   goldShimmer: 'rgba(212, 175, 55, 0.15)',
@@ -43,7 +43,7 @@ export const AuraTypography = {
     letterSpacing: -1,
     color: AuraColors.inkGray,
   } as TextStyle,
-  
+
   title: {
     fontFamily: 'Playfair Display',
     fontSize: 32,
@@ -52,7 +52,7 @@ export const AuraTypography = {
     letterSpacing: -0.5,
     color: AuraColors.inkGray,
   } as TextStyle,
-  
+
   subtitle: {
     fontFamily: 'Playfair Display',
     fontSize: 24,
@@ -61,7 +61,7 @@ export const AuraTypography = {
     letterSpacing: 0,
     color: AuraColors.inkGray,
   } as TextStyle,
-  
+
   // Body Hierarchy - Manrope
   body: {
     fontFamily: 'Manrope',
@@ -71,7 +71,7 @@ export const AuraTypography = {
     letterSpacing: 0.2,
     color: AuraColors.inkGray,
   } as TextStyle,
-  
+
   bodyLight: {
     fontFamily: 'Manrope',
     fontSize: 16,
@@ -80,7 +80,7 @@ export const AuraTypography = {
     letterSpacing: 0.3,
     color: AuraColors.inkGray,
   } as TextStyle,
-  
+
   caption: {
     fontFamily: 'Manrope',
     fontSize: 14,
@@ -90,7 +90,7 @@ export const AuraTypography = {
     color: AuraColors.inkGray,
     opacity: 0.8,
   } as TextStyle,
-  
+
   whisper: {
     fontFamily: 'Manrope',
     fontSize: 12,
@@ -100,7 +100,7 @@ export const AuraTypography = {
     color: AuraColors.inkGray,
     opacity: 0.6,
   } as TextStyle,
-  
+
   // Special Purpose
   button: {
     fontFamily: 'Manrope',
@@ -115,23 +115,23 @@ export const AuraTypography = {
 // Atmosphere of Breathable Space
 export const AuraSpacing = {
   // Micro Spaces
-  atom: 4,      // Smallest unit
-  molecule: 8,  // Base unit
-  
+  atom: 4, // Smallest unit
+  molecule: 8, // Base unit
+
   // Component Spaces
-  xs: 12,       // Tight grouping
-  sm: 16,       // Standard spacing
-  md: 24,       // Comfortable spacing
-  lg: 32,       // Generous spacing
-  xl: 48,       // Luxurious spacing
-  xxl: 64,      // Statement spacing
-  xxxl: 96,     // Dramatic spacing
-  
+  xs: 12, // Tight grouping
+  sm: 16, // Standard spacing
+  md: 24, // Comfortable spacing
+  lg: 32, // Generous spacing
+  xl: 48, // Luxurious spacing
+  xxl: 64, // Statement spacing
+  xxxl: 96, // Dramatic spacing
+
   // Semantic Spaces
-  breathe: 40,          // Standard breathing room
-  exhale: 80,           // Generous breathing room
-  pause: 120,           // Dramatic pause
-  screenPadding: 24,    // Consistent screen margins
+  breathe: 40, // Standard breathing room
+  exhale: 80, // Generous breathing room
+  pause: 120, // Dramatic pause
+  screenPadding: 24, // Consistent screen margins
 } as const;
 
 // PRINCIPLE II: GENTLE CONFIDENCE
@@ -146,22 +146,22 @@ export const AuraMotion = {
     considered: 700,
     cinematic: 1000,
   },
-  
+
   // Custom Curves - Real-World Physics
   curves: {
     // Standard ease with subtle acceleration
     confidence: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-    
+
     // Gentle overshoot for modals and important elements
     overshoot: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
-    
+
     // Smooth deceleration for dismissals
     settle: 'cubic-bezier(0.0, 0.0, 0.2, 1)',
-    
+
     // Elastic bounce for delightful moments
     delight: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
   },
-  
+
   // Threshold Transitions
   threshold: {
     fadeInUp: {
@@ -191,7 +191,7 @@ export const AuraMaterials = {
     backgroundColor: AuraColors.vellum,
     // Subtle texture will be added via noise overlay
   } as ViewStyle,
-  
+
   // The Frosted Glass Layers
   frostedGlass: {
     light: {
@@ -199,20 +199,20 @@ export const AuraMaterials = {
       backdropFilter: 'blur(20px)',
       '-webkit-backdrop-filter': 'blur(20px)',
     } as ViewStyle,
-    
+
     heavy: {
       backgroundColor: AuraColors.deepFrost,
       backdropFilter: 'blur(30px)',
       '-webkit-backdrop-filter': 'blur(30px)',
     } as ViewStyle,
-    
+
     subtle: {
       backgroundColor: AuraColors.veil,
       backdropFilter: 'blur(10px)',
       '-webkit-backdrop-filter': 'blur(10px)',
     } as ViewStyle,
   },
-  
+
   // Elevation System - Subtle and Refined
   elevation: {
     rest: {
@@ -222,7 +222,7 @@ export const AuraMaterials = {
       shadowRadius: 4,
       elevation: 2,
     } as ViewStyle,
-    
+
     hover: {
       shadowColor: AuraColors.shadow,
       shadowOffset: { width: 0, height: 4 },
@@ -230,7 +230,7 @@ export const AuraMaterials = {
       shadowRadius: 8,
       elevation: 4,
     } as ViewStyle,
-    
+
     lifted: {
       shadowColor: AuraColors.shadow,
       shadowOffset: { width: 0, height: 8 },
@@ -238,7 +238,7 @@ export const AuraMaterials = {
       shadowRadius: 16,
       elevation: 8,
     } as ViewStyle,
-    
+
     floating: {
       shadowColor: AuraColors.shadow,
       shadowOffset: { width: 0, height: 16 },
@@ -247,7 +247,7 @@ export const AuraMaterials = {
       elevation: 12,
     } as ViewStyle,
   },
-  
+
   // Border Radii - Soft and Organic
   borderRadius: {
     subtle: 8,
@@ -270,19 +270,19 @@ export const AuraBorderRadius = {
 export const AuraHaptics = {
   // Light interactions
   whisper: 'impactLight',
-  
+
   // Standard interactions
   touch: 'impactMedium',
-  
+
   // Important moments
   confirm: 'impactHeavy',
-  
+
   // Success states
   success: 'notificationSuccess',
-  
+
   // Warning states
   warning: 'notificationWarning',
-  
+
   // Selection
   selection: 'selection',
 } as const;
@@ -294,7 +294,7 @@ export const AuraComponents = {
     flex: 1,
     backgroundColor: AuraColors.vellum,
   } as ViewStyle,
-  
+
   // The Breathing Card
   card: {
     backgroundColor: AuraColors.whisper,
@@ -302,7 +302,7 @@ export const AuraComponents = {
     padding: AuraSpacing.lg,
     ...AuraMaterials.elevation.rest,
   } as ViewStyle,
-  
+
   // The Gentle Button
   button: {
     primary: {
@@ -312,7 +312,7 @@ export const AuraComponents = {
       paddingHorizontal: AuraSpacing.lg,
       ...AuraMaterials.elevation.hover,
     } as ViewStyle,
-    
+
     secondary: {
       backgroundColor: 'transparent',
       borderWidth: 1,
@@ -321,14 +321,14 @@ export const AuraComponents = {
       paddingVertical: AuraSpacing.sm,
       paddingHorizontal: AuraSpacing.lg,
     } as ViewStyle,
-    
+
     ghost: {
       backgroundColor: 'transparent',
       paddingVertical: AuraSpacing.sm,
       paddingHorizontal: AuraSpacing.lg,
     } as ViewStyle,
   },
-  
+
   // The Liquid Metal Accent
   accent: {
     backgroundColor: AuraColors.softGold,
@@ -357,4 +357,4 @@ export const LuxuryTheme = AuraTheme;
 // Type Exports
 export type AuraThemeType = typeof AuraTheme;
 export type AuraColorKeys = keyof typeof AuraColors;
-export type AuraTypographyKeys = keyof typeof AuraTypography; 
+export type AuraTypographyKeys = keyof typeof AuraTypography;

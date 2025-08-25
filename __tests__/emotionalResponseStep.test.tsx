@@ -4,21 +4,68 @@
 import { EmotionalResponse, EmotionalState } from '@/types/aynaMirror';
 
 describe('EmotionalResponseStep', () => {
-  
   describe('Emotional States and Configuration', () => {
     it('should have all valid emotional states', () => {
       const validEmotions: EmotionalState[] = [
-        'confident', 'comfortable', 'stylish', 'powerful', 'creative', 'elegant', 'playful'
+        'confident',
+        'comfortable',
+        'stylish',
+        'powerful',
+        'creative',
+        'elegant',
+        'playful',
       ];
 
       const emotionConfig = [
-        { state: 'confident', label: 'Confident', emoji: '💪', color: '#FF6B6B', description: 'Ready to take on the world' },
-        { state: 'comfortable', label: 'Comfortable', emoji: '😌', color: '#4ECDC4', description: 'At ease and relaxed' },
-        { state: 'stylish', label: 'Stylish', emoji: '✨', color: '#45B7D1', description: 'Fashion-forward and chic' },
-        { state: 'powerful', label: 'Powerful', emoji: '👑', color: '#F7DC6F', description: 'Strong and commanding' },
-        { state: 'creative', label: 'Creative', emoji: '🎨', color: '#BB8FCE', description: 'Artistic and expressive' },
-        { state: 'elegant', label: 'Elegant', emoji: '🌹', color: '#F1948A', description: 'Graceful and refined' },
-        { state: 'playful', label: 'Playful', emoji: '🦋', color: '#85C1E9', description: 'Fun and spirited' },
+        {
+          state: 'confident',
+          label: 'Confident',
+          emoji: '💪',
+          color: '#FF6B6B',
+          description: 'Ready to take on the world',
+        },
+        {
+          state: 'comfortable',
+          label: 'Comfortable',
+          emoji: '😌',
+          color: '#4ECDC4',
+          description: 'At ease and relaxed',
+        },
+        {
+          state: 'stylish',
+          label: 'Stylish',
+          emoji: '✨',
+          color: '#45B7D1',
+          description: 'Fashion-forward and chic',
+        },
+        {
+          state: 'powerful',
+          label: 'Powerful',
+          emoji: '👑',
+          color: '#F7DC6F',
+          description: 'Strong and commanding',
+        },
+        {
+          state: 'creative',
+          label: 'Creative',
+          emoji: '🎨',
+          color: '#BB8FCE',
+          description: 'Artistic and expressive',
+        },
+        {
+          state: 'elegant',
+          label: 'Elegant',
+          emoji: '🌹',
+          color: '#F1948A',
+          description: 'Graceful and refined',
+        },
+        {
+          state: 'playful',
+          label: 'Playful',
+          emoji: '🦋',
+          color: '#85C1E9',
+          description: 'Fun and spirited',
+        },
       ];
 
       emotionConfig.forEach(({ state, label, emoji, color, description }) => {
@@ -120,10 +167,10 @@ describe('EmotionalResponseStep', () => {
     it('should handle emotion selection callbacks', () => {
       const mockOnEmotionSelect = jest.fn();
       const testEmotion: EmotionalState = 'stylish';
-      
+
       // Simulate emotion selection
       mockOnEmotionSelect(testEmotion);
-      
+
       expect(mockOnEmotionSelect).toHaveBeenCalledWith(testEmotion);
       expect(mockOnEmotionSelect).toHaveBeenCalledTimes(1);
     });
@@ -131,10 +178,10 @@ describe('EmotionalResponseStep', () => {
     it('should handle intensity change callbacks', () => {
       const mockOnIntensityChange = jest.fn();
       const testIntensity = 8;
-      
+
       // Simulate intensity change
       mockOnIntensityChange(testIntensity);
-      
+
       expect(mockOnIntensityChange).toHaveBeenCalledWith(testIntensity);
       expect(mockOnIntensityChange).toHaveBeenCalledTimes(1);
     });
@@ -145,12 +192,12 @@ describe('EmotionalResponseStep', () => {
       const validIntensities = [1, 5, 10];
       const invalidIntensities = [0, 11, -1, 15];
 
-      validIntensities.forEach(intensity => {
+      validIntensities.forEach((intensity) => {
         expect(intensity).toBeGreaterThanOrEqual(1);
         expect(intensity).toBeLessThanOrEqual(10);
       });
 
-      invalidIntensities.forEach(intensity => {
+      invalidIntensities.forEach((intensity) => {
         expect(intensity < 1 || intensity > 10).toBeTruthy();
       });
     });
@@ -175,7 +222,7 @@ describe('EmotionalResponseStep', () => {
 
       expect(Array.isArray(response.additionalEmotions)).toBeTruthy();
       expect(response.additionalEmotions.length).toBe(3);
-      response.additionalEmotions.forEach(emotion => {
+      response.additionalEmotions.forEach((emotion) => {
         expect(typeof emotion).toBe('string');
         expect(emotion.length).toBeGreaterThan(0);
       });

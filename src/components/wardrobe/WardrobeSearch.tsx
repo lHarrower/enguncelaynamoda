@@ -1,12 +1,7 @@
 // Wardrobe Search Component
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Text,
-} from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
+
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 export interface WardrobeSearchProps {
@@ -14,7 +9,7 @@ export interface WardrobeSearchProps {
   onChangeText: (text: string) => void;
   onClear?: () => void;
   placeholder?: string;
-  style?: any;
+  style?: ViewStyle;
   autoFocus?: boolean;
 }
 
@@ -40,7 +35,7 @@ const WardrobeSearch: React.FC<WardrobeSearchProps> = ({
       <View style={styles.searchIcon}>
         <Text style={styles.searchIconText}>🔍</Text>
       </View>
-      
+
       <TextInput
         style={styles.input}
         value={value}
@@ -53,13 +48,19 @@ const WardrobeSearch: React.FC<WardrobeSearchProps> = ({
         returnKeyType="search"
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
+        accessibilityLabel="Search wardrobe"
+        accessibilityHint="Enter text to search through your wardrobe items"
+        accessibilityRole="search"
       />
-      
+
       {value.length > 0 && (
         <TouchableOpacity
           style={styles.clearButton}
           onPress={handleClear}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          accessibilityRole="button"
+          accessibilityLabel="Clear search"
+          accessibilityHint="Clear the search input"
         >
           <Text style={styles.clearButtonText}>✕</Text>
         </TouchableOpacity>
@@ -69,19 +70,28 @@ const WardrobeSearch: React.FC<WardrobeSearchProps> = ({
 };
 
 const styles = StyleSheet.create({
+  clearButton: {
+    marginLeft: 8,
+    padding: 4,
+  },
+  clearButtonText: {
+    color: '#9CA3AF',
+    fontSize: 14,
+  },
   container: {
-    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F3F4F6',
+    borderColor: 'transparent',
     borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: 'row',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: 'transparent',
   },
   focusedContainer: {
     backgroundColor: '#FFFFFF',
     borderColor: '#3B82F6',
+    elevation: 2,
     shadowColor: '#3B82F6',
     shadowOffset: {
       width: 0,
@@ -89,28 +99,19 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+  },
+  input: {
+    color: '#1F2937',
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 4,
   },
   searchIcon: {
     marginRight: 8,
   },
   searchIconText: {
-    fontSize: 16,
     color: '#6B7280',
-  },
-  input: {
-    flex: 1,
     fontSize: 16,
-    color: '#1F2937',
-    paddingVertical: 4,
-  },
-  clearButton: {
-    marginLeft: 8,
-    padding: 4,
-  },
-  clearButtonText: {
-    fontSize: 14,
-    color: '#9CA3AF',
   },
 });
 

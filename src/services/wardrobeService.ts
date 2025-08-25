@@ -1,6 +1,17 @@
 // WardrobeService class wrapper to align with tests and imports
-import { supabase } from '@/config/supabaseClient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../config/supabaseClient';
+import type { WardrobeItemRecord } from '../types/aynaMirror';
+import { logInDev } from '../utils/consoleSuppress';
+import { ConnectionMonitor, dbOptimizer, OptimizedQueries } from '../utils/databaseOptimizations';
+import { safeParse } from '../utils/safeJSON';
+import { secureStorage } from '../utils/secureStorage';
+import { ensureSupabaseOk } from '../utils/supabaseErrorMapping';
+import { isSupabaseOk, wrap } from '../utils/supabaseResult';
+import {
+  databasePerformanceService,
+  executeOptimizedQuery,
+  WardrobeOptimizedQueries,
+} from './databasePerformanceService';
 
 export interface WardrobeItem {
   id: string;
@@ -11,60 +22,392 @@ export interface WardrobeItem {
   color?: string;
   brand?: string;
   price?: number;
+  purchasePrice?: number;
+  purchaseDate?: Date;
   isFavorite?: boolean;
   tags?: string[];
   created_at?: string | Date;
 }
 
+/**
+ * Wardrobe Service - Manages user's clothing items and wardrobe data
+ *
+ * Provides comprehensive wardrobe management functionality including:
+ * - CRUD operations for wardrobe items
+ * - Intelligent caching for performance optimization
+ * - Data transformation between database and domain models
+ * - Offline support with local storage fallback
+ *
+ * Features automatic cache invalidation and error recovery mechanisms
+ * to ensure data consistency and reliability.
+ *
+ * @example
+ * ```typescript
+ * const wardrobeService = new WardrobeService();
+ * const items = await wardrobeService.getWardrobeItems('user123');
+ * await wardrobeService.addWardrobeItem(newItem);
+ * ```
+ */
 export class WardrobeService {
+  /** In-memory cache for wardrobe items by user ID */
   private cache: Map<string, WardrobeItem[]> = new Map();
+  private lastFetchTime = new Map<string, number>();
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  private readonly MAX_CACHE_SIZE = 50; // Maximum number of cached users
+  private readonly CLEANUP_INTERVAL = 10 * 60 * 1000; // 10 minutes
+  private cleanupTimer: ReturnType<typeof setInterval> | null = null;
+  private isDestroyed = false;
 
+  constructor() {
+    this.startCleanupTimer();
+  }
+
+  // Start periodic cache cleanup
+  private startCleanupTimer(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+    }
+
+    this.cleanupTimer = setInterval(() => {
+      this.cleanupExpiredCache();
+    }, this.CLEANUP_INTERVAL);
+  }
+
+  // Clean up expired cache entries and enforce size limits
+  private cleanupExpiredCache(): void {
+    if (this.isDestroyed) {
+      return;
+    }
+
+    const now = Date.now();
+    const expiredKeys: string[] = [];
+
+    // Find expired entries
+    this.lastFetchTime.forEach((fetchTime, userId) => {
+      if (now - fetchTime > this.CACHE_DURATION) {
+        expiredKeys.push(userId);
+      }
+    });
+
+    // Remove expired entries
+    expiredKeys.forEach((userId) => {
+      this.cache.delete(userId);
+      this.lastFetchTime.delete(userId);
+    });
+
+    // Enforce cache size limit (LRU eviction)
+    if (this.cache.size > this.MAX_CACHE_SIZE) {
+      const sortedEntries = Array.from(this.lastFetchTime.entries()).sort(([, a], [, b]) => a - b); // Sort by fetch time (oldest first)
+
+      const entriesToRemove = sortedEntries.slice(0, this.cache.size - this.MAX_CACHE_SIZE);
+      entriesToRemove.forEach(([userId]) => {
+        this.cache.delete(userId);
+        this.lastFetchTime.delete(userId);
+      });
+    }
+  }
+
+  // Check if cache is valid for a user
+  private isCacheValid(userId: string): boolean {
+    if (this.isDestroyed) {
+      return false;
+    }
+
+    const lastFetch = this.lastFetchTime.get(userId);
+    if (!lastFetch) {
+      return false;
+    }
+
+    return Date.now() - lastFetch < this.CACHE_DURATION;
+  }
+
+  // Destroy service and cleanup resources
+  public destroy(): void {
+    this.isDestroyed = true;
+
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
+    }
+
+    this.cache.clear();
+    this.lastFetchTime.clear();
+
+    // Clear related caches
+    OptimizedQueries.clearCacheByPattern('wardrobe');
+  }
+
+  // Get performance metrics for this service
+  public getPerformanceMetrics(): {
+    cacheSize: number;
+    cacheHitRate: number;
+    dbPerformance: ReturnType<typeof dbOptimizer.getPerformanceAnalytics>;
+  } {
+    const cacheStats = OptimizedQueries.getCacheStats();
+    const dbStats = databasePerformanceService.getPerformanceSummary();
+
+    return {
+      cacheSize: this.cache.size,
+      cacheHitRate: cacheStats.hitRate,
+      dbPerformance: dbStats.dbStats,
+    };
+  }
+
+  // Optimize wardrobe table
+  public async optimizeDatabase(): Promise<void> {
+    try {
+      await databasePerformanceService.optimizeTable('wardrobe_items');
+      logInDev('Wardrobe database optimization completed');
+    } catch (error) {
+      logInDev(
+        'Failed to optimize wardrobe database:',
+        error instanceof Error ? error.message : (String(error) as any),
+      );
+    }
+  }
+
+  private toDomain(record: WardrobeItemRecord | Record<string, unknown>): WardrobeItem {
+    const r = record as Record<string, unknown>;
+    const rawColors = (r as { colors?: unknown }).colors;
+    const fallbackColor = (r as { color?: unknown }).color;
+    const colors: string[] = Array.isArray(rawColors)
+      ? rawColors.filter((c): c is string => typeof c === 'string')
+      : typeof fallbackColor === 'string'
+        ? [fallbackColor]
+        : [];
+    return {
+      id: String((r as { id: unknown }).id),
+      name:
+        typeof (r as { name?: unknown }).name === 'string'
+          ? ((r as { name?: unknown }).name as string)
+          : undefined,
+      category:
+        typeof (r as { category?: unknown }).category === 'string'
+          ? ((r as { category?: unknown }).category as string)
+          : 'uncategorised',
+      colors,
+      color: colors[0],
+      brand:
+        typeof (r as { brand?: unknown }).brand === 'string'
+          ? ((r as { brand?: unknown }).brand as string)
+          : undefined,
+      price:
+        typeof (r as { price?: unknown }).price === 'number'
+          ? ((r as { price?: unknown }).price as number)
+          : undefined,
+      isFavorite: Boolean(
+        (r as { is_favorite?: unknown; isFavorite?: unknown }).is_favorite ||
+          (r as { is_favorite?: unknown; isFavorite?: unknown }).isFavorite,
+      ),
+      tags: Array.isArray((r as { tags?: unknown }).tags)
+        ? ((r as { tags?: unknown }).tags as unknown[]).filter(
+            (t): t is string => typeof t === 'string',
+          )
+        : undefined,
+      created_at: ((): string | Date | undefined => {
+        const v = (r as { created_at?: unknown }).created_at;
+        if (typeof v === 'string' || v instanceof Date) {
+          return v;
+        }
+        return undefined;
+      })(),
+    };
+  }
+
+  private normaliseArray(input: unknown): WardrobeItem[] {
+    if (!Array.isArray(input)) {
+      return [];
+    }
+    return input.map((rec) => this.toDomain(rec as Record<string, unknown>));
+  }
+
+  /**
+   * Retrieves all wardrobe items for a user with intelligent caching
+   *
+   * Fetches wardrobe items from the database with automatic caching for performance.
+   * Falls back to local storage cache if network request fails. Supports both
+   * user-specific queries and global item retrieval.
+   *
+   * @param userId - Optional user ID to filter items. If not provided, returns all items
+   * @returns Promise resolving to array of wardrobe items
+   *
+   * @throws {Error} When database query fails and no cached data is available
+   *
+   * @example
+   * ```typescript
+   * const userItems = await wardrobeService.getAllItems('user123');
+   * const allItems = await wardrobeService.getAllItems();
+   * ```
+   */
   async getAllItems(userId?: string): Promise<WardrobeItem[]> {
+    if (this.isDestroyed) {
+      throw new Error('WardrobeService has been destroyed');
+    }
+
     const cacheKey = `all_${userId || 'default'}`;
-    if (this.cache.has(cacheKey)) return this.cache.get(cacheKey)!;
+    if (this.isCacheValid(cacheKey)) {
+      const cachedItems = this.cache.get(cacheKey);
+      if (cachedItems) {
+        // Update access time for LRU
+        this.lastFetchTime.set(cacheKey, Date.now());
+        return [...cachedItems]; // Return a copy to prevent mutations
+      }
+    }
 
     try {
-      let query: any = supabase.from('wardrobe_items').select('*');
-      if (userId) {
-        query = query.eq('user_id', userId).order('created_at', { ascending: false });
+      // Check database health before querying
+      const isHealthy = await ConnectionMonitor.checkHealth();
+      if (!isHealthy) {
+        logInDev('Database unhealthy, using cached data');
+        await secureStorage.initialize();
+        const cached = await secureStorage.getItem('wardrobe_cache');
+        if (cached) {
+          const parsed = safeParse<unknown>(cached, []);
+          if (Array.isArray(parsed)) {
+            return parsed
+              .filter((r): r is Record<string, unknown> => !!r && typeof r === 'object')
+              .map((r) => this.toDomain(r));
+          }
+        }
       }
-      const { data, error } = await query;
-      if (error) throw error;
-      this.cache.set(cacheKey, (data || []) as WardrobeItem[]);
-      await AsyncStorage.setItem('wardrobe_cache', JSON.stringify(data || []));
-      return (data || []) as WardrobeItem[];
+
+      let normalised: WardrobeItem[];
+      if (userId) {
+        // Use optimized query with performance monitoring for user-specific items
+        const items = await this.getItems();
+        normalised = items.slice(0, 1000); // Apply limit
+      } else {
+        // Fallback to direct query for all items (admin use case)
+        const { data, error } = await dbOptimizer.monitorQuery(
+          'getAllItems_global',
+          async () => await (supabase.from('wardrobe_items').select('*') as any),
+        );
+        if (error) {
+          throw error;
+        }
+        normalised = this.normaliseArray(data);
+      }
+
+      // Ensure we don't exceed cache size before adding
+      if (this.cache.size >= this.MAX_CACHE_SIZE && !this.cache.has(cacheKey)) {
+        this.cleanupExpiredCache();
+      }
+
+      this.cache.set(cacheKey, normalised);
+      this.lastFetchTime.set(cacheKey, Date.now());
+      await secureStorage.setItem('wardrobe_cache', JSON.stringify(normalised));
+      return [...normalised]; // Return a copy
     } catch (e) {
-      const cached = await AsyncStorage.getItem('wardrobe_cache');
-      if (cached) return JSON.parse(cached);
+      const cached = await secureStorage.getItem('wardrobe_cache');
+      if (cached) {
+        const parsed = safeParse<unknown>(cached, []);
+        if (Array.isArray(parsed)) {
+          const items = parsed
+            .filter((r): r is Record<string, unknown> => !!r && typeof r === 'object')
+            .map((r) => this.toDomain(r));
+          return [...items]; // Return a copy
+        }
+      }
       throw e;
     }
   }
 
+  /**
+   * Retrieves a specific wardrobe item by its ID
+   *
+   * @param id - Unique identifier of the wardrobe item
+   * @returns Promise resolving to the wardrobe item or null if not found
+   *
+   * @example
+   * ```typescript
+   * const item = await wardrobeService.getItemById('item-123');
+   * if (item) {
+   *   console.log(item.name);
+   * }
+   * ```
+   */
   async getItemById(id: string): Promise<WardrobeItem | null> {
-    const { data, error } = await supabase.from('wardrobe_items').select('*').eq('id', id).single();
-    if (error) return null;
-    return data as WardrobeItem;
+    const data = await executeOptimizedQuery(
+      'SELECT_BY_ID',
+      'wardrobe_items',
+      async () => {
+        const res = await wrap(
+          async () =>
+            await (supabase.from('wardrobe_items').select('*').eq('id', id).single() as any),
+        );
+        if (!isSupabaseOk(res)) {
+          return null;
+        }
+        return res.data;
+      },
+      `wardrobe_item_${id}`,
+      10 * 60 * 1000, // 10 minutes cache for individual items
+    );
+
+    if (!data) {
+      return null;
+    }
+    return this.toDomain(data as Record<string, unknown>);
   }
 
-  // Flexible signature: addItem(item) or addItem(userId, item)
-  async addItem(arg1: string | Partial<WardrobeItem>, arg2?: Partial<WardrobeItem>): Promise<WardrobeItem> {
+  /**
+   * Adds a new item to the wardrobe with flexible parameter handling
+   *
+   * Supports two calling patterns:
+   * - addItem(item) - Adds item for current user
+   * - addItem(userId, item) - Adds item for specific user
+   *
+   * Automatically invalidates cache and generates unique ID if not provided.
+   *
+   * @param arg1 - Either userId (string) or item data (Partial<WardrobeItem>)
+   * @param arg2 - Item data when first argument is userId
+   * @returns Promise resolving to the created wardrobe item
+   *
+   * @throws {Error} When item creation fails or validation errors occur
+   *
+   * @example
+   * ```typescript
+   * // Add item for current user
+   * const item = await wardrobeService.addItem({
+   *   name: 'Blue Jeans',
+   *   category: 'BOTTOMS',
+   *   imageUri: 'path/to/image.jpg'
+   * });
+   *
+   * // Add item for specific user
+   * const item = await wardrobeService.addItem('user123', {
+   *   name: 'Red Dress',
+   *   category: 'DRESSES'
+   * });
+   * ```
+   */
+  async addItem(
+    arg1: string | Partial<WardrobeItem>,
+    arg2?: Partial<WardrobeItem>,
+  ): Promise<WardrobeItem> {
     const item = (typeof arg1 === 'string' ? arg2 : arg1) as Partial<WardrobeItem>;
-    if (!item.name) throw new Error('Item name is required');
+    if (!item.name) {
+      throw new Error('Item name is required');
+    }
     // Normalize single color -> colors array
-    const record: any = {
-      ...item,
-    };
+    const record: Record<string, unknown> = { ...item };
     if (!record.colors && record.color) {
       record.colors = [record.color];
     }
-    const { data, error } = await supabase.from('wardrobe_items').insert(record).select().single();
-    if (error) throw new Error(error.message || 'Insert failed');
+    const res = await wrap(
+      async () => await (supabase.from('wardrobe_items').insert(record).select().single() as any),
+    );
+    const data = ensureSupabaseOk(res, { action: 'addItem' }) as WardrobeItemRecord;
     this.cache.clear();
-    return data as WardrobeItem;
+    return this.toDomain(data);
   }
 
   // Flexible signature: updateItem(id, updates) or updateItem(userId, id, updates)
-  async updateItem(arg1: string, arg2: string | Partial<WardrobeItem>, arg3?: Partial<WardrobeItem>): Promise<WardrobeItem> {
+  async updateItem(
+    arg1: string,
+    arg2: string | Partial<WardrobeItem>,
+    arg3?: Partial<WardrobeItem>,
+  ): Promise<WardrobeItem> {
     let userId: string | undefined;
     let id: string;
     let updates: Partial<WardrobeItem>;
@@ -76,34 +419,42 @@ export class WardrobeService {
       id = arg1;
       updates = arg2 || {};
     }
-    let query: any = supabase.from('wardrobe_items').update(updates).eq('id', id);
-    if (userId) query = query.eq('user_id', userId);
-    const { data, error } = await query.select().single();
-    if (error) throw new Error(error.message || 'Update failed');
+    let query = supabase.from('wardrobe_items').update(updates).eq('id', id);
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+    const res = await wrap(async () => await (query.select().single() as any));
+    const data = ensureSupabaseOk(res, { action: 'updateItem' }) as WardrobeItemRecord;
     this.cache.clear();
-    return data as WardrobeItem;
+    return this.toDomain(data);
   }
 
   async bulkUpdateItems(userId: string, items: WardrobeItem[]): Promise<void> {
-    await supabase.from('wardrobe_items').upsert(items);
+    await (supabase.from('wardrobe_items') as any).upsert(items);
     this.cache.clear();
   }
 
   async bulkUpdate(itemIds: string[], updates: Partial<WardrobeItem>): Promise<void> {
-    const { error } = await supabase.from('wardrobe_items').update(updates).in('id', itemIds);
-    if (error) throw new Error(error.message || 'Bulk update failed');
+    const res = await wrap(
+      async () => await (supabase.from('wardrobe_items').update(updates) as any).in('id', itemIds),
+    );
+    ensureSupabaseOk(res, { action: 'bulkUpdate' });
     this.cache.clear();
   }
 
   async bulkDelete(itemIds: string[]): Promise<void> {
-    const { error } = await supabase.from('wardrobe_items').delete().in('id', itemIds);
-    if (error) throw new Error(error.message || 'Bulk delete failed');
+    const res = await wrap(
+      async () => await (supabase.from('wardrobe_items').delete() as any).in('id', itemIds),
+    );
+    ensureSupabaseOk(res, { action: 'bulkDelete' });
     this.cache.clear();
   }
 
   async deleteItem(id: string): Promise<boolean> {
-    const { error } = await supabase.from('wardrobe_items').delete().eq('id', id);
-    if (error) throw new Error(error.message || 'Delete failed');
+    const res = await wrap(
+      async () => await (supabase.from('wardrobe_items').delete().eq('id', id) as any),
+    );
+    ensureSupabaseOk(res, { action: 'deleteItem' });
     this.cache.clear();
     return true;
   }
@@ -112,72 +463,99 @@ export class WardrobeService {
   async searchItems(arg1: string, arg2?: string): Promise<WardrobeItem[]> {
     const hasUser = typeof arg2 === 'string';
     const userId = hasUser ? arg1 : undefined;
-    const queryText = hasUser ? (arg2 as string) : arg1;
-    // Follow chain mocked in tests: select -> eq(user_id) -> or(...) -> order
-    const like = `%${queryText}%`;
-    let builder: any = (supabase as any).from('wardrobe_items').select('*');
-    if (userId) builder = builder.eq('user_id', userId);
-    const { data, error } = await builder
-      .or(`name.ilike.${like},brand.ilike.${like}`)
-      .order('created_at', { ascending: false });
-    if (error) throw new Error(error.message || 'Search failed');
-    return (data || []) as WardrobeItem[];
+    const queryText = hasUser ? arg2 : arg1;
+
+    if (userId) {
+      // Use enhanced optimized search for user-specific queries
+      const data = await WardrobeOptimizedQueries.searchWardrobeItems(userId, queryText, {
+        limit: 50, // Reasonable limit for search results
+      });
+      return this.normaliseArray(data as unknown);
+    } else {
+      // Fallback to direct query for global search
+      const like = `%${queryText}%`;
+      const res = (await dbOptimizer.monitorQuery(
+        'searchItems_global',
+        async () =>
+          await (supabase.from('wardrobe_items').select('*') as any)
+            .or(`name.ilike.${like},brand.ilike.${like}`)
+            .order('created_at', { ascending: false })
+            .limit(50),
+      )) as any;
+      if (res.error) {
+        throw new Error(`Search items failed: ${res.error.message}`);
+      }
+      const data = res.data;
+      return this.normaliseArray(data);
+    }
   }
 
   async getItemsByCategory(category: string): Promise<WardrobeItem[]> {
-    const { data, error } = await supabase.from('wardrobe_items').select('*').eq('category', category);
-    if (error) throw new Error(error.message || 'Query failed');
-    return (data || []) as WardrobeItem[];
+    const res = await wrap(
+      async () =>
+        await (supabase.from('wardrobe_items').select('*').eq('category', category) as any),
+    );
+    const data = ensureSupabaseOk(res, { action: 'getItemsByCategory' });
+    return this.normaliseArray(data as unknown);
   }
 
   async getItemsByColor(color: string): Promise<WardrobeItem[]> {
     // Using contains on colors array when supported; fallback to filtering client-side
     try {
-      const { data, error } = await (supabase as any)
-        .from('wardrobe_items')
-        .select('*')
-        .contains('colors', [color]);
-      if (error) throw error;
-      return (data || []) as WardrobeItem[];
+      const { data, error } = await (supabase.from('wardrobe_items').select('*') as any).contains(
+        'colors',
+        [color],
+      );
+      if (error) {
+        throw error;
+      }
+      return this.normaliseArray(data);
     } catch {
       const all = await this.getAllItems();
-      return all.filter(i => Array.isArray(i.colors) && i.colors.includes(color));
+      return all.filter((i) => Array.isArray(i.colors) && i.colors.includes(color));
     }
   }
 
   async getItemsByTags(tags: string[]): Promise<WardrobeItem[]> {
     try {
-      const { data, error } = await (supabase as any)
-        .from('wardrobe_items')
-        .select('*')
-        .overlaps('tags', tags);
-      if (error) throw error;
-      return (data || []) as WardrobeItem[];
+      const { data, error } = await (supabase.from('wardrobe_items').select('*') as any).overlaps(
+        'tags',
+        tags,
+      );
+      if (error) {
+        throw error;
+      }
+      return this.normaliseArray(data);
     } catch {
       const all = await this.getAllItems();
-      return all.filter(i => i.tags && i.tags.some(t => tags.includes(t)));
+      return all.filter((i) => i.tags && i.tags.some((t) => tags.includes(t)));
     }
   }
 
   async getFavorites(): Promise<WardrobeItem[]> {
     try {
-      const { data, error } = await supabase.from('wardrobe_items').select('*').eq('is_favorite', true);
-      if (error) throw error;
-      return (data || []) as WardrobeItem[];
+      const { data, error } = await (supabase
+        .from('wardrobe_items')
+        .select('*')
+        .eq('is_favorite', true) as any);
+      if (error) {
+        throw error;
+      }
+      return this.normaliseArray(data);
     } catch {
       const all = await this.getAllItems();
-      return all.filter(i => i.isFavorite);
+      return all.filter((i) => i.isFavorite);
     }
   }
 
   async getRecentlyAdded(limit = 10): Promise<WardrobeItem[]> {
-    const { data, error } = await (supabase as any)
-      .from('wardrobe_items')
-      .select('*')
+    const { data, error } = await (supabase.from('wardrobe_items').select('*') as any)
       .order('created_at', { ascending: false })
       .limit(limit);
-    if (error) throw new Error(error.message || 'Query failed');
-    return (data || []) as WardrobeItem[];
+    if (error) {
+      throw new Error(error.message || 'Query failed');
+    }
+    return this.normaliseArray(data);
   }
 
   async getStatistics(): Promise<{ total: number; byCategory: Record<string, number> }> {
@@ -195,9 +573,11 @@ export class WardrobeService {
   }
 
   async initializeWardrobe(): Promise<WardrobeItem[]> {
-    // Ensure there is at least a minimal wardrobe; seed a placeholder if empty
+    // Ensure there is at least a minimal wardrobe; seed a starter item if empty
     const items = await this.getAllItems();
-    if (items.length > 0) return items;
+    if (items.length > 0) {
+      return items;
+    }
     try {
       await this.addItem({ name: 'First Item', category: 'tops', colors: ['black'] });
     } catch {

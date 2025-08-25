@@ -1,18 +1,15 @@
 // src/components/shared/OutfitCarousel.tsx
 
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+import { ScrollView, StyleSheet, ViewStyle } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface OutfitCarouselProps {
   children: React.ReactNode;
   showsHorizontalScrollIndicator?: boolean;
-  contentContainerStyle?: any;
-  style?: any;
+  contentContainerStyle?: ViewStyle;
+  style?: ViewStyle;
 }
 
 export const OutfitCarousel: React.FC<OutfitCarouselProps> = ({
@@ -25,10 +22,7 @@ export const OutfitCarousel: React.FC<OutfitCarouselProps> = ({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
-      contentContainerStyle={[
-        styles.contentContainer,
-        contentContainerStyle,
-      ]}
+      contentContainerStyle={[styles.contentContainer, contentContainerStyle]}
       style={[styles.container, style]}
       decelerationRate="fast"
       snapToInterval={280} // Approximate card width + margin
@@ -44,9 +38,9 @@ const styles = StyleSheet.create({
     flexGrow: 0,
   },
   contentContainer: {
+    gap: DesignSystem.spacing.lg,
     paddingLeft: DesignSystem.spacing.xl,
     paddingRight: DesignSystem.spacing.xl,
-    gap: DesignSystem.spacing.lg,
   },
 });
 

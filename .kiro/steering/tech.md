@@ -1,12 +1,14 @@
 # AynaModa Technical Stack
 
 ## Framework & Platform
+
 - **Platform**: React Native with Expo SDK 53
 - **Language**: TypeScript (strict mode enabled)
 - **Navigation**: expo-router (file-based routing system)
 - **Architecture**: React Native New Architecture enabled
 
 ## Core Dependencies
+
 - **UI Framework**: React Native with custom components
 - **State Management**: React Context API (AuthContext, ThemeContext)
 - **Animations**: react-native-reanimated for advanced animations
@@ -16,6 +18,7 @@
 - **Authentication**: Supabase Auth with Google/Apple sign-in
 
 ## Key Libraries
+
 - **Fonts**: @expo-google-fonts (Inter, Playfair Display, Karla)
 - **Icons**: @expo/vector-icons (Ionicons)
 - **UI Effects**: expo-blur (glassmorphism), expo-linear-gradient
@@ -23,12 +26,14 @@
 - **Utilities**: date-fns, expo-haptics
 
 ## Development Tools
+
 - **Linting**: ESLint with React Native config
 - **Formatting**: Prettier
 - **Type Checking**: TypeScript with strict configuration
 - **Build System**: Metro bundler
 
 ## Common Commands
+
 ```bash
 # Development
 npm start              # Start Expo development server
@@ -46,11 +51,13 @@ npx eas submit        # Submit to app stores
 ```
 
 ## Environment Setup
+
 - Requires `.env` file with Supabase credentials
 - Google/Apple OAuth configuration needed for social auth
 - EAS CLI for building and deployment
 
 ## Architecture Patterns
+
 - File-based routing with expo-router
 - Context providers for global state
 - Service layer for API interactions

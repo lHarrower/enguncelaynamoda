@@ -28,7 +28,7 @@ const ReactNative = {
   SafeAreaView: mockComponent('SafeAreaView'),
   KeyboardAvoidingView: mockComponent('KeyboardAvoidingView'),
   RefreshControl: mockComponent('RefreshControl'),
-  
+
   // Animated
   Animated: {
     View: mockComponent('Animated.View'),
@@ -98,7 +98,7 @@ const ReactNative = {
     event: jest.fn(() => jest.fn()),
     createAnimatedComponent: jest.fn((component) => component),
   },
-  
+
   // Easing - This is the critical part for fixing the Animation.ts issue
   Easing: {
     linear: jest.fn((t) => t),
@@ -106,7 +106,7 @@ const ReactNative = {
     quad: jest.fn((t) => t * t),
     cubic: jest.fn((t) => t * t * t),
     poly: jest.fn((n) => (t) => Math.pow(t, n)),
-    sin: jest.fn((t) => 1 - Math.cos(t * Math.PI / 2)),
+    sin: jest.fn((t) => 1 - Math.cos((t * Math.PI) / 2)),
     circle: jest.fn((t) => 1 - Math.sqrt(1 - t * t)),
     exp: jest.fn((t) => Math.pow(2, 10 * (t - 1))),
     elastic: jest.fn((bounciness) => (t) => t),
@@ -115,11 +115,13 @@ const ReactNative = {
     bezier: jest.fn((x1, y1, x2, y2) => (t) => t), // Critical for Animation.ts
     in: jest.fn((easing) => easing),
     out: jest.fn((easing) => (t) => 1 - easing(1 - t)),
-    inOut: jest.fn((easing) => (t) => t < 0.5 ? easing(t * 2) / 2 : (2 - easing((1 - t) * 2)) / 2),
-    step0: jest.fn((t) => t >= 1 ? 1 : 0),
-    step1: jest.fn((t) => t > 0 ? 1 : 0),
+    inOut: jest.fn(
+      (easing) => (t) => (t < 0.5 ? easing(t * 2) / 2 : (2 - easing((1 - t) * 2)) / 2),
+    ),
+    step0: jest.fn((t) => (t >= 1 ? 1 : 0)),
+    step1: jest.fn((t) => (t > 0 ? 1 : 0)),
   },
-  
+
   // Dimensions
   Dimensions: {
     get: jest.fn(() => ({
@@ -131,7 +133,7 @@ const ReactNative = {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
   },
-  
+
   // Platform
   Platform: {
     OS: 'ios',
@@ -141,7 +143,7 @@ const ReactNative = {
     isTV: false,
     select: jest.fn((obj) => obj.ios || obj.default),
   },
-  
+
   // StyleSheet
   StyleSheet: {
     create: (styles) => styles,
@@ -163,7 +165,7 @@ const ReactNative = {
     },
     hairlineWidth: 1,
   },
-  
+
   // PixelRatio
   PixelRatio: {
     get: jest.fn(() => 2),
@@ -171,20 +173,20 @@ const ReactNative = {
     getPixelSizeForLayoutSize: jest.fn((layoutSize) => layoutSize * 2),
     roundToNearestPixel: jest.fn((layoutSize) => Math.round(layoutSize)),
   },
-  
+
   // Alert
   Alert: {
     alert: jest.fn(),
     prompt: jest.fn(),
   },
-  
+
   // AppState
   AppState: {
     currentState: 'active',
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
   },
-  
+
   // Keyboard
   Keyboard: {
     addListener: jest.fn(() => ({ remove: jest.fn() })),
@@ -192,7 +194,7 @@ const ReactNative = {
     removeAllListeners: jest.fn(),
     dismiss: jest.fn(),
   },
-  
+
   // Linking
   Linking: {
     openURL: jest.fn(() => Promise.resolve()),
@@ -201,14 +203,14 @@ const ReactNative = {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
   },
-  
+
   // BackHandler
   BackHandler: {
     addEventListener: jest.fn(() => ({ remove: jest.fn() })),
     removeEventListener: jest.fn(),
     exitApp: jest.fn(),
   },
-  
+
   // StatusBar
   StatusBar: {
     setBarStyle: jest.fn(),
@@ -218,7 +220,7 @@ const ReactNative = {
     setTranslucent: jest.fn(),
     currentHeight: 24,
   },
-  
+
   // DeviceEventEmitter
   DeviceEventEmitter: {
     addListener: jest.fn(() => ({ remove: jest.fn() })),
@@ -226,7 +228,7 @@ const ReactNative = {
     removeAllListeners: jest.fn(),
     emit: jest.fn(),
   },
-  
+
   // NativeEventEmitter
   NativeEventEmitter: jest.fn(() => ({
     addListener: jest.fn(() => ({ remove: jest.fn() })),
@@ -234,38 +236,38 @@ const ReactNative = {
     removeAllListeners: jest.fn(),
     emit: jest.fn(),
   })),
-  
+
   // NativeModules
   NativeModules: {},
-  
+
   // findNodeHandle
   findNodeHandle: jest.fn(),
-  
+
   // requireNativeComponent
   requireNativeComponent: jest.fn((name) => mockComponent(name)),
-  
+
   // processColor
   processColor: jest.fn((color) => color),
-  
+
   // ColorPropType
   ColorPropType: jest.fn(),
-  
+
   // EdgeInsetsPropType
   EdgeInsetsPropType: jest.fn(),
-  
+
   // PointPropType
   PointPropType: jest.fn(),
-  
+
   // ViewPropTypes
   ViewPropTypes: {
     style: jest.fn(),
   },
-  
+
   // TextPropTypes
   TextPropTypes: {
     style: jest.fn(),
   },
-  
+
   // ImagePropTypes
   ImagePropTypes: {
     style: jest.fn(),

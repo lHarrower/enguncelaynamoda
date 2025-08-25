@@ -1,20 +1,20 @@
-// Wardrobe Types - Enums and constants for wardrobe management
-// This file provides enum versions of types for easier testing and usage
+// Gardırop Tipleri - Gardırop yönetimi için enum'lar ve sabitler
+// Bu dosya test ve kullanım kolaylığı için tiplerin enum versiyonlarını sağlar
 
 import { ItemCategory } from './aynaMirror';
 
-// Enum version of ItemCategory for easier testing
+// Daha kolay test için ItemCategory'nin enum versiyonu
 export enum WardrobeCategory {
   TOPS = 'tops',
-  BOTTOMS = 'bottoms', 
+  BOTTOMS = 'bottoms',
   SHOES = 'shoes',
   ACCESSORIES = 'accessories',
   OUTERWEAR = 'outerwear',
   DRESSES = 'dresses',
-  ACTIVEWEAR = 'activewear'
+  ACTIVEWEAR = 'activewear',
 }
 
-// Common wardrobe colors enum
+// Yaygın gardırop renkleri enum'u
 export enum WardrobeColor {
   BLACK = 'black',
   WHITE = 'white',
@@ -30,14 +30,14 @@ export enum WardrobeColor {
   GREY = 'grey',
   NAVY = 'navy',
   BEIGE = 'beige',
-  CREAM = 'cream'
+  CREAM = 'cream',
 }
 
-// Type aliases for compatibility
+// Uyumluluk için tip takma adları
 export type WardrobeCategoryType = ItemCategory;
 export type WardrobeColorType = string;
 
-// Helper functions
+// Yardımcı fonksiyonlar
 export const getWardrobeCategoryValues = (): string[] => {
   return Object.values(WardrobeCategory);
 };
@@ -46,7 +46,7 @@ export const getWardrobeColorValues = (): string[] => {
   return Object.values(WardrobeColor);
 };
 
-// Validation functions
+// Doğrulama fonksiyonları
 export const isValidWardrobeCategory = (category: string): category is ItemCategory => {
   return Object.values(WardrobeCategory).includes(category as WardrobeCategory);
 };

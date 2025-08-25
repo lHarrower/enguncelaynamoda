@@ -1,10 +1,20 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import { DesignSystem } from '@/theme/DesignSystem';
+// AYNAMODA Color Palette
+const COLORS = {
+  primary: '#8B6F47',
+  secondary: '#B8A082',
+  background: '#F5F1E8',
+  surface: '#FFFFFF',
+  text: '#2C2C2C',
+  textLight: '#B8A082',
+  border: '#E8DCC6',
+  accent: '#D4AF37',
+};
 
 interface MirrorHeaderProps {
   greetingText: string;
@@ -29,32 +39,19 @@ export const MirrorHeader: React.FC<MirrorHeaderProps> = ({
   }));
 
   return (
-  <Animated.View style={[getHeaderStyle(dimensions), headerAnimatedStyle]}>
+    <Animated.View style={[getHeaderStyle(dimensions), headerAnimatedStyle]}>
       <BlurView intensity={20} style={styles.headerBlur}>
         <LinearGradient
-          colors={[
-            'rgba(255, 255, 255, 0.9)',
-            'rgba(255, 255, 255, 0.7)',
-          ]}
+          colors={['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.7)']}
           style={styles.headerGradient}
         >
           <View style={styles.headerContent}>
-      <Text style={getGreetingTextStyle(dimensions)}>
-              {greetingText}
-            </Text>
-            <Text style={styles.dateText}>
-              {dateText}
-            </Text>
+            <Text style={getGreetingTextStyle(dimensions)}>{greetingText}</Text>
+            <Text style={styles.dateText}>{dateText}</Text>
             {weatherText && (
               <View style={styles.weatherContainer}>
-                <Ionicons
-                  name="partly-sunny-outline"
-                  size={16}
-                  color={DesignSystem.colors.inkGray[600]}
-                />
-                <Text style={styles.weatherText}>
-                  {weatherText}
-                </Text>
+                <Ionicons name="partly-sunny-outline" size={16} color={COLORS.textLight} />
+                <Text style={styles.weatherText}>{weatherText}</Text>
               </View>
             )}
           </View>
@@ -70,37 +67,41 @@ const getHeaderStyle = (dimensions: { headerHeight: number }) => ({
 });
 
 const getGreetingTextStyle = (dimensions: { isTablet: boolean }) => ({
-  ...DesignSystem.typography.heading.h1,
-  color: DesignSystem.colors.inkGray[800],
-  marginBottom: DesignSystem.spacing.xs,
   fontSize: dimensions.isTablet ? 32 : 28,
+  fontWeight: '700' as const,
+  color: COLORS.text,
+  marginBottom: 4,
+  fontFamily: 'Inter',
 });
 
 const styles = StyleSheet.create({
+  dateText: {
+    color: COLORS.textLight,
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '500' as const,
+    marginBottom: 8,
+  },
   headerBlur: {
     flex: 1,
+  },
+  headerContent: {
+    paddingBottom: 20,
+    paddingHorizontal: 24,
   },
   headerGradient: {
     flex: 1,
     justifyContent: 'flex-end',
   },
-  headerContent: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingBottom: DesignSystem.spacing.lg,
-  },
-  dateText: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.inkGray[600],
-    marginBottom: DesignSystem.spacing.sm,
-  },
   weatherContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: DesignSystem.spacing.xs,
+    flexDirection: 'row',
+    gap: 4,
   },
   weatherText: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.inkGray[600],
+    color: COLORS.textLight,
+    fontFamily: 'Inter',
+    fontSize: 14,
     textTransform: 'capitalize',
   },
 });

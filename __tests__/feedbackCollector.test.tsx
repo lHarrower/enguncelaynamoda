@@ -1,10 +1,15 @@
 // Feedback Collection System Tests
 // Tests for the feedback collection components and data validation
 
-import { OutfitFeedback, EmotionalResponse, SocialFeedback, ComfortRating, EmotionalState } from '@/types/aynaMirror';
+import {
+  OutfitFeedback,
+  EmotionalResponse,
+  SocialFeedback,
+  ComfortRating,
+  EmotionalState,
+} from '@/types/aynaMirror';
 
 describe('Feedback Collection System', () => {
-  
   describe('OutfitFeedback Data Structure', () => {
     it('should have all required properties for feedback collection', () => {
       const mockFeedback: OutfitFeedback = {
@@ -45,12 +50,12 @@ describe('Feedback Collection System', () => {
       const validRatings = [1, 2, 3, 4, 5];
       const invalidRatings = [0, 6, -1, 10];
 
-      validRatings.forEach(rating => {
+      validRatings.forEach((rating) => {
         expect(rating).toBeGreaterThanOrEqual(1);
         expect(rating).toBeLessThanOrEqual(5);
       });
 
-      invalidRatings.forEach(rating => {
+      invalidRatings.forEach((rating) => {
         expect(rating < 1 || rating > 5).toBeTruthy();
       });
     });
@@ -59,7 +64,13 @@ describe('Feedback Collection System', () => {
   describe('EmotionalResponse Data Structure', () => {
     it('should have valid emotional states', () => {
       const validEmotions: EmotionalState[] = [
-        'confident', 'comfortable', 'stylish', 'powerful', 'creative', 'elegant', 'playful'
+        'confident',
+        'comfortable',
+        'stylish',
+        'powerful',
+        'creative',
+        'elegant',
+        'playful',
       ];
 
       const mockResponse: EmotionalResponse = {
@@ -78,12 +89,12 @@ describe('Feedback Collection System', () => {
       const validIntensities = [1, 5, 10];
       const invalidIntensities = [0, 11, -1];
 
-      validIntensities.forEach(intensity => {
+      validIntensities.forEach((intensity) => {
         expect(intensity).toBeGreaterThanOrEqual(1);
         expect(intensity).toBeLessThanOrEqual(10);
       });
 
-      invalidIntensities.forEach(intensity => {
+      invalidIntensities.forEach((intensity) => {
         expect(intensity < 1 || intensity > 10).toBeTruthy();
       });
     });
@@ -102,7 +113,7 @@ describe('Feedback Collection System', () => {
       expect(mockComfort.confidence).toBeDefined();
 
       // All ratings should be in valid range
-      Object.values(mockComfort).forEach(rating => {
+      Object.values(mockComfort).forEach((rating) => {
         expect(rating).toBeGreaterThanOrEqual(0);
         expect(rating).toBeLessThanOrEqual(5);
       });
@@ -204,7 +215,7 @@ describe('Feedback Collection System', () => {
       // Test serialization/deserialization
       const serialized = JSON.stringify(feedback);
       const deserialized = JSON.parse(serialized);
-      
+
       expect(deserialized.id).toBe(feedback.id);
       expect(deserialized.confidenceRating).toBe(feedback.confidenceRating);
       expect(deserialized.emotionalResponse.primary).toBe(feedback.emotionalResponse.primary);

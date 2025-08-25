@@ -1,15 +1,16 @@
 /**
  * Button Atom
- * 
+ *
  * The most fundamental interactive element in the design system.
  * Follows the unified design system and supports all button variants.
  */
 
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import { ButtonComponentProps } from '@/types/componentProps';
-import { DesignSystem } from '@/theme/DesignSystem';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { ButtonComponentProps } from '@/types/componentProps';
 
 export interface ButtonProps extends Omit<ButtonComponentProps, 'variant'> {
   title: string;
@@ -42,7 +43,7 @@ const Button: React.FC<ButtonProps> = ({
 
   const handlePress = () => {
     if (!disabled && !loading) {
-  trigger('light');
+      trigger('light');
       onPress();
     }
   };
@@ -78,9 +79,7 @@ const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {leftIcon && <Text style={styles.icon}>{leftIcon}</Text>}
-      <Text style={textStyle}>
-        {loading ? 'Loading...' : title}
-      </Text>
+      <Text style={textStyle}>{loading ? 'Loading...' : title}</Text>
       {rightIcon && <Text style={styles.icon}>{rightIcon}</Text>}
     </TouchableOpacity>
   );
@@ -88,65 +87,65 @@ const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   base: {
-    flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: DesignSystem.borderRadius.md,
+    flexDirection: 'row',
     justifyContent: 'center',
-  borderRadius: DesignSystem.borderRadius.md,
+    minHeight: 44,
     paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
-    minHeight: 44, // Accessibility minimum touch target
+    paddingVertical: DesignSystem.spacing.sm, // Accessibility minimum touch target
   },
-  
+
   // Variants
   primary: {
     backgroundColor: DesignSystem.colors.secondary[500],
   },
   secondary: {
     backgroundColor: DesignSystem.colors.surface.elevated,
-    borderWidth: 1,
     borderColor: DesignSystem.colors.border.primary,
+    borderWidth: 1,
   },
   ghost: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
     borderColor: DesignSystem.colors.secondary[500],
+    borderWidth: 1,
   },
   luxury: {
     backgroundColor: DesignSystem.colors.gold[500],
   },
-  
+
   // Sizes
   small: {
+    minHeight: 36,
     paddingHorizontal: DesignSystem.spacing.sm,
     paddingVertical: DesignSystem.spacing.xs,
-    minHeight: 36,
   },
   medium: {
+    minHeight: 44,
     paddingHorizontal: DesignSystem.spacing.md,
     paddingVertical: DesignSystem.spacing.sm,
-    minHeight: 44,
   },
   large: {
+    minHeight: 52,
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.md,
-    minHeight: 52,
   },
-  
+
   fullWidth: {
     width: '100%',
   },
-  
+
   disabled: {
     opacity: 0.5,
   },
-  
+
   // Text styles
   text: {
     fontFamily: DesignSystem.typography.fontFamily.primary,
     fontWeight: '500',
     textAlign: 'center',
   },
-  
+
   primaryText: {
     color: DesignSystem.colors.text.inverse,
   },
@@ -154,7 +153,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.text.primary,
   },
   ghostText: {
-  color: DesignSystem.colors.secondary[500],
+    color: DesignSystem.colors.secondary[500],
   },
   dangerText: {
     color: DesignSystem.colors.text.inverse,
@@ -162,7 +161,7 @@ const styles = StyleSheet.create({
   luxuryText: {
     color: DesignSystem.colors.text.primary,
   },
-  
+
   smallText: {
     fontSize: 14,
   },
@@ -172,11 +171,11 @@ const styles = StyleSheet.create({
   largeText: {
     fontSize: 18,
   },
-  
+
   disabledText: {
     opacity: 0.7,
   },
-  
+
   icon: {
     marginHorizontal: DesignSystem.spacing.xs,
   },

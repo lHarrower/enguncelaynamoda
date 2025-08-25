@@ -1,0 +1,15 @@
+{
+  "bundle": { "androidReleaseKb": 13500, "iosReleaseKb": 14000, "deltaMaxPercent": 5 },
+  "performance": { "startupP50Ms": 2000, "startupP95Ms": 2600, "jsFrameDropPctMax": 2 },
+  "a11y": { "labelCoverageMin": 0.9, "contrastIssuesMax": 0 },
+  "quality": { "eslintErrorMax": 0, "deadExportsMax": 0 },
+  "security": { "criticalVulnMax": 0, "highVulnMax": 0 },
+  "stability": { "crashFreeMinPct": 99.3 },
+  "coverage": {
+    "statementsMin": 0.85,
+    "branchesMin": 0.7,
+    "linesMin": 0.85,
+    "functionsMin": 0.8,
+    "mutationScoreMin": 0.0
+  }
+}

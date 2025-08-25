@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
-  useSharedValue,
+  Easing,
   useAnimatedStyle,
-  withTiming,
+  useSharedValue,
   withDelay,
   withSequence,
-  Easing,
+  withTiming,
 } from 'react-native-reanimated';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface WaveOfLightProps {
@@ -33,34 +34,40 @@ export const WaveOfLight: React.FC<WaveOfLightProps> = ({
     easing: Easing.out(Easing.cubic),
   };
 
-  const createWaveAnimation = (delay: number) => {
-    return withDelay(
-      delay,
-      withSequence(
-        withTiming(1, {
-          duration: animationConfig.duration * 0.6,
-          easing: animationConfig.easing,
-        }),
-        withTiming(0, {
-          duration: animationConfig.duration * 0.4,
-          easing: Easing.in(Easing.cubic),
-        })
-      )
-    );
-  };
+  const createWaveAnimation = useCallback(
+    (delay: number) => {
+      return withDelay(
+        delay,
+        withSequence(
+          withTiming(1, {
+            duration: animationConfig.duration * 0.6,
+            easing: animationConfig.easing,
+          }),
+          withTiming(0, {
+            duration: animationConfig.duration * 0.4,
+            easing: Easing.in(Easing.cubic),
+          }),
+        ),
+      );
+    },
+    [animationConfig.duration, animationConfig.easing],
+  );
 
-  const createScaleAnimation = (delay: number) => {
-    return withDelay(
-      delay,
-      withSequence(
-        withTiming(2.5, {
-          duration: animationConfig.duration,
-          easing: animationConfig.easing,
-        }),
-        withTiming(0, { duration: 0 })
-      )
-    );
-  };
+  const createScaleAnimation = useCallback(
+    (delay: number) => {
+      return withDelay(
+        delay,
+        withSequence(
+          withTiming(2.5, {
+            duration: animationConfig.duration,
+            easing: animationConfig.easing,
+          }),
+          withTiming(0, { duration: 0 }),
+        ),
+      );
+    },
+    [animationConfig.duration, animationConfig.easing],
+  );
 
   useEffect(() => {
     if (isActive) {
@@ -72,8 +79,8 @@ export const WaveOfLight: React.FC<WaveOfLightProps> = ({
       wave3Scale.value = 0;
       wave3Opacity.value = 0;
 
-  // Start animations with staggered delays
-  const stagger = DesignSystem.motion.duration.quick;
+      // Start animations with staggered delays
+      const stagger = DesignSystem.motion.duration.quick;
 
       // First wave
       wave1Opacity.value = createWaveAnimation(0);
@@ -91,10 +98,21 @@ export const WaveOfLight: React.FC<WaveOfLightProps> = ({
       if (onAnimationComplete) {
         setTimeout(() => {
           onAnimationComplete();
-  }, DesignSystem.motion.duration.graceful);
+        }, DesignSystem.motion.duration.graceful);
       }
     }
-  }, [isActive]);
+  }, [
+    isActive,
+    createScaleAnimation,
+    createWaveAnimation,
+    onAnimationComplete,
+    wave1Opacity,
+    wave1Scale,
+    wave2Opacity,
+    wave2Scale,
+    wave3Opacity,
+    wave3Scale,
+  ]);
 
   const wave1Style = useAnimatedStyle(() => ({
     transform: [{ scale: wave1Scale.value }],
@@ -111,39 +129,47 @@ export const WaveOfLight: React.FC<WaveOfLightProps> = ({
     opacity: wave3Opacity.value,
   }));
 
-  if (!isActive) return null;
+  if (!isActive) {
+    return null;
+  }
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
-      <Animated.View style={[styles.wave, styles.wave1, wave1Style, { width: size, height: size }]} />
-      <Animated.View style={[styles.wave, styles.wave2, wave2Style, { width: size, height: size }]} />
-      <Animated.View style={[styles.wave, styles.wave3, wave3Style, { width: size, height: size }]} />
+      <Animated.View
+        style={[styles.wave, styles.wave1, wave1Style, { width: size, height: size }]}
+      />
+      <Animated.View
+        style={[styles.wave, styles.wave2, wave2Style, { width: size, height: size }]}
+      />
+      <Animated.View
+        style={[styles.wave, styles.wave3, wave3Style, { width: size, height: size }]}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
     pointerEvents: 'none',
+    position: 'absolute',
   },
-  
+
   wave: {
     position: 'absolute',
     borderRadius: 1000, // Large value for perfect circle
     borderWidth: 2,
   },
-  
+
   wave1: {
     borderColor: `${DesignSystem.colors.gold[500]}40`, // 25% opacity
   },
-  
+
   wave2: {
     borderColor: `${DesignSystem.colors.gold[500]}60`, // 37.5% opacity
   },
-  
+
   wave3: {
     borderColor: `${DesignSystem.colors.gold[500]}80`, // 50% opacity
   },

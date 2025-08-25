@@ -1,22 +1,25 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  Animated,
-  Modal,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+import { DesignSystem } from '@/theme/DesignSystem';
+import { warnInDev } from '@/utils/consoleSuppress';
 
 const { width, height } = Dimensions.get('window');
 
 interface ConfidenceLoopProps {
   visible: boolean;
-  outfit: any;
+  outfit: object;
   feedback: string;
   onClose: () => void;
   onContinue: () => void;
@@ -27,26 +30,22 @@ export default function ConfidenceLoop({
   outfit,
   feedback,
   onClose,
-  onContinue
+  onContinue,
 }: ConfidenceLoopProps) {
-  const [currentPhase, setCurrentPhase] = useState<'celebration' | 'feedback' | 'promise'>('celebration');
-  
+  const [currentPhase, setCurrentPhase] = useState<'celebration' | 'feedback' | 'promise'>(
+    'celebration',
+  );
+
   const celebrationAnim = useRef(new Animated.Value(0)).current;
   const feedbackAnim = useRef(new Animated.Value(0)).current;
   const promiseAnim = useRef(new Animated.Value(0)).current;
   const sparkleAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    if (visible) {
-      startCelebrationSequence();
-    }
-  }, [visible]);
-
-  const startCelebrationSequence = () => {
+  const startCelebrationSequence = useCallback(() => {
     // Haptic feedback for celebration
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    
+
     // Start sparkle animation
     Animated.loop(
       Animated.sequence([
@@ -60,7 +59,7 @@ export default function ConfidenceLoop({
           duration: 1000,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
 
     // Start pulse animation
@@ -76,7 +75,7 @@ export default function ConfidenceLoop({
           duration: 800,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     ).start();
 
     // Celebration phase
@@ -90,7 +89,7 @@ export default function ConfidenceLoop({
         showFeedback();
       }, 2000);
     });
-  };
+  }, [sparkleAnim, pulseAnim, celebrationAnim, feedbackAnim, promiseAnim]);
 
   const showFeedback = () => {
     Animated.timing(feedbackAnim, {
@@ -112,6 +111,12 @@ export default function ConfidenceLoop({
       useNativeDriver: true,
     }).start();
   };
+
+  useEffect(() => {
+    if (visible) {
+      startCelebrationSequence();
+    }
+  }, [visible, startCelebrationSequence]);
 
   const handleContinue = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -146,7 +151,7 @@ export default function ConfidenceLoop({
         <View style={styles.successIcon}>
           <Ionicons name="checkmark-circle" size={80} color="#4CAF50" />
         </View>
-        
+
         <Animated.View
           style={[
             styles.sparkleOverlay,
@@ -162,9 +167,7 @@ export default function ConfidenceLoop({
         </Animated.View>
 
         <Text style={styles.celebrationTitle}>Excellent Choice!</Text>
-        <Text style={styles.celebrationSubtitle}>
-          Your style intuition is remarkable
-        </Text>
+        <Text style={styles.celebrationSubtitle}>Your style intuition is remarkable</Text>
       </Animated.View>
     </Animated.View>
   );
@@ -188,16 +191,13 @@ export default function ConfidenceLoop({
     >
       <View style={styles.feedbackContainer}>
         <View style={styles.aiIcon}>
-          <LinearGradient
-            colors={['#D4A574', '#B8956A']}
-            style={styles.aiIconGradient}
-          >
+          <LinearGradient colors={['#D4A574', '#B8956A']} style={styles.aiIconGradient}>
             <Ionicons name="sparkles" size={32} color="#FFFFFF" />
           </LinearGradient>
         </View>
 
         <Text style={styles.feedbackTitle}>AI Style Analysis</Text>
-        
+
         <View style={styles.feedbackCard}>
           <Text style={styles.feedbackText}>{feedback}</Text>
         </View>
@@ -239,10 +239,10 @@ export default function ConfidenceLoop({
         </View>
 
         <Text style={styles.promiseTitle}>Your Style Journey Begins</Text>
-        
+
         <Text style={styles.promiseText}>
-          Every choice you make teaches us more about your unique style. 
-          Tomorrow's recommendations will be even more perfectly tailored to you.
+          Every choice you make teaches us more about your unique style. Tomorrow&apos;s recommendations
+          will be even more perfectly tailored to you.
         </Text>
 
         <View style={styles.promiseFeatures}>
@@ -265,10 +265,7 @@ export default function ConfidenceLoop({
           onPress={handleContinue}
           activeOpacity={0.8}
         >
-          <LinearGradient
-            colors={['#D4A574', '#B8956A']}
-            style={styles.continueGradient}
-          >
+          <LinearGradient colors={['#D4A574', '#B8956A']} style={styles.continueGradient}>
             <Text style={styles.continueText}>Start My Style Journey</Text>
             <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
           </LinearGradient>
@@ -278,12 +275,7 @@ export default function ConfidenceLoop({
   );
 
   return (
-    <Modal
-      visible={visible}
-      animationType="fade"
-      transparent={true}
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} animationType="fade" transparent={true} onRequestClose={onClose}>
       <View style={styles.modalOverlay}>
         <LinearGradient
           colors={['rgba(248, 246, 240, 0.95)', 'rgba(255, 255, 255, 0.95)']}
@@ -304,7 +296,23 @@ export default function ConfidenceLoop({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (styleObj: Record<string, ViewStyle | TextStyle | ImageStyle>) => {
+  try {
+    return StyleSheet.create(styleObj);
+  } catch (error) {
+    warnInDev('StyleSheet.create failed, using fallback styles:', error);
+    // Return a safe fallback with basic styles
+    return {
+      container: { flex: 1 },
+      gradient: { flex: 1 },
+      scrollView: { flex: 1 },
+      content: { padding: 20 },
+      ...styleObj,
+    };
+  }
+};
+
+const styles = createStyles({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -477,7 +485,7 @@ const styles = StyleSheet.create({
   continueText: {
     fontSize: 16,
     fontFamily: 'Inter_600SemiBold',
-    color: '#FFFFFF',
+    color: DesignSystem.colors.text.inverse,
     marginRight: 8,
   },
   backgroundDecoration: {
@@ -493,7 +501,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: 'rgba(212, 165, 116, 0.05)',
+    backgroundColor: DesignSystem.colors.background.overlay,
   },
   topLeft: {
     top: -50,

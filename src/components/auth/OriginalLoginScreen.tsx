@@ -1,22 +1,23 @@
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  KeyboardAvoidingView,
-  ScrollView,
-  Platform,
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import * as Haptics from 'expo-haptics';
-import { useAuth } from '@/context/AuthContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { useAuth } from '@/context/AuthContext';
 
 // Turkish text constants - exactly as specified
 const TURKISH_TEXT = {
@@ -29,7 +30,7 @@ const TURKISH_TEXT = {
   forgotPassword: 'Şifrenizi mi unuttunuz?',
   continueWith: 'veya şununla devam et',
   noAccount: 'Hesabın yok mu?',
-  signup: 'Kayıt Ol'
+  signup: 'Kayıt Ol',
 } as const;
 
 interface OriginalLoginScreenProps {
@@ -57,14 +58,22 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
 
   // Form validation
   const validateEmail = (email: string): string | undefined => {
-    if (!email) return 'E-posta adresi gerekli';
-    if (!/\S+@\S+\.\S+/.test(email)) return 'Geçerli bir e-posta adresi girin';
+    if (!email) {
+      return 'E-posta adresi gerekli';
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return 'Geçerli bir e-posta adresi girin';
+    }
     return undefined;
   };
 
   const validatePassword = (password: string): string | undefined => {
-    if (!password) return 'Şifre gerekli';
-    if (password.length < 6) return 'Şifre en az 6 karakter olmalı';
+    if (!password) {
+      return 'Şifre gerekli';
+    }
+    if (password.length < 6) {
+      return 'Şifre en az 6 karakter olmalı';
+    }
     return undefined;
   };
 
@@ -80,19 +89,19 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
     if (emailErr || passwordErr) {
       setEmailError(emailErr);
       setPasswordError(passwordErr);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       return;
     }
 
     setIsLoading(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     try {
       await signIn(email, password);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    } catch (error: any) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert('Giriş Başarısız', error.message || 'Bir hata oluştu.');
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch (error: unknown) {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert('Giriş Başarısız', error instanceof Error ? error.message : 'Bir hata oluştu.');
     } finally {
       setIsLoading(false);
     }
@@ -102,8 +111,11 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
-    } catch (error: any) {
-      Alert.alert('Google Giriş Başarısız', error.message);
+    } catch (error: unknown) {
+      Alert.alert(
+        'Google Giriş Başarısız',
+        error instanceof Error ? error.message : 'Bir hata oluştu.',
+      );
     } finally {
       setGoogleLoading(false);
     }
@@ -113,8 +125,11 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
     setAppleLoading(true);
     try {
       await signInWithApple();
-    } catch (error: any) {
-      Alert.alert('Apple Giriş Başarısız', error.message);
+    } catch (error: unknown) {
+      Alert.alert(
+        'Apple Giriş Başarısız',
+        error instanceof Error ? error.message : 'Bir hata oluştu.',
+      );
     } finally {
       setAppleLoading(false);
     }
@@ -160,7 +175,9 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
                   value={email}
                   onChangeText={(text) => {
                     setEmail(text);
-                    if (emailError) setEmailError(undefined);
+                    if (emailError) {
+                      setEmailError(undefined);
+                    }
                   }}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -172,7 +189,12 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
 
               {/* Password Input */}
               <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color="#999999" style={styles.inputIcon} />
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={20}
+                  color="#999999"
+                  style={styles.inputIcon}
+                />
                 <TextInput
                   style={styles.input}
                   placeholder={TURKISH_TEXT.passwordLabel}
@@ -180,35 +202,40 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
                   value={password}
                   onChangeText={(text) => {
                     setPassword(text);
-                    if (passwordError) setPasswordError(undefined);
+                    if (passwordError) {
+                      setPasswordError(undefined);
+                    }
                   }}
                   secureTextEntry={!showPassword}
                   autoComplete="password"
                   returnKeyType="done"
-                  onSubmitEditing={handleSignIn}
+                  onSubmitEditing={() => void handleSignIn()}
                 />
                 <TouchableOpacity
                   style={styles.passwordToggle}
                   onPress={() => setShowPassword(!showPassword)}
                 >
-                  <Ionicons 
-                    name={showPassword ? 'eye-off-outline' : 'eye-outline'} 
-                    size={20} 
-                    color="#999999" 
+                  <Ionicons
+                    name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                    size={20}
+                    color="#999999"
                   />
                 </TouchableOpacity>
               </View>
               {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
 
               {/* Forgot Password */}
-              <TouchableOpacity style={styles.forgotPasswordButton} onPress={handleForgotPassword}>
+              <TouchableOpacity
+                style={styles.forgotPasswordButton}
+                onPress={() => void handleForgotPassword()}
+              >
                 <Text style={styles.forgotPasswordText}>{TURKISH_TEXT.forgotPassword}</Text>
               </TouchableOpacity>
 
               {/* Login Button */}
-              <TouchableOpacity 
-                style={[styles.loginButton, isLoading && styles.loginButtonDisabled]} 
-                onPress={handleSignIn} 
+              <TouchableOpacity
+                style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+                onPress={() => void handleSignIn()}
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -223,9 +250,9 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
             <View style={styles.socialSection}>
               <Text style={styles.dividerText}>{TURKISH_TEXT.continueWith}</Text>
               <View style={styles.socialButtonsContainer}>
-                <TouchableOpacity 
-                  style={styles.socialButton} 
-                  onPress={handleGoogleSignIn} 
+                <TouchableOpacity
+                  style={styles.socialButton}
+                  onPress={() => void handleGoogleSignIn()}
                   disabled={isGoogleLoading || isAppleLoading}
                 >
                   {isGoogleLoading ? (
@@ -234,9 +261,9 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
                     <Ionicons name="logo-google" size={24} color="#DB4437" />
                   )}
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.socialButton} 
-                  onPress={handleAppleSignIn} 
+                <TouchableOpacity
+                  style={styles.socialButton}
+                  onPress={() => void handleAppleSignIn()}
                   disabled={isGoogleLoading || isAppleLoading}
                 >
                   {isAppleLoading ? (
@@ -252,7 +279,12 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
             <View style={[styles.registrationSection, { marginBottom: insets.bottom || 24 }]}>
               <Text style={styles.signupPrompt}>
                 {TURKISH_TEXT.noAccount}{' '}
-                <TouchableOpacity onPress={handleSignup}>
+                <TouchableOpacity
+                  onPress={handleSignup}
+                  accessibilityRole="button"
+                  accessibilityLabel="Kayıt Ol"
+                  accessibilityHint="Kayıt olma ekranına git"
+                >
                   <Text style={styles.signupLink}>{TURKISH_TEXT.signup}</Text>
                 </TouchableOpacity>
               </Text>
@@ -265,164 +297,164 @@ const OriginalLoginScreen: React.FC<OriginalLoginScreenProps> = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FAFAFA', // Light gray-white background
-  },
-  safeArea: {
-    flex: 1,
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  contentContainer: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 60,
-  },
   brandSection: {
     alignItems: 'center',
     marginBottom: 48,
     paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    letterSpacing: 2,
-    textAlign: 'center',
-    marginBottom: 24,
-    fontFamily: 'System',
+  container: {
+    backgroundColor: '#FAFAFA',
+    flex: 1, // Light gray-white background
   },
-  welcome: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#1A1A1A',
-    textAlign: 'center',
-    marginBottom: 8,
-    fontFamily: 'System',
-  },
-  subtitle: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: '#666666',
-    textAlign: 'center',
-    fontFamily: 'System',
-  },
-  formSection: {
-    width: '100%',
-    maxWidth: 400,
-  },
-  inputContainer: {
-    width: '100%',
-    height: 56,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    flexDirection: 'row',
+  contentContainer: {
     alignItems: 'center',
-    paddingHorizontal: 16,
-    marginBottom: 16,
-    position: 'relative',
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 60,
   },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1A1A1A',
+  dividerText: {
+    color: '#999999',
     fontFamily: 'System',
-    height: '100%',
-  },
-  passwordToggle: {
-    padding: 4,
+    fontSize: 14,
+    marginBottom: 24,
+    textAlign: 'center',
   },
   errorText: {
-    fontSize: 12,
     color: '#FF4444',
-    marginTop: -12,
+    fontFamily: 'System',
+    fontSize: 12,
     marginBottom: 16,
     marginLeft: 4,
-    fontFamily: 'System',
+    marginTop: -12,
   },
   forgotPasswordButton: {
     alignSelf: 'flex-end',
     marginBottom: 24,
   },
   forgotPasswordText: {
-    fontSize: 14,
     color: '#666666',
     fontFamily: 'System',
+    fontSize: 14,
+  },
+  formSection: {
+    maxWidth: 400,
+    width: '100%',
+  },
+  input: {
+    color: '#1A1A1A',
+    flex: 1,
+    fontFamily: 'System',
+    fontSize: 16,
+    height: '100%',
+  },
+  inputContainer: {
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: 'row',
+    height: 56,
+    marginBottom: 16,
+    paddingHorizontal: 16,
+    position: 'relative',
+    width: '100%',
+  },
+  inputIcon: {
+    marginRight: 12,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   loginButton: {
-    width: '100%',
-    height: 56,
+    alignItems: 'center',
     backgroundColor: '#1A1A1A',
     borderRadius: 12,
-    alignItems: 'center',
+    height: 56,
     justifyContent: 'center',
     marginBottom: 32,
+    width: '100%',
   },
   loginButtonDisabled: {
     backgroundColor: '#999999',
   },
   loginButtonText: {
     color: '#FFFFFF',
+    fontFamily: 'System',
     fontSize: 16,
     fontWeight: '600',
     letterSpacing: 1,
-    fontFamily: 'System',
   },
-  socialSection: {
+  passwordToggle: {
+    padding: 4,
+  },
+  registrationSection: {
     alignItems: 'center',
-    width: '100%',
-    marginBottom: 32,
   },
-  dividerText: {
-    fontSize: 14,
-    color: '#999999',
-    textAlign: 'center',
-    marginBottom: 24,
+  safeArea: {
+    flex: 1,
+  },
+  signupLink: {
+    color: '#1A1A1A',
     fontFamily: 'System',
+    fontSize: 14,
+    fontWeight: '600',
   },
-  socialButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
+  signupPrompt: {
+    color: '#666666',
+    fontFamily: 'System',
+    fontSize: 14,
+    textAlign: 'center',
   },
   socialButton: {
-    width: 56,
-    height: 56,
+    alignItems: 'center',
     backgroundColor: '#FFFFFF',
+    borderColor: '#E0E0E0',
     borderRadius: 28,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    alignItems: 'center',
+    elevation: 2,
+    height: 56,
     justifyContent: 'center',
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    width: 56,
   },
-  registrationSection: {
+  socialButtonsContainer: {
+    flexDirection: 'row',
+    gap: 16,
+    justifyContent: 'center',
+  },
+  socialSection: {
     alignItems: 'center',
+    marginBottom: 32,
+    width: '100%',
   },
-  signupPrompt: {
-    fontSize: 14,
+  subtitle: {
     color: '#666666',
-    textAlign: 'center',
     fontFamily: 'System',
-  },
-  signupLink: {
     fontSize: 14,
+    fontWeight: '400',
+    textAlign: 'center',
+  },
+  title: {
     color: '#1A1A1A',
-    fontWeight: '600',
     fontFamily: 'System',
+    fontSize: 32,
+    fontWeight: '700',
+    letterSpacing: 2,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  welcome: {
+    color: '#1A1A1A',
+    fontFamily: 'System',
+    fontSize: 18,
+    fontWeight: '500',
+    marginBottom: 8,
+    textAlign: 'center',
   },
 });
 

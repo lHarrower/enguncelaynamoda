@@ -1,17 +1,21 @@
 // Gesture Animations - Touch-based interactive animations
-import React, { useRef, useCallback } from 'react';
-import { Dimensions, ViewStyle, Animated } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import { Animated, Dimensions, StyleSheet, ViewStyle } from 'react-native';
 import {
+  GestureHandlerRootView,
   PanGestureHandler,
-  TapGestureHandler,
+  PanGestureHandlerGestureEvent,
   PinchGestureHandler,
+  PinchGestureHandlerGestureEvent,
   State,
-  GestureHandlerRootView
+  TapGestureHandler,
+  TapGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
-import { useSpringAnimation, useFadeAnimation } from '@/hooks/useAnimation';
-import { AnimationSystem, SPRING, TIMING } from '@/theme/foundations/Animation';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+import { useFadeAnimation } from '@/hooks/useAnimation';
+import { SPRING, TIMING } from '@/theme/foundations/Animation';
+
+const { width: _SCREEN_WIDTH, height: _SCREEN_HEIGHT } = Dimensions.get('window');
 
 /**
  * Draggable Component with spring physics
@@ -40,117 +44,134 @@ export const Draggable: React.FC<DraggableProps> = ({
   bounds,
   snapToGrid = false,
   gridSize = 20,
-  disabled = false
+  disabled = false,
 }) => {
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(1)).current;
   const { isReducedMotionEnabled } = useFadeAnimation();
-  
+
   const lastOffset = useRef({ x: 0, y: 0 });
-  
+
   const onGestureEvent = Animated.event(
     [
       {
         nativeEvent: {
           translationX: translateX,
-          translationY: translateY
-        }
-      }
+          translationY: translateY,
+        },
+      },
     ],
-    { useNativeDriver: true }
+    { useNativeDriver: true },
   );
-  
+
   const onHandlerStateChange = useCallback(
-    (event: any) => {
-      if (disabled || isReducedMotionEnabled) return;
-      
+    (event: PanGestureHandlerGestureEvent) => {
+      if (disabled || isReducedMotionEnabled) {
+        return;
+      }
+
       const { state, translationX, translationY } = event.nativeEvent;
-      
+
       switch (state) {
         case State.BEGAN:
-          if (onDragStart) onDragStart();
-          
+          if (onDragStart) {
+            onDragStart();
+          }
+
           // Scale up slightly to indicate drag start
           Animated.spring(scale, {
             toValue: 1.05,
             ...SPRING.gentle,
-            useNativeDriver: true
+            useNativeDriver: true,
           }).start();
           break;
-          
+
         case State.END:
         case State.CANCELLED:
           // Calculate final position
           let finalX = lastOffset.current.x + translationX;
           let finalY = lastOffset.current.y + translationY;
-          
+
           // Apply bounds
           if (bounds) {
-            if (bounds.left !== undefined) finalX = Math.max(bounds.left, finalX);
-            if (bounds.right !== undefined) finalX = Math.min(bounds.right, finalX);
-            if (bounds.top !== undefined) finalY = Math.max(bounds.top, finalY);
-            if (bounds.bottom !== undefined) finalY = Math.min(bounds.bottom, finalY);
+            if (bounds.left !== undefined) {
+              finalX = Math.max(bounds.left, finalX);
+            }
+            if (bounds.right !== undefined) {
+              finalX = Math.min(bounds.right, finalX);
+            }
+            if (bounds.top !== undefined) {
+              finalY = Math.max(bounds.top, finalY);
+            }
+            if (bounds.bottom !== undefined) {
+              finalY = Math.min(bounds.bottom, finalY);
+            }
           }
-          
+
           // Snap to grid if enabled
           if (snapToGrid) {
             finalX = Math.round(finalX / gridSize) * gridSize;
             finalY = Math.round(finalY / gridSize) * gridSize;
           }
-          
+
           // Update last offset
           lastOffset.current = { x: finalX, y: finalY };
-          
+
           // Animate to final position
           Animated.parallel([
             Animated.spring(translateX, {
               toValue: finalX,
               ...SPRING.gentle,
-              useNativeDriver: true
+              useNativeDriver: true,
             }),
             Animated.spring(translateY, {
               toValue: finalY,
               ...SPRING.gentle,
-              useNativeDriver: true
+              useNativeDriver: true,
             }),
             Animated.spring(scale, {
               toValue: 1,
               ...SPRING.gentle,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           ]).start();
-          
-          if (onDragEnd) onDragEnd(finalX, finalY);
+
+          if (onDragEnd) {
+            onDragEnd(finalX, finalY);
+          }
           break;
       }
     },
-    [disabled, isReducedMotionEnabled, onDragStart, onDragEnd, bounds, snapToGrid, gridSize]
+    [
+      disabled,
+      isReducedMotionEnabled,
+      onDragStart,
+      onDragEnd,
+      bounds,
+      snapToGrid,
+      gridSize,
+      scale,
+      translateX,
+      translateY,
+    ],
   );
-  
+
   if (disabled || isReducedMotionEnabled) {
-    return (
-      <Animated.View style={[style]}>
-        {children}
-      </Animated.View>
-    );
+    return <Animated.View style={style}>{children}</Animated.View>;
   }
-  
+
   return (
     <PanGestureHandler
       onGestureEvent={onGestureEvent}
-      onHandlerStateChange={onHandlerStateChange}
+      onHandlerStateChange={(event) => void onHandlerStateChange(event)}
     >
       <Animated.View
         style={[
           style,
           {
-            transform: [
-              { translateX },
-              { translateY },
-              { scale }
-            ]
-          }
+            transform: [{ translateX }, { translateY }, { scale }],
+          },
         ]}
       >
         {children}
@@ -181,34 +202,42 @@ export const Swipeable: React.FC<SwipeableProps> = ({
   onSwipeUp,
   onSwipeDown,
   threshold = 50,
-  disabled = false
+  disabled = false,
 }) => {
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const { isReducedMotionEnabled } = useFadeAnimation();
-  
+
   const onGestureEvent = Animated.event(
     [
       {
         nativeEvent: {
           translationX: translateX,
-          translationY: translateY
-        }
-      }
+          translationY: translateY,
+        },
+      },
     ],
-    { useNativeDriver: true }
+    { useNativeDriver: true },
   );
-  
+
   const onHandlerStateChange = useCallback(
-    (event: any) => {
-      if (disabled) return;
-      
-      const { state, translationX, translationY, velocityX, velocityY } = event.nativeEvent;
-      
+    (event: PanGestureHandlerGestureEvent) => {
+      if (disabled) {
+        return;
+      }
+
+      const {
+        state,
+        translationX,
+        translationY,
+        velocityX: _velocityX,
+        velocityY: _velocityY,
+      } = event.nativeEvent;
+
       if (state === State.END) {
         const absX = Math.abs(translationX);
         const absY = Math.abs(translationY);
-        
+
         // Determine swipe direction
         if (absX > absY && absX > threshold) {
           // Horizontal swipe
@@ -225,49 +254,52 @@ export const Swipeable: React.FC<SwipeableProps> = ({
             onSwipeUp();
           }
         }
-        
+
         // Reset position
         if (!isReducedMotionEnabled) {
           Animated.parallel([
             Animated.spring(translateX, {
               toValue: 0,
               ...SPRING.gentle,
-              useNativeDriver: true
+              useNativeDriver: true,
             }),
             Animated.spring(translateY, {
               toValue: 0,
               ...SPRING.gentle,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           ]).start();
         }
       }
     },
-    [disabled, isReducedMotionEnabled, onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, threshold]
+    [
+      disabled,
+      isReducedMotionEnabled,
+      onSwipeLeft,
+      onSwipeRight,
+      onSwipeUp,
+      onSwipeDown,
+      threshold,
+      translateX,
+      translateY,
+    ],
   );
-  
+
   if (disabled || isReducedMotionEnabled) {
-    return (
-      <Animated.View style={[style]}>
-        {children}
-      </Animated.View>
-    );
+    return <Animated.View style={style}>{children}</Animated.View>;
   }
-  
+
   return (
     <PanGestureHandler
       onGestureEvent={onGestureEvent}
-      onHandlerStateChange={onHandlerStateChange}
+      onHandlerStateChange={(event) => void onHandlerStateChange(event)}
     >
       <Animated.View
         style={[
           style,
           {
-            transform: [
-              { translateX },
-              { translateY }
-            ]
-          }
+            transform: [{ translateX }, { translateY }],
+          },
         ]}
       >
         {children}
@@ -296,64 +328,66 @@ export const Pinchable: React.FC<PinchableProps> = ({
   onPinchEnd,
   minScale = 0.5,
   maxScale = 3,
-  disabled = false
+  disabled = false,
 }) => {
   const scale = useRef(new Animated.Value(1)).current;
   const { isReducedMotionEnabled } = useFadeAnimation();
-  
+
   const lastScale = useRef(1);
-  
+
   const onGestureEvent = Animated.event(
     [
       {
-        nativeEvent: { scale }
-      }
+        nativeEvent: { scale },
+      },
     ],
-    { useNativeDriver: true }
+    { useNativeDriver: true },
   );
-  
+
   const onHandlerStateChange = useCallback(
-    (event: any) => {
-      if (disabled || isReducedMotionEnabled) return;
-      
+    (event: PinchGestureHandlerGestureEvent) => {
+      if (disabled || isReducedMotionEnabled) {
+        return;
+      }
+
       const { state, scale: gestureScale } = event.nativeEvent;
-      
+
       switch (state) {
         case State.BEGAN:
-          if (onPinchStart) onPinchStart();
+          if (onPinchStart) {
+            onPinchStart();
+          }
           break;
-          
+
         case State.END:
         case State.CANCELLED:
           let finalScale = lastScale.current * gestureScale;
-          
+
           // Apply scale bounds
           finalScale = Math.max(minScale, Math.min(maxScale, finalScale));
-          
+
           lastScale.current = finalScale;
-          
+
           // Animate to final scale
           Animated.spring(scale, {
             toValue: finalScale,
             ...SPRING.gentle,
-            useNativeDriver: true
+            useNativeDriver: true,
           }).start();
-          
-          if (onPinchEnd) onPinchEnd(finalScale);
+
+          if (onPinchEnd) {
+            onPinchEnd(finalScale);
+          }
           break;
       }
     },
-    [disabled, isReducedMotionEnabled, onPinchStart, onPinchEnd, minScale, maxScale]
+    [disabled, isReducedMotionEnabled, onPinchStart, onPinchEnd, minScale, maxScale, scale],
   );
-  
+
   if (disabled || isReducedMotionEnabled) {
-    return (
-      <Animated.View style={[style]}>
-        {children}
-      </Animated.View>
-    );
+    return <Animated.View style={style}>{children}</Animated.View>;
   }
-  
+
   return (
     <PinchGestureHandler
       onGestureEvent={onGestureEvent}
@@ -363,8 +397,8 @@ export const Pinchable: React.FC<PinchableProps> = ({
         style={[
           style,
           {
-            transform: [{ scale }]
-          }
+            transform: [{ scale }],
+          },
         ]}
       >
         {children}
@@ -393,81 +427,78 @@ export const Tappable: React.FC<TappableProps> = ({
   onDoubleTap,
   onLongPress,
   pressScale = 0.95,
-  disabled = false
+  disabled = false,
 }) => {
   const scale = useRef(new Animated.Value(1)).current;
   const { isReducedMotionEnabled } = useFadeAnimation();
-  
-  const doubleTapRef = useRef<any>(null);
-  
+
+  const doubleTapRef = useRef<TapGestureHandler>(null);
+
   const animatePress = useCallback(
     (toValue: number) => {
-      if (isReducedMotionEnabled) return;
-      
+      if (isReducedMotionEnabled) {
+        return;
+      }
+
       Animated.spring(scale, {
         toValue,
         ...SPRING.gentle,
-        useNativeDriver: true
+        useNativeDriver: true,
       }).start();
     },
-    [isReducedMotionEnabled]
+    [isReducedMotionEnabled, scale],
   );
-  
+
   const onSingleTapEvent = useCallback(
-    (event: any) => {
-      if (disabled) return;
-      
+    (event: TapGestureHandlerGestureEvent) => {
+      if (disabled) {
+        return;
+      }
+
       const { state } = event.nativeEvent;
-      
+
       if (state === State.BEGAN) {
         animatePress(pressScale);
       } else if (state === State.END) {
         animatePress(1);
-        if (onTap) onTap();
+        if (onTap) {
+          onTap();
+        }
       } else if (state === State.CANCELLED || state === State.FAILED) {
         animatePress(1);
       }
     },
-    [disabled, animatePress, pressScale, onTap]
+    [disabled, animatePress, pressScale, onTap],
   );
-  
+
   const onDoubleTapEvent = useCallback(
-    (event: any) => {
-      if (disabled) return;
-      
+    (event: TapGestureHandlerGestureEvent) => {
+      if (disabled) {
+        return;
+      }
+
       const { state } = event.nativeEvent;
-      
+
       if (state === State.ACTIVE && onDoubleTap) {
         onDoubleTap();
       }
     },
-    [disabled, onDoubleTap]
+    [disabled, onDoubleTap],
   );
-  
+
   if (disabled) {
-    return (
-      <Animated.View style={[style, { opacity: 0.6 }]}>
-        {children}
-      </Animated.View>
-    );
+    return <Animated.View style={[style, styles.disabledOpacity]}>{children}</Animated.View>;
   }
-  
+
   const TapComponent = onDoubleTap ? (
-    <TapGestureHandler
-      ref={doubleTapRef}
-      onHandlerStateChange={onDoubleTapEvent}
-      numberOfTaps={2}
-    >
-      <TapGestureHandler
-        onHandlerStateChange={onSingleTapEvent}
-        waitFor={doubleTapRef}
-      >
+    <TapGestureHandler ref={doubleTapRef} onHandlerStateChange={onDoubleTapEvent} numberOfTaps={2}>
+      <TapGestureHandler onHandlerStateChange={onSingleTapEvent} waitFor={doubleTapRef}>
         <Animated.View
           style={[
             style,
             {
-              transform: isReducedMotionEnabled ? [] : [{ scale }]
-            }
+              transform: isReducedMotionEnabled ? [] : [{ scale }],
+            },
           ]}
         >
           {children}
@@ -480,15 +511,15 @@ export const Tappable: React.FC<TappableProps> = ({
         style={[
           style,
           {
-            transform: isReducedMotionEnabled ? [] : [{ scale }]
-          }
+            transform: isReducedMotionEnabled ? [] : [{ scale }],
+          },
         ]}
       >
         {children}
       </Animated.View>
     </TapGestureHandler>
   );
-  
+
   return TapComponent;
 };
 
@@ -506,50 +537,52 @@ interface PullToRefreshProps {
 export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   children,
   onRefresh,
-  refreshing = false,
+  refreshing: _refreshing = false,
   threshold = 80,
-  style
+  style,
 }) => {
   const translateY = useRef(new Animated.Value(0)).current;
   const refreshOpacity = useRef(new Animated.Value(0)).current;
   const { isReducedMotionEnabled } = useFadeAnimation();
-  
+
   const isRefreshing = useRef(false);
-  
+
   const onGestureEvent = Animated.event(
     [
       {
         nativeEvent: {
-          translationY: translateY
-        }
-      }
+          translationY: translateY,
+        },
+      },
     ],
-    { useNativeDriver: true }
+    { useNativeDriver: true },
   );
-  
+
   const onHandlerStateChange = useCallback(
-    async (event: any) => {
-      if (isReducedMotionEnabled) return;
-      
+    async (event: PanGestureHandlerGestureEvent) => {
+      if (isReducedMotionEnabled) {
+        return;
+      }
+
       const { state, translationY } = event.nativeEvent;
-      
+
       if (state === State.END && translationY > threshold && !isRefreshing.current) {
         isRefreshing.current = true;
-        
+
         // Show refresh indicator
         Animated.parallel([
           Animated.spring(translateY, {
             toValue: threshold,
             ...SPRING.gentle,
-            useNativeDriver: true
+            useNativeDriver: true,
           }),
           Animated.timing(refreshOpacity, {
             toValue: 1,
             duration: TIMING.quick,
-            useNativeDriver: true
-          })
+            useNativeDriver: true,
+          }),
         ]).start();
-        
+
         try {
           await onRefresh();
         } finally {
@@ -558,13 +591,13 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
             Animated.spring(translateY, {
               toValue: 0,
               ...SPRING.gentle,
-              useNativeDriver: true
+              useNativeDriver: true,
             }),
             Animated.timing(refreshOpacity, {
               toValue: 0,
               duration: TIMING.quick,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           ]).start(() => {
             isRefreshing.current = false;
           });
@@ -574,51 +607,45 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
         Animated.spring(translateY, {
           toValue: 0,
           ...SPRING.gentle,
-          useNativeDriver: true
+          useNativeDriver: true,
         }).start();
       }
     },
-    [isReducedMotionEnabled, threshold, onRefresh]
+    [isReducedMotionEnabled, threshold, onRefresh, refreshOpacity, translateY],
   );
-  
+
   if (isReducedMotionEnabled) {
-    return (
-      <Animated.View style={[{ flex: 1 }, style]}>
-        {children}
-      </Animated.View>
-    );
+    return <Animated.View style={[{ flex: 1 }, style]}>{children}</Animated.View>;
   }
-  
+
   return (
     <PanGestureHandler
       onGestureEvent={onGestureEvent}
-      onHandlerStateChange={onHandlerStateChange}
+      onHandlerStateChange={(event) => void onHandlerStateChange(event)}
     >
       <Animated.View
         style={[
           { flex: 1 },
           style,
           {
-            transform: [{ translateY }]
-          }
+            transform: [{ translateY }],
+          },
         ]}
       >
         {/* Refresh Indicator */}
         <Animated.View
-          style={{
-            position: 'absolute',
-            top: -threshold,
-            left: 0,
-            right: 0,
-            height: threshold,
-            justifyContent: 'center',
-            alignItems: 'center',
-            opacity: refreshOpacity
-          }}
+          style={[
+            styles.refreshIndicator,
+            {
+              top: -threshold,
+              height: threshold,
+              opacity: refreshOpacity,
+            },
+          ]}
         >
           {/* Add your refresh indicator here */}
         </Animated.View>
-        
+
         {children}
       </Animated.View>
     </PanGestureHandler>
@@ -633,12 +660,24 @@ interface GestureRootProps {
 }
 
 export const GestureRoot: React.FC<GestureRootProps> = ({ children }) => {
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      {children}
-    </GestureHandlerRootView>
-  );
+  return <GestureHandlerRootView style={styles.gestureRoot}>{children}</GestureHandlerRootView>;
 };
+
+const styles = StyleSheet.create({
+  disabledOpacity: {
+    opacity: 0.6,
+  },
+  gestureRoot: {
+    flex: 1,
+  },
+  refreshIndicator: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+  },
+});
 
 export default {
   Draggable,
@@ -646,5 +685,5 @@ export default {
   Pinchable,
   Tappable,
   PullToRefresh,
-  GestureRoot
+  GestureRoot,
 };

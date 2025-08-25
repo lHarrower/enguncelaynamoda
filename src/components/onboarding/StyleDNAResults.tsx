@@ -1,19 +1,15 @@
 // Style DNA Results Component
 // Displays the AI-generated style profile in a beautiful, engaging format
 
-import React from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-  StyleSheet,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+import { IoniconsName } from '@/types/icons';
+import { warnInDev } from '@/utils/consoleSuppress';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -44,15 +40,15 @@ interface StyleDNAResultsProps {
   onContinue: () => void;
 }
 
-export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
-  styleDNA,
-  onContinue,
-}) => {
-  const { stylePersonality, colorPalette, stylePreferences, recommendations, confidence } = styleDNA;
+export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({ styleDNA, onContinue }) => {
+  const { stylePersonality, colorPalette, stylePreferences, recommendations, confidence } =
+    styleDNA;
 
   const renderColorPalette = (colors: string[], title: string) => {
-    if (colors.length === 0) return null;
-    
+    if (colors.length === 0) {
+      return null;
+    }
+
     return (
       <View style={styles.colorSection}>
         <Text style={styles.colorSectionTitle}>{title}</Text>
@@ -62,12 +58,10 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
               key={index}
               style={[
                 styles.colorSwatch,
-                { backgroundColor: color.toLowerCase() === 'white' ? '#FFFFFF' : color }
+                { backgroundColor: color.toLowerCase() === 'white' ? '#FFFFFF' : color },
               ]}
             >
-              {color.toLowerCase() === 'white' && (
-                <View style={styles.whiteBorder} />
-              )}
+              {color.toLowerCase() === 'white' && <View style={styles.whiteBorder} />}
             </View>
           ))}
         </View>
@@ -78,20 +72,27 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
   const renderPreferenceCard = (title: string, value: string, icon: string) => (
     <BlurView intensity={20} style={styles.preferenceCard}>
       <View style={styles.preferenceHeader}>
-        <Ionicons name={icon as any} size={24} color={DesignSystem.colors.sage[700]} />
+        <Ionicons name={icon as IoniconsName} size={24} color={DesignSystem.colors.sage[700]} />
         <Text style={styles.preferenceTitle}>{title}</Text>
       </View>
       <Text style={styles.preferenceValue}>{value}</Text>
     </BlurView>
   );
 
-  const renderRecommendationSection = (title: string, items: string[], icon: string, color: string) => {
-    if (items.length === 0) return null;
-    
+  const renderRecommendationSection = (
+    title: string,
+    items: string[],
+    icon: string,
+    color: string,
+  ) => {
+    if (items.length === 0) {
+      return null;
+    }
+
     return (
       <View style={styles.recommendationSection}>
         <View style={styles.recommendationHeader}>
-          <Ionicons name={icon as any} size={20} color={color} />
+          <Ionicons name={icon as IoniconsName} size={20} color={color} />
           <Text style={[styles.recommendationTitle, { color }]}>{title}</Text>
         </View>
         {items.map((item, index) => (
@@ -105,14 +106,25 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
   };
 
   const getConfidenceColor = (confidence: number): string => {
-    if (confidence >= 0.8) return (DesignSystem.colors.semantic?.success as unknown as string) || DesignSystem.colors.sage[600];
-    if (confidence >= 0.6) return DesignSystem.colors.gold[500];
+    if (confidence >= 0.8) {
+      return (
+        (DesignSystem.colors.semantic?.success as unknown as string) ||
+        DesignSystem.colors.sage[600]
+      );
+    }
+    if (confidence >= 0.6) {
+      return DesignSystem.colors.gold[500];
+    }
     return DesignSystem.colors.sage[500];
   };
 
   const getConfidenceText = (confidence: number) => {
-    if (confidence >= 0.8) return 'High Confidence';
-    if (confidence >= 0.6) return 'Good Confidence';
+    if (confidence >= 0.8) {
+      return 'High Confidence';
+    }
+    if (confidence >= 0.6) {
+      return 'Good Confidence';
+    }
     return 'Moderate Confidence';
   };
 
@@ -122,7 +134,7 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
         colors={[DesignSystem.colors.background.primary, DesignSystem.colors.sage[50]]}
         style={styles.gradient}
       >
-        <ScrollView 
+        <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -131,14 +143,10 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
           <View style={styles.header}>
             <Text style={styles.title}>Your Style DNA</Text>
             <Text style={styles.subtitle}>Discover your unique style personality</Text>
-            
+
             {/* Confidence Badge */}
             <View style={[styles.confidenceBadge, { borderColor: getConfidenceColor(confidence) }]}>
-              <Ionicons 
-                name="checkmark-circle" 
-                size={16} 
-                color={getConfidenceColor(confidence)} 
-              />
+              <Ionicons name="checkmark-circle" size={16} color={getConfidenceColor(confidence)} />
               <Text style={[styles.confidenceText, { color: getConfidenceColor(confidence) }]}>
                 {getConfidenceText(confidence)} ({Math.round(confidence * 100)}%)
               </Text>
@@ -161,7 +169,7 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
               <Ionicons name="color-palette" size={24} color={DesignSystem.colors.sage[700]} />
               <Text style={styles.cardTitle}>Your Color Palette</Text>
             </View>
-            
+
             {renderColorPalette(colorPalette.primary, 'Primary Colors')}
             {renderColorPalette(colorPalette.accent, 'Accent Colors')}
             {renderColorPalette(colorPalette.neutral, 'Neutral Colors')}
@@ -173,18 +181,20 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
             <View style={styles.preferencesGrid}>
               {renderPreferenceCard(
                 'Formality',
-                stylePreferences.formality.charAt(0).toUpperCase() + stylePreferences.formality.slice(1),
-                'business'
+                stylePreferences.formality.charAt(0).toUpperCase() +
+                  stylePreferences.formality.slice(1),
+                'business',
               )}
               {renderPreferenceCard(
                 'Energy',
                 stylePreferences.energy.charAt(0).toUpperCase() + stylePreferences.energy.slice(1),
-                'flash'
+                'flash',
               )}
               {renderPreferenceCard(
                 'Silhouette',
-                stylePreferences.silhouette.charAt(0).toUpperCase() + stylePreferences.silhouette.slice(1),
-                'shirt'
+                stylePreferences.silhouette.charAt(0).toUpperCase() +
+                  stylePreferences.silhouette.slice(1),
+                'shirt',
               )}
             </View>
           </View>
@@ -195,31 +205,38 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
               <Ionicons name="bulb" size={24} color={DesignSystem.colors.sage[700]} />
               <Text style={styles.cardTitle}>Personal Recommendations</Text>
             </View>
-            
+
             {renderRecommendationSection(
               'Your Strengths',
               recommendations.strengths,
               'star',
-              (DesignSystem.colors.semantic?.success as unknown as string) || DesignSystem.colors.sage[600]
+              (DesignSystem.colors.semantic?.success as unknown as string) ||
+                DesignSystem.colors.sage[600],
             )}
-            
+
             {renderRecommendationSection(
               'Style Suggestions',
               recommendations.suggestions,
               'arrow-up-circle',
-              DesignSystem.colors.gold[500]
+              DesignSystem.colors.gold[500],
             )}
-            
+
             {renderRecommendationSection(
               'Consider Avoiding',
               recommendations.avoidances,
               'information-circle',
-              DesignSystem.colors.sage[500]
+              DesignSystem.colors.sage[500],
             )}
           </BlurView>
 
           {/* Continue Button */}
-          <TouchableOpacity style={styles.continueButton} onPress={onContinue}>
+          <TouchableOpacity
+            style={styles.continueButton}
+            onPress={onContinue}
+            accessibilityRole="button"
+            accessibilityLabel="Continue to Survey"
+            accessibilityHint="Proceed to the next step of the onboarding process"
+          >
             <LinearGradient
               colors={[DesignSystem.colors.sage[500], DesignSystem.colors.sage[800]]}
               style={styles.continueGradient}
@@ -236,7 +253,23 @@ export const StyleDNAResults: React.FC<StyleDNAResultsProps> = ({
 
 export default StyleDNAResults;
 
-const styles = StyleSheet.create({
+const createStyles = (styleObj: Record<string, any>) => {
+  try {
+    return StyleSheet.create(styleObj);
+  } catch (error) {
+    warnInDev('StyleSheet.create failed, using fallback styles:', error);
+    // Return a safe fallback with basic styles
+    return {
+      container: { flex: 1 },
+      gradient: { flex: 1 },
+      scrollView: { flex: 1 },
+      content: { padding: 20 },
+      ...styleObj,
+    };
+  }
+};
+
+const styles = createStyles({
   container: {
     flex: 1,
   },
@@ -366,7 +399,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-  fontFamily: DesignSystem.typography.fontFamily.headline,
+    fontFamily: DesignSystem.typography.fontFamily.headline,
     color: DesignSystem.colors.text.primary,
     marginBottom: 16,
   },

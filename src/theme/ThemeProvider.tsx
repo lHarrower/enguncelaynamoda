@@ -1,4 +1,7 @@
-import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+
+import { fireAndForget } from '@/utils/asyncUtils';
+
 import { DesignSystem, DesignSystemType } from './DesignSystem';
 
 // Theme Context
@@ -22,14 +25,14 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [themeReady, setThemeReady] = useState(false);
-  
+
   useEffect(() => {
     // Ensure theme is available even with network issues
     const initializeTheme = async () => {
       try {
         // Add a small delay to ensure DesignSystem is fully loaded
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         // Validate theme structure
         if (DesignSystem && DesignSystem.colors && DesignSystem.typography) {
           setThemeReady(true);
@@ -42,14 +45,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         setThemeReady(true); // Proceed anyway
       }
     };
-    
-    initializeTheme();
+
+    fireAndForget(initializeTheme(), 'initializeTheme');
   }, []);
-  
+
   if (!themeReady) {
     return null; // or a loading component
   }
-  
+
   const themeValue: ThemeContextType = {
     theme: DesignSystem,
     colors: DesignSystem.colors,
@@ -58,14 +61,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     layout: DesignSystem.layout,
     elevation: DesignSystem.elevation,
     borderRadius: DesignSystem.borderRadius,
-    components: DesignSystem.components
+    components: DesignSystem.components,
   };
 
-  return (
-    <ThemeContext.Provider value={themeValue}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={themeValue}>{children}</ThemeContext.Provider>;
 }
 
 // Custom hook to use theme
@@ -91,7 +90,7 @@ export const useThemeWithDark = () => {
   const theme = useTheme();
   return {
     ...theme,
-    isDark: false // Set to false for light theme, or implement dark mode logic
+    isDark: false, // Set to false for light theme, or implement dark mode logic
   };
 };
 

@@ -1,18 +1,14 @@
 // Add Item Button Component
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 export interface AddItemButtonProps {
   onPress: () => void;
   title?: string;
   icon?: string;
-  style?: any;
+  style?: ViewStyle;
   disabled?: boolean;
   variant?: 'primary' | 'secondary' | 'floating';
 }
@@ -57,82 +53,68 @@ const AddItemButton: React.FC<AddItemButtonProps> = ({
   if (variant === 'floating') {
     return (
       <TouchableOpacity
-        style={[
-          getButtonStyle(),
-          disabled && styles.disabledButton,
-          style,
-        ]}
+        style={[getButtonStyle(), disabled && styles.disabledButton, style]}
         onPress={handlePress}
         disabled={disabled}
         activeOpacity={0.8}
+        accessibilityRole="button"
+        accessibilityLabel={title || 'Add item'}
+        accessibilityHint="Tap to add a new item to your wardrobe"
+        accessibilityState={{ disabled }}
       >
-        <Text style={[styles.floatingButtonIcon, disabled && styles.disabledText]}>
-          {icon}
-        </Text>
+        <Text style={[styles.floatingButtonIcon, disabled && styles.disabledText]}>{icon}</Text>
       </TouchableOpacity>
     );
   }
 
   return (
     <TouchableOpacity
-      style={[
-        getButtonStyle(),
-        disabled && styles.disabledButton,
-        style,
-      ]}
+      style={[getButtonStyle(), disabled && styles.disabledButton, style]}
       onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel={title || 'Add item'}
+      accessibilityHint="Tap to add a new item to your wardrobe"
+      accessibilityState={{ disabled }}
     >
       <View style={styles.buttonContent}>
         <Text style={[styles.buttonIcon, getTextStyle(), disabled && styles.disabledText]}>
           {icon}
         </Text>
-        <Text style={[getTextStyle(), disabled && styles.disabledText]}>
-          {title}
-        </Text>
+        <Text style={[getTextStyle(), disabled && styles.disabledText]}>{title}</Text>
       </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  primaryButton: {
-    backgroundColor: '#3B82F6',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+  buttonContent: {
     alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#3B82F6',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    flexDirection: 'row',
   },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: '#3B82F6',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+  buttonIcon: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+  disabledButton: {
+    backgroundColor: '#9CA3AF',
+    elevation: 0,
+    shadowOpacity: 0,
+  },
+  disabledText: {
+    color: '#D1D5DB',
   },
   floatingButton: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#3B82F6',
     alignItems: 'center',
+    backgroundColor: '#3B82F6',
+    borderRadius: 28,
+    bottom: 24,
+    elevation: 8,
+    height: 56,
     justifyContent: 'center',
+    position: 'absolute',
+    right: 24,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -140,38 +122,48 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 8,
-  },
-  disabledButton: {
-    backgroundColor: '#9CA3AF',
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  buttonIcon: {
-    fontSize: 18,
-    marginRight: 8,
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  secondaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#3B82F6',
+    width: 56,
   },
   floatingButtonIcon: {
+    color: '#FFFFFF',
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
   },
-  disabledText: {
-    color: '#D1D5DB',
+  primaryButton: {
+    alignItems: 'center',
+    backgroundColor: '#3B82F6',
+    borderRadius: 12,
+    elevation: 8,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    shadowColor: '#3B82F6',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  primaryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderColor: '#3B82F6',
+    borderRadius: 12,
+    borderWidth: 2,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+  },
+  secondaryButtonText: {
+    color: '#3B82F6',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

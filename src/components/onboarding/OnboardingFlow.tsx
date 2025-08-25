@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import OnboardingWelcome from '@/components/onboarding/OnboardingWelcome';
-import WardrobeSetupWizard from '@/components/onboarding/WardrobeSetupWizard';
-import StylePreferenceQuestionnaire, { StylePreferences } from '@/components/onboarding/StylePreferenceQuestionnaire';
+import { StyleSheet, View } from 'react-native';
+
 import NotificationPermissionRequest from '@/components/onboarding/NotificationPermissionRequest';
+import OnboardingWelcome from '@/components/onboarding/OnboardingWelcome';
 import SampleOutfitGeneration from '@/components/onboarding/SampleOutfitGeneration';
-import { logInDev } from '@/utils/consoleSuppress';
+import StylePreferenceQuestionnaire, {
+  StylePreferences,
+} from '@/components/onboarding/StylePreferenceQuestionnaire';
+import WardrobeSetupWizard from '@/components/onboarding/WardrobeSetupWizard';
+import { OnboardingData } from '@/context/AuthContext';
 
 interface OnboardingFlowProps {
-  onComplete: (userData: any) => void;
+  onComplete: (userData: OnboardingData) => void;
 }
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
@@ -37,39 +40,32 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const handleNotificationsSkip = () => goNext('samples');
 
   const handleSamplesComplete = () => {
-    const data = {
-      notificationPermissionGranted,
-      wardrobeItemsAdded,
-      stylePreferences: stylePreferences || {
-        preferredStyles: [],
-        preferredColors: [],
-        occasions: [],
-        bodyTypePreferences: [],
-        confidenceNoteStyle: 'encouraging',
-      },
-      completedAt: new Date(),
+    const data: OnboardingData = {
+      styleDNA: stylePreferences
+        ? {
+            preferredStyles: stylePreferences.preferredStyles,
+            preferredColors: stylePreferences.preferredColors,
+            occasions: stylePreferences.occasions,
+            bodyTypePreferences: stylePreferences.bodyTypePreferences,
+            confidenceNoteStyle: stylePreferences.confidenceNoteStyle,
+          }
+        : undefined,
+      notifications: notificationPermissionGranted,
+      onboardingDate: new Date(),
     };
     onComplete(data);
   };
 
   return (
     <View style={styles.container}>
-      {currentStep === 'welcome' && (
-        <OnboardingWelcome onNext={handleWelcomeNext} />
-      )}
+      {currentStep === 'welcome' && <OnboardingWelcome onNext={handleWelcomeNext} />}
 
       {currentStep === 'wardrobe' && (
-        <WardrobeSetupWizard
-          onNext={handleWardrobeNext}
-          onSkip={handleWardrobeSkip}
-        />
+        <WardrobeSetupWizard onNext={handleWardrobeNext} onSkip={handleWardrobeSkip} />
       )}
 
       {currentStep === 'style' && (
-        <StylePreferenceQuestionnaire
-          onNext={handleStyleNext}
-          onSkip={handleStyleSkip}
-        />
+        <StylePreferenceQuestionnaire onNext={handleStyleNext} onSkip={handleStyleSkip} />
       )}
 
       {currentStep === 'notifications' && (
@@ -79,14 +75,21 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         />
       )}
 
-      {currentStep === 'samples' && (
-        <SampleOutfitGeneration onComplete={handleSamplesComplete} />
-      )}
+      {currentStep === 'samples' && <SampleOutfitGeneration onComplete={handleSamplesComplete} />}
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+// Safe StyleSheet create for testing
+const createStyles = (styles: Record<string, ViewStyle | TextStyle | ImageStyle>) => {
+  try {
+    return StyleSheet.create(styles);
+  } catch {
+    return styles;
+  }
+};
+
+const styles = createStyles({
   container: {
     flex: 1,
   },

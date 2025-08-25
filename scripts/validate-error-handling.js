@@ -36,11 +36,11 @@ const requiredFeatures = [
   'syncPendingOperations',
   'syncPendingFeedback',
   'getUserFriendlyErrorMessage',
-  'getRecoveryActions'
+  'getRecoveryActions',
 ];
 
 console.log('\n📋 Checking required error handling features:');
-requiredFeatures.forEach(feature => {
+requiredFeatures.forEach((feature) => {
   if (errorHandlingContent.includes(feature)) {
     console.log(`  ✅ ${feature}`);
   } else {
@@ -52,11 +52,11 @@ requiredFeatures.forEach(feature => {
 const servicesToCheck = [
   { name: 'AYNA Mirror Service', path: '../services/aynaMirrorService.ts' },
   { name: 'Weather Service', path: '../services/weatherService.ts' },
-  { name: 'Notification Service', path: '../services/notificationService.ts' }
+  { name: 'Notification Service', path: '../services/notificationService.ts' },
 ];
 
 console.log('\n🔗 Checking service integration:');
-servicesToCheck.forEach(service => {
+servicesToCheck.forEach((service) => {
   const servicePath = path.join(__dirname, service.path);
   if (fs.existsSync(servicePath)) {
     const content = fs.readFileSync(servicePath, 'utf8');
@@ -73,11 +73,11 @@ servicesToCheck.forEach(service => {
 // Check if tests exist
 const testFiles = [
   '__tests__/errorHandlingService.test.ts',
-  '__tests__/errorHandlingIntegration.test.ts'
+  '__tests__/errorHandlingIntegration.test.ts',
 ];
 
 console.log('\n🧪 Checking test coverage:');
-testFiles.forEach(testFile => {
+testFiles.forEach((testFile) => {
   const testPath = path.join(__dirname, '..', testFile);
   if (fs.existsSync(testPath)) {
     console.log(`  ✅ ${testFile}`);
@@ -96,10 +96,10 @@ const patterns = [
   { name: 'User-friendly messages', pattern: /getUserFriendlyErrorMessage/ },
   { name: 'Offline mode support', pattern: /enableOfflineMode/ },
   { name: 'Error logging', pattern: /logError/ },
-  { name: 'Pending operations sync', pattern: /syncPending/ }
+  { name: 'Pending operations sync', pattern: /syncPending/ },
 ];
 
-patterns.forEach(pattern => {
+patterns.forEach((pattern) => {
   if (pattern.pattern.test(errorHandlingContent)) {
     console.log(`  ✅ ${pattern.name}`);
   } else {
@@ -111,9 +111,9 @@ patterns.forEach(pattern => {
 console.log('\n💾 Checking offline storage integration:');
 if (errorHandlingContent.includes('@react-native-async-storage/async-storage')) {
   console.log('  ✅ AsyncStorage imported');
-  
+
   const storageOperations = ['getItem', 'setItem', 'removeItem'];
-  storageOperations.forEach(op => {
+  storageOperations.forEach((op) => {
     if (errorHandlingContent.includes(`AsyncStorage.${op}`)) {
       console.log(`  ✅ ${op} operation used`);
     } else {
@@ -127,8 +127,11 @@ if (errorHandlingContent.includes('@react-native-async-storage/async-storage')) 
 // Validate error types and contexts
 console.log('\n🏷️  Checking error context handling:');
 const errorContexts = ['network', 'weather', 'ai', 'notification', 'storage'];
-errorContexts.forEach(context => {
-  if (errorHandlingContent.includes(`'${context}'`) || errorHandlingContent.includes(`"${context}"`)) {
+errorContexts.forEach((context) => {
+  if (
+    errorHandlingContent.includes(`'${context}'`) ||
+    errorHandlingContent.includes(`"${context}"`)
+  ) {
     console.log(`  ✅ ${context} context`);
   } else {
     console.log(`  ⚠️  ${context} context - May not be handled`);
@@ -143,10 +146,10 @@ const typeDefinitions = [
   'ErrorContext',
   'WeatherContext',
   'DailyRecommendations',
-  'WardrobeItem'
+  'WardrobeItem',
 ];
 
-typeDefinitions.forEach(type => {
+typeDefinitions.forEach((type) => {
   if (errorHandlingContent.includes(type)) {
     console.log(`  ✅ ${type} type`);
   } else {
@@ -166,7 +169,7 @@ const coreFeatures = [
   'Notification error recovery',
   'User-friendly error messages',
   'Pending operations synchronization',
-  'Cross-service error handling'
+  'Cross-service error handling',
 ];
 
 console.log('\n✨ Core Features Implemented:');

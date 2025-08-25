@@ -1,0 +1,61 @@
+import { styleDNAService } from '../src/services/styleDNAService';
+
+describe('StyleDNAService basic generation', () => {
+  // Mock fetch & supabase simple behaviors
+  beforeAll(() => {
+    // @ts-ignore
+    global.fetch = jest.fn(async (url: string, opts?: any) => {
+      if (typeof url === 'string' && url.includes('cloudinary')) {
+        return {
+          ok: true,
+          json: async () => ({
+            tags: ['casual', 'modern', 'stripe', 'work'],
+            colors: [{ name: 'blue' }, { name: 'white' }, { name: 'black' }],
+            confidence: 0.8,
+          }),
+        } as any;
+      }
+      // photo uri fetch -> return blob-like
+      return {
+        ok: true,
+        blob: async () => new Blob(),
+      } as any;
+    });
+  });
+
+  it('generates a Style DNA profile with expected structure', async () => {
+    const photos = [1, 2, 3].map((i) => ({
+      id: `p${i}`,
+      uri: `file://p${i}.jpg`,
+      timestamp: Date.now(),
+    }));
+    // Supabase mock: upsert + storage operations
+    const mockFrom = jest.fn().mockReturnValue({
+      upload: jest.fn().mockResolvedValue({ data: { path: 'x' }, error: null }),
+      getPublicUrl: jest.fn().mockReturnValue({ data: { publicUrl: 'https://cdn.test/img.jpg' } }),
+      upsert: jest.fn().mockResolvedValue({ error: null }),
+      select: jest.fn().mockReturnValue({
+        eq: jest
+          .fn()
+          .mockReturnValue({ single: jest.fn().mockResolvedValue({ data: null, error: null }) }),
+      }),
+    });
+    // @ts-ignore
+    global.supabase = {
+      storage: {
+        from: () => ({
+          upload: jest.fn().mockResolvedValue({ data: {}, error: null }),
+          getPublicUrl: () => ({ data: { publicUrl: 'http://example/img.jpg' } }),
+        }),
+      },
+      from: () => ({ upsert: jest.fn().mockResolvedValue({ error: null }) }),
+    };
+    const result = await styleDNAService.generateStyleDNA('user1', photos as any);
+    expect(result.userId).toBe('user1');
+    expect(result.visualAnalysis.dominantColors.length).toBeGreaterThan(0);
+    expect(result.stylePersonality.primary).toBeTruthy();
+    expect(result.colorPalette.primary.length + result.colorPalette.neutral.length).toBeGreaterThan(
+      0,
+    );
+  });
+});

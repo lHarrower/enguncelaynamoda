@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const CheckoutScreen = () => {
   return (
@@ -10,8 +12,8 @@ const CheckoutScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  text: { fontSize: 18, color: '#555' },
+  container: { alignItems: 'center', flex: 1, justifyContent: 'center' },
+  text: { color: DesignSystem.colors.text.secondary, fontSize: 18 },
 });
 
-export default CheckoutScreen; 
+export default CheckoutScreen;

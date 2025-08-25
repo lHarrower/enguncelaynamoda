@@ -1,76 +1,104 @@
 // AYNA Mirror Settings Screen - User Preferences Management
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { ComponentType, useEffect, useState } from 'react';
 import {
-  View,
-  Text,
+  Alert,
+  Platform,
   ScrollView,
   StyleSheet,
   Switch,
+  Text,
   TouchableOpacity,
-  Alert,
-  Platform
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-// Import DateTimePicker with error handling
-let DateTimePicker: any;
-try {
-  DateTimePicker = require('@react-native-community/datetimepicker').default;
-} catch (error) {
-  // Silently handle DateTimePicker not being available in Expo Go
-  DateTimePicker = null;
+
+// DateTimePicker props interface
+interface DateTimePickerProps {
+  value: Date;
+  mode?: 'date' | 'time' | 'datetime';
+  display?: 'default' | 'spinner' | 'compact';
+  is24Hour?: boolean;
+  onChange: (
+    event: { type: string; nativeEvent: { timestamp: number } },
+    selectedDate?: Date,
+  ) => void;
+  minimumDate?: Date;
+  maximumDate?: Date;
 }
-import { DesignSystem } from '../theme/DesignSystem';
-import { userPreferencesService } from '../services/userPreferencesService';
-import { 
-  UserPreferences, 
-  NotificationPreferences, 
-  PrivacySettings,
-  ConfidenceNoteStyle 
-} from '../types/aynaMirror';
+
+// DateTimePicker will be loaded dynamically
+let DateTimePicker: any = null;
+
+// Function to load DateTimePicker dynamically
+const loadDateTimePicker = async (): Promise<any> => {
+  if (DateTimePicker) {
+    return DateTimePicker;
+  }
+
+  try {
+    const module = await import('@react-native-community/datetimepicker');
+    DateTimePicker = module.default;
+    return DateTimePicker;
+  } catch (error) {
+    // Silently handle DateTimePicker not being available in Expo Go
+    return null;
+  }
+};
 import { useAuth } from '../context/AuthContext';
+import { userPreferencesService } from '../services/userPreferencesService';
+import { DesignSystem } from '../theme/DesignSystem';
+import { ConfidenceNoteStyle, PrivacySettings } from '../types/aynaMirror';
 import { errorInDev } from '../utils/consoleSuppress';
 
+interface NavigationProp {
+  goBack: () => void;
+  navigate: (route: string) => void;
+}
+
 interface SettingsScreenProps {
-  navigation: any;
+  navigation: NavigationProp;
 }
 
 export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenProps) {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
+
   // Preference states
   const [notificationTime, setNotificationTime] = useState(new Date());
   const [timezone, setTimezone] = useState('UTC');
-  const [confidenceNoteStyle, setConfidenceNoteStyle] = useState<ConfidenceNoteStyle>('encouraging');
+  const [confidenceNoteStyle, setConfidenceNoteStyle] =
+    useState<ConfidenceNoteStyle>('encouraging');
   const [privacySettings, setPrivacySettings] = useState<PrivacySettings>({
     shareUsageData: false,
     allowLocationTracking: true,
     enableSocialFeatures: true,
-    dataRetentionDays: 365
+    dataRetentionDays: 365,
   });
-  
+
   // UI states
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [dateTimePickerComponent, setDateTimePickerComponent] = useState<any>(null);
 
   useEffect(() => {
     loadUserPreferences();
   }, []);
 
   const loadUserPreferences = async () => {
-    if (!user?.id) return;
-    
+    if (!user?.id) {
+      return;
+    }
+
     try {
       setLoading(true);
       const preferences = await userPreferencesService.getUserPreferences(user.id);
-      
+
       setNotificationTime(preferences.notificationTime);
       setTimezone(preferences.timezone);
       setConfidenceNoteStyle(preferences.stylePreferences.confidenceNoteStyle || 'encouraging');
       setPrivacySettings(preferences.privacySettings);
-      
     } catch (error) {
-      errorInDev('Failed to load preferences:', error);
+      errorInDev('Failed to load preferences:', error instanceof Error ? error : String(error));
       Alert.alert('Error', 'Failed to load your preferences. Please try again.');
     } finally {
       setLoading(false);
@@ -78,27 +106,28 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
   };
 
   const savePreferences = async () => {
-    if (!user?.id) return;
-    
+    if (!user?.id) {
+      return;
+    }
+
     try {
       setSaving(true);
-      
+
       // Update notification preferences
       await userPreferencesService.updateNotificationPreferences(user.id, {
         preferredTime: notificationTime,
         timezone,
         confidenceNoteStyle,
         enableWeekends: true,
-        enableQuickOptions: true
+        enableQuickOptions: true,
       });
-      
+
       // Update privacy settings
       await userPreferencesService.updatePrivacySettings(user.id, privacySettings);
-      
+
       Alert.alert('Success', 'Your preferences have been saved!');
-      
     } catch (error) {
-      errorInDev('Failed to save preferences:', error);
+      errorInDev('Failed to save preferences:', error instanceof Error ? error : String(error));
       Alert.alert('Error', 'Failed to save your preferences. Please try again.');
     } finally {
       setSaving(false);
@@ -106,22 +135,27 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
   };
 
   const detectTimezone = async () => {
-    if (!user?.id) return;
-    
+    if (!user?.id) {
+      return;
+    }
+
     try {
       setSaving(true);
       const detectedTimezone = await userPreferencesService.detectAndUpdateTimezone(user.id);
       setTimezone(detectedTimezone);
       Alert.alert('Timezone Updated', `Your timezone has been set to ${detectedTimezone}`);
     } catch (error) {
-      errorInDev('Failed to detect timezone:', error);
+      errorInDev('Failed to detect timezone:', error instanceof Error ? error : String(error));
       Alert.alert('Error', 'Failed to detect your timezone. Please try again.');
     } finally {
       setSaving(false);
     }
   };
 
-  const onTimeChange = (event: any, selectedTime?: Date) => {
+  const onTimeChange = (
+    event: { type: string; nativeEvent?: { timestamp: number } },
+    selectedTime?: Date,
+  ) => {
     setShowTimePicker(Platform.OS === 'ios');
     if (selectedTime) {
       setNotificationTime(selectedTime);
@@ -132,27 +166,31 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const confidenceNoteOptions: { value: ConfidenceNoteStyle; label: string; description: string }[] = [
-    { 
-      value: 'encouraging', 
-      label: 'Encouraging', 
-      description: 'Supportive and uplifting messages' 
+  const confidenceNoteOptions: {
+    value: ConfidenceNoteStyle;
+    label: string;
+    description: string;
+  }[] = [
+    {
+      value: 'encouraging',
+      label: 'Encouraging',
+      description: 'Supportive and uplifting messages',
     },
-    { 
-      value: 'witty', 
-      label: 'Witty', 
-      description: 'Clever and playful confidence notes' 
+    {
+      value: 'witty',
+      label: 'Witty',
+      description: 'Clever and playful confidence notes',
     },
-    { 
-      value: 'poetic', 
-      label: 'Poetic', 
-      description: 'Beautiful and artistic expressions' 
+    {
+      value: 'poetic',
+      label: 'Poetic',
+      description: 'Beautiful and artistic expressions',
     },
-    { 
-      value: 'friendly', 
-      label: 'Friendly', 
-      description: 'Warm and casual like a best friend' 
-    }
+    {
+      value: 'friendly',
+      label: 'Friendly',
+      description: 'Warm and casual like a best friend',
+    },
   ];
 
   if (loading) {
@@ -167,9 +205,12 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          accessibilityHint="Navigate back to the previous screen"
         >
           <Ionicons name="arrow-back" size={24} color={DesignSystem.colors.text.primary} />
         </TouchableOpacity>
@@ -179,15 +220,26 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
       {/* Notification Settings */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Daily Ritual</Text>
-        
+
         <View style={styles.settingItem}>
           <View style={styles.settingInfo}>
             <Text style={styles.settingLabel}>Notification Time</Text>
-            <Text style={styles.settingDescription}>When to receive your daily outfit recommendations</Text>
+            <Text style={styles.settingDescription}>
+              When to receive your daily outfit recommendations
+            </Text>
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.timeButton}
-            onPress={() => setShowTimePicker(true)}
+            onPress={async () => {
+              const component = await loadDateTimePicker();
+              if (component) {
+                setDateTimePickerComponent(component);
+                setShowTimePicker(true);
+              }
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={`Notification time ${formatTime(notificationTime)}`}
+            accessibilityHint="Tap to change the daily notification time"
           >
             <Text style={styles.timeText}>{formatTime(notificationTime)}</Text>
             <Ionicons name="time-outline" size={20} color={DesignSystem.colors.sage[500]} />
@@ -199,10 +251,14 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
             <Text style={styles.settingLabel}>Timezone</Text>
             <Text style={styles.settingDescription}>{timezone}</Text>
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.detectButton}
             onPress={detectTimezone}
             disabled={saving}
+            accessibilityRole="button"
+            accessibilityLabel="Auto-detect timezone"
+            accessibilityHint="Automatically detect and set your current timezone"
+            accessibilityState={{ disabled: saving }}
           >
             <Text style={styles.detectButtonText}>Auto-Detect</Text>
           </TouchableOpacity>
@@ -215,36 +271,40 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
         <Text style={styles.sectionDescription}>
           Choose how your daily confidence notes should feel
         </Text>
-        
+
         {confidenceNoteOptions.map((option) => (
           <TouchableOpacity
             key={option.value}
             style={[
               styles.optionItem,
-              confidenceNoteStyle === option.value && styles.optionItemSelected
+              confidenceNoteStyle === option.value && styles.optionItemSelected,
             ]}
             onPress={() => setConfidenceNoteStyle(option.value)}
+            accessibilityRole="button"
+            accessibilityLabel={`${option.label} confidence note style`}
+            accessibilityHint={`Select ${option.label.toLowerCase()} style: ${option.description}`}
+            accessibilityState={{ selected: confidenceNoteStyle === option.value }}
           >
             <View style={styles.optionContent}>
-              <Text style={[
-                styles.optionLabel,
-                confidenceNoteStyle === option.value && styles.optionLabelSelected
-              ]}>
+              <Text
+                style={[
+                  styles.optionLabel,
+                  confidenceNoteStyle === option.value && styles.optionLabelSelected,
+                ]}
+              >
                 {option.label}
               </Text>
-              <Text style={[
-                styles.optionDescription,
-                confidenceNoteStyle === option.value && styles.optionDescriptionSelected
-              ]}>
+              <Text
+                style={[
+                  styles.optionDescription,
+                  confidenceNoteStyle === option.value && styles.optionDescriptionSelected,
+                ]}
+              >
                 {option.description}
               </Text>
             </View>
             {confidenceNoteStyle === option.value && (
-              <Ionicons 
-                name="checkmark-circle" 
-                size={24} 
-                color={DesignSystem.colors.sage[500]} 
-              />
+              <Ionicons name="checkmark-circle" size={24} color={DesignSystem.colors.sage[500]} />
             )}
           </TouchableOpacity>
         ))}
@@ -253,7 +313,7 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
       {/* Privacy Settings */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Privacy & Data</Text>
-        
+
         <View style={styles.settingItem}>
           <View style={styles.settingInfo}>
             <Text style={styles.settingLabel}>Share Usage Data</Text>
@@ -263,12 +323,12 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
           </View>
           <Switch
             value={privacySettings.shareUsageData}
-            onValueChange={(value) => 
-              setPrivacySettings(prev => ({ ...prev, shareUsageData: value }))
+            onValueChange={(value) =>
+              setPrivacySettings((prev) => ({ ...prev, shareUsageData: value }))
             }
-            trackColor={{ 
+            trackColor={{
               false: DesignSystem.colors.sage[200],
-                true: DesignSystem.colors.sage[500] 
+              true: DesignSystem.colors.sage[500],
             }}
             thumbColor={DesignSystem.colors.background.elevated}
           />
@@ -283,12 +343,12 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
           </View>
           <Switch
             value={privacySettings.allowLocationTracking}
-            onValueChange={(value) => 
-              setPrivacySettings(prev => ({ ...prev, allowLocationTracking: value }))
+            onValueChange={(value) =>
+              setPrivacySettings((prev) => ({ ...prev, allowLocationTracking: value }))
             }
-            trackColor={{ 
-              false: DesignSystem.colors.neutral[300], 
-              true: DesignSystem.colors.sage[500] 
+            trackColor={{
+              false: DesignSystem.colors.neutral[300],
+              true: DesignSystem.colors.sage[500],
             }}
             thumbColor={DesignSystem.colors.background.elevated}
           />
@@ -303,12 +363,12 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
           </View>
           <Switch
             value={privacySettings.enableSocialFeatures}
-            onValueChange={(value) => 
-              setPrivacySettings(prev => ({ ...prev, enableSocialFeatures: value }))
+            onValueChange={(value) =>
+              setPrivacySettings((prev) => ({ ...prev, enableSocialFeatures: value }))
             }
-            trackColor={{ 
-              false: DesignSystem.colors.neutral[200], 
-              true: DesignSystem.colors.sage[500] 
+            trackColor={{
+              false: DesignSystem.colors.neutral[200],
+              true: DesignSystem.colors.sage[500],
             }}
             thumbColor={DesignSystem.colors.text.inverse}
           />
@@ -316,191 +376,193 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
       </View>
 
       {/* Save Button */}
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[styles.saveButton, saving && styles.saveButtonDisabled]}
         onPress={savePreferences}
         disabled={saving}
+        accessibilityRole="button"
+        accessibilityLabel={saving ? 'Saving preferences' : 'Save preferences'}
+        accessibilityHint="Save all your preference changes"
+        accessibilityState={{ disabled: saving }}
       >
-        <Text style={styles.saveButtonText}>
-          {saving ? 'Saving...' : 'Save Preferences'}
-        </Text>
+        <Text style={styles.saveButtonText}>{saving ? 'Saving...' : 'Save Preferences'}</Text>
       </TouchableOpacity>
 
       {/* Time Picker Modal */}
-      {showTimePicker && DateTimePicker && (
-        <DateTimePicker
-          value={notificationTime}
-          mode="time"
-          is24Hour={false}
-          display="default"
-          onChange={onTimeChange}
-        />
-      )}
+      {showTimePicker &&
+        dateTimePickerComponent &&
+        React.createElement(dateTimePickerComponent, {
+          value: notificationTime,
+          mode: 'time',
+          is24Hour: false,
+          display: 'default',
+          onChange: onTimeChange,
+        })}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
-  },
-  contentContainer: {
-    paddingBottom: 100,
-  },
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: DesignSystem.colors.text.secondary,
-    fontFamily: DesignSystem.typography.fontFamily.body,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-    backgroundColor: DesignSystem.colors.background.elevated,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.sage[200],
-  },
   backButton: {
     marginRight: 16,
     padding: 8,
   },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: DesignSystem.colors.text.primary,
-    fontFamily: DesignSystem.typography.fontFamily.body,
-  },
-  section: {
-    backgroundColor: DesignSystem.colors.background.elevated,
-    marginHorizontal: 20,
-    marginTop: 20,
-    borderRadius: 16,
-    padding: 20,
-    ...DesignSystem.elevation.medium,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: DesignSystem.colors.text.primary,
-    marginBottom: 8,
-    fontFamily: DesignSystem.typography.fontFamily.body,
-  },
-  sectionDescription: {
-    fontSize: 14,
-    color: DesignSystem.colors.text.secondary,
-    marginBottom: 16,
-    fontFamily: DesignSystem.typography.fontFamily.body,
-  },
-  settingItem: {
-    flexDirection: 'row',
+  centered: {
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.sage[100],
+    justifyContent: 'center',
   },
-  settingInfo: {
+  container: {
+    backgroundColor: DesignSystem.colors.background.primary,
     flex: 1,
-    marginRight: 16,
   },
-  settingLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: DesignSystem.colors.text.primary,
-    marginBottom: 4,
-    fontFamily: DesignSystem.typography.fontFamily.body,
-  },
-  settingDescription: {
-    fontSize: 14,
-    color: DesignSystem.colors.text.secondary,
-    fontFamily: DesignSystem.typography.fontFamily.body,
-  },
-  timeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: DesignSystem.colors.sage[200],
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  timeText: {
-    fontSize: 16,
-    color: DesignSystem.colors.text.primary,
-    marginRight: 8,
-    fontFamily: DesignSystem.typography.fontFamily.body,
+  contentContainer: {
+    paddingBottom: 100,
   },
   detectButton: {
     backgroundColor: DesignSystem.colors.sage[500],
+    borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 8,
   },
   detectButtonText: {
-    fontSize: 14,
     color: DesignSystem.colors.background.elevated,
-    fontWeight: '500',
     fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  header: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderBottomColor: DesignSystem.colors.sage[200],
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 60,
+  },
+  headerTitle: {
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  loadingText: {
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 16,
+  },
+  optionContent: {
+    flex: 1,
+  },
+  optionDescription: {
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 14,
+  },
+  optionDescriptionSelected: {
+    color: DesignSystem.colors.text.primary,
   },
   optionItem: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    marginVertical: 4,
-    borderRadius: 12,
     backgroundColor: DesignSystem.colors.sage[200],
-    borderWidth: 2,
     borderColor: 'transparent',
+    borderRadius: 12,
+    borderWidth: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
   },
   optionItemSelected: {
     backgroundColor: DesignSystem.colors.sage[50],
     borderColor: DesignSystem.colors.sage[500],
   },
-  optionContent: {
-    flex: 1,
-  },
   optionLabel: {
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontSize: 16,
     fontWeight: '500',
-    color: DesignSystem.colors.text.primary,
     marginBottom: 4,
-    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   optionLabelSelected: {
     color: DesignSystem.colors.sage[500],
   },
-  optionDescription: {
-    fontSize: 14,
-    color: DesignSystem.colors.text.secondary,
-    fontFamily: DesignSystem.typography.fontFamily.body,
-  },
-  optionDescriptionSelected: {
-    color: DesignSystem.colors.text.primary,
-  },
   saveButton: {
+    alignItems: 'center',
     backgroundColor: DesignSystem.colors.sage[500],
+    borderRadius: 12,
     marginHorizontal: 20,
     marginTop: 30,
     paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
     ...DesignSystem.elevation.medium,
   },
   saveButtonDisabled: {
     opacity: 0.6,
   },
   saveButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
     color: DesignSystem.colors.background.elevated,
     fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  section: {
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderRadius: 16,
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 20,
+    ...DesignSystem.elevation.medium,
+  },
+  sectionDescription: {
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  settingDescription: {
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 14,
+  },
+  settingInfo: {
+    flex: 1,
+    marginRight: 16,
+  },
+  settingItem: {
+    alignItems: 'center',
+    borderBottomColor: DesignSystem.colors.sage[100],
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+  },
+  settingLabel: {
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  timeButton: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.sage[200],
+    borderRadius: 8,
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  timeText: {
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 16,
+    marginRight: 8,
   },
 });

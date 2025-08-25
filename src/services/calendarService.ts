@@ -3,7 +3,8 @@
  * Handles calendar integration for outfit recommendations based on events
  */
 
-import { CalendarContext } from '@/types/aynaMirror';
+import { CalendarContext } from '../types/aynaMirror';
+import { errorInDev, logInDev, warnInDev } from '../utils/consoleSuppress';
 import { analyticsService } from './analyticsService';
 
 interface CalendarEvent {
@@ -28,39 +29,39 @@ class CalendarService {
   private permissions: CalendarPermissions = {
     granted: false,
     canRead: false,
-    canWrite: false
+    canWrite: false,
   };
 
   /**
    * Request calendar permissions
    */
-  async requestPermissions(): Promise<CalendarPermissions> {
+  requestPermissions(): CalendarPermissions {
     try {
       // In a real app, this would request actual calendar permissions:
       // - iOS: EventKit framework
       // - Android: Calendar Provider
       // - React Native: expo-calendar or react-native-calendar-events
-      
+
       // Mock implementation for now
       this.permissions = {
         granted: true,
         canRead: true,
-        canWrite: false // Usually read-only for outfit recommendations
+        canWrite: false, // Usually read-only for outfit recommendations
       };
 
       analyticsService.trackEvent('calendar_permissions_requested', {
         granted: this.permissions.granted,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
-      console.log('Calendar permissions requested:', this.permissions);
+      logInDev('Calendar permissions requested:', this.permissions);
       return this.permissions;
     } catch (error) {
-      console.error('Failed to request calendar permissions:', error);
+      errorInDev('Failed to request calendar permissions:', String(error));
       return {
         granted: false,
         canRead: false,
-        canWrite: false
+        canWrite: false,
       };
     }
   }
@@ -68,15 +69,15 @@ class CalendarService {
   /**
    * Get calendar context for a specific date
    */
-  async getCalendarContext(userId: string, date: Date = new Date()): Promise<CalendarContext | undefined> {
+  getCalendarContext(userId: string, date: Date = new Date()): CalendarContext | undefined {
     try {
       if (!this.permissions.granted || !this.permissions.canRead) {
-        console.log('Calendar permissions not granted, skipping calendar context');
+        warnInDev('Calendar permissions not granted, skipping calendar context');
         return undefined;
       }
 
-      const events = await this.getEventsForDate(date);
-      
+      const events = this.getEventsForDate(date);
+
       if (events.length === 0) {
         return {
           events: [],
@@ -88,35 +89,50 @@ class CalendarService {
       // Find the most important/formal event of the day
       const primaryEvent = this.selectPrimaryEvent(events);
       const formalityLevel = this.calculateOverallFormalityLevel(events);
-  const eventTypes = [...new Set(events.map(e => e.category))];
+      const eventTypes = [...new Set(events.map((e) => e.category))];
 
       analyticsService.trackEvent('calendar_context_retrieved', {
         user_id: userId,
         date: date.toISOString(),
         event_count: events.length,
         formality_level: formalityLevel,
-        event_types: eventTypes
+        event_types: eventTypes,
       });
 
       return {
-        events: events.map(e => ({
+        events: events.map((e) => ({
           title: e.title,
           startTime: e.start,
           endTime: e.end,
           location: e.location,
-          type: e.category === 'special' ? 'special' : (e.category as any)
+          type:
+            e.category === 'fitness' || e.category === 'travel'
+              ? 'personal'
+              : e.category === 'special'
+                ? 'special'
+                : e.category,
         })),
         primaryEvent: {
           title: primaryEvent.title,
           startTime: primaryEvent.start,
           endTime: primaryEvent.end,
           location: primaryEvent.location,
-          type: (primaryEvent.category as any)
+          type:
+            primaryEvent.category === 'fitness' || primaryEvent.category === 'travel'
+              ? 'personal'
+              : primaryEvent.category === 'special'
+                ? 'special'
+                : primaryEvent.category,
         },
-        formalityLevel: (formalityLevel === 'business-casual' ? 'business' : formalityLevel) as any,
+        formalityLevel:
+          formalityLevel === 'business-casual'
+            ? 'business'
+            : formalityLevel === 'black-tie'
+              ? 'formal'
+              : formalityLevel,
       };
     } catch (error) {
-      console.error('Failed to get calendar context:', error);
+      errorInDev('Failed to get calendar context:', String(error));
       return undefined;
     }
   }
@@ -124,20 +140,20 @@ class CalendarService {
   /**
    * Get events for a specific date
    */
-  private async getEventsForDate(date: Date): Promise<CalendarEvent[]> {
+  private getEventsForDate(date: Date): CalendarEvent[] {
     try {
       // In a real app, this would fetch from device calendar:
       // - iOS: EventKit
       // - Android: CalendarContract
       // - React Native: expo-calendar
-      
+
       // Mock implementation with sample events
       const mockEvents: CalendarEvent[] = this.generateMockEvents(date);
-      
-      console.log(`Found ${mockEvents.length} events for ${date.toDateString()}`);
+
+      logInDev(`Found ${mockEvents.length} events for ${date.toDateString()}`);
       return mockEvents;
     } catch (error) {
-      console.error('Failed to fetch calendar events:', error);
+      errorInDev('Failed to fetch calendar events:', String(error));
       return [];
     }
   }
@@ -148,10 +164,10 @@ class CalendarService {
   private generateMockEvents(date: Date): CalendarEvent[] {
     const dayOfWeek = date.getDay();
     const hour = date.getHours();
-    
+
     // Generate different events based on day and time
     const events: CalendarEvent[] = [];
-    
+
     // Weekday work events
     if (dayOfWeek >= 1 && dayOfWeek <= 5) {
       if (hour >= 9 && hour <= 17) {
@@ -161,11 +177,11 @@ class CalendarService {
           start: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 10, 0),
           end: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 11, 0),
           formalityLevel: 'business-casual',
-          category: 'work'
+          category: 'work',
         });
       }
     }
-    
+
     // Weekend social events
     if (dayOfWeek === 0 || dayOfWeek === 6) {
       if (hour >= 18) {
@@ -175,11 +191,11 @@ class CalendarService {
           start: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 19, 0),
           end: new Date(date.getFullYear(), date.getMonth(), date.getDate(), 22, 0),
           formalityLevel: 'casual',
-          category: 'social'
+          category: 'social',
         });
       }
     }
-    
+
     return events;
   }
 
@@ -190,45 +206,64 @@ class CalendarService {
     // Priority order: formal events first, then by start time
     const formalityPriority = {
       'black-tie': 5,
-      'formal': 4,
-      'business': 3,
+      formal: 4,
+      business: 3,
       'business-casual': 2,
-      'casual': 1
+      casual: 1,
     };
 
-    return events.sort((a, b) => {
-      const formalityDiff = formalityPriority[b.formalityLevel] - formalityPriority[a.formalityLevel];
-      if (formalityDiff !== 0) return formalityDiff;
-      
+    const sorted = events.sort((a, b) => {
+      const formalityDiff =
+        formalityPriority[b.formalityLevel] - formalityPriority[a.formalityLevel];
+      if (formalityDiff !== 0) {
+        return formalityDiff;
+      }
+
       // If same formality, sort by start time
       return a.start.getTime() - b.start.getTime();
-    })[0];
+    });
+    if (sorted[0]) {
+      return sorted[0];
+    }
+    // Fallback synthetic minimal event (should not normally occur because caller checks length)
+    return {
+      id: 'synthetic-0',
+      title: 'General Engagement',
+      start: new Date(),
+      end: new Date(),
+      formalityLevel: 'casual',
+      category: 'personal',
+    };
   }
 
   /**
    * Calculate overall formality level for the day
    */
-  private calculateOverallFormalityLevel(events: CalendarEvent[]): 'casual' | 'business-casual' | 'business' | 'formal' | 'black-tie' {
-    if (events.length === 0) return 'casual';
-    
+  private calculateOverallFormalityLevel(
+    events: CalendarEvent[],
+  ): 'casual' | 'business-casual' | 'business' | 'formal' | 'black-tie' {
+    if (events.length === 0) {
+      return 'casual';
+    }
+
     const formalityScores = {
-      'casual': 1,
+      casual: 1,
       'business-casual': 2,
-      'business': 3,
-      'formal': 4,
-      'black-tie': 5
+      business: 3,
+      formal: 4,
+      'black-tie': 5,
     };
-    
-    const maxFormality = Math.max(...events.map(e => formalityScores[e.formalityLevel]));
-    
+
+    const maxFormality = Math.max(...events.map((e) => formalityScores[e.formalityLevel]));
+
     const formalityMap = {
       1: 'casual' as const,
       2: 'business-casual' as const,
       3: 'business' as const,
       4: 'formal' as const,
-      5: 'black-tie' as const
+      5: 'black-tie' as const,
     };
-    
+
     return formalityMap[maxFormality as keyof typeof formalityMap];
   }
 
@@ -237,10 +272,16 @@ class CalendarService {
    */
   private getTimeOfDay(date: Date): 'morning' | 'afternoon' | 'evening' | 'night' {
     const hour = date.getHours();
-    
-    if (hour >= 5 && hour < 12) return 'morning';
-    if (hour >= 12 && hour < 17) return 'afternoon';
-    if (hour >= 17 && hour < 22) return 'evening';
+
+    if (hour >= 5 && hour < 12) {
+      return 'morning';
+    }
+    if (hour >= 12 && hour < 17) {
+      return 'afternoon';
+    }
+    if (hour >= 17 && hour < 22) {
+      return 'evening';
+    }
     return 'night';
   }
 
@@ -261,34 +302,42 @@ class CalendarService {
   /**
    * Analyze calendar patterns for better recommendations
    */
-  async analyzeCalendarPatterns(userId: string, days: number = 30): Promise<{
+  analyzeCalendarPatterns(
+    userId: string,
+    days: number = 30,
+  ): {
     workDays: number[];
     commonEventTypes: string[];
     averageFormalityLevel: string;
     busyHours: number[];
-  }> {
+  } {
     try {
       // In a real app, this would analyze historical calendar data
       // to understand user patterns and improve recommendations
-      
+
       const mockAnalysis = {
         workDays: [1, 2, 3, 4, 5], // Monday to Friday
         commonEventTypes: ['work', 'social', 'personal'],
         averageFormalityLevel: 'business-casual',
-        busyHours: [9, 10, 11, 14, 15, 16] // Common meeting hours
+        busyHours: [9, 10, 11, 14, 15, 16], // Common meeting hours
       };
-      
+
       analyticsService.trackEvent('calendar_patterns_analyzed', {
         user_id: userId,
         analysis_days: days,
         work_days_count: mockAnalysis.workDays.length,
-        common_event_types: mockAnalysis.commonEventTypes
+        common_event_types: mockAnalysis.commonEventTypes,
       });
-      
+
       return mockAnalysis;
     } catch (error) {
-      console.error('Failed to analyze calendar patterns:', error);
-      throw error;
+      errorInDev('Failed to analyze calendar patterns:', String(error));
+      return {
+        workDays: [],
+        commonEventTypes: [],
+        averageFormalityLevel: 'casual',
+        busyHours: [],
+      };
     }
   }
 }

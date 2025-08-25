@@ -1,5 +1,6 @@
 // Legacy AynaOutfitCard - Now redirects to the new V2 version
 import React from 'react';
+
 import { AynaOutfitCardV2 } from '@/components/sanctuary/AynaOutfitCardV2';
 import { Outfit } from '@/data/sanctuaryModels';
 

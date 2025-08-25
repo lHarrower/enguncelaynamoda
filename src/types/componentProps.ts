@@ -1,53 +1,55 @@
 /**
- * Standardized Component Prop Interfaces
- * 
- * This file defines consistent prop interface patterns and base types
- * that should be used across all components in the AYNAMODA application.
+ * Standartlaştırılmış Bileşen Prop Arayüzleri
+ *
+ * Bu dosya AYNAMODA uygulamasındaki tüm bileşenlerde kullanılması gereken
+ * tutarlı prop arayüz kalıplarını ve temel tipleri tanımlar.
  */
 
-import { ViewStyle, TextStyle, TextInputProps } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { TextInputProps, TextStyle, ViewStyle } from 'react-native';
 
-// Base prop interfaces that can be extended
+import { warnInDev } from '@/utils/consoleSuppress';
+
+// Genişletilebilir temel prop arayüzleri
 export interface BaseComponentProps {
-  /** Custom styles for the component container */
+  /** Bileşen konteyneri için özel stiller */
   style?: ViewStyle;
-  /** Test ID for automated testing */
+  /** Otomatik test için test kimliği */
   testID?: string;
-  /** Accessibility label for screen readers */
+  /** Ekran okuyucular için erişilebilirlik etiketi */
   accessibilityLabel?: string;
-  /** Whether the component is disabled */
+  /** Bileşenin devre dışı olup olmadığı */
   disabled?: boolean;
 }
 
 export interface InteractiveComponentProps extends BaseComponentProps {
-  /** Callback function when component is pressed */
+  /** Bileşene basıldığında çağrılan geri çağırma fonksiyonu */
   onPress?: () => void;
-  /** Whether the component is in a loading state */
+  /** Bileşenin yükleme durumunda olup olmadığı */
   loading?: boolean;
-  /** Haptic feedback type on press */
+  /** Basma sırasında dokunsal geri bildirim türü */
   hapticFeedback?: 'light' | 'medium' | 'heavy' | 'none';
 }
 
 export interface FormComponentProps extends BaseComponentProps {
-  /** Label text for the form field */
+  /** Form alanı için etiket metni */
   label?: string;
-  /** Error message to display */
+  /** Gösterilecek hata mesajı */
   error?: string;
-  /** Helper text or hint */
+  /** Yardımcı metin veya ipucu */
   hint?: string;
-  /** Whether the field is required */
+  /** Alanın gerekli olup olmadığı */
   required?: boolean;
-  /** Custom label styles */
+  /** Özel etiket stilleri */
   labelStyle?: TextStyle;
-  /** Custom error text styles */
+  /** Özel hata metni stilleri */
   errorStyle?: TextStyle;
 }
 
 export interface InputComponentProps extends FormComponentProps, Omit<TextInputProps, 'style'> {
-  /** Icon to display on the left side */
+  /** Sol tarafta gösterilecek ikon */
   leftIcon?: keyof typeof Ionicons.glyphMap;
-  /** Icon to display on the right side */
+  /** Sağ tarafta gösterilecek ikon */
   rightIcon?: keyof typeof Ionicons.glyphMap;
   /** Callback when right icon is pressed */
   onRightIconPress?: () => void;
@@ -118,21 +120,21 @@ export interface FeedbackComponentProps extends BaseComponentProps {
   /** User ID providing feedback */
   userId: string;
   /** Callback when feedback is submitted */
-  onFeedbackSubmit: (feedback: any) => Promise<void>;
+  onFeedbackSubmit: (feedback: Record<string, unknown>) => Promise<void>;
   /** Callback when feedback collection is cancelled */
   onCancel?: () => void;
 }
 
 export interface NavigationComponentProps extends BaseComponentProps {
   /** Navigation object from React Navigation */
-  navigation?: any;
+  navigation?: Record<string, unknown>;
   /** Route object from React Navigation */
-  route?: any;
+  route?: Record<string, unknown>;
   /** Callback for navigation actions */
-  onNavigate?: (screen: string, params?: any) => void;
+  onNavigate?: (screen: string, params?: Record<string, unknown>) => void;
 }
 
-export interface ListComponentProps<T = any> extends BaseComponentProps {
+export interface ListComponentProps<T = Record<string, unknown>> extends BaseComponentProps {
   /** Array of data items to render */
   data: T[];
   /** Function to render each item */
@@ -184,7 +186,7 @@ export interface MediaComponentProps extends BaseComponentProps {
   /** Callback when media loads */
   onLoad?: () => void;
   /** Callback when media fails to load */
-  onError?: (error: any) => void;
+  onError?: (error: Error) => void;
 }
 
 // Utility types for common prop patterns
@@ -209,18 +211,26 @@ export const DEFAULT_PROPS = {
 } as const;
 
 // Validation helpers
-export const validateRequiredProps = (props: any, requiredProps: string[]): void => {
-  requiredProps.forEach(prop => {
+export const validateRequiredProps = (
+  props: Record<string, unknown>,
+  requiredProps: string[],
+): void => {
+  requiredProps.forEach((prop) => {
     if (props[prop] === undefined || props[prop] === null) {
-      console.warn(`Missing required prop: ${prop}`);
+      warnInDev(`Missing required prop: ${prop}`);
     }
   });
 };
 
-export const validatePropTypes = (props: any, propTypes: Record<string, string>): void => {
+export const validatePropTypes = (
+  props: Record<string, unknown>,
+  propTypes: Record<string, string>,
+): void => {
   Object.entries(propTypes).forEach(([prop, expectedType]) => {
     if (props[prop] !== undefined && typeof props[prop] !== expectedType) {
-      console.warn(`Invalid prop type for ${prop}: expected ${expectedType}, got ${typeof props[prop]}`);
+      warnInDev(
+        `Invalid prop type for ${prop}: expected ${expectedType}, got ${typeof props[prop]}`,
+      );
     }
   });
 };

@@ -1,24 +1,20 @@
 // src/components/studio/StudioHomeScreen.tsx
 
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  StatusBar,
-  Dimensions,
-} from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
 import * as Haptics from 'expo-haptics';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Dimensions, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
+
+import MiniDiscoveryEngine from '@/components/home/MiniDiscoveryEngine';
+import OutfitCarousel from '@/components/shared/OutfitCarousel';
+import SectionHeader from '@/components/shared/SectionHeader';
+// Import components
+import StudioHeader from '@/components/shared/StudioHeader';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { IoniconsName } from '@/types/icons';
 import { logInDev } from '@/utils/consoleSuppress';
 
-// Import components
-import { StudioHeader } from '@/components/shared/StudioHeader';
-import { SectionHeader } from '@/components/shared/SectionHeader';
-import { OutfitCarousel } from '@/components/shared/OutfitCarousel';
-import BentoBoxGallery from './BentoBoxGallery';
+import BentoBoxGallery, { type BentoItem } from './BentoBoxGallery';
 import PremiumOutfitCard from './PremiumOutfitCard';
-import MiniDiscoveryEngine from '@/components/home/MiniDiscoveryEngine';
 
 const { width, height } = Dimensions.get('window');
 
@@ -38,23 +34,31 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
   const [likedOutfits, setLikedOutfits] = useState<Set<string>>(new Set());
   const [messageOfTheDay, setMessageOfTheDay] = useState('');
 
-  const dailyMessages = [
-    "Style is a way to say who you are without having to speak.",
-    "Fashion is about dressing according to what's fashionable. Style is more about being yourself.",
-    "Elegance is the only beauty that never fades.",
-    "You can have anything you want in life if you dress for it.",
-    "Fashion fades, but style is eternal.",
-    "Dress like you're already famous.",
-    "Style is knowing who you are, what you want to say, and not giving a damn.",
-    "Fashion is what you buy. Style is what you do with it.",
-  ];
+  const dailyMessages = useMemo(
+    () => [
+      'Style is a way to say who you are without having to speak.',
+      "Fashion is about dressing according to what's fashionable. Style is more about being yourself.",
+      'Elegance is the only beauty that never fades.',
+      'You can have anything you want in life if you dress for it.',
+      'Fashion fades, but style is eternal.',
+      "Dress like you're already famous.",
+      'Style is knowing who you are, what you want to say, and not giving a damn.',
+      'Fashion is what you buy. Style is what you do with it.',
+    ],
+    [],
+  );
 
   useEffect(() => {
     const today = new Date();
-    const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
+    const dayOfYear = Math.floor(
+      (today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000,
+    );
     const messageIndex = dayOfYear % dailyMessages.length;
-    setMessageOfTheDay(dailyMessages[messageIndex]);
-  }, []);
+    const msg = dailyMessages[messageIndex];
+    if (msg) {
+      setMessageOfTheDay(msg);
+    }
+  }, [dailyMessages]);
 
   const personalizedItems = [
     {
@@ -63,7 +67,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
       brand: 'Elegant Essentials',
       price: 89,
       originalPrice: 120,
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
       boutique: 'Madison Avenue',
       confidence: 96,
     },
@@ -73,7 +78,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
       brand: 'Professional Plus',
       price: 145,
       originalPrice: 195,
-      image: 'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=400&h=600&fit=crop&q=80',
       boutique: 'Executive Style',
       confidence: 92,
     },
@@ -83,7 +89,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
       brand: 'Luxury Lane',
       price: 210,
       originalPrice: 280,
-      image: 'https://images.unsplash.com/photo-1594619336195-39a8f2712533?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1594619336195-39a8f2712533?w=400&h=600&fit=crop&q=80',
       boutique: 'Boutique Bella',
       confidence: 94,
     },
@@ -94,7 +101,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
       id: '1',
       title: 'Confident Professional',
       subtitle: 'Perfect for meetings',
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
       confidence: 94,
       tags: ['Professional', 'Elegant'],
       mood: 'Confident',
@@ -104,7 +112,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
       id: '2',
       title: 'Casual Chic',
       subtitle: 'Weekend vibes',
-      image: 'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=400&h=600&fit=crop&q=80',
+      image:
+        'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=400&h=600&fit=crop&q=80',
       confidence: 87,
       tags: ['Casual', 'Comfortable'],
       mood: 'Relaxed',
@@ -112,20 +121,17 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
     },
   ];
 
-  const bentoItems = [
+  const bentoItems: BentoItem[] = [
     {
       id: 'daily-inspiration',
       type: 'mood' as const,
       size: 'medium' as const,
       span: 2 as const,
-      title: 'Today\'s Inspiration',
+      title: "Today's Inspiration",
       subtitle: 'Confident & Radiant',
       content: {
         emoji: '✨',
-        gradient: [
-          DesignSystem.colors.sage[200],
-          DesignSystem.colors.amber[200],
-        ],
+        gradient: [DesignSystem.colors.sage[200], DesignSystem.colors.amber[200]] as const,
       },
     },
     {
@@ -158,7 +164,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
       title: 'Your Wardrobe',
       subtitle: 'Explore your collection',
       content: {
-        icon: 'shirt-outline',
+        icon: 'shirt-outline' as IoniconsName,
+        backgroundColor: DesignSystem.colors.sage[500],
       },
       onPress: onNavigateToWardrobe,
     },
@@ -170,7 +177,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
       title: 'Discover',
       subtitle: 'Find new styles',
       content: {
-        icon: 'sparkles-outline',
+        icon: 'sparkles-outline' as IoniconsName,
+        backgroundColor: DesignSystem.colors.gold[500],
       },
       onPress: onNavigateToDiscover,
     },
@@ -182,8 +190,9 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
       title: 'Style Tip of the Day',
       subtitle: 'Confidence comes from within',
       content: {
-        icon: 'bulb-outline',
-        description: 'Mix textures to add visual interest to your outfit. Try pairing smooth silk with structured cotton.',
+        icon: 'bulb-outline' as IoniconsName,
+        description:
+          'Mix textures to add visual interest to your outfit. Try pairing smooth silk with structured cotton.',
       },
     },
     {
@@ -194,7 +203,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
       title: 'Ayna Mirror',
       subtitle: 'Virtual styling',
       content: {
-        image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=300&fit=crop&q=80',
+        image:
+          'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=300&fit=crop&q=80',
       },
       onPress: onNavigateToMirror,
     },
@@ -212,7 +222,7 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
   ];
 
   const handleLikeOutfit = (outfitId: string) => {
-    setLikedOutfits(prev => {
+    setLikedOutfits((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(outfitId)) {
         newSet.delete(outfitId);
@@ -231,8 +241,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
-      <ScrollView 
+
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
@@ -252,7 +262,7 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
             subtitle="AI-powered recommendations"
             showArrow={false}
           />
-          
+
           <MiniDiscoveryEngine
             items={personalizedItems}
             onLike={(item) => {
@@ -275,7 +285,7 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
             actionText="See All"
             onActionPress={onNavigateToDiscover}
           />
-          
+
           <OutfitCarousel>
             {todaysOutfits.map((outfit, index) => (
               <PremiumOutfitCard
@@ -298,12 +308,8 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
             actionText="Open Wardrobe"
             onActionPress={onNavigateToWardrobe}
           />
-          
-          <BentoBoxGallery
-            items={bentoItems}
-            columns={2}
-            style={styles.bentoGallery}
-          />
+
+          <BentoBoxGallery items={bentoItems} columns={2} style={styles.bentoGallery} />
         </View>
       </ScrollView>
     </View>
@@ -311,24 +317,24 @@ const StudioHomeScreen: React.FC<StudioHomeScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
+  bentoGallery: {
+    marginTop: -DesignSystem.spacing.xl,
   },
-  scrollView: {
+  container: {
+    backgroundColor: DesignSystem.colors.background.primary,
     flex: 1,
   },
   contentContainer: {
     paddingBottom: DesignSystem.spacing.sanctuary,
   },
-  section: {
-    marginBottom: DesignSystem.spacing.sanctuary,
-  },
   outfitCard: {
     marginRight: DesignSystem.spacing.lg,
   },
-  bentoGallery: {
-    marginTop: -DesignSystem.spacing.xl,
+  scrollView: {
+    flex: 1,
+  },
+  section: {
+    marginBottom: DesignSystem.spacing.sanctuary,
   },
 });
 

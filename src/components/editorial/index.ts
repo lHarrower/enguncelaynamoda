@@ -1,10 +1,10 @@
-export { EditorialHomeScreen } from '@/components/editorial/EditorialHomeScreen';
-export { EditorialDemo, EditorialDemoWrapper } from '@/components/editorial/EditorialDemo';
-export { FloatingNavBar } from '@/components/editorial/FloatingNavBar';
-export { WeeklyColorCard } from '@/components/editorial/WeeklyColorCard';
-export { StylePickCard } from '@/components/editorial/StylePickCard';
-export { EditorialStoryCard } from '@/components/editorial/EditorialStoryCard';
-export { SwipeableCardStack } from '@/components/editorial/SwipeableCardStack';
 export { DiscoverScreen } from '@/components/editorial/DiscoverScreen';
-export { WardrobeScreen } from '@/components/editorial/WardrobeScreen';
+export { EditorialDemo, EditorialDemoWrapper } from '@/components/editorial/EditorialDemo';
+export { EditorialHomeScreen } from '@/components/editorial/EditorialHomeScreen';
+export { EditorialStoryCard } from '@/components/editorial/EditorialStoryCard';
+export { FloatingNavBar } from '@/components/editorial/FloatingNavBar';
 export { ProfileScreen } from '@/components/editorial/ProfileScreen';
+export { StylePickCard } from '@/components/editorial/StylePickCard';
+export { SwipeableCardStack } from '@/components/editorial/SwipeableCardStack';
+export { WardrobeScreen } from '@/components/editorial/WardrobeScreen';
+export { WeeklyColorCard } from '@/components/editorial/WeeklyColorCard';

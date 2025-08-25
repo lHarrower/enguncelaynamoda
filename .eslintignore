@@ -1,0 +1,31 @@
+test-primary-colors.tsx
+node_modules/
+dist/
+build/
+coverage/
+android/
+ios/
+ops/reports/
+.expo/
+*.config.js
+*.config.cjs
+*.config.mjs
+stryker.conf.js
+__mocks__/
+@types/
+.eslintrc.js
+.eslintrc.legacy.js
+babel.config.js
+metro.config.js
+jest.config.js
+jest.setup.js
+__tests__/
+src/__tests__/
+# Ignore operational and maintenance scripts
+scripts/**/*.js
+scripts/**/*.ts
+ops/scripts/**
+# Ignore Supabase edge functions (lint separately with dedicated config)
+supabase/functions/**
+# Ignore Stryker temporary files
+stryker-tmp/

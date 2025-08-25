@@ -1,12 +1,7 @@
 // Header Component
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
 export interface HeaderProps {
@@ -23,7 +18,7 @@ export interface HeaderProps {
     onPress: () => void;
   };
   centerComponent?: React.ReactNode;
-  style?: any;
+  style?: ViewStyle;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -59,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({
             </TouchableOpacity>
           )}
         </View>
-        
+
         <View style={styles.centerSection}>
           {centerComponent || (
             <View style={styles.titleContainer}>
@@ -68,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({
             </View>
           )}
         </View>
-        
+
         <View style={styles.rightSection}>
           {rightButton && (
             <TouchableOpacity
@@ -90,58 +85,58 @@ const Header: React.FC<HeaderProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+  button: {
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 56,
+  buttonIcon: {
+    color: '#3B82F6',
+    fontSize: 20,
   },
-  leftSection: {
-    flex: 1,
-    alignItems: 'flex-start',
+  buttonText: {
+    color: '#3B82F6',
+    fontSize: 16,
+    fontWeight: '500',
   },
   centerSection: {
-    flex: 2,
     alignItems: 'center',
+    flex: 2,
+  },
+  container: {
+    backgroundColor: '#FFFFFF',
+    borderBottomColor: '#E5E7EB',
+    borderBottomWidth: 1,
+  },
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    minHeight: 56,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  leftSection: {
+    alignItems: 'flex-start',
+    flex: 1,
   },
   rightSection: {
-    flex: 1,
     alignItems: 'flex-end',
+    flex: 1,
+  },
+  subtitle: {
+    color: '#6B7280',
+    fontSize: 12,
+    marginTop: 2,
+    textAlign: 'center',
+  },
+  title: {
+    color: '#1F2937',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   titleContainer: {
     alignItems: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 12,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginTop: 2,
-  },
-  button: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#3B82F6',
-  },
-  buttonIcon: {
-    fontSize: 20,
-    color: '#3B82F6',
   },
 });
 

@@ -1,16 +1,17 @@
 /**
  * FormField Molecule
- * 
+ *
  * A complete form input component that combines Input and Text atoms
  * to provide a consistent form field experience with validation.
  */
 
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { FormComponentProps } from '@/types/componentProps';
-import { SPACING } from '@/theme';
+import { StyleSheet, View } from 'react-native';
+
 import Input, { InputProps } from '@/components/atoms/Input';
 import Text from '@/components/atoms/Text';
+import { SPACING } from '@/theme';
+import { FormComponentProps } from '@/types/componentProps';
 
 export interface FormFieldProps extends FormComponentProps, Omit<InputProps, 'error' | 'hint'> {
   label: string;
@@ -38,16 +39,16 @@ const FormField: React.FC<FormFieldProps> = ({
 
   return (
     <View style={[styles.container, style]} testID={testID}>
-      <Text 
-        variant="label" 
-        weight="medium" 
+      <Text
+        variant="label"
+        weight="medium"
         style={styles.label}
         accessibilityLabel={accessibilityLabel || `${label} field`}
       >
         {label}
         {required && <Text color="error"> *</Text>}
       </Text>
-      
+
       <Input
         {...inputProps}
         error={shouldShowError ? error : undefined}
@@ -55,23 +56,19 @@ const FormField: React.FC<FormFieldProps> = ({
         required={required}
         accessibilityLabel={`${label} input`}
       />
-      
+
       {shouldShowError && (
         <View accessibilityLabel={`Error: ${error}`} accessibilityRole="text">
-          <Text 
-            variant="caption" 
-            color="error" 
-            style={styles.errorText}
-          >
+          <Text variant="caption" color="error" style={styles.errorText}>
             {error}
           </Text>
         </View>
       )}
-      
+
       {shouldShowHint && (
-        <Text 
-          variant="caption" 
-          color="slate" 
+        <Text
+          variant="caption"
+          color="slate"
           style={styles.hintText}
           accessibilityLabel={`Hint: ${hint}`}
         >
@@ -86,17 +83,17 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: SPACING.medium,
   },
-  
-  label: {
-    marginBottom: SPACING.xs,
-  },
-  
+
   errorText: {
     marginTop: SPACING.xs,
   },
-  
+
   hintText: {
     marginTop: SPACING.xs,
+  },
+
+  label: {
+    marginBottom: SPACING.xs,
   },
 });
 

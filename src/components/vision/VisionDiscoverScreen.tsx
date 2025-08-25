@@ -1,56 +1,48 @@
 // src/components/vision/VisionDiscoverScreen.tsx
 
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState } from 'react';
+import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DesignSystem } from '@/theme/DesignSystem';
+
 import { VisionHeader } from '@/components/shared/VisionHeader';
-import { SwipeStack, OutfitCard } from '@/components/vision/shared/SwipeStack';
 import DiscoverStats from '@/components/vision/shared/DiscoverStats';
+import { OutfitCard, SwipeStack } from '@/components/vision/shared/SwipeStack';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const SAMPLE_OUTFITS: OutfitCard[] = [
   {
     id: '1',
-    title: 'Serene Sunday',
+    name: 'Serene Sunday',
     description: 'Effortless elegance for a peaceful day',
-    mood: 'Calm & Confident',
+    category: 'Casual',
     colors: ['#E8F4E6', '#F5F1E8', '#FFF8F0'],
-    confidence: 95,
-    pieces: ['Cream silk blouse', 'High-waisted trousers', 'Gold accessories'],
+    tags: ['Calm & Confident'],
+    style: 'Elegant',
   },
   {
     id: '2',
-    title: 'Creative Energy',
+    name: 'Creative Energy',
     description: 'Bold choices for inspired moments',
-    mood: 'Vibrant & Artistic',
+    category: 'Creative',
     colors: ['#FF6B6B', '#B794F6', '#68D391'],
-    confidence: 88,
-    pieces: ['Statement blazer', 'Wide-leg jeans', 'Colorful scarf'],
+    tags: ['Vibrant & Artistic'],
+    style: 'Bold',
   },
   {
     id: '3',
-    title: 'Minimalist Grace',
+    name: 'Minimalist Grace',
     description: 'Pure sophistication in simplicity',
-    mood: 'Refined & Timeless',
+    category: 'Minimalist',
     colors: ['#F7F7F7', '#E2E8F0', '#4A5568'],
-    confidence: 92,
-    pieces: ['White button-down', 'Tailored pants', 'Classic pumps'],
+    tags: ['Refined & Timeless'],
+    style: 'Classic',
   },
 ];
-
-
 
 const VisionDiscoverScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
@@ -64,32 +56,28 @@ const VisionDiscoverScreen: React.FC = () => {
   const availableOutfits = SAMPLE_OUTFITS.slice(currentIndex);
 
   const handleSwipeLeft = (outfit: OutfitCard) => {
-    setPassedOutfits(prev => new Set([...prev, outfit.id]));
+    setPassedOutfits((prev) => new Set([...prev, outfit.id]));
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   const handleSwipeRight = (outfit: OutfitCard) => {
-    setLikedOutfits(prev => new Set([...prev, outfit.id]));
+    setLikedOutfits((prev) => new Set([...prev, outfit.id]));
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
   const handleCardPress = (outfit: OutfitCard) => {
-    Alert.alert(
-      outfit.title,
-      outfit.description,
-      [
-        { text: 'Pass', onPress: () => handleSwipeLeft(outfit), style: 'destructive' },
-        { text: 'Love', onPress: () => handleSwipeRight(outfit) },
-        { text: 'Cancel', style: 'cancel' },
-      ]
-    );
+    Alert.alert(outfit.name || 'Outfit', outfit.description, [
+      { text: 'Pass', onPress: () => handleSwipeLeft(outfit), style: 'destructive' },
+      { text: 'Love', onPress: () => handleSwipeRight(outfit) },
+      { text: 'Cancel', style: 'cancel' },
+    ]);
   };
 
   const handleStackEmpty = () => {
     Alert.alert(
       'All Done!',
-      'You\'ve seen all available outfits. Check back later for more recommendations!',
-      [{ text: 'View Stats', onPress: () => setShowStats(true) }]
+      "You've seen all available outfits. Check back later for more recommendations!",
+      [{ text: 'View Stats', onPress: () => setShowStats(true) }],
     );
   };
 
@@ -99,7 +87,7 @@ const VisionDiscoverScreen: React.FC = () => {
     } else {
       handleSwipeRight(outfit);
     }
-    setCurrentIndex(prev => prev + 1);
+    setCurrentIndex((prev) => prev + 1);
   };
 
   return (
@@ -130,18 +118,18 @@ const VisionDiscoverScreen: React.FC = () => {
         ) : (
           <View style={styles.cardStack}>
             {availableOutfits.length > 0 ? (
-              <SwipeStack
-                outfits={availableOutfits}
-                onSwipe={handleSwipe}
-              />
+              <SwipeStack outfits={availableOutfits} onSwipe={handleSwipe} />
             ) : (
               <View style={styles.emptyState}>
                 <Ionicons name="checkmark-circle" size={64} color={DesignSystem.colors.sage[500]} />
                 <Text style={styles.emptyTitle}>All Caught Up!</Text>
-                <Text style={styles.emptySubtitle}>You've seen all available outfits</Text>
-                <TouchableOpacity 
+                <Text style={styles.emptySubtitle}>{"You've seen all available outfits"}</Text>
+                <TouchableOpacity
                   style={styles.viewStatsButton}
                   onPress={() => setShowStats(true)}
+                  accessibilityRole="button"
+                  accessibilityLabel="View Your Stats"
+                  accessibilityHint="Opens your outfit discovery statistics"
                 >
                   <Text style={styles.viewStatsText}>View Your Stats</Text>
                 </TouchableOpacity>
@@ -153,22 +141,32 @@ const VisionDiscoverScreen: React.FC = () => {
 
       {!showStats && availableOutfits.length > 0 && (
         <View style={styles.actionButtons}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.actionButton, styles.passButton]}
             onPress={() => {
               const currentOutfit = availableOutfits[0];
-              if (currentOutfit) handleSwipeLeft(currentOutfit);
+              if (currentOutfit) {
+                handleSwipeLeft(currentOutfit);
+              }
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Pass outfit"
+            accessibilityHint="Tap to skip this outfit recommendation"
           >
             <Ionicons name="close" size={28} color={DesignSystem.colors.coral[500]} />
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[styles.actionButton, styles.loveButton]}
             onPress={() => {
               const currentOutfit = availableOutfits[0];
-              if (currentOutfit) handleSwipeRight(currentOutfit);
+              if (currentOutfit) {
+                handleSwipeRight(currentOutfit);
+              }
             }}
+            accessibilityRole="button"
+            accessibilityLabel="Love outfit"
+            accessibilityHint="Tap to save this outfit to your favorites"
           >
             <Ionicons name="heart" size={28} color={DesignSystem.colors.sage[600]} />
           </TouchableOpacity>
@@ -179,77 +177,77 @@ const VisionDiscoverScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  actionButton: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 28,
+    height: 56,
+    justifyContent: 'center',
+    width: 56,
+    ...DesignSystem.elevation.medium,
   },
-  
+
+  actionButtons: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.xl,
+    justifyContent: 'center',
+    paddingBottom: DesignSystem.spacing.xxxl,
+    paddingHorizontal: DesignSystem.spacing.xl,
+  },
+
   backgroundGradient: {
     flex: 1,
   },
-  
-  content: {
-    flex: 1,
-  },
-  
+
   cardStack: {
-    flex: 1,
     alignItems: 'center',
+    flex: 1,
     justifyContent: 'center',
     paddingHorizontal: DesignSystem.spacing.lg,
   },
-  
-  actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingBottom: DesignSystem.spacing.xxxl,
-    gap: DesignSystem.spacing.xl,
+
+  container: {
+    flex: 1,
   },
-  
-  actionButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    ...DesignSystem.elevation.medium,
+
+  content: {
+    flex: 1,
   },
-  
-  passButton: {
-    backgroundColor: 'rgba(245, 101, 101, 0.1)',
-  },
-  
-  loveButton: {
-    backgroundColor: 'rgba(104, 211, 145, 0.1)',
-  },
-  
+
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
     padding: DesignSystem.spacing.xl,
   },
-  
-  emptyTitle: {
-    color: DesignSystem.colors.charcoal[800],
-    marginTop: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  
+
   emptySubtitle: {
     color: DesignSystem.colors.charcoal[500],
-    textAlign: 'center',
     marginBottom: DesignSystem.spacing.xl,
+    textAlign: 'center',
   },
-  
+
+  emptyTitle: {
+    color: DesignSystem.colors.charcoal[800],
+    marginBottom: DesignSystem.spacing.sm,
+    marginTop: DesignSystem.spacing.lg,
+  },
+
+  loveButton: {
+    backgroundColor: 'rgba(104, 211, 145, 0.1)',
+  },
+
+  passButton: {
+    backgroundColor: 'rgba(245, 101, 101, 0.1)',
+  },
+
   viewStatsButton: {
     backgroundColor: DesignSystem.colors.coral[500],
+    borderRadius: 25,
     paddingHorizontal: DesignSystem.spacing.xl,
     paddingVertical: DesignSystem.spacing.md,
-    borderRadius: 25,
   },
-  
+
   viewStatsText: {
     color: 'white',
     fontWeight: '600',

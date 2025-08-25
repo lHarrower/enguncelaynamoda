@@ -1,13 +1,8 @@
-import React, { useRef, useEffect } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  Animated,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef } from 'react';
+import { ActivityIndicator, Animated, Modal, StyleSheet, Text, View } from 'react-native';
+
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ModernLoadingProps {
   visible: boolean;
@@ -51,7 +46,7 @@ export default function ModernLoading({
             toValue: 1,
             duration: 1000,
             useNativeDriver: true,
-          })
+          }),
         );
         rotateAnimation.start();
         return () => rotateAnimation.stop();
@@ -74,17 +69,23 @@ export default function ModernLoading({
 
   const getIcon = () => {
     switch (type) {
-      case 'success': return 'checkmark-circle';
-      case 'error': return 'close-circle';
-      default: return 'refresh';
+      case 'success':
+        return 'checkmark-circle';
+      case 'error':
+        return 'close-circle';
+      default:
+        return 'refresh';
     }
   };
 
   const getIconColor = () => {
     switch (type) {
-      case 'success': return '#9AA493';
-      case 'error': return '#D32F2F';
-      default: return '#B8918F';
+      case 'success':
+        return '#9AA493';
+      case 'error':
+        return '#D32F2F';
+      default:
+        return '#B8918F';
     }
   };
 
@@ -94,11 +95,7 @@ export default function ModernLoading({
   });
 
   return (
-    <Modal
-      animationType="none"
-      transparent={true}
-      visible={visible}
-    >
+    <Modal animationType="none" transparent={true} visible={visible}>
       <View style={styles.overlay}>
         <Animated.View
           style={[
@@ -118,32 +115,19 @@ export default function ModernLoading({
                     transform: [{ rotate: rotation }],
                   }}
                 >
-                  <Ionicons
-                    name="refresh"
-                    size={32}
-                    color="#B8918F"
-                  />
+                  <Ionicons name="refresh" size={32} color="#B8918F" />
                 </Animated.View>
               ) : (
-                <ActivityIndicator
-                  size="large"
-                  color="#B8918F"
-                />
+                <ActivityIndicator size="large" color={DesignSystem.colors.primary[500]} />
               )
             ) : (
-              <Ionicons
-                name={getIcon()}
-                size={32}
-                color={getIconColor()}
-              />
+              <Ionicons name={getIcon()} size={32} color={getIconColor()} />
             )}
           </View>
 
           {/* Text */}
           <Text style={styles.title}>{title}</Text>
-          {subtitle && (
-            <Text style={styles.subtitle}>{subtitle}</Text>
-          )}
+          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
         </Animated.View>
       </View>
     </Modal>
@@ -151,45 +135,45 @@ export default function ModernLoading({
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(122, 107, 86, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
   container: {
-    backgroundColor: '#FDFCFB',
-    borderRadius: 20,
-    paddingVertical: 32,
-    paddingHorizontal: 24,
     alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderRadius: 20,
+    elevation: 10,
     minWidth: 160,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
     shadowColor: '#7A6B56',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.2,
     shadowRadius: 16,
-    elevation: 10,
   },
   iconContainer: {
+    alignItems: 'center',
+    height: 48,
+    justifyContent: 'center',
     marginBottom: 16,
     width: 48,
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#7A6B56',
-    textAlign: 'center',
-    letterSpacing: -0.2,
+  overlay: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.overlay,
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 40,
   },
   subtitle: {
+    color: DesignSystem.colors.text.secondary,
     fontSize: 14,
-    color: '#B8918F',
-    textAlign: 'center',
-    marginTop: 8,
     letterSpacing: -0.1,
+    marginTop: 8,
+    textAlign: 'center',
   },
-}); 
+  title: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+    textAlign: 'center',
+  },
+});

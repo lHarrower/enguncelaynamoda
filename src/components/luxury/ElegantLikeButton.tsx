@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { TouchableOpacity, StyleSheet, View } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSequence,
-  Easing,
-} from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/theme/DesignSystem';
+import React, { useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+
 import WaveOfLight from '@/components/luxury/WaveOfLight';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ElegantLikeButtonProps {
   isLiked: boolean;
@@ -30,24 +31,24 @@ export const ElegantLikeButton: React.FC<ElegantLikeButtonProps> = ({
     // Trigger heart animation
     heartScale.value = withSequence(
       withTiming(1.2, {
-  duration: DesignSystem.motion.duration.quick,
+        duration: DesignSystem.motion.duration.quick,
         easing: Easing.out(Easing.cubic),
       }),
       withTiming(1, {
-  duration: DesignSystem.motion.duration.smooth,
+        duration: DesignSystem.motion.duration.smooth,
         easing: Easing.out(Easing.cubic),
-      })
+      }),
     );
 
     heartRotation.value = withSequence(
       withTiming(15, {
-  duration: DesignSystem.motion.duration.quick,
+        duration: DesignSystem.motion.duration.quick,
         easing: Easing.out(Easing.cubic),
       }),
       withTiming(0, {
-  duration: DesignSystem.motion.duration.smooth,
+        duration: DesignSystem.motion.duration.smooth,
         easing: Easing.out(Easing.cubic),
-      })
+      }),
     );
 
     // Trigger wave animation only when liking (not unliking)
@@ -59,10 +60,7 @@ export const ElegantLikeButton: React.FC<ElegantLikeButtonProps> = ({
   };
 
   const heartAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: heartScale.value },
-      { rotate: `${heartRotation.value}deg` },
-    ],
+    transform: [{ scale: heartScale.value }, { rotate: `${heartRotation.value}deg` }] as any,
   }));
 
   const handleWaveComplete = () => {
@@ -72,7 +70,7 @@ export const ElegantLikeButton: React.FC<ElegantLikeButtonProps> = ({
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.button, { width: size + 16, height: size + 16 }]}
+        style={[styles.button, { height: size + 16, width: size + 16 }]}
         onPress={handlePress}
         activeOpacity={0.8}
       >
@@ -85,7 +83,7 @@ export const ElegantLikeButton: React.FC<ElegantLikeButtonProps> = ({
           />
         </Animated.View>
       </TouchableOpacity>
-      
+
       {showWave && (
         <WaveOfLight
           isActive={showWave}
@@ -98,19 +96,18 @@ export const ElegantLikeButton: React.FC<ElegantLikeButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  
   button: {
-    justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 20,
     backgroundColor: 'transparent',
+    borderRadius: 20,
+    justifyContent: 'center',
   },
-  
+
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
   heartIcon: {
     // Thin, elegant line-art style
     textShadowColor: 'rgba(0, 0, 0, 0.1)',

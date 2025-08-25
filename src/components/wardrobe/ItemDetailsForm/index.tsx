@@ -1,19 +1,20 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Image,
   Alert,
   Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+
 import { DesignSystem } from '@/theme/DesignSystem';
-import { logInDev, errorInDev } from '@/utils/consoleSuppress';
+import { logInDev } from '@/utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -39,41 +40,92 @@ interface ItemDetailsFormProps {
 
 // Predefined options for better UX
 const CATEGORIES = [
-  'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories', 'Activewear', 'Underwear'
+  'Tops',
+  'Bottoms',
+  'Dresses',
+  'Outerwear',
+  'Shoes',
+  'Accessories',
+  'Activewear',
+  'Underwear',
 ];
 
 const SUBCATEGORIES: { [key: string]: string[] } = {
-  'Tops': ['T-Shirt', 'Blouse', 'Sweater', 'Hoodie', 'Tank Top', 'Crop Top', 'Shirt'],
-  'Bottoms': ['Jeans', 'Trousers', 'Shorts', 'Skirt', 'Leggings', 'Sweatpants'],
-  'Dresses': ['Casual Dress', 'Formal Dress', 'Maxi Dress', 'Mini Dress', 'Midi Dress'],
-  'Outerwear': ['Jacket', 'Coat', 'Blazer', 'Cardigan', 'Vest', 'Trench Coat'],
-  'Shoes': ['Sneakers', 'Heels', 'Flats', 'Boots', 'Sandals', 'Loafers'],
-  'Accessories': ['Bag', 'Hat', 'Scarf', 'Belt', 'Jewelry', 'Sunglasses'],
-  'Activewear': ['Sports Bra', 'Yoga Pants', 'Athletic Shorts', 'Running Shirt'],
-  'Underwear': ['Bra', 'Underwear', 'Shapewear', 'Socks', 'Tights']
+  Tops: ['T-Shirt', 'Blouse', 'Sweater', 'Hoodie', 'Tank Top', 'Crop Top', 'Shirt'],
+  Bottoms: ['Jeans', 'Trousers', 'Shorts', 'Skirt', 'Leggings', 'Sweatpants'],
+  Dresses: ['Casual Dress', 'Formal Dress', 'Maxi Dress', 'Mini Dress', 'Midi Dress'],
+  Outerwear: ['Jacket', 'Coat', 'Blazer', 'Cardigan', 'Vest', 'Trench Coat'],
+  Shoes: ['Sneakers', 'Heels', 'Flats', 'Boots', 'Sandals', 'Loafers'],
+  Accessories: ['Bag', 'Hat', 'Scarf', 'Belt', 'Jewelry', 'Sunglasses'],
+  Activewear: ['Sports Bra', 'Yoga Pants', 'Athletic Shorts', 'Running Shirt'],
+  Underwear: ['Bra', 'Underwear', 'Shapewear', 'Socks', 'Tights'],
 };
 
 const AVAILABLE_COLORS = [
-  'Black', 'White', 'Gray', 'Navy', 'Blue', 'Red', 'Pink', 'Purple', 'Green', 
-  'Yellow', 'Orange', 'Brown', 'Beige', 'Cream', 'Gold', 'Silver', 'Multicolor'
+  'Black',
+  'White',
+  'Gray',
+  'Navy',
+  'Blue',
+  'Red',
+  'Pink',
+  'Purple',
+  'Green',
+  'Yellow',
+  'Orange',
+  'Brown',
+  'Beige',
+  'Cream',
+  'Gold',
+  'Silver',
+  'Multicolor',
 ];
 
 const COLOR_HEX_MAP: { [key: string]: string } = {
-  'Black': '#000000', 'White': '#FFFFFF', 'Gray': '#808080', 'Navy': '#000080',
-  'Blue': '#0066CC', 'Red': '#FF0000', 'Pink': '#FF69B4', 'Purple': '#800080',
-  'Green': '#008000', 'Yellow': '#FFD700', 'Orange': '#FFA500', 'Brown': '#8B4513',
-  'Beige': '#F5F5DC', 'Cream': '#FFFDD0', 'Gold': '#DAA520', 'Silver': '#C0C0C0',
-  'Multicolor': '#FF6B6B'
+  Black: '#000000',
+  White: '#FFFFFF',
+  Gray: '#808080',
+  Navy: '#000080',
+  Blue: '#0066CC',
+  Red: '#FF0000',
+  Pink: '#FF69B4',
+  Purple: '#800080',
+  Green: '#008000',
+  Yellow: '#FFD700',
+  Orange: '#FFA500',
+  Brown: '#8B4513',
+  Beige: '#F5F5DC',
+  Cream: '#FFFDD0',
+  Gold: '#DAA520',
+  Silver: '#C0C0C0',
+  Multicolor: '#FF6B6B',
 };
 
-const SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '0', '2', '4', '6', '8', '10', '12', '14', '16'];
+const SIZES = [
+  'XXS',
+  'XS',
+  'S',
+  'M',
+  'L',
+  'XL',
+  'XXL',
+  '0',
+  '2',
+  '4',
+  '6',
+  '8',
+  '10',
+  '12',
+  '14',
+  '16',
+];
 
 const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
   processedImageUri,
   suggestedCategory,
   suggestedColors = [],
   onSave,
-  onCancel
+  onCancel,
 }) => {
   // Form state
   const [category, setCategory] = useState(suggestedCategory || '');
@@ -106,7 +158,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
       categoryValid: !!category.trim(),
       selectedColors,
       colorsValid: selectedColors.length > 0,
-      errors: newErrors
+      errors: newErrors,
     });
 
     setErrors(newErrors);
@@ -116,10 +168,8 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
   const isFormValid = category.trim() && selectedColors.length > 0;
 
   const handleColorToggle = (color: string) => {
-    setSelectedColors(prev => 
-      prev.includes(color) 
-        ? prev.filter(c => c !== color)
-        : [...prev, color]
+    setSelectedColors((prev) =>
+      prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color],
     );
   };
 
@@ -130,7 +180,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
       selectedColors,
       isFormValid,
       categoryLength: category.trim().length,
-      colorsLength: selectedColors.length
+      colorsLength: selectedColors.length,
     });
 
     if (!validateForm()) {
@@ -166,7 +216,13 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={onCancel}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel"
+            accessibilityHint="Tap to cancel and go back"
+          >
             <Ionicons name="close" size={24} color="#B8918F" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Item Details</Text>
@@ -189,9 +245,13 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
             <Text style={styles.fieldLabel}>
               Category <Text style={styles.required}>*</Text>
             </Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.dropdown, errors.category && styles.fieldError]}
               onPress={() => setShowCategoryDropdown(!showCategoryDropdown)}
+              accessibilityRole="button"
+              accessibilityLabel={category ? `Selected category: ${category}` : 'Select category'}
+              accessibilityHint="Tap to open category selection dropdown"
+              accessibilityState={{ expanded: showCategoryDropdown }}
             >
               <Text style={[styles.dropdownText, !category && styles.placeholder]}>
                 {category || 'Select category'}
@@ -199,7 +259,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
               <Ionicons name="chevron-down" size={20} color="#B8918F" />
             </TouchableOpacity>
             {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
-            
+
             {showCategoryDropdown && (
               <View style={styles.dropdownList}>
                 {CATEGORIES.map((cat) => (
@@ -212,9 +272,12 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
                       setShowCategoryDropdown(false);
                       // Clear category error when selection is made
                       if (errors.category) {
-                        setErrors(prev => ({ ...prev, category: '' }));
+                        setErrors((prev) => ({ ...prev, category: '' }));
                       }
                     }}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Select ${cat} category`}
+                    accessibilityHint="Tap to select this category"
                   >
                     <Text style={styles.dropdownItemText}>{cat}</Text>
                   </TouchableOpacity>
@@ -227,16 +290,24 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
           {availableSubcategories.length > 0 && (
             <View style={styles.fieldContainer}>
               <Text style={styles.fieldLabel}>Subcategory</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.dropdown}
                 onPress={() => setShowSubcategoryDropdown(!showSubcategoryDropdown)}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  subcategory
+                    ? `Selected subcategory: ${subcategory}`
+                    : 'Select subcategory (optional)'
+                }
+                accessibilityHint="Tap to open subcategory selection dropdown"
+                accessibilityState={{ expanded: showSubcategoryDropdown }}
               >
                 <Text style={[styles.dropdownText, !subcategory && styles.placeholder]}>
                   {subcategory || 'Select subcategory (optional)'}
                 </Text>
                 <Ionicons name="chevron-down" size={20} color="#B8918F" />
               </TouchableOpacity>
-              
+
               {showSubcategoryDropdown && (
                 <View style={styles.dropdownList}>
                   <TouchableOpacity
@@ -245,6 +316,9 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
                       setSubcategory('');
                       setShowSubcategoryDropdown(false);
                     }}
+                    accessibilityRole="button"
+                    accessibilityLabel="Clear subcategory selection"
+                    accessibilityHint="Tap to clear the selected subcategory"
                   >
                     <Text style={[styles.dropdownItemText, styles.clearOption]}>
                       Clear selection
@@ -258,6 +332,9 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
                         setSubcategory(subcat);
                         setShowSubcategoryDropdown(false);
                       }}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Select ${subcat} subcategory`}
+                      accessibilityHint="Tap to select this subcategory"
                     >
                       <Text style={styles.dropdownItemText}>{subcat}</Text>
                     </TouchableOpacity>
@@ -277,34 +354,35 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
               {AVAILABLE_COLORS.map((color) => {
                 const isSelected = selectedColors.includes(color);
                 const isSuggested = suggestedColors.includes(color);
-                
+
                 return (
                   <TouchableOpacity
                     key={color}
                     style={[
                       styles.colorTag,
                       isSelected && styles.colorTagSelected,
-                      isSuggested && !isSelected && styles.colorTagSuggested
+                      isSuggested && !isSelected && styles.colorTagSuggested,
                     ]}
                     onPress={() => {
                       handleColorToggle(color);
                       // Clear colors error when selection is made
                       if (errors.colors && selectedColors.length === 0) {
-                        setErrors(prev => ({ ...prev, colors: '' }));
+                        setErrors((prev) => ({ ...prev, colors: '' }));
                       }
                     }}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${color} color ${isSelected ? 'selected' : 'not selected'}${isSuggested ? ', AI suggested' : ''}`}
+                    accessibilityHint={`Tap to ${isSelected ? 'deselect' : 'select'} ${color} color`}
+                    accessibilityState={{ selected: isSelected }}
                   >
-                    <View 
+                    <View
                       style={[
-                        styles.colorDot, 
+                        styles.colorDot,
                         { backgroundColor: COLOR_HEX_MAP[color] },
-                        color === 'White' && styles.whiteBorder
-                      ]} 
+                        color === 'White' && styles.whiteBorder,
+                      ]}
                     />
-                    <Text style={[
-                      styles.colorTagText,
-                      isSelected && styles.colorTagTextSelected
-                    ]}>
+                    <Text style={[styles.colorTagText, isSelected && styles.colorTagTextSelected]}>
                       {color}
                     </Text>
                     {isSuggested && !isSelected && (
@@ -333,16 +411,20 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
           {/* Size Field */}
           <View style={styles.fieldContainer}>
             <Text style={styles.fieldLabel}>Size</Text>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.dropdown}
               onPress={() => setShowSizeDropdown(!showSizeDropdown)}
+              accessibilityRole="button"
+              accessibilityLabel={size ? `Selected size: ${size}` : 'Select size (optional)'}
+              accessibilityHint="Tap to open size selection dropdown"
+              accessibilityState={{ expanded: showSizeDropdown }}
             >
               <Text style={[styles.dropdownText, !size && styles.placeholder]}>
                 {size || 'Select size (optional)'}
               </Text>
               <Ionicons name="chevron-down" size={20} color="#B8918F" />
             </TouchableOpacity>
-            
+
             {showSizeDropdown && (
               <View style={styles.dropdownList}>
                 <TouchableOpacity
@@ -351,10 +433,11 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
                     setSize('');
                     setShowSizeDropdown(false);
                   }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear size selection"
+                  accessibilityHint="Tap to clear the selected size"
                 >
-                  <Text style={[styles.dropdownItemText, styles.clearOption]}>
-                    Clear selection
-                  </Text>
+                  <Text style={[styles.dropdownItemText, styles.clearOption]}>Clear selection</Text>
                 </TouchableOpacity>
                 {SIZES.map((s) => (
                   <TouchableOpacity
@@ -364,6 +447,9 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
                       setSize(s);
                       setShowSizeDropdown(false);
                     }}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Select size ${s}`}
+                    accessibilityHint="Tap to select this size"
                   >
                     <Text style={styles.dropdownItemText}>{s}</Text>
                   </TouchableOpacity>
@@ -390,33 +476,34 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
 
         {/* Action Buttons */}
         <View style={styles.actionContainer}>
-          <TouchableOpacity 
-            style={styles.cancelActionButton} 
+          <TouchableOpacity
+            style={styles.cancelActionButton}
             onPress={onCancel}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel"
+            accessibilityHint="Tap to cancel and discard changes"
           >
             <Text style={styles.cancelActionButtonText}>Cancel</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[
-              styles.saveButton,
-              !isFormValid && styles.saveButtonDisabled
-            ]}
+          <TouchableOpacity
+            style={[styles.saveButton, !isFormValid && styles.saveButtonDisabled]}
             onPress={() => {
               logInDev('[ItemDetailsForm] Save button pressed, isFormValid:', isFormValid);
               handleSave();
             }}
             disabled={!isFormValid}
+            accessibilityRole="button"
+            accessibilityLabel="Save Item"
+            accessibilityHint={
+              isFormValid
+                ? 'Tap to save the item to your wardrobe'
+                : 'Complete required fields to enable saving'
+            }
+            accessibilityState={{ disabled: !isFormValid }}
           >
-            <Ionicons 
-              name="checkmark" 
-              size={20} 
-              color={isFormValid ? "#FFFFFF" : "#CCCCCC"} 
-            />
-            <Text style={[
-              styles.saveButtonText,
-              !isFormValid && styles.saveButtonTextDisabled
-            ]}>
+            <Ionicons name="checkmark" size={20} color={isFormValid ? '#FFFFFF' : '#CCCCCC'} />
+            <Text style={[styles.saveButtonText, !isFormValid && styles.saveButtonTextDisabled]}>
               Save Item
             </Text>
           </TouchableOpacity>
@@ -427,138 +514,37 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2EFE9',
-  },
-  scrollContent: {
-    paddingBottom: 100,
-  },
-  header: {
+  actionContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  cancelActionButton: {
+    alignItems: 'center',
+    borderColor: '#B8918F',
+    borderRadius: 12,
+    borderWidth: 1,
+    flex: 1,
+    marginRight: 12,
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
+  },
+  cancelActionButtonText: {
+    color: '#B8918F',
+    fontSize: 16,
+    fontWeight: '600',
   },
   cancelButton: {
     padding: 8,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#7A6B56',
-  },
-  headerSpacer: {
-    width: 40,
-  },
-  imageContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-    position: 'relative',
-  },
-  processedImage: {
-    width: screenWidth * 0.4,
-    height: screenWidth * 0.5,
-    borderRadius: 12,
-    backgroundColor: '#FFFFFF',
-  },
-  imageOverlay: {
-    position: 'absolute',
-    bottom: 10,
-    backgroundColor: 'rgba(242, 239, 233, 0.95)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  imageStatus: {
-    marginLeft: 6,
-    fontSize: 12,
-    color: '#9AA493',
-    fontWeight: '600',
-  },
-  formContainer: {
-    paddingHorizontal: 20,
-  },
-  fieldContainer: {
-    marginBottom: 20,
-    position: 'relative',
-  },
-  fieldLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#7A6B56',
-    marginBottom: 8,
-  },
-  required: {
-    color: '#FF6B6B',
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
-    color: '#333333',
-  },
-  textAreaInput: {
-    height: 80,
-    paddingTop: 14,
-  },
-  dropdown: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: DesignSystem.colors.background.elevated,
-  },
-  dropdownText: {
-    fontSize: 16,
-    color: DesignSystem.colors.charcoal[700],
-  },
-  placeholder: {
-    color: DesignSystem.colors.neutral[500],
-  },
-  dropdownList: {
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    right: 0,
-    backgroundColor: DesignSystem.colors.background.elevated,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
-    maxHeight: 200,
-    zIndex: 1000,
-    elevation: 5,
-    shadowColor: DesignSystem.colors.charcoal[800],
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  dropdownItem: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border.secondary,
-  },
-  dropdownItemText: {
-    fontSize: 16,
-    color: DesignSystem.colors.charcoal[700],
-  },
   clearOption: {
     color: DesignSystem.colors.neutral[500],
     fontStyle: 'italic',
+  },
+  colorDot: {
+    borderRadius: 6,
+    height: 12,
+    marginRight: 6,
+    width: 12,
   },
   colorGrid: {
     flexDirection: 'row',
@@ -566,15 +552,15 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   colorTag: {
-    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    margin: 4,
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderColor: DesignSystem.colors.border.primary,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
-    backgroundColor: DesignSystem.colors.background.elevated,
+    flexDirection: 'row',
+    margin: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     position: 'relative',
   },
   colorTagSelected: {
@@ -585,93 +571,194 @@ const styles = StyleSheet.create({
     borderColor: DesignSystem.colors.gold[500],
     borderWidth: 2,
   },
-  colorDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 6,
-  },
-  whiteBorder: {
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
-  },
   colorTagText: {
-    fontSize: 14,
     color: DesignSystem.colors.charcoal[700],
+    fontSize: 14,
   },
   colorTagTextSelected: {
     color: DesignSystem.colors.background.elevated,
   },
-  suggestedBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: '#9AA493',
-    borderRadius: 8,
-    width: 16,
-    height: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+  container: {
+    backgroundColor: '#F2EFE9',
+    flex: 1,
   },
-  suggestedBadgeText: {
-    fontSize: 10,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+  dropdown: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderColor: DesignSystem.colors.border.primary,
+    borderRadius: 12,
+    borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  dropdownItem: {
+    borderBottomColor: DesignSystem.colors.border.secondary,
+    borderBottomWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  dropdownItemText: {
+    color: DesignSystem.colors.charcoal[700],
+    fontSize: 16,
+  },
+  dropdownList: {
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderColor: DesignSystem.colors.border.primary,
+    borderRadius: 12,
+    borderWidth: 1,
+    elevation: 5,
+    left: 0,
+    maxHeight: 200,
+    position: 'absolute',
+    right: 0,
+    shadowColor: DesignSystem.colors.charcoal[800],
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    top: '100%',
+    zIndex: 1000,
+  },
+  dropdownText: {
+    color: DesignSystem.colors.charcoal[700],
+    fontSize: 16,
+  },
+  errorText: {
+    color: '#FF6B6B',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  fieldContainer: {
+    marginBottom: 20,
+    position: 'relative',
   },
   fieldError: {
     borderColor: '#FF6B6B',
   },
-  errorText: {
-    fontSize: 12,
-    color: '#FF6B6B',
-    marginTop: 4,
-  },
-  actionContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  cancelActionButton: {
-    flex: 1,
-    paddingVertical: 16,
-    marginRight: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#B8918F',
-    alignItems: 'center',
-  },
-  cancelActionButtonText: {
+  fieldLabel: {
+    color: '#7A6B56',
     fontSize: 16,
-    color: '#B8918F',
     fontWeight: '600',
+    marginBottom: 8,
+  },
+  formContainer: {
+    paddingHorizontal: 20,
+  },
+  header: {
+    alignItems: 'center',
+    borderBottomColor: '#E0E0E0',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  headerTitle: {
+    color: '#7A6B56',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  imageContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    position: 'relative',
+  },
+  imageOverlay: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(242, 239, 233, 0.95)',
+    borderRadius: 20,
+    bottom: 10,
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    position: 'absolute',
+  },
+  imageStatus: {
+    color: '#9AA493',
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 6,
+  },
+  placeholder: {
+    color: DesignSystem.colors.neutral[500],
+  },
+  processedImage: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    height: screenWidth * 0.5,
+    width: screenWidth * 0.4,
+  },
+  required: {
+    color: '#FF6B6B',
   },
   saveButton: {
+    alignItems: 'center',
+    backgroundColor: '#B8918F',
+    borderRadius: 12,
+    elevation: 6,
     flex: 2,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
-    borderRadius: 12,
-    backgroundColor: '#B8918F',
     shadowColor: '#B8918F',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 6,
   },
   saveButtonDisabled: {
     backgroundColor: '#E0E0E0',
-    shadowOpacity: 0,
     elevation: 0,
+    shadowOpacity: 0,
   },
   saveButtonText: {
-    fontSize: 16,
     color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
   },
   saveButtonTextDisabled: {
     color: '#CCCCCC',
+  },
+  scrollContent: {
+    paddingBottom: 100,
+  },
+  suggestedBadge: {
+    alignItems: 'center',
+    backgroundColor: '#9AA493',
+    borderRadius: 8,
+    height: 16,
+    justifyContent: 'center',
+    position: 'absolute',
+    right: -4,
+    top: -4,
+    width: 16,
+  },
+  suggestedBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  textAreaInput: {
+    height: 80,
+    paddingTop: 14,
+  },
+  textInput: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E0E0E0',
+    borderRadius: 12,
+    borderWidth: 1,
+    color: '#333333',
+    fontSize: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  whiteBorder: {
+    borderColor: DesignSystem.colors.border.primary,
+    borderWidth: 1,
   },
 });
 

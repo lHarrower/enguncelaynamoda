@@ -1,25 +1,28 @@
 // src/components/shared/SwipeableCard.tsx
 
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   Dimensions,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
-import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  useAnimatedGestureHandler,
-  withSpring,
-  runOnJS,
-} from 'react-native-reanimated';
 import { PanGestureHandler } from 'react-native-gesture-handler';
-import * as Haptics from 'expo-haptics';
+import Animated, {
+  runOnJS,
+  useAnimatedGestureHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -40,7 +43,7 @@ interface SwipeableCardProps {
   onSwipeLeft: (id: string) => void;
   onSwipeRight: (id: string) => void;
   onPress?: (id: string) => void;
-  style?: any;
+  style?: StyleProp<ViewStyle>;
 }
 
 export const SwipeableCard: React.FC<SwipeableCardProps> = ({
@@ -65,12 +68,12 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
     },
     onEnd: (event) => {
       scale.value = withSpring(1);
-      
+
       if (Math.abs(event.translationX) > SWIPE_THRESHOLD) {
         const direction = event.translationX > 0 ? 1 : -1;
         translateX.value = withSpring(direction * screenWidth);
         opacity.value = withSpring(0);
-        
+
         runOnJS(direction > 0 ? onSwipeRight : onSwipeLeft)(outfit.id);
         runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
       } else {
@@ -81,10 +84,7 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
   });
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: translateX.value },
-      { scale: scale.value },
-    ],
+    transform: [{ translateX: translateX.value }, { scale: scale.value }] as any,
     opacity: opacity.value,
   }));
 
@@ -103,24 +103,32 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
           style={styles.card}
           onPress={() => onPress?.(outfit.id)}
           activeOpacity={0.9}
+          accessibilityRole="button"
+          accessibilityLabel={`Outfit: ${outfit.title}`}
+          accessibilityHint="Tap to view outfit details, swipe left to love, swipe right to pass"
         >
           <BlurView intensity={20} style={styles.cardBlur}>
             <LinearGradient
-              colors={[
-                'rgba(255, 255, 255, 0.9)',
-                'rgba(255, 255, 255, 0.7)',
-              ]}
+              colors={['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.7)']}
               style={styles.cardGradient}
             >
               {/* Swipe Indicators */}
-              <Animated.View style={[styles.swipeIndicator, styles.leftIndicator, leftIndicatorStyle]}>
+              <Animated.View
+                style={[styles.swipeIndicator, styles.leftIndicator, leftIndicatorStyle]}
+              >
                 <Ionicons name="heart" size={32} color={DesignSystem.colors.sage[600]} />
-                <Text style={[styles.indicatorText, { color: DesignSystem.colors.sage[600] }]}>Love</Text>
+                <Text style={[styles.indicatorText, { color: DesignSystem.colors.sage[600] }]}>
+                  Love
+                </Text>
               </Animated.View>
-              
-              <Animated.View style={[styles.swipeIndicator, styles.rightIndicator, rightIndicatorStyle]}>
+
+              <Animated.View
+                style={[styles.swipeIndicator, styles.rightIndicator, rightIndicatorStyle]}
+              >
                 <Ionicons name="close" size={32} color={DesignSystem.colors.coral[500]} />
-                <Text style={[styles.indicatorText, { color: DesignSystem.colors.coral[500] }]}>Pass</Text>
+                <Text style={[styles.indicatorText, { color: DesignSystem.colors.coral[500] }]}>
+                  Pass
+                </Text>
               </Animated.View>
 
               {/* Card Content */}
@@ -128,19 +136,25 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
                 <View style={styles.header}>
                   <Text style={styles.title}>{outfit.title}</Text>
                   <View style={styles.confidenceBadge}>
-                    <Text style={styles.confidenceText}>{Math.round(outfit.confidence * 100)}%</Text>
+                    <Text style={styles.confidenceText}>
+                      {Math.round(outfit.confidence * 100)}%
+                    </Text>
                   </View>
                 </View>
-                
+
                 <Text style={styles.description}>{outfit.description}</Text>
-                
+
                 <View style={styles.metadata}>
                   <View style={styles.metadataItem}>
                     <Ionicons name="sunny" size={16} color={DesignSystem.colors.text.secondary} />
                     <Text style={styles.metadataText}>{outfit.weather}</Text>
                   </View>
                   <View style={styles.metadataItem}>
-                    <Ionicons name="calendar" size={16} color={DesignSystem.colors.text.secondary} />
+                    <Ionicons
+                      name="calendar"
+                      size={16}
+                      color={DesignSystem.colors.text.secondary}
+                    />
                     <Text style={styles.metadataText}>{outfit.occasion}</Text>
                   </View>
                   <View style={styles.metadataItem}>
@@ -148,10 +162,10 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
                     <Text style={styles.metadataText}>{outfit.mood}</Text>
                   </View>
                 </View>
-                
+
                 <View style={styles.tags}>
-                  {outfit.tags.slice(0, 3).map((tag, index) => (
-                    <View key={index} style={styles.tag}>
+                  {outfit.tags.slice(0, 3).map((tag) => (
+                    <View key={tag} style={styles.tag}>
                       <Text style={styles.tagText}>{tag}</Text>
                     </View>
                   ))}
@@ -166,109 +180,107 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
 };
 
 const styles = StyleSheet.create({
-  cardContainer: {
-    width: CARD_WIDTH,
-    height: 400,
-    alignSelf: 'center',
-  },
   card: {
-    flex: 1,
     borderRadius: DesignSystem.radius.xl,
+    flex: 1,
     overflow: 'hidden',
     ...DesignSystem.elevation.high,
   },
   cardBlur: {
     flex: 1,
   },
-  cardGradient: {
-    flex: 1,
-    position: 'relative',
-  },
-  swipeIndicator: {
-    position: 'absolute',
-    top: '50%',
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  leftIndicator: {
-    left: 30,
-    transform: [{ translateY: -30 }],
-  },
-  rightIndicator: {
-    right: 30,
-    transform: [{ translateY: -30 }],
-  },
-  indicatorText: {
-    ...DesignSystem.typography.scale.caption,
-    fontWeight: '600',
-    marginTop: 4,
+  cardContainer: {
+    alignSelf: 'center',
+    height: 400,
+    width: CARD_WIDTH,
   },
   cardContent: {
     flex: 1,
+    justifyContent: 'space-between',
     padding: DesignSystem.spacing.xl,
-    justifyContent: 'space-between',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: DesignSystem.spacing.md,
-  },
-  title: {
-    ...DesignSystem.typography.scale.h3,
-    color: DesignSystem.colors.text.primary,
+  cardGradient: {
     flex: 1,
-    marginRight: DesignSystem.spacing.md,
   },
   confidenceBadge: {
-    backgroundColor: DesignSystem.colors.sage[100],
+    backgroundColor: DesignSystem.colors.terracotta[50],
+    borderRadius: DesignSystem.radius.sm,
     paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.radius.full,
+    paddingVertical: 4,
   },
   confidenceText: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.sage[700],
+    color: DesignSystem.colors.terracotta[600],
+    fontSize: 12,
     fontWeight: '600',
   },
   description: {
-  ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
-    lineHeight: 22,
-    marginBottom: DesignSystem.spacing.lg,
+    fontSize: 14,
+    marginTop: DesignSystem.spacing.sm,
+  },
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  indicatorText: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+  leftIndicator: {
+    left: 16,
+    transform: [{ rotate: '-15deg' }],
   },
   metadata: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: DesignSystem.spacing.md,
-    marginBottom: DesignSystem.spacing.lg,
+    gap: 12,
+    marginTop: DesignSystem.spacing.md,
   },
   metadataItem: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: DesignSystem.spacing.xs,
+    flexDirection: 'row',
+    gap: 6,
   },
   metadataText: {
-    ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
+    fontSize: 12,
   },
-  tags: {
+  rightIndicator: {
+    right: 16,
+    transform: [{ rotate: '15deg' }],
+  },
+  swipeIndicator: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 20,
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: DesignSystem.spacing.xs,
+    gap: 8,
+    padding: 8,
+    position: 'absolute',
+    top: 16,
   },
   tag: {
-    backgroundColor: DesignSystem.colors.background.elevated,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.radius.sm,
-    borderWidth: 1,
-  borderColor: DesignSystem.colors.border.secondary,
+    backgroundColor: DesignSystem.colors.sage[50],
+    borderRadius: DesignSystem.radius.full,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: 6,
   },
   tagText: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.tertiary,
-    fontSize: 11,
+    color: DesignSystem.colors.sage[700],
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  tags: {
+    columnGap: 8,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: DesignSystem.spacing.md,
+    rowGap: 8,
+  },
+  title: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: 18,
+    fontWeight: '700',
   },
 });
 

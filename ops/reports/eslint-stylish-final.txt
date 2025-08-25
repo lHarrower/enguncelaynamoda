@@ -1,0 +1,1278 @@
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\CustomModal.tsx[24m[0m
+[0m  [2m84:6[22m  [33mwarning[39m  React Hook useEffect has missing dependencies: 'fadeAnim', 'scaleAnim', and 'slideAnim'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\FloatingActionButton.tsx[24m[0m
+[0m  [2m26:7[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\GoldShimmer.tsx[24m[0m
+[0m  [2m51:6[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'shimmerPosition'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\ModernActionSheet.tsx[24m[0m
+[0m  [2m76:6[22m  [33mwarning[39m  React Hook useEffect has missing dependencies: 'fadeAnim' and 'slideAnim'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\ModernLoading.tsx[24m[0m
+[0m  [2m68:6[22m  [33mwarning[39m  React Hook useEffect has missing dependencies: 'fadeAnim', 'rotateAnim', and 'scaleAnim'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\PermissionManager.tsx[24m[0m
+[0m   [2m67:17[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                           [2mno-void[22m[0m
+[0m   [2m82:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                           [2mno-void[22m[0m
+[0m   [2m83:6[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'checkInitialPermissions'. Either include it or remove the dependency array                                                                            [2mreact-hooks/exhaustive-deps[22m[0m
+[0m   [2m85:9[22m   [33mwarning[39m  'requestAllPermissions' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                      [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m110:7[22m   [33mwarning[39m  Unexpected console statement                                                                                                                                                                          [2mno-console[22m[0m
+[0m  [2m124:13[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                           [2mno-void[22m[0m
+[0m  [2m151:13[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                           [2mno-void[22m[0m
+[0m  [2m174:7[22m   [33mwarning[39m  Unexpected console statement                                                                                                                                                                          [2mno-console[22m[0m
+[0m  [2m194:7[22m   [33mwarning[39m  Unexpected console statement                                                                                                                                                                          [2mno-console[22m[0m
+[0m  [2m222:36[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                           [2mno-void[22m[0m
+[0m  [2m230:9[22m   [33mwarning[39m  Unexpected console statement                                                                                                                                                                          [2mno-console[22m[0m
+[0m  [2m260:34[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                           [2mno-void[22m[0m
+[0m  [2m268:7[22m   [33mwarning[39m  Unexpected console statement                                                                                                                                                                          [2mno-console[22m[0m
+[0m  [2m285:6[22m   [33mwarning[39m  React Hook React.useEffect has missing dependencies: 'openCamera', 'openImagePicker', 'requestCameraPermission', and 'requestLocationPermission'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\StyleMatchCircle.tsx[24m[0m
+[0m  [2m30:3[22m  [33mwarning[39m  'confidence' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\animated\AnimatedComponents.tsx[24m[0m
+[0m  [2m358:23[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m437:23[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\animated\GestureAnimations.tsx[24m[0m
+[0m  [2m167:40[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                    [2mno-void[22m[0m
+[0m  [2m295:40[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                    [2mno-void[22m[0m
+[0m  [2m428:3[22m   [33mwarning[39m  'onLongPress' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m618:35[22m  [33mwarning[39m  Inline style: { flex: 1 }                                                      [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m624:40[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                    [2mno-void[22m[0m
+[0m  [2m628:11[22m  [33mwarning[39m  Inline style: { flex: 1 }                                                      [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\animated\PageTransitions.tsx[24m[0m
+[0m  [2m253:3[22m   [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m279:9[22m   [33mwarning[39m  Inline style: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }       [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m308:3[22m   [33mwarning[39m  'tabIndex' is defined but never used. Allowed unused args must match /^_/u         [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m339:9[22m   [33mwarning[39m  Inline style: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }       [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m518:3[22m   [33mwarning[39m  'sharedElementId' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m573:28[22m  [33mwarning[39m  Inline style: { flex: 1 }                                                          [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m602:3[22m   [33mwarning[39m  'onSwipeLeft' is defined but never used. Allowed unused args must match /^_/u      [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m603:3[22m   [33mwarning[39m  'onSwipeRight' is defined but never used. Allowed unused args must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m604:3[22m   [33mwarning[39m  'onSwipeUp' is defined but never used. Allowed unused args must match /^_/u        [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m605:3[22m   [33mwarning[39m  'onSwipeDown' is defined but never used. Allowed unused args must match /^_/u      [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m637:9[22m   [33mwarning[39m  Inline style: { flex: 1 }                                                          [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\antiConsumption\CostPerWearDisplay.tsx[24m[0m
+[0m  [2m46:5[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\antiConsumption\MonthlyConfidenceMetrics.tsx[24m[0m
+[0m   [2m27:3[22m   [33mwarning[39m  'onMetricsLoaded' is defined but never used. Allowed unused args must match /^_/u                               [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m60:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                     [2mno-void[22m[0m
+[0m   [2m61:6[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'loadMetrics'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m143:28[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                     [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\antiConsumption\RediscoveryChallenge.tsx[24m[0m
+[0m   [2m35:9[22m   [33mwarning[39m  The 'createNewChallenge' function makes the dependencies of useEffect Hook (at line 53) change on every render. To fix this, wrap the definition of 'createNewChallenge' in its own useCallback() Hook  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m   [2m43:7[22m   [33mwarning[39m  Unexpected console statement                                                                                                                                                                            [2mno-console[22m[0m
+[0m   [2m51:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                             [2mno-void[22m[0m
+[0m  [2m156:28[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                             [2mno-void[22m[0m
+[0m  [2m322:31[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                                [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\antiConsumption\ShopYourClosetFirst.tsx[24m[0m
+[0m   [2m72:7[22m   [33mwarning[39m  Unexpected console statement                                                                                                                                                                                                                                         [2mno-console[22m[0m
+[0m   [2m79:6[22m   [33mwarning[39m  React Hook useCallback has a missing dependency: 'onRecommendationGenerated'. Either include it or remove the dependency array. If 'onRecommendationGenerated' changes too often, find the parent component that defines it and wrap that definition in useCallback  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m   [2m83:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                                                                                          [2mno-void[22m[0m
+[0m  [2m102:5[22m   [33mwarning[39m  Unexpected console statement                                                                                                                                                                                                                                         [2mno-console[22m[0m
+[0m  [2m127:28[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                                                                                          [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\antiConsumption\ShoppingBehaviorTracker.tsx[24m[0m
+[0m   [2m40:6[22m   [33mwarning[39m  React Hook useCallback has a missing dependency: 'onBehaviorTracked'. Either include it or remove the dependency array. If 'onBehaviorTracked' changes too often, find the parent component that defines it and wrap that definition in useCallback  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m   [2m43:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                                                                          [2mno-void[22m[0m
+[0m  [2m141:28[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                                                                          [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\artistry\ArtistryTabBar.tsx[24m[0m
+[0m  [2m157:22[22m  [33mwarning[39m  Expected { after 'if' condition  [2mcurly[22m[0m
+[0m  [2m160:18[22m  [33mwarning[39m  Expected { after 'if' condition  [2mcurly[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\artistry\InteractiveTotem.tsx[24m[0m
+[0m  [2m28:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m56:11[22m  [33mwarning[39m  Unexpected any. Specify a different type                                           [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\artistry\KineticTypography.tsx[24m[0m
+[0m  [2m228:30[22m  [33mwarning[39m  Inline style: { position: 'relative' }                                        [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m232:23[22m  [33mwarning[39m  Inline style: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }  [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\atmospheric\AtmosphericHomeScreen.tsx[24m[0m
+[0m   [2m17:9[22m   [33mwarning[39m  'width' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m17:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m338:72[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\atmospheric\EditorialBentoGallery.tsx[24m[0m
+[0m   [2m29:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m38:12[22m  [33mwarning[39m  Unexpected any. Specify a different type                                           [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m46:11[22m  [33mwarning[39m  Unexpected any. Specify a different type                                           [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m102:26[22m  [33mwarning[39m  'height' is already declared in the upper scope on line 29 column 16               [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m122:44[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m133:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                        [2mno-void[22m[0m
+[0m  [2m158:45[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m168:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                        [2mno-void[22m[0m
+[0m  [2m188:50[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m199:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                        [2mno-void[22m[0m
+[0m  [2m227:46[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m238:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                        [2mno-void[22m[0m
+[0m  [2m265:45[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m275:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                        [2mno-void[22m[0m
+[0m  [2m298:48[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m308:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                        [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\atmospheric\InteractiveTotem.tsx[24m[0m
+[0m  [2m33:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m65:11[22m  [33mwarning[39m  Unexpected any. Specify a different type                                           [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\atmospheric\InvisibleNavigation.tsx[24m[0m
+[0m   [2m20:9[22m   [33mwarning[39m  'width' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m20:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m148:33[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\aura\AuraButton.tsx[24m[0m
+[0m  [2m92:9[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m94:9[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m96:9[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\auth\AuthContainer.tsx[24m[0m
+[0m  [2m17:66[22m  [33mwarning[39m  'showHeader' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\auth\ForgotPasswordForm.tsx[24m[0m
+[0m  [2m30:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m42:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m45:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m51:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m84:26[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\auth\LoginForm.tsx[24m[0m
+[0m   [2m33:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m   [2m43:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m   [2m46:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m   [2m50:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m105:26[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\auth\OriginalInput.tsx[24m[0m
+[0m   [2m52:7[22m   [33mwarning[39m  'hint' is defined but never used. Allowed unused args must match /^_/u                [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m53:7[22m   [33mwarning[39m  'required' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m59:7[22m   [33mwarning[39m  'style' is defined but never used. Allowed unused args must match /^_/u               [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m60:7[22m   [33mwarning[39m  'inputStyle' is defined but never used. Allowed unused args must match /^_/u          [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m61:7[22m   [33mwarning[39m  'labelStyle' is defined but never used. Allowed unused args must match /^_/u          [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m62:7[22m   [33mwarning[39m  'errorStyle' is defined but never used. Allowed unused args must match /^_/u          [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m63:7[22m   [33mwarning[39m  'testID' is defined but never used. Allowed unused args must match /^_/u              [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m64:7[22m   [33mwarning[39m  'accessibilityLabel' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m65:7[22m   [33mwarning[39m  'disabled' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m66:7[22m   [33mwarning[39m  'variant' is assigned a value but never used. Allowed unused vars must match /^_/u    [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m75:11[22m  [33mwarning[39m  'isFocused' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m120:55[22m  [33mwarning[39m  Inline style: { marginBottom: 8, textAlign: 'left' }                                  [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\auth\OriginalLoginForm.tsx[24m[0m
+[0m  [2m49:26[22m  [33mwarning[39m  'email' is already declared in the upper scope on line 42 column 10     [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m62:29[22m  [33mwarning[39m  'password' is already declared in the upper scope on line 43 column 10  [2m@typescript-eslint/no-shadow[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\auth\OriginalLoginScreen.tsx[24m[0m
+[0m   [2m60:26[22m  [33mwarning[39m  'email' is already declared in the upper scope on line 47 column 10     [2m@typescript-eslint/no-shadow[22m[0m
+[0m   [2m70:29[22m  [33mwarning[39m  'password' is already declared in the upper scope on line 48 column 10  [2m@typescript-eslint/no-shadow[22m[0m
+[0m   [2m92:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                             [2mno-void[22m[0m
+[0m   [2m97:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                             [2mno-void[22m[0m
+[0m  [2m101:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                             [2mno-void[22m[0m
+[0m  [2m103:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                             [2mno-void[22m[0m
+[0m  [2m212:42[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                             [2mno-void[22m[0m
+[0m  [2m230:32[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                             [2mno-void[22m[0m
+[0m  [2m238:32[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                             [2mno-void[22m[0m
+[0m  [2m255:34[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                             [2mno-void[22m[0m
+[0m  [2m266:34[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                             [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\auth\SignUpForm.tsx[24m[0m
+[0m   [2m38:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m   [2m44:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m   [2m50:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m   [2m62:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m   [2m69:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m   [2m73:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m155:26[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\auth\SocialLoginButtons.tsx[24m[0m
+[0m  [2m23:5[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\aynaMirror\ConfidenceNote.tsx[24m[0m
+[0m  [2m255:3[22m  [33mwarning[39m  'colors' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\aynaMirror\OutfitRecommendationCard.tsx[24m[0m
+[0m   [2m83:12[22m  [33mwarning[39m  'imageLoaded' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m105:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                             [2mno-void[22m[0m
+[0m  [2m173:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                             [2mno-void[22m[0m
+[0m  [2m188:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                             [2mno-void[22m[0m
+[0m  [2m340:58[22m  [33mwarning[39m  Inline style: { position: 'absolute', left: -9999 }                                     [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m389:67[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                 [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m395:46[22m  [33mwarning[39m  Unexpected console statement                                                            [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\aynaMirror\QuickActionButton.tsx[24m[0m
+[0m   [2m49:39[22m  [33mwarning[39m  'screenHeight' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m195:7[22m   [33mwarning[39m  Unexpected console statement                                                             [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\common\AnimatedPastelCircleBackground.tsx[24m[0m
+[0m  [2m24:26[22m  [33mwarning[39m  'delay' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\common\AnimatedWrapper.tsx[24m[0m
+[0m  [2m25:27[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m26:47[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m39:39[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m47:36[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m48:38[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\common\ErrorBoundary.tsx[24m[0m
+[0m  [2m38:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\common\UndoNotification.tsx[24m[0m
+[0m  [2m45:5[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\common\WardrobeCard.tsx[24m[0m
+[0m  [2m15:9[22m  [33mwarning[39m  'width' is assigned a value but never used. Allowed unused vars must match /^_/u    [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m54:3[22m  [33mwarning[39m  'variant' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\common\ZenCard.tsx[24m[0m
+[0m  [2m62:23[22m  [33mwarning[39m  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component “ZenCard” and pass data as props  [2mreact/no-unstable-nested-components[22m[0m
+[0m  [2m64:28[22m  [33mwarning[39m  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component “ZenCard” and pass data as props  [2mreact/no-unstable-nested-components[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\demo\MotionRefinementDemo.tsx[24m[0m
+[0m  [2m12:9[22m   [33mwarning[39m  'width' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m12:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m65:34[22m  [33mwarning[39m  Unexpected console statement                                                       [2mno-console[22m[0m
+[0m  [2m66:35[22m  [33mwarning[39m  Unexpected console statement                                                       [2mno-console[22m[0m
+[0m  [2m67:34[22m  [33mwarning[39m  Unexpected console statement                                                       [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\discovery\DiscoveryEngine.tsx[24m[0m
+[0m   [2m29:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m296:39[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\editorial\EditorialHomeScreen.tsx[24m[0m
+[0m  [2m100:38[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m115:38[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m130:38[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\editorial\SwipeableCardStack.tsx[24m[0m
+[0m   [2m19:37[22m  [33mwarning[39m  'screenHeight' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m20:7[22m   [33mwarning[39m  'cardWidth' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m84:15[22m  [33mwarning[39m  Unexpected console statement                                                             [2mno-console[22m[0m
+[0m  [2m126:11[22m  [33mwarning[39m  'scale' is already declared in the upper scope on line 37 column 9                       [2m@typescript-eslint/no-shadow[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\efficiency\EfficiencyGoals.tsx[24m[0m
+[0m  [2m21:9[22m   [33mwarning[39m  'width' is assigned a value but never used. Allowed unused vars must match /^_/u          [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m33:61[22m  [33mwarning[39m  'error' is assigned a value but never used. Allowed unused vars must match /^_/u          [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m33:68[22m  [33mwarning[39m  'clearError' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m33:80[22m  [33mwarning[39m  'getScoreColor' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\efficiency\EfficiencyInsights.tsx[24m[0m
+[0m   [2m13:7[22m   [33mwarning[39m  'chartConfig' is assigned a value but never used. Allowed unused vars must match /^_/u       [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m41:42[22m  [33mwarning[39m  'getScoreColor' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m47:10[22m  [33mwarning[39m  'timeRange' is assigned a value but never used. Allowed unused vars must match /^_/u         [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m47:21[22m  [33mwarning[39m  'setTimeRange' is assigned a value but never used. Allowed unused vars must match /^_/u      [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m51:9[22m   [33mwarning[39m  'trends' is assigned a value but never used. Allowed unused vars must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m147:23[22m  [33mwarning[39m  Inline style: { width: '100%' }                                                              [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m190:26[22m  [33mwarning[39m  Inline style: { color: '#64748B' }                                                           [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m255:19[22m  [33mwarning[39m  Inline style: {[0m
+[0m  color: "currentScore.trends.monthlyChange >= 0 ? '#10B981' : '#EF4444'"[0m
+[0m}  [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m267:19[22m  [33mwarning[39m  Inline style: {[0m
+[0m  color: "currentScore.trends.yearlyChange >= 0 ? '#10B981' : '#EF4444'"[0m
+[0m}   [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m276:28[22m  [33mwarning[39m  Inline style: { flexDirection: 'row', alignItems: 'center' }                                 [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m288:51[22m  [33mwarning[39m  Inline style: { marginLeft: 8 }                                                              [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m381:25[22m  [33mwarning[39m  Inline style: { width: '100%' }                                                              [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m413:26[22m  [33mwarning[39m  Inline style: { color: '#64748B' }                                                           [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m418:58[22m  [33mwarning[39m  Inline style: { backgroundColor: '#F0F4FF' }                                                 [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m439:54[22m  [33mwarning[39m  'score' is already declared in the upper scope on line 37 column 3                           [2m@typescript-eslint/no-shadow[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\efficiency\EfficiencyScoreDashboard.tsx[24m[0m
+[0m   [2m92:9[22m   [33mwarning[39m  'getTrendColor' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m109:11[22m  [33mwarning[39m  'scoreColor' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\error\ErrorBoundary.tsx[24m[0m
+[0m   [2m54:35[22m  [33mwarning[39m  'error' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m112:7[22m   [33mwarning[39m  Unexpected console statement                                             [2mno-console[22m[0m
+[0m  [2m133:7[22m   [33mwarning[39m  Unexpected console statement                                             [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\error\NetworkErrorBoundary.tsx[24m[0m
+[0m  [2m68:5[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\feedback\EmotionalResponseStep.tsx[24m[0m
+[0m  [2m203:21[22m  [33mwarning[39m  'progress' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\feedback\FeedbackCollector.tsx[24m[0m
+[0m   [2m64:3[22m   [33mwarning[39m  'title' is assigned a value but never used. Allowed unused vars must match /^_/u              [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m67:3[22m   [33mwarning[39m  'style' is defined but never used. Allowed unused args must match /^_/u                       [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m68:3[22m   [33mwarning[39m  'testID' is defined but never used. Allowed unused args must match /^_/u                      [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m69:3[22m   [33mwarning[39m  'accessibilityLabel' is defined but never used. Allowed unused args must match /^_/u          [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m70:6[22m   [33mwarning[39m  'props' is defined but never used. Allowed unused args must match /^_/u                       [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m75:9[22m   [33mwarning[39m  'effectiveTargetId' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m187:7[22m   [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier                                       [2mno-catch-shadow[22m[0m
+[0m  [2m187:14[22m  [33mwarning[39m  'error' is already declared in the upper scope on line 65 column 3                            [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m320:23[22m  [33mwarning[39m  'a11y' is assigned a value but never used. Allowed unused vars must match /^_/u               [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m320:29[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                      [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m376:31[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                      [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\feedback\SocialFeedbackStep.tsx[24m[0m
+[0m  [2m60:9[22m  [33mwarning[39m  'animationValue' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\haptic\HapticComponents.tsx[24m[0m
+[0m  [2m359:9[22m  [33mwarning[39m  'handleSwipeStart' is assigned a value but never used. Allowed unused vars must match /^_/u      [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m366:9[22m  [33mwarning[39m  'handleSwipeEnd' is assigned a value but never used. Allowed unused vars must match /^_/u        [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m373:9[22m  [33mwarning[39m  'handlePinchStart' is assigned a value but never used. Allowed unused vars must match /^_/u      [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m380:9[22m  [33mwarning[39m  'handlePinchEnd' is assigned a value but never used. Allowed unused vars must match /^_/u        [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m387:9[22m  [33mwarning[39m  'handleLongPressStart' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\home\EditorialColorSection.tsx[24m[0m
+[0m  [2m146:56[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\home\ExperienceShowcase.tsx[24m[0m
+[0m  [2m106:21[22m  [33mwarning[39m  Inline style: { fontWeight: "currentStory.id === story.id ? '600' : '400'" }  [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\home\ExperienceStoryBlock.tsx[24m[0m
+[0m  [2m146:11[22m  [33mwarning[39m  'isActive' is assigned a value but never used. Allowed unused vars must match /^_/u                                       [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m308:15[22m  [33mwarning[39m  Inline style: {[0m
+[0m  backgroundColor: "index === currentIndex ? story.accentColor || '#FFFFFF' : 'rgba(255,255,255,0.3)'"[0m
+[0m}  [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\home\MiniDiscoveryEngine.tsx[24m[0m
+[0m  [2m42:11[22m  [33mwarning[39m  Unexpected any. Specify a different type                                               [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m54:10[22m  [33mwarning[39m  'lastAction' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\home\ProductCardShowcase.tsx[24m[0m
+[0m  [2m65:43[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m80:5[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\home\StyleMatchCarousel.tsx[24m[0m
+[0m   [2m20:16[22m  [33mwarning[39m  'setData' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m138:37[22m  [33mwarning[39m  Unexpected any. Specify a different type                                            [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\luxury\ElegantTabs.tsx[24m[0m
+[0m    [2m1:28[22m  [31merror[39m    'useMemo' is defined but never used                                                                                                                                                                                                                                                                                                    [2munused-imports/no-unused-imports[22m[0m
+[0m   [2m54:9[22m   [33mwarning[39m  'SPRING_CONFIG' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                               [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m116:83[22m  [33mwarning[39m  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component “ElegantTabs” and pass data as props  [2mreact/no-unstable-nested-components[22m[0m
+[0m  [2m134:21[22m  [31merror[39m    Replace `␍⏎········style={[styles.tabLabel,·animatedStyle,·isActive·&&·styles.activeTabLabel]}␍⏎······` with `·style={[styles.tabLabel,·animatedStyle,·isActive·&&·styles.activeTabLabel]}`                                                                                                                                            [2mprettier/prettier[22m[0m
+[0m  [2m172:27[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                                                                                                                [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\luxury\LuxuryWardrobeCard.tsx[24m[0m
+[0m  [2m55:3[22m  [33mwarning[39m  'variant' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\modern\ModernButton.tsx[24m[0m
+[0m   [2m66:8[22m   [33mwarning[39m  React Hook useCallback has missing dependencies: 'opacity' and 'scale'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m   [2m76:8[22m   [33mwarning[39m  React Hook useCallback has missing dependencies: 'opacity' and 'scale'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m122:43[22m  [33mwarning[39m  Inline style: { marginLeft: 8 }                                                                                             [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\modern\ModernInput.tsx[24m[0m
+[0m   [2m68:12[22m  [33mwarning[39m  'isFocused' is assigned a value but never used. Allowed unused vars must match /^_/u                                                        [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m86:7[22m   [33mwarning[39m  React Hook useCallback has missing dependencies: 'focusAnimation' and 'labelAnimation'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m102:7[22m   [33mwarning[39m  React Hook useCallback has missing dependencies: 'focusAnimation' and 'labelAnimation'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m110:8[22m   [33mwarning[39m  React Hook React.useEffect has a missing dependency: 'errorAnimation'. Either include it or remove the dependency array                     [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m116:8[22m   [33mwarning[39m  React Hook React.useEffect has a missing dependency: 'labelAnimation'. Either include it or remove the dependency array                     [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\modern\ModernLoading.tsx[24m[0m
+[0m  [2m147:13[22m  [33mwarning[39m  'translateX' is already declared in the upper scope on line 46 column 11  [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m252:46[22m  [33mwarning[39m  Inline style: { width: '80%' }                                            [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m253:46[22m  [33mwarning[39m  Inline style: { width: '60%' }                                            [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m254:46[22m  [33mwarning[39m  Inline style: { width: '90%' }                                            [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\naming\AINameGenerator.tsx[24m[0m
+[0m  [2m33:3[22m  [33mwarning[39m  'showPreferences' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m41:5[22m  [33mwarning[39m  'getEffectiveName' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\navigation\FloatingTabBar.tsx[24m[0m
+[0m   [2m30:16[22m  [33mwarning[39m  'screenWidth' is assigned a value but never used. Allowed unused vars must match /^_/u                                       [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m60:11[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                     [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m245:17[22m  [33mwarning[39m  Inline style: {[0m
+[0m  color: "isActive ? '#FFD700' : ORIGINAL_COLORS.secondaryText",[0m
+[0m  fontWeight: "isActive ? '600' : '400'"[0m
+[0m}  [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\navigation\FluidTabNavigator.tsx[24m[0m
+[0m   [2m22:34[22m  [33mwarning[39m  Unexpected any. Specify a different type                                 [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m120:44[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\navigation\NavigationShowcase.tsx[24m[0m
+[0m  [2m47:22[22m  [33mwarning[39m  'setShowLabels' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\navigation\PremiumTabBar.tsx[24m[0m
+[0m   [2m86:6[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'indicatorPosition'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m121:84[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\navigation\StackNavigator.tsx[24m[0m
+[0m  [2m11:68[22m  [33mwarning[39m  'initialRoute' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\navigation\TabBar.tsx[24m[0m
+[0m  [2m55:6[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'indicatorPosition'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\navigation\TabNavigator.tsx[24m[0m
+[0m  [2m11:64[22m  [33mwarning[39m  'initialTab' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\onboarding\ConfidenceLoop.tsx[24m[0m
+[0m   [2m21:11[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                           [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m29:3[22m   [33mwarning[39m  'outfit' is defined but never used. Allowed unused args must match /^_/u                                           [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m91:6[22m   [33mwarning[39m  React Hook useCallback has a missing dependency: 'showFeedback'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m298:48[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                           [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m302:5[22m   [33mwarning[39m  Unexpected console statement                                                                                       [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\onboarding\OnboardingFlow.tsx[24m[0m
+[0m  [2m20:10[22m  [33mwarning[39m  'wardrobeItemsAdded' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m20:30[22m  [33mwarning[39m  'setWardrobeItemsAdded' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m84:46[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                          [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\onboarding\OnboardingWelcome.tsx[24m[0m
+[0m   [2m19:9[22m   [33mwarning[39m  'width' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m19:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m102:46[22m  [33mwarning[39m  Unexpected any. Specify a different type                                           [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\onboarding\SampleOutfitGeneration.tsx[24m[0m
+[0m   [2m52:10[22m  [33mwarning[39m  'showOutfits' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m338:48[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m342:5[22m   [33mwarning[39m  Unexpected console statement                                                            [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\onboarding\StyleDNAResults.tsx[24m[0m
+[0m   [2m13:16[22m  [33mwarning[39m  'screenWidth' is assigned a value but never used. Allowed unused vars must match /^_/u      [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m13:37[22m  [33mwarning[39m  'screenHeight' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m60:17[22m  [33mwarning[39m  Inline style: {[0m
+[0m  backgroundColor: "color.toLowerCase() === 'white' ? '#FFFFFF' : color"[0m
+[0m}  [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m107:31[22m  [33mwarning[39m  'confidence' is already declared in the upper scope on line 43 column 78                    [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m120:30[22m  [33mwarning[39m  'confidence' is already declared in the upper scope on line 43 column 78                    [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m255:48[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                    [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m259:5[22m   [33mwarning[39m  Unexpected console statement                                                                [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\onboarding\StyleDNASurvey.tsx[24m[0m
+[0m    [2m2:19[22m  [33mwarning[39m  'useRef' is assigned a value but never used. Allowed unused vars must match /^_/u        [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m18:37[22m  [33mwarning[39m  'screenHeight' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m28:13[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                 [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m263:48[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                 [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m267:5[22m   [33mwarning[39m  Unexpected console statement                                                             [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\onboarding\StylePreferenceQuestionnaire.tsx[24m[0m
+[0m  [2m428:46[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\onboarding\VisualStyleDNAUpload.tsx[24m[0m
+[0m   [2m23:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m177:37[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m326:48[22m  [33mwarning[39m  Unexpected any. Specify a different type                                           [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m330:5[22m   [33mwarning[39m  Unexpected console statement                                                       [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\onboarding\WelcomeGift.tsx[24m[0m
+[0m   [2m15:9[22m   [33mwarning[39m  'width' is assigned a value but never used. Allowed unused vars must match /^_/u         [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m15:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u        [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m20:18[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                 [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m45:38[22m  [33mwarning[39m  'styleDNA' is defined but never used. Allowed unused args must match /^_/u               [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m95:9[22m   [33mwarning[39m  'fadeAnim' is assigned a value but never used. Allowed unused vars must match /^_/u      [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m173:57[22m  [33mwarning[39m  'styleDNA' is already declared in the upper scope on line 88 column 39                   [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m179:11[22m  [33mwarning[39m  'colorPalette' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m330:48[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                 [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m334:5[22m   [33mwarning[39m  Unexpected console statement                                                             [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\optimized\OptimizedImage.tsx[24m[0m
+[0m  [2m142:13[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\organisms\ItemDetailsForm\index.tsx[24m[0m
+[0m  [2m46:3[22m  [33mwarning[39m  'categories' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m55:3[22m  [33mwarning[39m  'colors' is assigned a value but never used. Allowed unused vars must match /^_/u      [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m56:3[22m  [33mwarning[39m  'sizes' is assigned a value but never used. Allowed unused vars must match /^_/u       [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\premium\PremiumBrandShowcase.tsx[24m[0m
+[0m  [2m15:16[22m  [33mwarning[39m  'screenWidth' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\premium\PremiumCard.tsx[24m[0m
+[0m  [2m128:15[22m  [33mwarning[39m  Inline style: { backgroundColor: 'rgba(255, 255, 255, 0.1)' }  [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\premium\PremiumHomeScreen.tsx[24m[0m
+[0m   [2m94:10[22m  [33mwarning[39m  'activeCollection' is assigned a value but never used. Allowed unused vars must match /^_/u                                              [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m191:15[22m  [33mwarning[39m  Inline style: {[0m
+[0m  marginLeft: 'index === 1 ? DesignSystem.spacing.sm : 0',[0m
+[0m  marginRight: 'index === 1 ? DesignSystem.spacing.sm : 0'[0m
+[0m}  [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m235:15[22m  [33mwarning[39m  Inline style: { marginLeft: 'index === 0 ? DesignSystem.spacing.xl : 0' }                                                                [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\premium\PremiumLoadingScreen.tsx[24m[0m
+[0m  [2m15:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m81:11[22m  [33mwarning[39m  'width' is already declared in the upper scope on line 15 column 9                 [2m@typescript-eslint/no-shadow[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\premium\PremiumProductCard.tsx[24m[0m
+[0m  [2m37:11[22m  [33mwarning[39m  Unexpected any. Specify a different type                            [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m86:11[22m  [33mwarning[39m  'width' is already declared in the upper scope on line 17 column 9  [2m@typescript-eslint/no-shadow[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\premium\PremiumTabBar.tsx[24m[0m
+[0m  [2m128:63[22m  [33mwarning[39m  'descriptors' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m187:19[22m  [33mwarning[39m  Expected { after 'if' condition                                                [2mcurly[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\product\ProductCard.tsx[24m[0m
+[0m  [2m80:11[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\product\ProductCardShowcase.tsx[24m[0m
+[0m   [2m24:16[22m  [33mwarning[39m  'screenWidth' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                                                                                                            [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m159:7[22m   [33mwarning[39m  'SORT_OPTIONS' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                                                                                                           [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m182:18[22m  [33mwarning[39m  'setSortBy' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                                                                                                              [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m374:33[22m  [33mwarning[39m  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component “ProductCardShowcase” and pass data as props. If you want to allow component creation in props, set allowAsProps option to true  [2mreact/no-unstable-nested-components[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\profile\SettingsSection.tsx[24m[0m
+[0m  [2m198:7[22m  [33mwarning[39m  'styles' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\profile\StatsCard.tsx[24m[0m
+[0m    [2m8:16[22m  [33mwarning[39m  'screenWidth' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m173:37[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                 [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\sanctuary\ArtistryShowcase.tsx[24m[0m
+[0m   [2m90:33[22m  [33mwarning[39m  Unexpected console statement        [2mno-console[22m[0m
+[0m  [2m117:48[22m  [33mwarning[39m  Inline style: { color: 'white' }    [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m120:48[22m  [33mwarning[39m  Inline style: { color: 'white' }    [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m125:48[22m  [33mwarning[39m  Inline style: { color: 'white' }    [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m224:17[22m  [33mwarning[39m  Inline style: { marginBottom: 16 }  [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m248:15[22m  [33mwarning[39m  Inline style: { marginBottom: 20 }  [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m257:30[22m  [33mwarning[39m  Unexpected console statement        [2mno-console[22m[0m
+[0m  [2m258:33[22m  [33mwarning[39m  Unexpected console statement        [2mno-console[22m[0m
+[0m  [2m270:15[22m  [33mwarning[39m  Inline style: { marginBottom: 20 }  [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\sanctuary\AynaOutfitCardV2.tsx[24m[0m
+[0m   [2m40:12[22m  [33mwarning[39m  'imageLoaded' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m245:58[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                 [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m252:29[22m  [33mwarning[39m  Unexpected console statement                                                            [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\sanctuary\LikeButton.tsx[24m[0m
+[0m   [2m18:16[22m  [33mwarning[39m  'screenWidth' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m221:11[22m  [33mwarning[39m  Inline style: { opacity: 'disabled ? 0.5 : 1' }                                         [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\sanctuary\MainRitualScreen.tsx[24m[0m
+[0m   [2m63:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                               [2mno-void[22m[0m
+[0m  [2m108:7[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m129:29[22m  [33mwarning[39m  'outfit' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m143:5[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\sanctuary\WardrobeItemCard.tsx[24m[0m
+[0m   [2m36:3[22m   [33mwarning[39m  'variant' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m165:42[22m  [33mwarning[39m  Unexpected any. Specify a different type                                            [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m166:80[22m  [33mwarning[39m  Unexpected any. Specify a different type                                            [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m168:42[22m  [33mwarning[39m  Unexpected any. Specify a different type                                            [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m169:80[22m  [33mwarning[39m  Unexpected any. Specify a different type                                            [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\shared\OptimizedImage.tsx[24m[0m
+[0m  [2m138:7[22m   [33mwarning[39m  Unexpected console statement                                                                                                                [2mno-console[22m[0m
+[0m  [2m201:13[22m  [33mwarning[39m  Unexpected console statement                                                                                                                [2mno-console[22m[0m
+[0m  [2m224:7[22m   [33mwarning[39m  Unexpected console statement                                                                                                                [2mno-console[22m[0m
+[0m  [2m235:6[22m   [33mwarning[39m  React Hook useCallback has missing dependencies: 'lowQualityFadeAnim' and 'source'. Either include them or remove the dependency array      [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m237:5[22m   [33mwarning[39m  React Hook useCallback has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m254:6[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'source'. Either include it or remove the dependency array                                   [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m254:19[22m  [33mwarning[39m  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked    [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m287:13[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                    [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m354:43[22m  [33mwarning[39m  Inline style: { fontSize: 12, marginTop: 4 }                                                                                                [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m369:28[22m  [33mwarning[39m  Unexpected console statement                                                                                                                [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\shared\RecommendationsList.tsx[24m[0m
+[0m    [2m5:7[22m   [33mwarning[39m  'COLORS' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                                                                                                                 [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m89:33[22m  [33mwarning[39m  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component “RecommendationsList” and pass data as props. If you want to allow component creation in props, set allowAsProps option to true  [2mreact/no-unstable-nested-components[22m[0m
+[0m  [2m112:7[22m   [33mwarning[39m  'recommendationsContainer' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                                                                                               [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\shared\SectionHeader.tsx[24m[0m
+[0m  [2m15:11[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\shared\StandardButton.tsx[24m[0m
+[0m  [2m55:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\shared\StandardInput.tsx[24m[0m
+[0m   [2m82:7[22m   [33mwarning[39m  'style' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m268:73[22m  [33mwarning[39m  Forbidden non-null assertion                                             [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\shared\SwipeStack.tsx[24m[0m
+[0m    [2m9:16[22m  [33mwarning[39m  'screenWidth' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                [2munused-imports/no-unused-vars[22m[0m
+[0m    [2m9:37[22m  [33mwarning[39m  'screenHeight' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                               [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m82:6[22m   [33mwarning[39m  React Hook useCallback has a missing dependency: 'cardAnimations'. Either include it or remove the dependency array                                                                                                                                                                                                                   [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m133:12[22m  [31merror[39m    Replace `·scale:·Animated.SharedValue<number>;·translateY:·Animated.SharedValue<number>;·opacity:·Animated.SharedValue<number>` with `␍⏎······scale:·Animated.SharedValue<number>;␍⏎······translateY:·Animated.SharedValue<number>;␍⏎······opacity:·Animated.SharedValue<number>;␍⏎···`                                               [2mprettier/prettier[22m[0m
+[0m  [2m139:8[22m   [33mwarning[39m  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component “SwipeStack” and pass data as props  [2mreact/no-unstable-nested-components[22m[0m
+[0m  [2m139:33[22m  [33mwarning[39m  'onSwipeLeft' is already declared in the upper scope on line 36 column 3                                                                                                                                                                                                                                                              [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m139:46[22m  [33mwarning[39m  'onSwipeRight' is already declared in the upper scope on line 37 column 3                                                                                                                                                                                                                                                             [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m147:21[22m  [31merror[39m    Replace `·key={`${outfit.id}-${currentIndex}`}·style={[styles.cardWrapper,·animatedStyle]}` with `␍⏎········key={`${outfit.id}-${currentIndex}`}␍⏎········style={[styles.cardWrapper,·animatedStyle]}␍⏎······`                                                                                                                        [2mprettier/prettier[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\shared\SwipeableCard.tsx[24m[0m
+[0m  [2m38:11[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\shared\VisionStats.tsx[24m[0m
+[0m   [2m18:11[22m  [33mwarning[39m  Unexpected any. Specify a different type                                 [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m114:27[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\studio\BentoBoxGallery.tsx[24m[0m
+[0m   [2m86:46[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                                                                                                                    [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m129:44[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                                                                                                                    [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m151:38[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m167:47[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                                                                                                                    [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m210:46[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                                                                                                                    [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m255:46[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                                                                                                                    [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m294:45[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                                                                                                                    [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m330:82[22m  [33mwarning[39m  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component “BentoBoxGallery” and pass data as props  [2mreact/no-unstable-nested-components[22m[0m
+[0m  [2m330:84[22m  [31merror[39m    Replace `·index,·children` with `␍⏎······index,␍⏎······children,␍⏎···`                                                                                                                                                                                                                                                                     [2mprettier/prettier[22m[0m
+[0m  [2m330:85[22m  [33mwarning[39m  'index' is already declared in the upper scope on line 329 column 40                                                                                                                                                                                                                                                                       [2m@typescript-eslint/no-shadow[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\studio\PremiumOutfitCard.tsx[24m[0m
+[0m  [2m32:11[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\studio\StudioHomeScreen.tsx[24m[0m
+[0m   [2m19:9[22m   [33mwarning[39m  'width' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m19:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m290:41[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u            [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\studio\StudioTabBar.tsx[24m[0m
+[0m  [2m127:22[22m  [33mwarning[39m  Expected { after 'if' condition  [2mcurly[22m[0m
+[0m  [2m130:18[22m  [33mwarning[39m  Expected { after 'if' condition  [2mcurly[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\ultra\UltraPremiumHomeScreen.tsx[24m[0m
+[0m   [2m23:16[22m  [33mwarning[39m  'height' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m215:19[22m  [33mwarning[39m  Inline style: { marginLeft: 'index === 0 ? DesignSystem.spacing.lg : 0' }          [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\ultra\UltraPremiumTabBar.tsx[24m[0m
+[0m  [2m122:21[22m  [33mwarning[39m  Expected { after 'if' condition                                                                                                                                                                      [2mcurly[22m[0m
+[0m  [2m126:41[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                             [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m127:23[22m  [31merror[39m    Replace `·type:·string;·target:·string;·canPreventDefault?:·boolean·})·=>` with `⏎··················type:·string;⏎··················target:·string;⏎··················canPreventDefault?:·boolean;`  [2mprettier/prettier[22m[0m
+[0m  [2m128:17[22m  [31merror[39m    Replace `··|·{·defaultPrevented?:·boolean·}⏎·················` with `})·=>·{·defaultPrevented?:·boolean·}`                                                                                           [2mprettier/prettier[22m[0m
+[0m  [2m137:22[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                             [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m140:41[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                             [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m146:28[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                             [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m149:18[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                             [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\vision\VisionDiscoverScreen.tsx[24m[0m
+[0m  [2m15:16[22m  [33mwarning[39m  'screenWidth' is assigned a value but never used. Allowed unused vars must match /^_/u       [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m15:37[22m  [33mwarning[39m  'screenHeight' is assigned a value but never used. Allowed unused vars must match /^_/u      [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m53:10[22m  [33mwarning[39m  'streakDays' is assigned a value but never used. Allowed unused vars must match /^_/u        [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m53:22[22m  [33mwarning[39m  'setStreakDays' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m68:9[22m   [33mwarning[39m  'handleCardPress' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m76:9[22m   [33mwarning[39m  'handleStackEmpty' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\vision\VisionWardrobeScreen.tsx[24m[0m
+[0m   [2m28:38[22m  [33mwarning[39m  'SCREEN_HEIGHT' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                   [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m129:8[22m   [33mwarning[39m  Do not define components during render. React will see a new component type on every render and destroy the entire subtree’s DOM nodes and state (https://reactjs.org/docs/reconciliation.html#elements-of-different-types). Instead, move this component definition out of the parent component “MorphingGallery” and pass data as props  [2mreact/no-unstable-nested-components[22m[0m
+[0m  [2m129:17[22m  [33mwarning[39m  'index' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                                                                                                                    [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m129:24[22m  [33mwarning[39m  'onItemPress' is already declared in the upper scope on line 113 column 77                                                                                                                                                                                                                                                                 [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m129:37[22m  [33mwarning[39m  'morphProgress' is already declared in the upper scope on line 114 column 9                                                                                                                                                                                                                                                                [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m328:23[22m  [33mwarning[39m  'setSearchQuery' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\vision\shared\SwipeStack.tsx[24m[0m
+[0m  [2m6:16[22m  [33mwarning[39m  'SCREEN_WIDTH' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\vision\shared\SwipeableCard.tsx[24m[0m
+[0m   [2m70:10[22m  [33mwarning[39m  'isPressed' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                               [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m105:6[22m   [33mwarning[39m  React Hook useCallback has missing dependencies: 'opacity', 'rotate', 'scale', 'translateX', and 'translateY'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m130:5[22m   [33mwarning[39m  React Hook useCallback has missing dependencies: 'opacity', 'rotate', 'translateX', and 'translateY'. Either include them or remove the dependency array           [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m159:13[22m  [33mwarning[39m  'distance' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\wardrobe\CameraView\index.tsx[24m[0m
+[0m   [2m9:37[22m  [33mwarning[39m  'screenHeight' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m20:3[22m   [33mwarning[39m  'onGallerySelect' is defined but never used. Allowed unused args must match /^_/u        [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m29:28[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                 [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\wardrobe\ColorPicker.tsx[24m[0m
+[0m  [2m37:3[22m  [33mwarning[39m  'multiSelect' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\wardrobe\PhotoProcessingLoader\index.tsx[24m[0m
+[0m    [2m7:37[22m  [33mwarning[39m  'screenHeight' is assigned a value but never used. Allowed unused vars must match /^_/u                          [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m91:6[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'progressAnim'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m158:11[22m  [33mwarning[39m  Inline style: { backgroundColor: 'rgba(0,0,0,0.9)' }                                                             [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m341:37[22m  [33mwarning[39m  Inline style: { fontWeight: '600' }                                                                              [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\wardrobe\WardrobeFilter.tsx[24m[0m
+[0m  [2m42:65[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\wardrobe\WardrobeGrid.tsx[24m[0m
+[0m  [2m46:39[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                                                                                         [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m53:16[22m  [33mwarning[39m  The ref value 'itemRefs.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'itemRefs.current' to a variable inside the effect, and use that variable in the cleanup function  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\wardrobe\WardrobeItem.tsx[24m[0m
+[0m   [2m34:61[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m154:11[22m  [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\components\wardrobe\WardrobeItemForm.tsx[24m[0m
+[0m   [2m30:7[22m   [33mwarning[39m  'CATEGORIES' is assigned a value but never used. Allowed unused vars must match /^_/u          [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m40:7[22m   [33mwarning[39m  'SIZES' is assigned a value but never used. Allowed unused vars must match /^_/u               [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m48:11[22m  [33mwarning[39m  'getEffectiveName' is assigned a value but never used. Allowed unused vars must match /^_/u    [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m71:10[22m  [33mwarning[39m  'useAIName' is assigned a value but never used. Allowed unused vars must match /^_/u           [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m80:9[22m   [33mwarning[39m  'handleInputChange' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m90:9[22m   [33mwarning[39m  'handleSelectChange' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m205:24[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m206:34[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m207:23[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m209:21[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\config\aiProxy.ts[24m[0m
+[0m  [2m7:12[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\config\bundleOptimization.ts[24m[0m
+[0m  [2m142:32[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m158:7[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m169:7[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m194:9[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m204:32[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m320:5[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m331:7[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m336:7[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\config\googleVision.ts[24m[0m
+[0m  [2m37:5[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m48:5[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m69:5[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\config\openai.ts[24m[0m
+[0m  [2m35:7[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m58:22[22m  [33mwarning[39m  'params' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m59:9[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\config\sentry.ts[24m[0m
+[0m  [2m23:7[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m45:49[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m46:40[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m48:5[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m49:34[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m50:43[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m52:5[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\config\supabaseClient.ts[24m[0m
+[0m   [2m39:5[22m   [33mwarning[39m  Do not use 'new' for side effects  [2mno-new[22m[0m
+[0m   [2m39:13[22m  [33mwarning[39m  Forbidden non-null assertion       [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m   [2m46:39[22m  [33mwarning[39m  Forbidden non-null assertion       [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m   [2m53:7[22m   [33mwarning[39m  Forbidden non-null assertion       [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m   [2m54:5[22m   [33mwarning[39m  Unexpected console statement       [2mno-console[22m[0m
+[0m   [2m64:3[22m   [33mwarning[39m  Unexpected console statement       [2mno-console[22m[0m
+[0m   [2m67:5[22m   [33mwarning[39m  Unexpected console statement       [2mno-console[22m[0m
+[0m   [2m74:38[22m  [33mwarning[39m  Forbidden non-null assertion       [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m   [2m74:52[22m  [33mwarning[39m  Forbidden non-null assertion       [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m101:17[22m  [33mwarning[39m  Forbidden non-null assertion       [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m102:22[22m  [33mwarning[39m  Forbidden non-null assertion       [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m103:25[22m  [33mwarning[39m  Forbidden non-null assertion       [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\constants\AppConstants.ts[24m[0m
+[0m  [2m91:19[22m  [33mwarning[39m  Unnecessary escape character: \+  [2mno-useless-escape[22m[0m
+[0m  [2m91:43[22m  [33mwarning[39m  Unnecessary escape character: \.  [2mno-useless-escape[22m[0m
+[0m  [2m91:67[22m  [33mwarning[39m  Unnecessary escape character: \.  [2mno-useless-escape[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\constants\AynaModaVisionTheme.ts[24m[0m
+[0m  [2m242:50[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\context\AuthContext.tsx[24m[0m
+[0m  [2m112:55[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m123:10[22m  [33mwarning[39m  'request' is assigned a value but never used. Allowed unused vars must match /^_/u                                        [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m188:29[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m189:31[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m190:41[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m191:42[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m192:37[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m193:49[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m194:32[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m195:32[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m215:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                               [2mno-void[22m[0m
+[0m  [2m218:19[22m  [33mwarning[39m  'session' is already declared in the upper scope on line 102 column 10                                                    [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m237:56[22m  [33mwarning[39m  'session' is already declared in the upper scope on line 102 column 10                                                    [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m255:6[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'checkOnboardingStatus'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\data\experienceStories.ts[24m[0m
+[0m  [2m160:12[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\hooks\useAINaming.ts[24m[0m
+[0m  [2m118:5[22m  [33mwarning[39m  React Hook useCallback has an unnecessary dependency: 'user'. Either exclude it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\hooks\useAnimation.ts[24m[0m
+[0m   [2m31:11[22m  [33mwarning[39m  'AnimationControls' is defined but never used. Allowed unused vars must match /^_/u                                      [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m57:9[22m   [33mwarning[39m  Unexpected console statement                                                                                             [2mno-console[22m[0m
+[0m  [2m151:6[22m   [33mwarning[39m  React Hook useCallback has an unnecessary dependency: 'animatedValue'. Either exclude it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m307:62[22m  [33mwarning[39m  'options' is assigned a value but never used. Allowed unused vars must match /^_/u                                       [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m322:9[22m   [33mwarning[39m  Unexpected console statement                                                                                             [2mno-console[22m[0m
+[0m  [2m389:3[22m   [33mwarning[39m  'options' is assigned a value but never used. Allowed unused vars must match /^_/u                                       [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m405:9[22m   [33mwarning[39m  Unexpected console statement                                                                                             [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\hooks\useAuth.ts[24m[0m
+[0m   [2m89:27[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m   [2m94:25[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m   [2m98:27[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m102:27[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m105:23[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m112:25[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m128:25[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m130:27[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m135:25[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m137:27[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m140:34[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m166:9[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m181:9[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m264:11[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m286:9[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m298:7[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\hooks\useEfficiencyScore.ts[24m[0m
+[0m  [2m56:6[22m  [33mwarning[39m  React Hook useEffect has missing dependencies: 'refreshGoals' and 'refreshScore'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\hooks\useErrorRecovery.ts[24m[0m
+[0m   [2m48:18[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                               [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m626:5[22m   [33mwarning[39m  React Hook useCallback has an unnecessary dependency: 'retryConfig'. Either exclude it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\hooks\useHaptic.ts[24m[0m
+[0m  [2m106:7[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\hooks\useImageUploader.ts[24m[0m
+[0m   [2m63:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m107:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m141:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m150:9[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m154:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m162:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m167:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m203:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m211:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m221:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m242:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m248:9[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m261:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\hooks\useLoading.ts[24m[0m
+[0m  [2m12:10[22m  [33mwarning[39m  'loadingTitle' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m13:10[22m  [33mwarning[39m  'loadingSubtitle' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\hooks\useStyleDNA.ts[24m[0m
+[0m   [2m82:6[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'loadExistingStyleDNA'. Either include it or remove the dependency array    [2mreact-hooks/exhaustive-deps[22m[0m
+[0m   [2m96:7[22m   [33mwarning[39m  Unexpected console statement                                                                                               [2mno-console[22m[0m
+[0m  [2m119:9[22m   [33mwarning[39m  Unexpected console statement                                                                                               [2mno-console[22m[0m
+[0m  [2m122:9[22m   [33mwarning[39m  Unexpected console statement                                                                                               [2mno-console[22m[0m
+[0m  [2m125:9[22m   [33mwarning[39m  Unexpected console statement                                                                                               [2mno-console[22m[0m
+[0m  [2m137:6[22m   [33mwarning[39m  React Hook useCallback has a missing dependency: 'loadExistingStyleDNA'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m195:27[22m  [33mwarning[39m  'stylePreferences' is assigned a value but never used. Allowed unused vars must match /^_/u                                [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\lib\callAiAnalysis.ts[24m[0m
+[0m  [2m4:21[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m5:22[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\lib\logger.ts[24m[0m
+[0m   [2m76:22[22m  [33mwarning[39m  Expected { after 'if' condition                                                                                                                  [2mcurly[22m[0m
+[0m   [2m77:34[22m  [33mwarning[39m  Expected { after 'if' condition                                                                                                                  [2mcurly[22m[0m
+[0m   [2m80:38[22m  [31merror[39m    Replace `␍⏎······Object.entries(err).filter(([_,·v])·=>·v·!==·undefined),␍⏎····` with `Object.entries(err).filter(([_,·v])·=>·v·!==·undefined)`  [2mprettier/prettier[22m[0m
+[0m   [2m90:34[22m  [33mwarning[39m  Expected { after 'if' condition                                                                                                                  [2mcurly[22m[0m
+[0m  [2m123:7[22m   [33mwarning[39m  Unexpected console statement                                                                                                                     [2mno-console[22m[0m
+[0m  [2m129:5[22m   [33mwarning[39m  Unexpected console statement                                                                                                                     [2mno-console[22m[0m
+[0m  [2m131:5[22m   [33mwarning[39m  Unexpected console statement                                                                                                                     [2mno-console[22m[0m
+[0m  [2m133:5[22m   [33mwarning[39m  Unexpected console statement                                                                                                                     [2mno-console[22m[0m
+[0m  [2m135:5[22m   [33mwarning[39m  Unexpected console statement                                                                                                                     [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\lib\supa.ts[24m[0m
+[0m  [2m4:13[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m5:14[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\pages\ai-naming-demo.tsx[24m[0m
+[0m   [2m26:10[22m  [33mwarning[39m  'TabPanel' is defined but never used. Allowed unused vars must match /^_/u                     [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m30:18[22m  [33mwarning[39m  Inline style: { display: "value !== index ? 'none' : 'flex'" }                                 [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m430:5[22m   [33mwarning[39m  'preferences' is assigned a value but never used. Allowed unused vars must match /^_/u         [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m437:10[22m  [33mwarning[39m  'selectedItem' is assigned a value but never used. Allowed unused vars must match /^_/u        [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m437:24[22m  [33mwarning[39m  'setSelectedItem' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m439:10[22m  [33mwarning[39m  'showPreferences' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m439:27[22m  [33mwarning[39m  'setShowPreferences' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m441:9[22m   [33mwarning[39m  'handleTabChange' is assigned a value but never used. Allowed unused vars must match /^_/u     [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m453:19[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m462:12[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m643:41[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m670:39[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m679:84[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m691:42[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m697:48[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m700:44[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m706:44[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m709:43[22m  [33mwarning[39m  Forbidden non-null assertion                                                                   [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\providers\AIProvider.tsx[24m[0m
+[0m  [2m130:9[22m  [33mwarning[39m  The 'aiService' object construction makes the dependencies of useCallback Hook (at line 153) change on every render. To fix this, wrap the initialization of 'aiService' in its own useMemo() Hook  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m130:9[22m  [33mwarning[39m  The 'aiService' object construction makes the dependencies of useCallback Hook (at line 177) change on every render. To fix this, wrap the initialization of 'aiService' in its own useMemo() Hook  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m130:9[22m  [33mwarning[39m  The 'aiService' object construction makes the dependencies of useCallback Hook (at line 197) change on every render. To fix this, wrap the initialization of 'aiService' in its own useMemo() Hook  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m130:9[22m  [33mwarning[39m  The 'aiService' object construction makes the dependencies of useCallback Hook (at line 222) change on every render. To fix this, wrap the initialization of 'aiService' in its own useMemo() Hook  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m130:9[22m  [33mwarning[39m  The 'aiService' object construction makes the dependencies of useCallback Hook (at line 252) change on every render. To fix this, wrap the initialization of 'aiService' in its own useMemo() Hook  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\providers\AnimationProvider.tsx[24m[0m
+[0m  [2m107:33[22m  [33mwarning[39m  'setIsHighContrastEnabled' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m110:33[22m  [33mwarning[39m  'setIsLowPowerModeEnabled' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m340:17[22m  [33mwarning[39m  'accessibleAnimations' is assigned a value but never used. Allowed unused vars must match /^_/u      [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\providers\AppProvider.tsx[24m[0m
+[0m   [2m23:5[22m   [33mwarning[39m  Unexpected console statement                                                          [2mno-console[22m[0m
+[0m   [2m61:10[22m  [33mwarning[39m  'fontError' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m77:13[22m  [33mwarning[39m  Unexpected console statement                                                          [2mno-console[22m[0m
+[0m   [2m85:11[22m  [33mwarning[39m  Unexpected console statement                                                          [2mno-console[22m[0m
+[0m   [2m89:9[22m   [33mwarning[39m  Unexpected console statement                                                          [2mno-console[22m[0m
+[0m  [2m125:18[22m  [33mwarning[39m  Inline style: { flex: 1, justifyContent: 'center', alignItems: 'center' }             [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m130:38[22m  [33mwarning[39m  Inline style: { flex: 1 }                                                             [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\providers\ErrorProvider.tsx[24m[0m
+[0m  [2m165:36[22m  [33mwarning[39m  'removed' is assigned a value but never used. Allowed unused vars must match /^_/u                                                              [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m301:6[22m   [33mwarning[39m  React Hook useEffect has missing dependencies: 'config' and 'state.config.enableReporting'. Either include them or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\providers\HapticProvider.tsx[24m[0m
+[0m  [2m137:9[22m   [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier                                                      [2mno-catch-shadow[22m[0m
+[0m  [2m146:6[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'settings'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m259:9[22m   [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier                                                      [2mno-catch-shadow[22m[0m
+[0m  [2m276:7[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                  [2mno-void[22m[0m
+[0m  [2m279:11[22m  [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier                                                      [2mno-catch-shadow[22m[0m
+[0m  [2m302:9[22m   [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier                                                      [2mno-catch-shadow[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\providers\WardrobeProvider.tsx[24m[0m
+[0m  [2m125:9[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m138:9[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m200:43[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m201:43[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\screens\AynaMirrorScreen.tsx[24m[0m
+[0m   [2m36:7[22m   [33mwarning[39m  'LIQUID_SPRING' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                     [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m92:6[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'loadDailyRecommendations'. Either include it or remove the dependency array                                                                                  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m102:6[22m   [33mwarning[39m  React Hook useEffect has missing dependencies: 'backgroundScale', 'contentTranslateY', and 'headerOpacity'. Either include them or remove the dependency array                                               [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m161:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                                  [2mno-void[22m[0m
+[0m  [2m170:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                                                                                                                                  [2mno-void[22m[0m
+[0m  [2m185:7[22m   [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier                                                                                                                                                      [2mno-catch-shadow[22m[0m
+[0m  [2m185:14[22m  [33mwarning[39m  'error' is already declared in the upper scope on line 54 column 10                                                                                                                                          [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m194:9[22m   [33mwarning[39m  'handleWearOutfit' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m209:7[22m   [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier                                                                                                                                                      [2mno-catch-shadow[22m[0m
+[0m  [2m209:14[22m  [33mwarning[39m  'error' is already declared in the upper scope on line 54 column 10                                                                                                                                          [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m218:9[22m   [33mwarning[39m  'handleSaveOutfit' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m233:7[22m   [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier                                                                                                                                                      [2mno-catch-shadow[22m[0m
+[0m  [2m233:14[22m  [33mwarning[39m  'error' is already declared in the upper scope on line 54 column 10                                                                                                                                          [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m242:9[22m   [33mwarning[39m  'handleShareOutfit' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                 [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m255:7[22m   [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier                                                                                                                                                      [2mno-catch-shadow[22m[0m
+[0m  [2m255:14[22m  [33mwarning[39m  'error' is already declared in the upper scope on line 54 column 10                                                                                                                                          [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m311:46[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                                     [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m346:9[22m   [33mwarning[39m  Unexpected console statement                                                                                                                                                                                 [2mno-console[22m[0m
+[0m  [2m348:7[22m   [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier                                                                                                                                                      [2mno-catch-shadow[22m[0m
+[0m  [2m348:14[22m  [33mwarning[39m  'error' is already declared in the upper scope on line 54 column 10                                                                                                                                          [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m386:9[22m   [33mwarning[39m  'animatedContentStyle' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                              [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m424:22[22m  [33mwarning[39m  Inline style: {[0m
+[0m  padding: 24,[0m
+[0m  alignItems: 'center',[0m
+[0m  justifyContent: 'center',[0m
+[0m  flex: 1[0m
+[0m}                                                                                                               [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m425:24[22m  [33mwarning[39m  Inline style: { textAlign: 'center', marginBottom: 16 }                                                                                                                                                      [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m468:17[22m  [33mwarning[39m  Inline style: { position: 'absolute', top: 60, right: 20, zIndex: 1000 }                                                                                                                                     [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m471:18[22m  [33mwarning[39m  Inline style: {[0m
+[0m  width: 50,[0m
+[0m  height: 50,[0m
+[0m  borderRadius: 25,[0m
+[0m  alignItems: 'center',[0m
+[0m  justifyContent: 'center',[0m
+[0m  shadowOpacity: 0.15,[0m
+[0m  shadowRadius: 8,[0m
+[0m  elevation: 4[0m
+[0m}                                [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m517:18[22m  [33mwarning[39m  Inline style: {[0m
+[0m  position: 'absolute',[0m
+[0m  top: 0,[0m
+[0m  left: 0,[0m
+[0m  right: 0,[0m
+[0m  bottom: 0,[0m
+[0m  backgroundColor: 'black',[0m
+[0m  zIndex: 2000[0m
+[0m}                                                                           [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m527:30[22m  [33mwarning[39m  Inline style: { flex: 1 }                                                                                                                                                                                    [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m530:22[22m  [33mwarning[39m  Inline style: {[0m
+[0m  position: 'absolute',[0m
+[0m  top: 60,[0m
+[0m  left: 0,[0m
+[0m  right: 0,[0m
+[0m  flexDirection: 'row',[0m
+[0m  justifyContent: 'space-between',[0m
+[0m  paddingHorizontal: 20[0m
+[0m}                                               [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m541:24[22m  [33mwarning[39m  Inline style: {[0m
+[0m  width: 50,[0m
+[0m  height: 50,[0m
+[0m  borderRadius: 25,[0m
+[0m  backgroundColor: 'rgba(0,0,0,0.5)',[0m
+[0m  alignItems: 'center',[0m
+[0m  justifyContent: 'center'[0m
+[0m}                                                    [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m555:28[22m  [33mwarning[39m  Inline style: { flexDirection: 'row', gap: 10 }                                                                                                                                                              [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m557:26[22m  [33mwarning[39m  Inline style: {[0m
+[0m  width: 50,[0m
+[0m  height: 50,[0m
+[0m  borderRadius: 25,[0m
+[0m  backgroundColor: "flashMode !== 'off' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.5)'",[0m
+[0m  alignItems: 'center',[0m
+[0m  justifyContent: 'center'[0m
+[0m}  [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m583:26[22m  [33mwarning[39m  Inline style: {[0m
+[0m  width: 50,[0m
+[0m  height: 50,[0m
+[0m  borderRadius: 25,[0m
+[0m  backgroundColor: 'rgba(0,0,0,0.5)',[0m
+[0m  alignItems: 'center',[0m
+[0m  justifyContent: 'center'[0m
+[0m}                                                    [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m601:22[22m  [33mwarning[39m  Inline style: {[0m
+[0m  position: 'absolute',[0m
+[0m  bottom: 100,[0m
+[0m  left: 0,[0m
+[0m  right: 0,[0m
+[0m  alignItems: 'center'[0m
+[0m}                                                                                                       [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m610:24[22m  [33mwarning[39m  Inline style: {[0m
+[0m  width: 80,[0m
+[0m  height: 80,[0m
+[0m  borderRadius: 40,[0m
+[0m  backgroundColor: 'white',[0m
+[0m  alignItems: 'center',[0m
+[0m  justifyContent: 'center',[0m
+[0m  borderWidth: 4,[0m
+[0m  opacity: 'isCapturing ? 0.6 : 1'[0m
+[0m}        [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m627:28[22m  [33mwarning[39m  Inline style: {[0m
+[0m  width: 60,[0m
+[0m  height: 60,[0m
+[0m  borderRadius: 30,[0m
+[0m  alignItems: 'center',[0m
+[0m  justifyContent: 'center'[0m
+[0m}                                                                                          [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m636:34[22m  [33mwarning[39m  Inline style: { color: 'white', fontSize: 12 }                                                                                                                                                               [2mreact-native/no-inline-styles[22m[0m
+[0m  [2m640:28[22m  [33mwarning[39m  Inline style: { width: 60, height: 60, borderRadius: 30 }                                                                                                                                                    [2mreact-native/no-inline-styles[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\screens\AynaMirrorSettingsScreen.tsx[24m[0m
+[0m  [2m86:6[22m  [33mwarning[39m  React Hook useEffect has a missing dependency: 'loadUserPreferences'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\screens\MainRitualScreen.tsx[24m[0m
+[0m  [2m18:13[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\screens\WardrobeScreen.tsx[24m[0m
+[0m    [2m51:10[22m  [33mwarning[39m  'loading' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                              [2munused-imports/no-unused-vars[22m[0m
+[0m    [2m97:7[22m   [33mwarning[39m  Unexpected console statement                                                                                                                                                                                                                    [2mno-console[22m[0m
+[0m   [2m200:9[22m   [33mwarning[39m  The 'handleItemPress' function makes the dependencies of useCallback Hook (at line 233) change on every render. Move it inside the useCallback callback. Alternatively, wrap the definition of 'handleItemPress' in its own useCallback() Hook  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m   [2m226:24[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                                                                        [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m256:9[22m   [33mwarning[39m  'handleEditItem' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                       [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m261:9[22m   [33mwarning[39m  'handleDeleteItem' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                     [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m296:81[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                                                                        [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m306:47[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                                                                        [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m339:94[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                                                                        [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m345:11[22m  [33mwarning[39m  Unexpected console statement                                                                                                                                                                                                                    [2mno-console[22m[0m
+[0m   [2m366:9[22m   [33mwarning[39m  'getItemDisplayName' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                   [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m578:36[22m  [33mwarning[39m  Inline style: { paddingBottom: 100 }                                                                                                                                                                                                            [2mreact-native/no-inline-styles[22m[0m
+[0m   [2m740:34[22m  [33mwarning[39m  'name' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                          [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m740:40[22m  [33mwarning[39m  'isAI' is defined but never used. Allowed unused args must match /^_/u                                                                                                                                                                          [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m1085:79[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                                                                                                        [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\AIService.ts[24m[0m
+[0m  [2m273:20[22m  [33mwarning[39m  'text' is already declared in the upper scope on line 270 column 13  [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m347:13[22m  [33mwarning[39m  Forbidden non-null assertion                                         [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m503:15[22m  [33mwarning[39m  Unexpected use of '<<'                                               [2mno-bitwise[22m[0m
+[0m  [2m504:14[22m  [33mwarning[39m  Unexpected use of '&'                                                [2mno-bitwise[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\ErrorReporting.ts[24m[0m
+[0m  [2m193:7[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m352:9[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m358:7[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m359:7[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m360:7[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m361:7[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m362:7[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m369:36[22m  [33mwarning[39m  'report' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\HapticService.ts[24m[0m
+[0m  [2m291:52[22m  [33mwarning[39m  'intensity' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\accessibilityService.ts[24m[0m
+[0m   [2m44:5[22m   [33mwarning[39m  Unexpected console statement                                                                    [2mno-console[22m[0m
+[0m   [2m75:11[22m  [33mwarning[39m  'TouchTargetValidation' is defined but never used. Allowed unused vars must match /^_/u         [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m82:11[22m  [33mwarning[39m  'ScreenReaderValidation' is defined but never used. Allowed unused vars must match /^_/u        [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m90:11[22m  [33mwarning[39m  'KeyboardNavigationValidation' is defined but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m108:47[22m  [33mwarning[39m  Unexpected console statement                                                                    [2mno-console[22m[0m
+[0m  [2m254:14[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                        [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m343:19[22m  [33mwarning[39m  Forbidden non-null assertion                                                                    [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m344:19[22m  [33mwarning[39m  Forbidden non-null assertion                                                                    [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m345:19[22m  [33mwarning[39m  Forbidden non-null assertion                                                                    [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m430:7[22m   [33mwarning[39m  Unexpected console statement                                                                    [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\aiNamingService.ts[24m[0m
+[0m  [2m337:5[22m  [33mwarning[39m  'preferences' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\analyticsService.ts[24m[0m
+[0m   [2m42:7[22m   [33mwarning[39m  Unexpected console statement                                            [2mno-console[22m[0m
+[0m   [2m50:7[22m   [33mwarning[39m  Unexpected console statement                                            [2mno-console[22m[0m
+[0m   [2m78:5[22m   [33mwarning[39m  Unexpected console statement                                            [2mno-console[22m[0m
+[0m   [2m99:60[22m  [33mwarning[39m  Unexpected any. Specify a different type                                [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m108:7[22m   [33mwarning[39m  Unexpected console statement                                            [2mno-console[22m[0m
+[0m  [2m113:7[22m   [33mwarning[39m  Unexpected console statement                                            [2mno-console[22m[0m
+[0m  [2m130:40[22m  [33mwarning[39m  'data' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\antiConsumptionService.ts[24m[0m
+[0m  [2m515:5[22m  [33mwarning[39m  'target' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m702:5[22m  [33mwarning[39m  'userId' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m703:5[22m  [33mwarning[39m  'month' is defined but never used. Allowed unused args must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m704:5[22m  [33mwarning[39m  'year' is defined but never used. Allowed unused args must match /^_/u    [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m712:5[22m  [33mwarning[39m  'userId' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m713:5[22m  [33mwarning[39m  'month' is defined but never used. Allowed unused args must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m714:5[22m  [33mwarning[39m  'year' is defined but never used. Allowed unused args must match /^_/u    [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\aynaMirrorService.ts[24m[0m
+[0m   [2m165:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                           [2mno-void[22m[0m
+[0m   [2m309:15[22m  [33mwarning[39m  'genStart' is assigned a value but never used. Allowed unused vars must match /^_/u   [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m1005:83[22m  [33mwarning[39m  'idx' is defined but never used. Allowed unused args must match /^_/u                 [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m1005:88[22m  [33mwarning[39m  'arr' is defined but never used. Allowed unused args must match /^_/u                 [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m1132:59[22m  [33mwarning[39m  'style' is defined but never used. Allowed unused args must match /^_/u               [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m1957:18[22m  [33mwarning[39m  Unexpected use of '>>>'                                                               [2mno-bitwise[22m[0m
+[0m  [2m1979:18[22m  [33mwarning[39m  Unexpected use of '>>>'                                                               [2mno-bitwise[22m[0m
+[0m  [2m2109:13[22m  [33mwarning[39m  'weatherService' is already declared in the upper scope on line 23 column 10          [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m2164:13[22m  [33mwarning[39m  'weatherService' is already declared in the upper scope on line 23 column 10          [2m@typescript-eslint/no-shadow[22m[0m
+[0m  [2m2435:13[22m  [33mwarning[39m  'itemNames' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m2589:9[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                           [2mno-void[22m[0m
+[0m  [2m2688:11[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                           [2mno-void[22m[0m
+[0m  [2m2712:11[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                           [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\calendarService.ts[24m[0m
+[0m   [2m56:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m59:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m74:9[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m134:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m152:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m155:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m333:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\databasePerformanceService.ts[24m[0m
+[0m   [2m11:15[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m98:76[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m99:38[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m134:80[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m135:42[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m223:56[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m241:75[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m264:17[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m265:14[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\designSystemValidationService.ts[24m[0m
+[0m  [2m329:11[22m  [33mwarning[39m  'recommendations' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m626:7[22m   [33mwarning[39m  Unexpected console statement                                                                [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\efficiencyScoreService.ts[24m[0m
+[0m  [2m473:11[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                               [2mno-void[22m[0m
+[0m  [2m643:5[22m   [33mwarning[39m  'userId' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\enhancedWardrobeService.ts[24m[0m
+[0m  [2m119:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'              [2mno-void[22m[0m
+[0m  [2m379:11[22m  [33mwarning[39m  Value of 'error' may be overwritten in IE 8 and earlier  [2mno-catch-shadow[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\errorHandlingService.ts[24m[0m
+[0m  [2m133:11[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m675:32[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m675:66[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\featureIntegrationCoordinator.ts[24m[0m
+[0m  [2m474:7[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m484:7[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m809:5[22m  [33mwarning[39m  Forbidden non-null assertion                 [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\imageCacheManager.ts[24m[0m
+[0m  [2m136:7[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m138:7[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m199:13[22m  [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m221:9[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m238:7[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m293:63[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m341:7[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m377:7[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m386:7[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m428:5[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m469:11[22m  [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m  [2m478:5[22m   [33mwarning[39m  Unexpected console statement              [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\intelligenceService.ts[24m[0m
+[0m    [2m65:7[22m   [33mwarning[39m  'SEASONAL_COLOR_PREFERENCES' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m    [2m72:7[22m   [33mwarning[39m  'STYLE_COMPATIBILITY_MATRIX' is assigned a value but never used. Allowed unused vars must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m   [2m449:7[22m   [33mwarning[39m  Unexpected console statement                                                                           [2mno-console[22m[0m
+[0m   [2m473:30[22m  [33mwarning[39m  Forbidden non-null assertion                                                                           [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m1158:9[22m   [33mwarning[39m  Unexpected console statement                                                                           [2mno-console[22m[0m
+[0m  [2m1160:9[22m   [33mwarning[39m  Unexpected console statement                                                                           [2mno-console[22m[0m
+[0m  [2m1425:37[22m  [33mwarning[39m  'humidity' is assigned a value but never used. Allowed unused vars must match /^_/u                    [2munused-imports/no-unused-vars[22m[0m
+[0m  [2m1629:11[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'                                                            [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\navigationIntegrationService.ts[24m[0m
+[0m  [2m321:33[22m  [33mwarning[39m  'error' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\notificationHandler.ts[24m[0m
+[0m  [2m119:9[22m  [33mwarning[39m  Nested block is redundant                    [2mno-lone-blocks[22m[0m
+[0m  [2m202:7[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m222:7[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m242:7[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\notificationService.ts[24m[0m
+[0m   [2m15:30[22m  [33mwarning[39m  Unexpected any. Specify a different type                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m98:7[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m161:7[22m   [33mwarning[39m  Unexpected console statement                                              [2mno-console[22m[0m
+[0m  [2m323:95[22m  [33mwarning[39m  Unexpected any. Specify a different type                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m396:42[22m  [33mwarning[39m  Unexpected any. Specify a different type                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m397:12[22m  [33mwarning[39m  Unexpected any. Specify a different type                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m447:12[22m  [33mwarning[39m  Unexpected any. Specify a different type                                  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m669:42[22m  [33mwarning[39m  'userId' is defined but never used. Allowed unused args must match /^_/u  [2munused-imports/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\performanceOptimizationService.ts[24m[0m
+[0m   [2m485:15[22m  [33mwarning[39m  Unexpected use of '<<'                       [2mno-bitwise[22m[0m
+[0m   [2m486:14[22m  [33mwarning[39m  Unexpected use of '&'                        [2mno-bitwise[22m[0m
+[0m   [2m785:11[22m  [33mwarning[39m  Forbidden non-null assertion                 [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m1015:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m1025:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m1034:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m1043:5[22m   [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m1162:11[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m  [2m1170:11[22m  [33mwarning[39m  Expected 'undefined' and instead saw 'void'  [2mno-void[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\services\wardrobeService.ts[24m[0m
+[0m  [2m144:20[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\types\componentProps.ts[24m[0m
+[0m  [2m218:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m229:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\utils\ErrorHandler.ts[24m[0m
+[0m  [2m219:3[22m   [31merror[39m    Duplicate name 'createError'  [2mno-dupe-class-members[22m[0m
+[0m  [2m225:3[22m   [31merror[39m    Duplicate name 'createError'  [2mno-dupe-class-members[22m[0m
+[0m  [2m278:18[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m279:11[22m  [33mwarning[39m  Forbidden non-null assertion  [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m618:5[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m657:7[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\utils\asyncUtils.ts[24m[0m
+[0m  [2m10:7[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\utils\consoleSuppress.ts[24m[0m
+[0m    [2m7:24[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m    [2m8:25[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m    [2m9:24[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m10:25[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m11:26[22m  [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m14:3[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m15:3[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m16:3[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m69:3[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m77:3[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m90:5[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m   [2m97:5[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m  [2m102:5[22m   [33mwarning[39m  Unexpected console statement  [2mno-console[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\utils\databaseOptimizations.ts[24m[0m
+[0m   [2m18:39[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m20:26[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m21:22[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m22:21[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m98:42[22m  [33mwarning[39m  Forbidden non-null assertion              [2m@typescript-eslint/no-non-null-assertion[22m[0m
+[0m  [2m218:13[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m491:22[22m  [33mwarning[39m  Unexpected any. Specify a different type  [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mC:\AYNAMODA\src\utils\dynamicImports.tsx[24m[0m
+[0m    [2m6:1[22m   [31merror[39m    Run autofix to sort these imports!                                                                                                                                    [2msimple-import-sort/imports[22m[0m
+[0m   [2m35:38[22m  [31merror[39m    Replace `·error:·String(error),·componentStack:·errorInfo.componentStack` with `␍⏎······error:·String(error),␍⏎······componentStack:·errorInfo.componentStack,␍⏎···`  [2mprettier/prettier[22m[0m
+[0m   [2m57:61[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m61:24[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m77:52[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m85:52[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m   [2m92:83[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m105:93[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m112:93[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m118:88[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m124:90[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m134:82[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m139:85[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m144:93[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m149:85[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m154:83[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m193:91[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m198:34[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m206:90[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m209:87[22m  [33mwarning[39m  Unexpected any. Specify a different type                                                                                                                              [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[31m[1m✖ 820 problems (12 errors, 808 warnings)[22m[39m[0m
+[0m[31m[1m[22m[39m[31m[1m  10 errors and 9 warnings potentially fixable with the `--fix` option.[22m[39m[0m
+[0m[31m[1m[22m[39m[0m

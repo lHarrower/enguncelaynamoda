@@ -17,19 +17,32 @@ jest.mock('../../utils/ErrorHandler');
 jest.mock('@react-native-async-storage/async-storage', () => mocks.asyncStorage);
 jest.mock('react-native', () => ({
   ...jest.requireActual('react-native'),
-  AppState: mocks.appState,
-  NetInfo: mocks.netInfo,
+  AppState: {
+    currentState: 'active',
+    addEventListener: jest.fn(() => jest.fn()),
+    removeEventListener: jest.fn(),
+  },
+}));
+jest.mock('@react-native-community/netinfo', () => mocks.netInfo);
+jest.mock('c:/AYNAMODA/src/config/supabaseClient', () => ({
+  supabaseClient: {
+    from: jest.fn(() => ({
+      select: jest.fn().mockResolvedValue({ data: [], error: null }),
+    })),
+  },
 }));
 
 describe('useErrorRecovery', () => {
-  const mockErrorHandler = ErrorHandler.getInstance as jest.MockedFunction<typeof ErrorHandler.getInstance>;
+  const mockErrorHandler = ErrorHandler.getInstance as jest.MockedFunction<
+    typeof ErrorHandler.getInstance
+  >;
   const mockHandleError = jest.fn();
   const mockGetRecoveryStrategy = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    
+
     mockErrorHandler.mockReturnValue({
       handleError: mockHandleError,
       getRecoveryStrategy: mockGetRecoveryStrategy,
@@ -70,17 +83,20 @@ describe('useErrorRecovery', () => {
     });
 
     it('should execute retry with exponential backoff', async () => {
-      const mockOperation = jest.fn()
+      const mockOperation = jest
+        .fn()
         .mockRejectedValueOnce(new Error('First failure'))
         .mockRejectedValueOnce(new Error('Second failure'))
         .mockResolvedValueOnce('Success');
 
-      const { result } = renderHook(() => useErrorRecovery({
-        maxRetries: 3,
-        baseDelay: 100,
-        backoffMultiplier: 2,
-        jitter: false,
-      }));
+      const { result } = renderHook(() =>
+        useErrorRecovery({
+          maxRetries: 3,
+          baseDelay: 100,
+          backoffMultiplier: 2,
+          jitter: false,
+        }),
+      );
 
       act(() => {
         result.current.executeWithRetry(mockOperation);
@@ -112,14 +128,16 @@ describe('useErrorRecovery', () => {
     it('should stop retrying after max attempts', async () => {
       const mockOperation = jest.fn().mockRejectedValue(new Error('Always fails'));
 
-      const { result } = renderHook(() => useErrorRecovery({
-        maxRetries: 2,
-        baseDelay: 100,
-      }));
+      const { result } = renderHook(() =>
+        useErrorRecovery({
+          maxRetries: 2,
+          baseDelay: 100,
+        }),
+      );
 
-      let finalError;
+      let finalError: unknown;
       act(() => {
-        result.current.executeWithRetry(mockOperation).catch(error => {
+        result.current.executeWithRetry(mockOperation).catch((error) => {
           finalError = error;
         });
       });
@@ -137,12 +155,14 @@ describe('useErrorRecovery', () => {
     });
 
     it('should apply jitter to delay calculations', () => {
-      const { result } = renderHook(() => useErrorRecovery({
-        maxRetries: 3,
-        baseDelay: 1000,
-        backoffMultiplier: 2,
-        jitter: true,
-      }));
+      const { result } = renderHook(() =>
+        useErrorRecovery({
+          maxRetries: 3,
+          baseDelay: 1000,
+          backoffMultiplier: 2,
+          jitter: true,
+        }),
+      );
 
       const mockOperation = jest.fn().mockRejectedValue(new Error('Test'));
 
@@ -176,9 +196,9 @@ describe('useErrorRecovery', () => {
 
       const { result } = renderHook(() => useErrorRecovery());
 
-      let operationResult;
+      let operationResult: unknown;
       act(() => {
-        result.current.executeWithRetry(mockOperation).then(result => {
+        result.current.executeWithRetry(mockOperation).then((result) => {
           operationResult = result;
         });
       });
@@ -202,8 +222,9 @@ describe('useErrorRecovery', () => {
     it('should handle network timeout errors', async () => {
       const timeoutError = new Error('Network timeout');
       timeoutError.name = 'TimeoutError';
-      
-      const mockOperation = jest.fn()
+
+      const mockOperation = jest
+        .fn()
         .mockRejectedValueOnce(timeoutError)
         .mockResolvedValueOnce('Success');
 
@@ -225,14 +246,14 @@ describe('useErrorRecovery', () => {
     it('should not retry on 4xx client errors', async () => {
       const clientError = new Error('Bad Request');
       (clientError as any).status = 400;
-      
+
       const mockOperation = jest.fn().mockRejectedValue(clientError);
 
       const { result } = renderHook(() => useNetworkErrorRecovery());
 
-      let finalError;
+      let finalError: unknown;
       act(() => {
-        result.current.executeWithRetry(mockOperation).catch(error => {
+        result.current.executeWithRetry(mockOperation).catch((error) => {
           finalError = error;
         });
       });
@@ -255,8 +276,9 @@ describe('useErrorRecovery', () => {
     it('should handle rate limit errors with longer delays', async () => {
       const rateLimitError = new Error('Rate limit exceeded');
       (rateLimitError as any).status = 429;
-      
-      const mockOperation = jest.fn()
+
+      const mockOperation = jest
+        .fn()
         .mockRejectedValueOnce(rateLimitError)
         .mockResolvedValueOnce('Success');
 
@@ -287,8 +309,9 @@ describe('useErrorRecovery', () => {
 
     it('should handle image processing errors', async () => {
       const imageError = new Error('Image processing failed');
-      
-      const mockOperation = jest.fn()
+
+      const mockOperation = jest
+        .fn()
         .mockRejectedValueOnce(imageError)
         .mockResolvedValueOnce('Processed');
 
@@ -318,10 +341,12 @@ describe('useErrorRecovery', () => {
     });
 
     it('should open circuit after failure threshold', async () => {
-      const { result } = renderHook(() => useCircuitBreaker({
-        failureThreshold: 2,
-        timeout: 1000,
-      }));
+      const { result } = renderHook(() =>
+        useCircuitBreaker({
+          failureThreshold: 2,
+          timeout: 1000,
+        }),
+      );
 
       const failingOperation = jest.fn().mockRejectedValue(new Error('Failure'));
 
@@ -348,10 +373,12 @@ describe('useErrorRecovery', () => {
     });
 
     it('should transition to half-open after timeout', async () => {
-      const { result } = renderHook(() => useCircuitBreaker({
-        failureThreshold: 1,
-        timeout: 100,
-      }));
+      const { result } = renderHook(() =>
+        useCircuitBreaker({
+          failureThreshold: 1,
+          timeout: 100,
+        }),
+      );
 
       const failingOperation = jest.fn().mockRejectedValue(new Error('Failure'));
 
@@ -376,10 +403,12 @@ describe('useErrorRecovery', () => {
     });
 
     it('should reset on successful execution in half-open state', async () => {
-      const { result } = renderHook(() => useCircuitBreaker({
-        failureThreshold: 1,
-        timeout: 100,
-      }));
+      const { result } = renderHook(() =>
+        useCircuitBreaker({
+          failureThreshold: 1,
+          timeout: 100,
+        }),
+      );
 
       // Open circuit
       act(() => {
@@ -409,23 +438,27 @@ describe('useErrorRecovery', () => {
       const onForeground = jest.fn();
       const onBackground = jest.fn();
 
-      renderHook(() => useAppStateRecovery({
-        onForeground,
-        onBackground,
-      }));
+      renderHook(() =>
+        useAppStateRecovery({
+          onForeground,
+          onBackground,
+        }),
+      );
 
       // Simulate app going to background
       act(() => {
-        mocks.appState.currentState = 'background';
-        mocks.appState.addEventListener.mock.calls[0][1]('background');
+        const { AppState } = require('react-native');
+        AppState.currentState = 'background';
+        AppState.addEventListener.mock.calls[0][1]('background');
       });
 
       expect(onBackground).toHaveBeenCalled();
 
       // Simulate app coming to foreground
       act(() => {
-        mocks.appState.currentState = 'active';
-        mocks.appState.addEventListener.mock.calls[0][1]('active');
+        const { AppState } = require('react-native');
+        AppState.currentState = 'active';
+        AppState.addEventListener.mock.calls[0][1]('active');
       });
 
       expect(onForeground).toHaveBeenCalled();
@@ -434,14 +467,17 @@ describe('useErrorRecovery', () => {
     it('should retry failed operations when app becomes active', async () => {
       const retryOperation = jest.fn();
 
-      renderHook(() => useAppStateRecovery({
-        retryOnForeground: true,
-        onForeground: retryOperation,
-      }));
+      renderHook(() =>
+        useAppStateRecovery({
+          retryOnForeground: true,
+          onForeground: retryOperation,
+        }),
+      );
 
       // Simulate app coming to foreground
       act(() => {
-        mocks.appState.addEventListener.mock.calls[0][1]('active');
+        const { AppState } = require('react-native');
+        AppState.addEventListener.mock.calls[0][1]('active');
       });
 
       expect(retryOperation).toHaveBeenCalled();
@@ -458,9 +494,9 @@ describe('useErrorRecovery', () => {
         jest.fn().mockResolvedValue('Result 3'),
       ];
 
-      let batchResult;
+      let batchResult: unknown;
       act(() => {
-        result.current.executeBatch(operations).then(results => {
+        result.current.executeBatch(operations).then((results) => {
           batchResult = results;
         });
       });
@@ -481,9 +517,9 @@ describe('useErrorRecovery', () => {
         jest.fn().mockResolvedValue('Success'),
       ];
 
-      let batchResult;
+      let batchResult: unknown;
       act(() => {
-        result.current.executeBatch(operations, { continueOnError: true }).then(results => {
+        result.current.executeBatch(operations, { continueOnError: true }).then((results) => {
           batchResult = results;
         });
       });
@@ -500,13 +536,14 @@ describe('useErrorRecovery', () => {
 
       const operations = [
         jest.fn().mockResolvedValue('Success'),
-        jest.fn()
+        jest
+          .fn()
           .mockRejectedValueOnce(new Error('Failure'))
           .mockResolvedValueOnce('Retry Success'),
       ];
 
       act(() => {
-        result.current.executeBatch(operations, { 
+        result.current.executeBatch(operations, {
           retryFailures: true,
           maxRetries: 1,
         });
@@ -527,9 +564,9 @@ describe('useErrorRecovery', () => {
       const { result } = renderHook(() => useBatchRecovery());
 
       const operations = [
-        () => new Promise(resolve => setTimeout(() => resolve('1'), 100)),
-        () => new Promise(resolve => setTimeout(() => resolve('2'), 200)),
-        () => new Promise(resolve => setTimeout(() => resolve('3'), 300)),
+        () => new Promise((resolve) => setTimeout(() => resolve('1'), 100)),
+        () => new Promise((resolve) => setTimeout(() => resolve('2'), 200)),
+        () => new Promise((resolve) => setTimeout(() => resolve('3'), 300)),
       ];
 
       act(() => {
@@ -567,16 +604,18 @@ describe('useErrorRecovery', () => {
         throw new Error('Sync error');
       };
 
-      let caughtError;
+      let caughtError: unknown;
       act(() => {
-        result.current.executeWithRetry(throwingOperation).catch(error => {
+        result.current.executeWithRetry(throwingOperation).catch((error) => {
           caughtError = error;
         });
       });
 
       await waitFor(() => {
         expect(caughtError).toBeInstanceOf(Error);
-        expect(caughtError.message).toBe('Sync error');
+        if (caughtError && typeof caughtError === 'object' && 'message' in caughtError) {
+          expect((caughtError as any).message).toBe('Sync error');
+        }
       });
     });
 

@@ -1,13 +1,14 @@
+import * as Haptics from 'expo-haptics';
 import React, { useEffect } from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
   interpolate,
   runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface LuxuryUndoNotificationProps {
@@ -26,7 +27,7 @@ const LuxuryUndoNotification: React.FC<LuxuryUndoNotificationProps> = ({
   const progress = useSharedValue(0);
 
   useEffect(() => {
-    let timeoutId: any;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     if (isVisible) {
       progress.value = withTiming(1, { duration: 300 });
       timeoutId = setTimeout(() => {
@@ -35,7 +36,11 @@ const LuxuryUndoNotification: React.FC<LuxuryUndoNotificationProps> = ({
     } else {
       progress.value = withTiming(0, { duration: 300 });
     }
-    return () => clearTimeout(timeoutId);
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [isVisible, onTimeout, progress]);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -60,7 +65,13 @@ const LuxuryUndoNotification: React.FC<LuxuryUndoNotificationProps> = ({
 
   return (
     <Animated.View style={[styles.container, animatedStyle]}>
-      <TouchableOpacity onPress={handlePress} style={styles.button}>
+      <TouchableOpacity
+        onPress={handlePress}
+        style={styles.button}
+        accessibilityRole="button"
+        accessibilityLabel="Undo action"
+        accessibilityHint="Tap to undo the last action"
+      >
         <Text style={styles.text}>Undo</Text>
       </TouchableOpacity>
     </Animated.View>
@@ -68,22 +79,22 @@ const LuxuryUndoNotification: React.FC<LuxuryUndoNotificationProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    bottom: 100,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-    zIndex: 1000,
-  },
   button: {
     backgroundColor: DesignSystem.colors.charcoal[800],
-    paddingVertical: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.lg,
     borderRadius: DesignSystem.radius.full,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
     ...DesignSystem.elevation.medium,
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
+  },
+  container: {
+    alignItems: 'center',
+    bottom: 100,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    zIndex: 1000,
   },
   text: {
     ...DesignSystem.typography.scale.body1,

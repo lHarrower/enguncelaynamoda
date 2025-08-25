@@ -12,7 +12,7 @@ export const ORGANIC_PALETTE = {
     dark: '#F7F6F3',
     texture: '#F9F8F5', // For noise overlay effect
   },
-  
+
   // Accent Colors - Liquid metals and natural tones
   sageGreen: {
     50: '#F6F8F6',
@@ -26,7 +26,7 @@ export const ORGANIC_PALETTE = {
     800: '#2D4A2D',
     900: '#1F341F',
   },
-  
+
   liquidGold: {
     50: '#FFFEF7',
     100: '#FFF9E6',
@@ -39,7 +39,7 @@ export const ORGANIC_PALETTE = {
     800: '#806108',
     900: '#644904',
   },
-  
+
   inkGray: {
     50: '#F8F9FA',
     100: '#E9ECEF',
@@ -52,7 +52,7 @@ export const ORGANIC_PALETTE = {
     800: '#212529', // Primary ink gray
     900: '#1A1D20',
   },
-  
+
   // Emotional accent colors
   whisperWhite: '#FEFEFE',
   cloudGray: '#F5F5F7',
@@ -68,7 +68,7 @@ export const TYPOGRAPHY_V2 = {
     body: 'Inter', // Satoshi alternative - clean, modern
     accent: 'Playfair Display',
   },
-  
+
   // Typographic Hierarchy with precise scales
   scale: {
     // Headlines - Expressive and commanding
@@ -79,7 +79,7 @@ export const TYPOGRAPHY_V2 = {
       letterSpacing: -0.5,
       fontFamily: 'Playfair Display',
     },
-    
+
     h1: {
       fontSize: 28,
       lineHeight: 36,
@@ -87,7 +87,7 @@ export const TYPOGRAPHY_V2 = {
       letterSpacing: -0.3,
       fontFamily: 'Playfair Display',
     },
-    
+
     h2: {
       fontSize: 24,
       lineHeight: 32,
@@ -95,7 +95,7 @@ export const TYPOGRAPHY_V2 = {
       letterSpacing: -0.2,
       fontFamily: 'Playfair Display',
     },
-    
+
     h3: {
       fontSize: 20,
       lineHeight: 28,
@@ -103,7 +103,7 @@ export const TYPOGRAPHY_V2 = {
       letterSpacing: -0.1,
       fontFamily: 'Inter',
     },
-    
+
     // Body Text - Readable and harmonious
     body1: {
       fontSize: 16,
@@ -112,7 +112,7 @@ export const TYPOGRAPHY_V2 = {
       letterSpacing: 0,
       fontFamily: 'Inter',
     },
-    
+
     body2: {
       fontSize: 14,
       lineHeight: 20,
@@ -120,7 +120,7 @@ export const TYPOGRAPHY_V2 = {
       letterSpacing: 0.1,
       fontFamily: 'Inter',
     },
-    
+
     // Whispers - Gentle, poetic text
     whisper: {
       fontSize: 15,
@@ -130,7 +130,7 @@ export const TYPOGRAPHY_V2 = {
       fontFamily: 'Playfair Display',
       fontStyle: 'italic' as TextStyle['fontStyle'],
     },
-    
+
     // UI Elements
     button: {
       fontSize: 16,
@@ -139,7 +139,7 @@ export const TYPOGRAPHY_V2 = {
       letterSpacing: 0.5,
       fontFamily: 'Inter',
     },
-    
+
     caption: {
       fontSize: 12,
       lineHeight: 16,
@@ -159,7 +159,7 @@ export const GLASSMORPHISM = {
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.18)',
   } as ViewStyle,
-  
+
   // Subtle glass for cards
   subtle: {
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
@@ -167,7 +167,7 @@ export const GLASSMORPHISM = {
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.12)',
   } as ViewStyle,
-  
+
   // Dark glass for contrast
   dark: {
     backgroundColor: 'rgba(0, 0, 0, 0.15)',
@@ -175,7 +175,7 @@ export const GLASSMORPHISM = {
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
   } as ViewStyle,
-  
+
   // Liquid gold glass
   gold: {
     backgroundColor: 'rgba(212, 175, 55, 0.2)',
@@ -195,7 +195,7 @@ export const ELEVATION_V2 = {
     shadowRadius: 24,
     elevation: 8,
   } as ViewStyle,
-  
+
   // Gentle lift
   lift: {
     shadowColor: ORGANIC_PALETTE.shadowCharcoal,
@@ -204,7 +204,7 @@ export const ELEVATION_V2 = {
     shadowRadius: 12,
     elevation: 4,
   } as ViewStyle,
-  
+
   // Subtle presence
   whisper: {
     shadowColor: ORGANIC_PALETTE.shadowCharcoal,
@@ -213,7 +213,7 @@ export const ELEVATION_V2 = {
     shadowRadius: 8,
     elevation: 2,
   } as ViewStyle,
-  
+
   // Dramatic depth
   dramatic: {
     shadowColor: ORGANIC_PALETTE.shadowCharcoal,
@@ -231,19 +231,19 @@ export const ANIMATION_CURVES = {
     tension: 100,
     friction: 8,
   },
-  
+
   // Liquid, flowing motion
   liquid: {
     tension: 120,
     friction: 10,
   },
-  
+
   // Zen-like, peaceful transitions
   zen: {
     tension: 80,
     friction: 12,
   },
-  
+
   // Whisper-soft animations
   whisper: {
     tension: 60,
@@ -286,7 +286,7 @@ export const APP_THEME_V2 = {
   animation: ANIMATION_CURVES,
   spacing: SPACING_V2,
   radius: RADIUS_V2,
-  
+
   // Semantic color mappings for consistent usage
   semantic: {
     background: {
@@ -318,5 +318,3 @@ export const APP_THEME_V2 = {
     error: '#E57373',
   },
 };
-
-export default APP_THEME_V2;

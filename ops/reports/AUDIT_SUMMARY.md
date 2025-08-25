@@ -1,13 +1,16 @@
-﻿# AYNAMODA â€“ Full Audit (Local)
+# AYNAMODA – Full Audit (Local)
+
 **Tarih:** 2025-08-14 22:07:37Z
 
-## Ã–zet
-- ESLint bulgularÄ± (dosya adedi): **418**
-- Testler: **493** toplam / **0** baÅŸarÄ±sÄ±z
-- NPM gÃ¼venlik (yÃ¼ksek): **0**
-- Detay dosyalarÄ±: \ops/reports\
+## Özet
+
+- ESLint bulguları (dosya adedi): **418**
+- Testler: **493** toplam / **0** başarısız
+- NPM güvenlik (yüksek): **0**
+- Detay dosyaları: ops/reports/
 
 ## Dosyalar
+
 - expo-config.txt, expo-doctor.txt
 - eslint.json, eslint-stylish.txt
 - depcheck.txt
@@ -15,4 +18,3 @@
 - jest.json, jest-console.txt (coverage dahil)
 - bundle-visualizer.txt
 - eas-configure.txt
-

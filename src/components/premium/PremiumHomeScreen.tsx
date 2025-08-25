@@ -1,32 +1,25 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Image,
-  Dimensions,
-  StatusBar,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DesignSystem } from '@/theme/DesignSystem';
-import PremiumButton from './PremiumButton';
-import PremiumCard from './PremiumCard';
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { 
-  useSharedValue, 
+import React, { useState } from 'react';
+import { Dimensions, Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
-  interpolate,
-  withSpring,
+  useSharedValue,
 } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { DesignSystem } from '@/theme/DesignSystem';
+
+import PremiumButton from './PremiumButton';
+import PremiumCard from './PremiumCard';
 
 const { width, height } = Dimensions.get('window');
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-// Sample data for premium showcase
+// Premium showcase content
 const heroContent = {
   title: 'Your Style Sanctuary',
   subtitle: 'Where confidence meets artistry',
@@ -107,12 +100,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
   });
 
   const headerAnimatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollY.value,
-      [0, 100],
-      [0, 1],
-      'clamp'
-    );
+    const opacity = interpolate(scrollY.value, [0, 100], [0, 1], 'clamp');
 
     return {
       opacity,
@@ -120,25 +108,12 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
   });
 
   const heroAnimatedStyle = useAnimatedStyle(() => {
-    const translateY = interpolate(
-      scrollY.value,
-      [0, 300],
-      [0, -100],
-      'clamp'
-    );
+    const translateY = interpolate(scrollY.value, [0, 300], [0, -100], 'clamp');
 
-    const scale = interpolate(
-      scrollY.value,
-      [0, 300],
-      [1, 1.1],
-      'clamp'
-    );
+    const scale = interpolate(scrollY.value, [0, 300], [1, 1.1], 'clamp');
 
     return {
-      transform: [
-        { translateY },
-        { scale },
-      ],
+      transform: [{ translateY }, { scale }] as any,
     };
   });
 
@@ -171,11 +146,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
 
   const renderHeroSection = () => (
     <Animated.View style={[styles.heroSection, heroAnimatedStyle]}>
-      <Image
-        source={{ uri: heroContent.image }}
-        style={styles.heroImage}
-        resizeMode="cover"
-      />
+      <Image source={{ uri: heroContent.image }} style={styles.heroImage} resizeMode="cover" />
       <LinearGradient
         colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
         style={styles.heroGradient}
@@ -209,7 +180,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
     <View style={styles.insightsSection}>
       <Text style={styles.sectionTitle}>Your Style Journey</Text>
       <Text style={styles.sectionSubtitle}>Insights that inspire confidence</Text>
-      
+
       <View style={styles.insightsGrid}>
         {styleInsights.map((insight, index) => (
           <PremiumCard
@@ -217,18 +188,14 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
             variant="luxury"
             style={[
               styles.insightCard,
-              { 
+              {
                 marginLeft: index === 1 ? DesignSystem.spacing.sm : 0,
-        marginRight: index === 1 ? DesignSystem.spacing.sm : 0,
-              }
+                marginRight: index === 1 ? DesignSystem.spacing.sm : 0,
+              },
             ]}
           >
             <View style={styles.insightHeader}>
-              <Ionicons
-                name={insight.icon}
-                size={24}
-                color={DesignSystem.colors.gold[500]}
-              />
+              <Ionicons name={insight.icon} size={24} color={DesignSystem.colors.gold[500]} />
               <Text style={styles.insightTrend}>{insight.trend}</Text>
             </View>
             <Text style={styles.insightValue}>{insight.value}</Text>
@@ -247,12 +214,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
           <Text style={styles.sectionTitle}>Curated Collections</Text>
           <Text style={styles.sectionSubtitle}>Handpicked for your aesthetic</Text>
         </View>
-        <PremiumButton
-          title="View All"
-          onPress={() => {}}
-          variant="ghost"
-          size="small"
-        />
+        <PremiumButton title="View All" onPress={() => {}} variant="ghost" size="small" />
       </View>
 
       <ScrollView
@@ -270,7 +232,7 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
             onPress={() => setActiveCollection(index)}
             style={[
               styles.collectionCard,
-              { marginLeft: index === 0 ? DesignSystem.spacing.xl : 0 }
+              { marginLeft: index === 0 ? DesignSystem.spacing.xl : 0 },
             ]}
           >
             <Image
@@ -303,26 +265,13 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
           onPress={onNavigateToWardrobe || (() => {})}
           style={styles.quickActionCard}
         >
-          <Ionicons
-            name="shirt-outline"
-            size={32}
-            color={DesignSystem.colors.text.primary}
-          />
+          <Ionicons name="shirt-outline" size={32} color={DesignSystem.colors.text.primary} />
           <Text style={styles.quickActionTitle}>My Wardrobe</Text>
           <Text style={styles.quickActionSubtitle}>Organize & discover</Text>
         </PremiumCard>
 
-        <PremiumCard
-          variant="glass"
-          interactive
-          onPress={() => {}}
-          style={styles.quickActionCard}
-        >
-          <Ionicons
-            name="camera-outline"
-            size={32}
-            color={DesignSystem.colors.text.primary}
-          />
+        <PremiumCard variant="glass" interactive onPress={() => {}} style={styles.quickActionCard}>
+          <Ionicons name="camera-outline" size={32} color={DesignSystem.colors.text.primary} />
           <Text style={styles.quickActionTitle}>Add Item</Text>
           <Text style={styles.quickActionSubtitle}>Capture new pieces</Text>
         </PremiumCard>
@@ -333,14 +282,14 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      
+
       {renderFloatingHeader()}
-      
+
       <AnimatedScrollView
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + DesignSystem.spacing.xxxl }
+          { paddingBottom: insets.bottom + DesignSystem.spacing.xxxl },
         ]}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -356,29 +305,70 @@ const PremiumHomeScreen: React.FC<PremiumHomeScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
+  collectionCard: {
+    height: 300,
+    marginRight: DesignSystem.spacing.lg,
+    overflow: 'hidden',
+    width: width * 0.8,
+  },
+  collectionContent: {
+    bottom: 0,
+    left: 0,
+    padding: DesignSystem.spacing.xl,
+    position: 'absolute',
+    right: 0,
+  },
+  collectionGradient: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  collectionImage: {
+    ...StyleSheet.absoluteFillObject,
+    height: '100%',
+    width: '100%',
+  },
+  collectionItems: {
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.gold[300],
+  },
+  collectionSubtitle: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.inverse,
+    marginBottom: DesignSystem.spacing.sm,
+    opacity: 0.9,
+  },
+  collectionTitle: {
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.text.inverse,
+    marginBottom: DesignSystem.spacing.xs,
+  },
+  collectionsScrollContainer: {
+    paddingRight: DesignSystem.spacing.xl,
+  },
+  collectionsSection: {
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
+  },
   container: {
-    flex: 1,
     backgroundColor: DesignSystem.colors.background.primary,
-  },
-  scrollView: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
   },
   floatingHeader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
     height: 100,
     justifyContent: 'flex-end',
+    left: 0,
     paddingBottom: DesignSystem.spacing.md,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 1000,
+  },
+  floatingHeaderActions: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.sm,
   },
   floatingHeaderContent: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: DesignSystem.spacing.xl,
   },
@@ -388,41 +378,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 2,
   },
-  floatingHeaderActions: {
-    flexDirection: 'row',
-    gap: DesignSystem.spacing.sm,
-  },
   headerButton: {
-    width: 40,
-    height: 40,
     borderRadius: 20,
+    height: 40,
+    width: 40,
   },
-  heroSection: {
-    height: height * 0.7,
-    position: 'relative',
-    justifyContent: 'flex-end',
-  },
-  heroImage: {
-    ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: '100%',
-  },
-  heroGradient: {
-    ...StyleSheet.absoluteFillObject,
+  heroActions: {
+    gap: DesignSystem.spacing.md,
   },
   heroContent: {
     padding: DesignSystem.spacing.xl,
     paddingBottom: DesignSystem.spacing.xxxl,
-  },
-  heroTitle: {
-  ...DesignSystem.typography.scale.hero,
-    color: DesignSystem.colors.text.inverse,
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  heroSubtitle: {
-    ...DesignSystem.typography.body.large,
-    color: DesignSystem.colors.text.inverse,
-    marginBottom: DesignSystem.spacing.md,
   },
   heroDescription: {
     ...DesignSystem.typography.body.medium,
@@ -430,45 +396,48 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.xl,
     opacity: 0.9,
   },
-  heroActions: {
-    gap: DesignSystem.spacing.md,
+  heroGradient: {
+    ...StyleSheet.absoluteFillObject,
   },
-  secondaryHeroButton: {
-    marginTop: DesignSystem.spacing.sm,
+  heroImage: {
+    ...StyleSheet.absoluteFillObject,
+    height: '100%',
+    width: '100%',
   },
-  insightsSection: {
-    padding: DesignSystem.spacing.xl,
-    paddingTop: DesignSystem.spacing.xxxl,
+  heroSection: {
+    height: height * 0.7,
+    justifyContent: 'flex-end',
+    position: 'relative',
   },
-  sectionTitle: {
-    ...DesignSystem.typography.heading.h2,
-    color: DesignSystem.colors.text.primary,
-    marginBottom: DesignSystem.spacing.xs,
+  heroSubtitle: {
+    ...DesignSystem.typography.body.large,
+    color: DesignSystem.colors.text.inverse,
+    marginBottom: DesignSystem.spacing.md,
   },
-  sectionSubtitle: {
-    ...DesignSystem.typography.caption.medium,
-    color: DesignSystem.colors.text.secondary,
-    marginBottom: DesignSystem.spacing.xl,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginBottom: DesignSystem.spacing.xl,
-  },
-  insightsGrid: {
-    flexDirection: 'row',
-    gap: DesignSystem.spacing.sm,
+  heroTitle: {
+    ...DesignSystem.typography.scale.hero,
+    color: DesignSystem.colors.text.inverse,
+    marginBottom: DesignSystem.spacing.sm,
   },
   insightCard: {
     flex: 1,
     minHeight: 140,
   },
+  insightDescription: {
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
+  },
   insightHeader: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: DesignSystem.spacing.md,
+  },
+  insightTitle: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
+    fontWeight: '600',
+    marginBottom: DesignSystem.spacing.xs,
   },
   insightTrend: {
     ...DesignSystem.typography.caption.medium,
@@ -480,83 +449,63 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.text.primary,
     marginBottom: DesignSystem.spacing.xs,
   },
-  insightTitle: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.primary,
-    fontWeight: '600',
-    marginBottom: DesignSystem.spacing.xs,
+  insightsGrid: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.sm,
   },
-  insightDescription: {
-    ...DesignSystem.typography.body.small,
-    color: DesignSystem.colors.text.secondary,
-  },
-  collectionsSection: {
-    paddingTop: DesignSystem.spacing.xl,
-    paddingHorizontal: DesignSystem.spacing.xl,
-  },
-  collectionsScrollContainer: {
-    paddingRight: DesignSystem.spacing.xl,
-  },
-  collectionCard: {
-    width: width * 0.8,
-    height: 300,
-    marginRight: DesignSystem.spacing.lg,
-    overflow: 'hidden',
-  },
-  collectionImage: {
-    ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: '100%',
-  },
-  collectionGradient: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  collectionContent: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: DesignSystem.spacing.xl,
-  },
-  collectionTitle: {
-    ...DesignSystem.typography.heading.h3,
-    color: DesignSystem.colors.text.inverse,
-    marginBottom: DesignSystem.spacing.xs,
-  },
-  collectionSubtitle: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.inverse,
-    opacity: 0.9,
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  collectionItems: {
-    ...DesignSystem.typography.caption.medium,
-    color: DesignSystem.colors.gold[300],
-  },
-  quickActionsSection: {
+  insightsSection: {
     padding: DesignSystem.spacing.xl,
     paddingTop: DesignSystem.spacing.xxxl,
   },
-  quickActionsGrid: {
-    flexDirection: 'row',
-    gap: DesignSystem.spacing.lg,
-  },
   quickActionCard: {
-    flex: 1,
     alignItems: 'center',
+    flex: 1,
     paddingVertical: DesignSystem.spacing.xl,
-  },
-  quickActionTitle: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.primary,
-    fontWeight: '600',
-    marginTop: DesignSystem.spacing.md,
-    marginBottom: DesignSystem.spacing.xs,
   },
   quickActionSubtitle: {
     ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
+  },
+  quickActionTitle: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
+    fontWeight: '600',
+    marginBottom: DesignSystem.spacing.xs,
+    marginTop: DesignSystem.spacing.md,
+  },
+  quickActionsGrid: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.lg,
+  },
+  quickActionsSection: {
+    padding: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xxxl,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  secondaryHeroButton: {
+    marginTop: DesignSystem.spacing.sm,
+  },
+  sectionHeader: {
+    alignItems: 'flex-end',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: DesignSystem.spacing.xl,
+  },
+  sectionSubtitle: {
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.xl,
+  },
+  sectionTitle: {
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: DesignSystem.spacing.xs,
   },
 });
 

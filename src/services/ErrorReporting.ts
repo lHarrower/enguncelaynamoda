@@ -1,5 +1,6 @@
 // Error Reporting Service - Analytics and crash reporting integration
-import { AppError, ErrorSeverity, ErrorCategory } from '../utils/ErrorHandler';
+import { errorInDev, logInDev, warnInDev } from '../utils/consoleSuppress';
+import { AppError, ErrorSeverity } from '../utils/ErrorHandler';
 
 /**
  * Error Report Interface
@@ -68,7 +69,7 @@ export interface Breadcrumb {
   category: 'navigation' | 'user_action' | 'network' | 'ui' | 'system';
   message: string;
   level: 'info' | 'warning' | 'error';
-  data?: Record<string, any>;
+  data?: Record<string, string | number | boolean | null>;
 }
 
 /**
@@ -79,7 +80,7 @@ export interface LogEntry {
   level: 'debug' | 'info' | 'warn' | 'error';
   message: string;
   category: string;
-  data?: Record<string, any>;
+  data?: Record<string, string | number | boolean | null>;
 }
 
 /**
@@ -110,19 +111,8 @@ const DEFAULT_CONFIG: ErrorReportingConfig = {
   includeDeviceInfo: true,
   includeUserInfo: false, // Privacy-first approach
   samplingRate: 1.0,
-  blacklistedErrors: [
-    'Network request failed',
-    'AbortError',
-    'TimeoutError'
-  ],
-  sensitiveDataKeys: [
-    'password',
-    'token',
-    'apiKey',
-    'email',
-    'phone',
-    'address'
-  ]
+  blacklistedErrors: ['Network request failed', 'AbortError', 'TimeoutError'],
+  sensitiveDataKeys: ['password', 'token', 'apiKey', 'email', 'phone', 'address'],
 };
 
 /**
@@ -155,18 +145,20 @@ export class ErrorReportingService {
    * Initialize the error reporting service
    */
   public async initialize(config?: Partial<ErrorReportingConfig>): Promise<void> {
-    if (this.isInitialized) return;
+    if (this.isInitialized) {
+      return;
+    }
 
     this.config = { ...this.config, ...config };
-    
+
     // Initialize crash reporting SDKs here
     // Example: Crashlytics, Sentry, Bugsnag
-    
+
     this.isInitialized = true;
     this.addBreadcrumb({
       category: 'system',
       message: 'Error reporting initialized',
-      level: 'info'
+      level: 'info',
     });
   }
 
@@ -180,7 +172,10 @@ export class ErrorReportingService {
   /**
    * Report an error
    */
-  public async reportError(error: AppError, context?: Record<string, any>): Promise<void> {
+  public async reportError(
+    error: AppError,
+    context?: Record<string, string | number | boolean | null>,
+  ): Promise<void> {
     if (!this.config.enabled || !this.shouldReportError(error)) {
       return;
     }
@@ -188,15 +183,17 @@ export class ErrorReportingService {
     try {
       const report = await this.createErrorReport(error, context);
       await this.sendReport(report);
-      
+
       this.addBreadcrumb({
         category: 'system',
-  message: `Error reported: ${error.category || 'unknown'}`,
+        message: `Error reported: ${error.category || 'unknown'}`,
         level: 'error',
-        data: { errorId: report.id }
+        data: { errorId: report.id },
       });
     } catch (reportingError) {
-      console.warn('Failed to report error:', reportingError);
+      const err =
+        reportingError instanceof Error ? reportingError : new Error(String(reportingError));
+      warnInDev('Failed to report error:', err);
     }
   }
 
@@ -206,11 +203,11 @@ export class ErrorReportingService {
   public addBreadcrumb(breadcrumb: Omit<Breadcrumb, 'timestamp'>): void {
     const fullBreadcrumb: Breadcrumb = {
       ...breadcrumb,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.breadcrumbs.push(fullBreadcrumb);
-    
+
     // Keep only the most recent breadcrumbs
     if (this.breadcrumbs.length > this.config.maxBreadcrumbs) {
       this.breadcrumbs = this.breadcrumbs.slice(-this.config.maxBreadcrumbs);
@@ -223,11 +220,11 @@ export class ErrorReportingService {
   public addLog(log: Omit<LogEntry, 'timestamp'>): void {
     const fullLog: LogEntry = {
       ...log,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     this.logs.push(fullLog);
-    
+
     // Keep only the most recent logs
     if (this.logs.length > this.config.maxLogs) {
       this.logs = this.logs.slice(-this.config.maxLogs);
@@ -237,36 +234,45 @@ export class ErrorReportingService {
   /**
    * Set user context
    */
-  public setUserContext(userId: string, properties?: Record<string, any>): void {
+  public setUserContext(
+    userId: string,
+    properties?: Record<string, string | number | boolean | null>,
+  ): void {
     this.addBreadcrumb({
       category: 'user_action',
       message: 'User context updated',
       level: 'info',
-      data: this.sanitizeData({ userId, ...properties })
+      data: this.sanitizeData({ userId, ...properties }),
     });
   }
 
   /**
    * Track navigation
    */
-  public trackNavigation(screenName: string, params?: Record<string, any>): void {
+  public trackNavigation(
+    screenName: string,
+    params?: Record<string, string | number | boolean | null>,
+  ): void {
     this.addBreadcrumb({
       category: 'navigation',
       message: `Navigated to ${screenName}`,
       level: 'info',
-      data: this.sanitizeData(params || {})
+      data: this.sanitizeData(params || {}),
     });
   }
 
   /**
    * Track user action
    */
-  public trackUserAction(action: string, data?: Record<string, any>): void {
+  public trackUserAction(
+    action: string,
+    data?: Record<string, string | number | boolean | null>,
+  ): void {
     this.addBreadcrumb({
       category: 'user_action',
       message: action,
       level: 'info',
-      data: this.sanitizeData(data || {})
+      data: this.sanitizeData(data || {}),
     });
   }
 
@@ -274,10 +280,10 @@ export class ErrorReportingService {
    * Track network request
    */
   public trackNetworkRequest(
-    url: string, 
-    method: string, 
-    statusCode?: number, 
-    duration?: number
+    url: string,
+    method: string,
+    statusCode?: number,
+    duration?: number,
   ): void {
     this.addBreadcrumb({
       category: 'network',
@@ -286,9 +292,9 @@ export class ErrorReportingService {
       data: {
         method,
         url: this.sanitizeUrl(url),
-        statusCode,
-        duration
-      }
+        statusCode: statusCode ?? null,
+        duration: duration ?? null,
+      },
     });
   }
 
@@ -296,8 +302,8 @@ export class ErrorReportingService {
    * Create error report
    */
   private async createErrorReport(
-    error: AppError, 
-    context?: Record<string, any>
+    error: AppError,
+    context?: Record<string, string | number | boolean | null>,
   ): Promise<ErrorReport> {
     const report: ErrorReport = {
       id: this.generateReportId(),
@@ -307,7 +313,7 @@ export class ErrorReportingService {
       userInfo: this.getUserInfo(),
       appState: await this.getAppState(),
       breadcrumbs: [...this.breadcrumbs],
-      logs: [...this.logs]
+      logs: [...this.logs],
     };
 
     // Add context if provided
@@ -317,7 +323,7 @@ export class ErrorReportingService {
         category: 'system',
         message: 'Error context',
         level: 'info',
-        data: this.sanitizeData(context)
+        data: this.sanitizeData(context),
       });
     }
 
@@ -330,32 +336,33 @@ export class ErrorReportingService {
   private async sendReport(report: ErrorReport): Promise<void> {
     // Implementation would depend on your analytics service
     // Examples: Firebase Crashlytics, Sentry, custom endpoint
-    
+
     if (this.config.apiEndpoint) {
       try {
         const response = await fetch(this.config.apiEndpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` })
+            ...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
           },
-          body: JSON.stringify(report)
+          body: JSON.stringify(report),
         });
 
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
       } catch (error) {
-        console.warn('Failed to send error report:', error);
+        const err = error instanceof Error ? error : new Error(String(error));
+        warnInDev('Failed to send error report:', err);
         // Store locally for retry
         this.storeReportLocally(report);
       }
     } else {
       // Log to console in development
       console.group('🚨 Error Report');
-      console.error('Error:', report.error);
-      console.log('Device:', report.deviceInfo);
-      console.log('Breadcrumbs:', report.breadcrumbs);
+      errorInDev('Error:', report.error);
+      logInDev('Device:', report.deviceInfo);
+      logInDev('Breadcrumbs:', report.breadcrumbs);
       console.groupEnd();
     }
   }
@@ -378,7 +385,7 @@ export class ErrorReportingService {
     }
 
     // Check blacklisted errors
-  if (this.config.blacklistedErrors.includes((error as any).code || error.category)) {
+    if (this.config.blacklistedErrors.includes(error.code || error.category)) {
       return false;
     }
 
@@ -401,7 +408,7 @@ export class ErrorReportingService {
       model: 'iPhone', // DeviceInfo.getModel()
       screenSize: { width: 375, height: 812 }, // Dimensions.get('screen')
       orientation: 'portrait',
-      networkType: 'wifi'
+      networkType: 'wifi',
     };
   }
 
@@ -415,7 +422,7 @@ export class ErrorReportingService {
       timezone: 'UTC',
       isFirstSession: false,
       sessionDuration: Date.now() - this.sessionStartTime,
-      previousCrashes: 0
+      previousCrashes: 0,
     };
   }
 
@@ -430,7 +437,7 @@ export class ErrorReportingService {
       memoryWarnings: 0,
       networkStatus: 'online',
       lastUserAction: 'Unknown',
-      activeFeatures: []
+      activeFeatures: [],
     };
   }
 
@@ -438,12 +445,12 @@ export class ErrorReportingService {
    * Sanitize error data
    */
   private sanitizeError(error: AppError): AppError {
-  const sanitized = { ...error } as AppError;
-    
+    const sanitized = { ...error } as AppError;
+
     // Remove sensitive data from error context
     if (sanitized.context) {
       const base = sanitized.context;
-      const cleaned = this.sanitizeData(base as any);
+      const cleaned = this.sanitizeData(base.additionalData || {});
       sanitized.context = {
         timestamp: base.timestamp,
         platform: base.platform,
@@ -451,7 +458,7 @@ export class ErrorReportingService {
         action: base.action,
         version: base.version,
         additionalData: cleaned,
-      } as any;
+      };
     }
 
     return sanitized;
@@ -460,12 +467,14 @@ export class ErrorReportingService {
   /**
    * Sanitize data by removing sensitive keys
    */
-  private sanitizeData(data: Record<string, any>): Record<string, any> {
+  private sanitizeData(
+    data: Record<string, string | number | boolean | null>,
+  ): Record<string, string | number | boolean | null> {
     const sanitized = { ...data };
-    
-    this.config.sensitiveDataKeys.forEach(key => {
+
+    this.config.sensitiveDataKeys.forEach((key) => {
       if (key in sanitized) {
-        sanitized[key] = '[REDACTED]';
+        sanitized[key] = null;
       }
     });
 
@@ -478,12 +487,12 @@ export class ErrorReportingService {
   private sanitizeUrl(url: string): string {
     try {
       const urlObj = new URL(url);
-      
+
       // Remove sensitive query parameters
-      this.config.sensitiveDataKeys.forEach(key => {
+      this.config.sensitiveDataKeys.forEach((key) => {
         urlObj.searchParams.delete(key);
       });
-      
+
       return urlObj.toString();
     } catch {
       return url;
@@ -512,7 +521,10 @@ export class ErrorReportingService {
  */
 export const ErrorReporting = ErrorReportingService.getInstance();
 
-export const reportError = (error: AppError, context?: Record<string, any>) => {
+export const reportError = (
+  error: AppError,
+  context?: Record<string, string | number | boolean | null>,
+) => {
   return ErrorReporting.reportError(error, context);
 };
 
@@ -520,19 +532,25 @@ export const addBreadcrumb = (breadcrumb: Omit<Breadcrumb, 'timestamp'>) => {
   return ErrorReporting.addBreadcrumb(breadcrumb);
 };
 
-export const trackNavigation = (screenName: string, params?: Record<string, any>) => {
+export const trackNavigation = (
+  screenName: string,
+  params?: Record<string, string | number | boolean | null>,
+) => {
   return ErrorReporting.trackNavigation(screenName, params);
 };
 
-export const trackUserAction = (action: string, data?: Record<string, any>) => {
+export const trackUserAction = (
+  action: string,
+  data?: Record<string, string | number | boolean | null>,
+) => {
   return ErrorReporting.trackUserAction(action, data);
 };
 
 export const trackNetworkRequest = (
-  url: string, 
-  method: string, 
-  statusCode?: number, 
-  duration?: number
+  url: string,
+  method: string,
+  statusCode?: number,
+  duration?: number,
 ) => {
   return ErrorReporting.trackNetworkRequest(url, method, statusCode, duration);
 };

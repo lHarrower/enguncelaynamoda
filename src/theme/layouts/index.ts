@@ -1,59 +1,105 @@
 /**
  * Layout Systems Index
  * Part of AYNAMODA Unified Design System
- * 
+ *
  * Exports all layout pattern systems for easy importing
  */
 
 // Layout Systems - Import first, then re-export
-import { BentoBoxLayouts, BENTO_LAYOUTS, BENTO_PATTERNS, BENTO_ANIMATIONS, BENTO_BREAKPOINTS } from './BentoBox';
-import { CollageLayouts, COLLAGE_LAYOUTS, COLLAGE_INTERACTIONS, EFFICIENCY_INDICATOR, COLLAGE_ANIMATIONS, COLLAGE_RESPONSIVE } from './Collage';
-import { GridLayouts, GRID_LAYOUTS, GRID_SIZES, GRID_SPACING, GRID_INTERACTIONS, GRID_COMPONENTS, GRID_ANIMATIONS, GRID_BREAKPOINTS } from './Grid';
-import { StackLayouts, STACK_LAYOUTS, STACK_ITEMS, STACK_ALIGNMENT, STACK_INTERACTIONS, STACK_ANIMATIONS, STACK_RESPONSIVE } from './Stack';
+import {
+  BENTO_ANIMATIONS,
+  BENTO_BREAKPOINTS,
+  BENTO_LAYOUTS,
+  BENTO_PATTERNS,
+  BentoBoxLayouts,
+} from './BentoBox';
+import {
+  COLLAGE_ANIMATIONS,
+  COLLAGE_INTERACTIONS,
+  COLLAGE_LAYOUTS,
+  COLLAGE_RESPONSIVE,
+  CollageLayouts,
+  EFFICIENCY_INDICATOR,
+} from './Collage';
+import {
+  GRID_ANIMATIONS,
+  GRID_BREAKPOINTS,
+  GRID_COMPONENTS,
+  GRID_INTERACTIONS,
+  GRID_LAYOUTS,
+  GRID_SIZES,
+  GRID_SPACING,
+  GridLayouts,
+} from './Grid';
+import {
+  STACK_ALIGNMENT,
+  STACK_ANIMATIONS,
+  STACK_INTERACTIONS,
+  STACK_ITEMS,
+  STACK_LAYOUTS,
+  STACK_RESPONSIVE,
+  StackLayouts,
+} from './Stack';
 
 // Re-export for external use
-export { BentoBoxLayouts, BENTO_LAYOUTS, BENTO_PATTERNS, BENTO_ANIMATIONS, BENTO_BREAKPOINTS };
-export { CollageLayouts, COLLAGE_LAYOUTS, COLLAGE_INTERACTIONS, EFFICIENCY_INDICATOR, COLLAGE_ANIMATIONS, COLLAGE_RESPONSIVE };
-export { GridLayouts, GRID_LAYOUTS, GRID_SIZES, GRID_SPACING, GRID_INTERACTIONS, GRID_COMPONENTS, GRID_ANIMATIONS, GRID_BREAKPOINTS };
-export { StackLayouts, STACK_LAYOUTS, STACK_ITEMS, STACK_ALIGNMENT, STACK_INTERACTIONS, STACK_ANIMATIONS, STACK_RESPONSIVE };
+export { BENTO_ANIMATIONS, BENTO_BREAKPOINTS, BENTO_LAYOUTS, BENTO_PATTERNS, BentoBoxLayouts };
+export {
+  COLLAGE_ANIMATIONS,
+  COLLAGE_INTERACTIONS,
+  COLLAGE_LAYOUTS,
+  COLLAGE_RESPONSIVE,
+  CollageLayouts,
+  EFFICIENCY_INDICATOR,
+};
+export {
+  GRID_ANIMATIONS,
+  GRID_BREAKPOINTS,
+  GRID_COMPONENTS,
+  GRID_INTERACTIONS,
+  GRID_LAYOUTS,
+  GRID_SIZES,
+  GRID_SPACING,
+  GridLayouts,
+};
+export {
+  STACK_ALIGNMENT,
+  STACK_ANIMATIONS,
+  STACK_INTERACTIONS,
+  STACK_ITEMS,
+  STACK_LAYOUTS,
+  STACK_RESPONSIVE,
+  StackLayouts,
+};
 
 // Helper Functions
 export { getResponsiveCardWidth as getBentoCardWidth, getBentoPattern } from './BentoBox';
 export { getCollageCardPosition } from './Collage';
-export { getGridItemWidth, getGridColumns, getGridSpacing, getMasonryItemHeight } from './Grid';
-export { getStackSpacing, getStackPadding, createStack, createHorizontalStack } from './Stack';
+export { getGridColumns, getGridItemWidth, getGridSpacing, getMasonryItemHeight } from './Grid';
+export { createHorizontalStack, createStack, getStackPadding, getStackSpacing } from './Stack';
 
 // Type Definitions
+export type { BentoBreakpoint, BentoCardSize, BentoContentType, BentoPattern } from './BentoBox';
 export type {
-  BentoCardSize,
-  BentoContentType,
-  BentoPattern,
-  BentoBreakpoint
-} from './BentoBox';
-
-export type {
-  CollageLayoutType,
+  CollageAnimation,
   CollageInteraction,
+  CollageLayoutType,
   EfficiencyLevel,
-  CollageAnimation
 } from './Collage';
-
 export type {
+  GridAnimationType,
+  GridBreakpoint,
+  GridInteractionState,
   GridLayoutType,
   GridSizeType,
   GridSpacingType,
-  GridInteractionState,
-  GridAnimationType,
-  GridBreakpoint
 } from './Grid';
-
 export type {
-  StackLayoutType,
-  StackItemType,
   StackAlignment,
-  StackJustification,
   StackDensity,
-  StackSize
+  StackItemType,
+  StackJustification,
+  StackLayoutType,
+  StackSize,
 } from './Stack';
 
 // Combined Layout System

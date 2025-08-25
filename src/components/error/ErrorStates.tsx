@@ -1,16 +1,18 @@
 // Error States - Elegant error state components for various scenarios
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
+  ActivityIndicator,
   Dimensions,
-  ActivityIndicator
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from 'react-native';
-import { AppError, ErrorCategory, ErrorSeverity, RecoveryAction } from '../../utils/ErrorHandler';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+
+import { AppError, ErrorCategory, RecoveryAction } from '../../utils/ErrorHandler';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -23,18 +25,18 @@ interface BaseErrorStateProps {
   illustration?: string;
   actions?: RecoveryAction[];
   onActionPress?: (action: RecoveryAction) => void;
-  style?: any;
+  style?: ViewStyle;
 }
 
 /**
  * Network Error State
  */
 export const NetworkErrorState: React.FC<BaseErrorStateProps> = ({
-  title = "Connection Lost",
+  title = 'Connection Lost',
   message = "Take a moment to breathe. Check your connection and we'll try again together.",
   actions = [],
   onActionPress,
-  style
+  style,
 }) => {
   return (
     <View style={[styles.container, style]}>
@@ -42,16 +44,19 @@ export const NetworkErrorState: React.FC<BaseErrorStateProps> = ({
         <Text style={styles.illustration}>📡</Text>
         <View style={styles.illustrationAccent} />
       </View>
-      
+
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
-      
+
       <View style={styles.actionsContainer}>
         {actions.map((action, index) => (
           <TouchableOpacity
             key={index}
             style={[styles.actionButton, action.primary && styles.primaryButton]}
             onPress={() => onActionPress?.(action)}
+            accessibilityRole="button"
+            accessibilityLabel={action.label}
+            accessibilityHint={action.primary ? 'Primary action button' : 'Secondary action button'}
           >
             <Text style={[styles.actionText, action.primary && styles.primaryText]}>
               {action.label}
@@ -67,28 +72,33 @@ export const NetworkErrorState: React.FC<BaseErrorStateProps> = ({
  * AI Service Error State
  */
 export const AIServiceErrorState: React.FC<BaseErrorStateProps> = ({
-  title = "AI Stylist Unavailable",
-  message = "Our AI stylist is taking a quick break. Please try again in a moment.",
+  title = 'AI Stylist Unavailable',
+  message = 'Our AI stylist is taking a quick break. Please try again in a moment.',
   actions = [],
   onActionPress,
-  style
+  style,
 }) => {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         <Text style={styles.illustration}>🤖</Text>
-  <View style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.lilac[600] }]} />
+        <View
+          style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.lilac[600] }]}
+        />
       </View>
-      
+
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
-      
+
       <View style={styles.actionsContainer}>
         {actions.map((action, index) => (
           <TouchableOpacity
             key={index}
             style={[styles.actionButton, action.primary && styles.primaryButton]}
             onPress={() => onActionPress?.(action)}
+            accessibilityRole="button"
+            accessibilityLabel={action.label}
+            accessibilityHint={action.primary ? 'Primary action button' : 'Secondary action button'}
           >
             <Text style={[styles.actionText, action.primary && styles.primaryText]}>
               {action.label}
@@ -104,28 +114,33 @@ export const AIServiceErrorState: React.FC<BaseErrorStateProps> = ({
  * Image Processing Error State
  */
 export const ImageErrorState: React.FC<BaseErrorStateProps> = ({
-  title = "Image Processing Failed",
-  message = "This image needs a different approach. Try another one that speaks to you.",
+  title = 'Image Processing Failed',
+  message = 'This image needs a different approach. Try another one that speaks to you.',
   actions = [],
   onActionPress,
-  style
+  style,
 }) => {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         <Text style={styles.illustration}>🖼️</Text>
-  <View style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.coral[400] }]} />
+        <View
+          style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.coral[400] }]}
+        />
       </View>
-      
+
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
-      
+
       <View style={styles.actionsContainer}>
         {actions.map((action, index) => (
           <TouchableOpacity
             key={index}
             style={[styles.actionButton, action.primary && styles.primaryButton]}
             onPress={() => onActionPress?.(action)}
+            accessibilityRole="button"
+            accessibilityLabel={action.label}
+            accessibilityHint={action.primary ? 'Primary action button' : 'Secondary action button'}
           >
             <Text style={[styles.actionText, action.primary && styles.primaryText]}>
               {action.label}
@@ -141,22 +156,24 @@ export const ImageErrorState: React.FC<BaseErrorStateProps> = ({
  * Authentication Error State
  */
 export const AuthErrorState: React.FC<BaseErrorStateProps> = ({
-  title = "Authentication Required",
+  title = 'Authentication Required',
   message = "Let's get you back on track. Please sign in again to continue your journey.",
   actions = [],
   onActionPress,
-  style
+  style,
 }) => {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         <Text style={styles.illustration}>🔐</Text>
-  <View style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.gold[400] }]} />
+        <View
+          style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.gold[400] }]}
+        />
       </View>
-      
+
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
-      
+
       <View style={styles.actionsContainer}>
         {actions.map((action, index) => (
           <TouchableOpacity
@@ -178,22 +195,24 @@ export const AuthErrorState: React.FC<BaseErrorStateProps> = ({
  * Permission Error State
  */
 export const PermissionErrorState: React.FC<BaseErrorStateProps> = ({
-  title = "Permission Needed",
-  message = "We need a little more access to help you. Please check your permissions.",
+  title = 'Permission Needed',
+  message = 'We need a little more access to help you. Please check your permissions.',
   actions = [],
   onActionPress,
-  style
+  style,
 }) => {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         <Text style={styles.illustration}>🛡️</Text>
-  <View style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.sage[400] }]} />
+        <View
+          style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.sage[400] }]}
+        />
       </View>
-      
+
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
-      
+
       <View style={styles.actionsContainer}>
         {actions.map((action, index) => (
           <TouchableOpacity
@@ -215,22 +234,27 @@ export const PermissionErrorState: React.FC<BaseErrorStateProps> = ({
  * Validation Error State
  */
 export const ValidationErrorState: React.FC<BaseErrorStateProps> = ({
-  title = "Input Validation",
-  message = "Almost there! Please review your information and try once more.",
+  title = 'Input Validation',
+  message = 'Almost there! Please review your information and try once more.',
   actions = [],
   onActionPress,
-  style
+  style,
 }) => {
   return (
     <View style={[styles.container, style]}>
       <View style={styles.illustrationContainer}>
         <Text style={styles.illustration}>✏️</Text>
-        <View style={[styles.illustrationAccent, { backgroundColor: DesignSystem.colors.accent.lavender }]} />
+        <View
+          style={[
+            styles.illustrationAccent,
+            { backgroundColor: DesignSystem.colors.accent.lavender },
+          ]}
+        />
       </View>
-      
+
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
-      
+
       <View style={styles.actionsContainer}>
         {actions.map((action, index) => (
           <TouchableOpacity
@@ -252,11 +276,11 @@ export const ValidationErrorState: React.FC<BaseErrorStateProps> = ({
  * Generic Error State
  */
 export const GenericErrorState: React.FC<BaseErrorStateProps> = ({
-  title = "Something Unexpected",
+  title = 'Something Unexpected',
   message = "Every journey has bumps. Let's try again with a clear mind.",
   actions = [],
   onActionPress,
-  style
+  style,
 }) => {
   return (
     <View style={[styles.container, style]}>
@@ -264,10 +288,10 @@ export const GenericErrorState: React.FC<BaseErrorStateProps> = ({
         <Text style={styles.illustration}>🌸</Text>
         <View style={styles.illustrationAccent} />
       </View>
-      
+
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
-      
+
       <View style={styles.actionsContainer}>
         {actions.map((action, index) => (
           <TouchableOpacity
@@ -294,11 +318,11 @@ interface LoadingErrorStateProps extends BaseErrorStateProps {
 }
 
 export const LoadingErrorState: React.FC<LoadingErrorStateProps> = ({
-  title = "Retrying...",
-  message = "Please wait while we try again.",
+  title = 'Retrying...',
+  message = 'Please wait while we try again.',
   isRetrying = false,
   retryProgress = 0,
-  style
+  style,
 }) => {
   return (
     <View style={[styles.container, style]}>
@@ -309,16 +333,14 @@ export const LoadingErrorState: React.FC<LoadingErrorStateProps> = ({
           <Text style={styles.illustration}>⏳</Text>
         )}
       </View>
-      
+
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.message}>{message}</Text>
-      
+
       {isRetrying && retryProgress > 0 && (
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
-            <View 
-              style={[styles.progressFill, { width: `${retryProgress * 100}%` }]} 
-            />
+            <View style={[styles.progressFill, { width: `${retryProgress * 100}%` }]} />
           </View>
           <Text style={styles.progressText}>{Math.round(retryProgress * 100)}%</Text>
         </View>
@@ -334,22 +356,22 @@ interface SmartErrorStateProps {
   error: AppError;
   actions?: RecoveryAction[];
   onActionPress?: (action: RecoveryAction) => void;
-  style?: any;
+  style?: ViewStyle;
 }
 
 export const SmartErrorState: React.FC<SmartErrorStateProps> = ({
   error,
   actions = [],
   onActionPress,
-  style
+  style,
 }) => {
   const commonProps = {
     message: error.userMessage,
     actions,
     onActionPress,
-    style
+    style,
   };
-  
+
   switch (error.category) {
     case ErrorCategory.NETWORK:
       return <NetworkErrorState {...commonProps} />;
@@ -374,16 +396,14 @@ export const SmartErrorState: React.FC<SmartErrorStateProps> = ({
 interface InlineErrorProps {
   message: string;
   visible?: boolean;
-  style?: any;
+  style?: ViewStyle;
 }
 
-export const InlineError: React.FC<InlineErrorProps> = ({
-  message,
-  visible = true,
-  style
-}) => {
-  if (!visible) return null;
-  
+export const InlineError: React.FC<InlineErrorProps> = ({ message, visible = true, style }) => {
+  if (!visible) {
+    return null;
+  }
+
   return (
     <View style={[styles.inlineContainer, style]}>
       <Text style={styles.inlineIcon}>⚠️</Text>
@@ -400,7 +420,7 @@ interface ToastErrorProps {
   visible?: boolean;
   onDismiss?: () => void;
   duration?: number;
-  style?: any;
+  style?: ViewStyle;
 }
 
 export const ToastError: React.FC<ToastErrorProps> = ({
@@ -408,26 +428,34 @@ export const ToastError: React.FC<ToastErrorProps> = ({
   visible = true,
   onDismiss,
   duration = 4000,
-  style
+  style,
 }) => {
   React.useEffect(() => {
     if (visible && duration > 0) {
       const timer = setTimeout(() => {
         onDismiss?.();
       }, duration);
-      
+
       return () => clearTimeout(timer);
     }
   }, [visible, duration, onDismiss]);
-  
-  if (!visible) return null;
-  
+
+  if (!visible) {
+    return null;
+  }
+
   return (
     <View style={[styles.toastContainer, style]}>
       <Text style={styles.toastIcon}>⚠️</Text>
       <Text style={styles.toastMessage}>{message}</Text>
       {onDismiss && (
-        <TouchableOpacity onPress={onDismiss} style={styles.toastDismiss}>
+        <TouchableOpacity
+          onPress={onDismiss}
+          style={styles.toastDismiss}
+          accessibilityRole="button"
+          accessibilityLabel="Dismiss error message"
+          accessibilityHint="Closes this error notification"
+        >
           <Text style={styles.toastDismissText}>✕</Text>
         </TouchableOpacity>
       )}
@@ -437,58 +465,58 @@ export const ToastError: React.FC<ToastErrorProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.primary,
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     padding: DesignSystem.spacing.xl,
-    backgroundColor: DesignSystem.colors.background.primary,
   },
   illustrationContainer: {
-    position: 'relative',
-    marginBottom: DesignSystem.spacing.xl,
     alignItems: 'center',
+    marginBottom: DesignSystem.spacing.xl,
+    position: 'relative',
   },
   illustration: {
     fontSize: 80,
     textAlign: 'center',
   },
   illustrationAccent: {
-    position: 'absolute',
+    backgroundColor: DesignSystem.colors.primary[500],
+    borderRadius: 12,
     bottom: -8,
+    height: 24,
+    opacity: 0.8,
+    position: 'absolute',
     right: -8,
     width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: DesignSystem.colors.primary[500],
-    opacity: 0.8,
   },
   title: {
     ...DesignSystem.typography.heading.h2,
     color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
     marginBottom: DesignSystem.spacing.md,
+    textAlign: 'center',
   },
   message: {
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing.xl,
     lineHeight: 24,
+    marginBottom: DesignSystem.spacing.xl,
     maxWidth: screenWidth * 0.8,
+    textAlign: 'center',
   },
   actionsContainer: {
-    width: '100%',
-    maxWidth: 300,
     gap: DesignSystem.spacing.md,
+    maxWidth: 300,
+    width: '100%',
   },
   actionButton: {
-    backgroundColor: DesignSystem.colors.background.secondary,
-    paddingVertical: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.lg,
-    borderRadius: 12,
     alignItems: 'center',
-    borderWidth: 1,
+    backgroundColor: DesignSystem.colors.background.secondary,
     borderColor: DesignSystem.colors.border.primary,
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
   },
   primaryButton: {
     backgroundColor: DesignSystem.colors.primary[500],
@@ -502,22 +530,22 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.text.inverse,
   },
   progressContainer: {
-    width: '100%',
-    maxWidth: 200,
-    marginTop: DesignSystem.spacing.lg,
     alignItems: 'center',
+    marginTop: DesignSystem.spacing.lg,
+    maxWidth: 200,
+    width: '100%',
   },
   progressBar: {
-    width: '100%',
-    height: 4,
     backgroundColor: DesignSystem.colors.background.secondary,
     borderRadius: 2,
+    height: 4,
     overflow: 'hidden',
+    width: '100%',
   },
   progressFill: {
-    height: '100%',
     backgroundColor: DesignSystem.colors.primary[500],
     borderRadius: 2,
+    height: '100%',
   },
   progressText: {
     ...DesignSystem.typography.scale.caption,
@@ -526,13 +554,13 @@ const styles = StyleSheet.create({
   },
   // Inline Error Styles
   inlineContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: DesignSystem.spacing.xs,
-    paddingHorizontal: DesignSystem.spacing.sm,
     backgroundColor: DesignSystem.colors.semantic.error + '10',
     borderRadius: 6,
+    flexDirection: 'row',
     marginTop: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   inlineIcon: {
     fontSize: 14,
@@ -545,21 +573,21 @@ const styles = StyleSheet.create({
   },
   // Toast Error Styles
   toastContainer: {
-    position: 'absolute',
-    top: 60,
-    left: DesignSystem.spacing.md,
-    right: DesignSystem.spacing.md,
-    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: DesignSystem.colors.semantic.error,
-    paddingVertical: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.lg,
     borderRadius: 12,
-    shadowColor: '#000',
+    elevation: 5,
+    flexDirection: 'row',
+    left: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+    position: 'absolute',
+    right: DesignSystem.spacing.md,
+    shadowColor: DesignSystem.colors.neutral[900],
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5,
+    top: 60,
     zIndex: 1000,
   },
   toastIcon: {
@@ -572,8 +600,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   toastDismiss: {
-    padding: DesignSystem.spacing.xs,
     marginLeft: DesignSystem.spacing.sm,
+    padding: DesignSystem.spacing.xs,
   },
   toastDismissText: {
     ...DesignSystem.typography.scale.caption,

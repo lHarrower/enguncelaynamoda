@@ -1,9 +1,10 @@
 // Haptic Feedback Hook
-import { useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
+import { useCallback } from 'react';
+
 import { logInDev } from '../utils/consoleSuppress';
 
-export type HapticFeedbackType = 
+export type HapticFeedbackType =
   | 'light'
   | 'medium'
   | 'heavy'
@@ -55,7 +56,7 @@ export function useHapticFeedback(): UseHapticFeedbackReturn {
           break;
       }
     } catch (error) {
-      logInDev('Haptic feedback failed:', error);
+      logInDev('Haptic feedback failed:', error instanceof Error ? error : String(error));
     }
   }, []);
 

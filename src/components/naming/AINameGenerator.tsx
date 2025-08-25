@@ -1,23 +1,20 @@
 // AI Name Generator Component
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Modal,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  Modal,
-  Alert,
-  ActivityIndicator,
-  Dimensions,
-  FlatList,
-  Image,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/theme/DesignSystem';
+
 import { useAINaming } from '@/hooks/useAINaming';
-import { WardrobeItem, NamingResponse } from '@/types/aynaMirror';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { WardrobeItem } from '@/types/aynaMirror';
+
 import { NamingPreferences } from './NamingPreferences';
 
 interface AINameGeneratorProps {
@@ -33,7 +30,7 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
   onNameSelected,
   onCancel,
   initialName = '',
-  showPreferences = false
+  showPreferences = false,
 }) => {
   const {
     isGenerating,
@@ -42,7 +39,7 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
     generateNameForItem,
     clearError,
     getEffectiveName,
-    saveNamingChoice
+    saveNamingChoice,
   } = useAINaming();
 
   const [customName, setCustomName] = useState(initialName);
@@ -50,12 +47,37 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
   const [showPreferencesDialog, setShowPreferencesDialog] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
 
+  const handleGenerateName = useCallback(async () => {
+    if (!item.imageUri) {
+      return;
+    }
+
+    clearError();
+    setHasGenerated(true);
+
+    const response = await generateNameForItem(item);
+    if (response) {
+      setSelectedSuggestion(response.aiGeneratedName);
+      if (!customName) {
+        setCustomName(response.aiGeneratedName);
+      }
+    }
+  }, [
+    clearError,
+    setHasGenerated,
+    generateNameForItem,
+    item,
+    setSelectedSuggestion,
+    customName,
+    setCustomName,
+  ]);
+
   // Auto-generate name on mount if item has image
   useEffect(() => {
     if (item.imageUri && !hasGenerated && !initialName) {
       handleGenerateName();
     }
-  }, [item.imageUri]);
+  }, [item.imageUri, handleGenerateName, hasGenerated, initialName]);
 
   // Update custom name when AI name is generated
   useEffect(() => {
@@ -65,59 +87,53 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
     }
   }, [lastResponse, customName]);
 
-  const handleGenerateName = async () => {
-    if (!item.imageUri) {
-      return;
-    }
-
-    clearError();
-    setHasGenerated(true);
-    
-    const response = await generateNameForItem(item);
-    if (response) {
-      setSelectedSuggestion(response.aiGeneratedName);
-      if (!customName) {
-        setCustomName(response.aiGeneratedName);
-      }
-    }
-  };
-
   const handleSuggestionClick = (suggestion: string) => {
     setSelectedSuggestion(suggestion);
     setCustomName(suggestion);
   };
 
   const handleAcceptName = async () => {
-    const finalName = customName.trim() || (lastResponse?.aiGeneratedName) || 'Item';
+    const finalName = customName.trim() || lastResponse?.aiGeneratedName || 'Item';
     const isAIGenerated = selectedSuggestion === lastResponse?.aiGeneratedName;
-    
+
     // Save naming choice if we have an item ID
     if (item.id && lastResponse) {
       await saveNamingChoice(
         item.id,
         isAIGenerated ? 'ai' : 'user',
-        isAIGenerated ? undefined : finalName
+        isAIGenerated ? undefined : finalName,
       );
     }
-    
+
     onNameSelected(finalName, isAIGenerated);
   };
 
   const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.8) return DesignSystem.colors.success[100];
-    if (confidence >= 0.6) return DesignSystem.colors.warning[100];
+    if (confidence >= 0.8) {
+      return DesignSystem.colors.success[100];
+    }
+    if (confidence >= 0.6) {
+      return DesignSystem.colors.warning[100];
+    }
     return DesignSystem.colors.error[100];
   };
 
-
   const getConfidenceText = (confidence: number) => {
-    if (confidence >= 0.8) return 'High confidence';
-    if (confidence >= 0.6) return 'Medium confidence';
+    if (confidence >= 0.8) {
+      return 'High confidence';
+    }
+    if (confidence >= 0.6) {
+      return 'Medium confidence';
+    }
     return 'Low confidence';
   };
   const getConfidenceTextColor = (confidence: number) => {
-    if (confidence >= 0.8) return DesignSystem.colors.success[700];
-    if (confidence >= 0.6) return DesignSystem.colors.warning[700];
+    if (confidence >= 0.8) {
+      return DesignSystem.colors.success[700];
+    }
+    if (confidence >= 0.6) {
+      return DesignSystem.colors.warning[700];
+    }
     return DesignSystem.colors.error[700];
   };
 
@@ -132,20 +148,27 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
               <TouchableOpacity
                 style={styles.settingsButton}
                 onPress={() => setShowPreferencesDialog(true)}
+                accessibilityRole="button"
+                accessibilityLabel="Open naming preferences"
+                accessibilityHint="Tap to open naming preferences settings"
               >
                 <Ionicons name="settings" size={20} color={DesignSystem.colors.text.secondary} />
               </TouchableOpacity>
             </View>
-            <Text style={styles.subtitle}>
-              Generate intelligent names for your wardrobe items
-            </Text>
+            <Text style={styles.subtitle}>Generate intelligent names for your wardrobe items</Text>
           </View>
 
           {error && (
             <View style={styles.errorContainer}>
               <Ionicons name="alert-circle" size={20} color={DesignSystem.colors.error[600]} />
               <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity onPress={clearError} style={styles.closeButton}>
+              <TouchableOpacity
+                onPress={clearError}
+                style={styles.closeButton}
+                accessibilityRole="button"
+                accessibilityLabel="Close error message"
+                accessibilityHint="Tap to dismiss the error message"
+              >
                 <Ionicons name="close" size={16} color={DesignSystem.colors.error[600]} />
               </TouchableOpacity>
             </View>
@@ -162,7 +185,9 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
                 <View style={styles.itemDetails}>
                   <Text style={styles.itemDetailsText}>
                     {item.category && `Category: ${item.category}`}
-                    {item.colors && item.colors.length > 0 && ` • Colors: ${item.colors.join(', ')}`}
+                    {item.colors &&
+                      item.colors.length > 0 &&
+                      ` • Colors: ${item.colors.join(', ')}`}
                     {item.brand && ` • Brand: ${item.brand}`}
                   </Text>
                 </View>
@@ -174,7 +199,10 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
           {!lastResponse && (
             <View style={styles.generateButtonContainer}>
               <TouchableOpacity
-                style={[styles.generateButton, (!item.imageUri || isGenerating) && styles.disabledButton]}
+                style={[
+                  styles.generateButton,
+                  (!item.imageUri || isGenerating) && styles.disabledButton,
+                ]}
                 onPress={handleGenerateName}
                 disabled={!item.imageUri || isGenerating}
               >
@@ -188,9 +216,7 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
                 </Text>
               </TouchableOpacity>
               {!item.imageUri && (
-                <Text style={styles.warningText}>
-                  Image required for AI name generation
-                </Text>
+                <Text style={styles.warningText}>Image required for AI name generation</Text>
               )}
             </View>
           )}
@@ -200,13 +226,29 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
             <View style={styles.responseContainer}>
               <View style={styles.responseHeader}>
                 <Text style={styles.responseTitle}>AI Generated Name</Text>
-                <View style={[styles.confidenceChip, { backgroundColor: getConfidenceColor(lastResponse.confidence) }]}>
-                  <Text style={[styles.confidenceText, { color: getConfidenceTextColor(lastResponse.confidence) }]}>{getConfidenceText(lastResponse.confidence)}</Text>
+                <View
+                  style={[
+                    styles.confidenceChip,
+                    { backgroundColor: getConfidenceColor(lastResponse.confidence) },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.confidenceText,
+                      { color: getConfidenceTextColor(lastResponse.confidence) },
+                    ]}
+                  >
+                    {getConfidenceText(lastResponse.confidence)}
+                  </Text>
                 </View>
                 <TouchableOpacity
                   style={styles.refreshButton}
                   onPress={handleGenerateName}
                   disabled={isGenerating}
+                  accessibilityRole="button"
+                  accessibilityLabel={isGenerating ? 'Generating name...' : 'Regenerate AI name'}
+                  accessibilityHint="Tap to generate a new AI-powered name suggestion"
+                  accessibilityState={{ disabled: isGenerating }}
                 >
                   {isGenerating ? (
                     <ActivityIndicator size={16} color={DesignSystem.colors.text.secondary} />
@@ -217,9 +259,7 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
               </View>
 
               <View style={styles.generatedNameContainer}>
-                <Text style={styles.generatedNameText}>
-                  {lastResponse.aiGeneratedName}
-                </Text>
+                <Text style={styles.generatedNameText}>{lastResponse.aiGeneratedName}</Text>
               </View>
 
               {/* Suggestions */}
@@ -231,20 +271,26 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
                   </View>
                   <View style={styles.suggestionsGrid}>
                     {lastResponse.suggestions
-                      .filter(s => s !== lastResponse.aiGeneratedName)
+                      .filter((s) => s !== lastResponse.aiGeneratedName)
                       .map((suggestion, index) => (
                         <TouchableOpacity
                           key={index}
                           style={[
                             styles.suggestionChip,
-                            selectedSuggestion === suggestion && styles.selectedSuggestionChip
+                            selectedSuggestion === suggestion && styles.selectedSuggestionChip,
                           ]}
                           onPress={() => handleSuggestionClick(suggestion)}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Select suggestion: ${suggestion}`}
+                          accessibilityHint="Tap to use this name suggestion"
+                          accessibilityState={{ selected: selectedSuggestion === suggestion }}
                         >
-                          <Text style={[
-                            styles.suggestionText,
-                            selectedSuggestion === suggestion && styles.selectedSuggestionText
-                          ]}>
+                          <Text
+                            style={[
+                              styles.suggestionText,
+                              selectedSuggestion === suggestion && styles.selectedSuggestionText,
+                            ]}
+                          >
                             {suggestion}
                           </Text>
                         </TouchableOpacity>
@@ -281,6 +327,9 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={onCancel}
+                accessibilityRole="button"
+                accessibilityLabel="Cancel"
+                accessibilityHint="Tap to cancel and close the name generator"
               >
                 <Ionicons name="close" size={16} color={DesignSystem.colors.text.secondary} />
                 <Text style={styles.cancelButtonText}>Cancel</Text>
@@ -290,6 +339,10 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
               style={[styles.acceptButton, !customName.trim() && styles.disabledButton]}
               onPress={handleAcceptName}
               disabled={!customName.trim()}
+              accessibilityRole="button"
+              accessibilityLabel="Use this name"
+              accessibilityHint="Tap to confirm and use the selected name"
+              accessibilityState={{ disabled: !customName.trim() }}
             >
               <Ionicons name="checkmark" size={16} color="white" />
               <Text style={styles.acceptButtonText}>Use This Name</Text>
@@ -299,9 +352,7 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
           {/* Analysis Details */}
           {lastResponse?.analysisData && (
             <View style={styles.analysisContainer}>
-              <Text style={styles.analysisTitle}>
-                Analysis Details
-              </Text>
+              <Text style={styles.analysisTitle}>Analysis Details</Text>
               <View style={styles.analysisGrid}>
                 {lastResponse.analysisData.detectedTags.length > 0 && (
                   <View style={styles.analysisSection}>
@@ -342,12 +393,13 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
       >
         <View style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>
-              Naming Preferences
-            </Text>
+            <Text style={styles.modalTitle}>Naming Preferences</Text>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setShowPreferencesDialog(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close preferences"
+              accessibilityHint="Tap to close the naming preferences dialog"
             >
               <Ionicons name="close" size={24} color="#666" />
             </TouchableOpacity>
@@ -369,99 +421,228 @@ export const AINameGenerator: React.FC<AINameGeneratorProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    margin: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  acceptButton: {
+    alignItems: 'center',
+    backgroundColor: '#4caf50',
+    borderRadius: 8,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 12,
+  },
+  acceptButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 4,
+  },
+  actionsContainer: {
+    marginTop: 16,
+  },
+  aiNameText: {
+    color: '#1976d2',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  analysisContainer: {
+    borderTopColor: '#eee',
+    borderTopWidth: 1,
+    marginTop: 16,
+    paddingTop: 16,
+  },
+  analysisGrid: {
+    gap: 16,
+  },
+  analysisLabel: {
+    color: '#666',
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  analysisSection: {
+    flex: 1,
+  },
+  analysisTitle: {
+    color: '#333',
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  buttonsRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  cancelButton: {
+    alignItems: 'center',
+    borderColor: '#e0e0e0',
+    borderRadius: 6,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  cancelButtonText: {
+    color: '#666',
   },
   card: {
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 16,
+    elevation: 3,
     margin: 16,
+    padding: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
   },
   cardContent: {
     padding: 0,
   },
+  closeButton: {
+    padding: 8,
+  },
+  compactButton: {
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    justifyContent: 'center',
+    padding: 8,
+  },
+  confidenceChip: {
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  confidenceText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  container: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    elevation: 3,
+    margin: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  customInput: {
+    backgroundColor: '#fff',
+    borderColor: '#ddd',
+    borderRadius: 8,
+    borderWidth: 1,
+    fontSize: 16,
+    padding: 12,
+  },
+  customInputContainer: {
+    marginBottom: 12,
+  },
+  customNameContainer: {
+    marginTop: 8,
+  },
+  customNameHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 6,
+  },
+  customNameTitle: {
+    color: '#333',
+    fontWeight: '600',
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+    opacity: 0.6,
+  },
+  divider: {
+    backgroundColor: '#eee',
+    height: 1,
+    marginVertical: 16,
+  },
+  errorContainer: {
+    alignItems: 'center',
+    backgroundColor: '#ffebee',
+    borderRadius: 8,
+    flexDirection: 'row',
+    marginBottom: 12,
+    padding: 8,
+  },
+  errorText: {
+    color: '#c62828',
+    flex: 1,
+    marginLeft: 8,
+  },
+  explanationText: {
+    color: '#666',
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  generateButton: {
+    alignItems: 'center',
+    backgroundColor: '#1976d2',
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 16,
+    padding: 12,
+  },
+  generateButtonContainer: {
+    alignItems: 'center',
+  },
+  generateButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  generatedNameContainer: {
+    marginBottom: 8,
+    marginTop: 8,
+  },
+  generatedNameText: {
+    color: '#333',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
   headerContainer: {
     marginBottom: 16,
   },
-  titleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
+  helperText: {
     color: '#666',
-    marginBottom: 16,
+    fontSize: 12,
+    marginTop: 6,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  imageContainer: {
     alignItems: 'center',
     marginBottom: 16,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  settingsButton: {
-    padding: 8,
+  imagePlaceholder: {
+    backgroundColor: '#f0f0f0',
+    borderColor: '#e0e0e0',
     borderRadius: 8,
-    backgroundColor: '#f5f5f5',
+    borderWidth: 1,
+    height: 80,
+    width: 80,
   },
   infoContainer: {
     backgroundColor: '#e3f2fd',
-    padding: 12,
     borderRadius: 8,
     marginBottom: 16,
+    padding: 12,
   },
   infoText: {
     color: '#1976d2',
     fontSize: 14,
-  },
-  errorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#ffebee',
-    padding: 8,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  errorText: {
-    color: '#c62828',
-    marginLeft: 8,
-    flex: 1,
-  },
-  itemPreview: {
-    marginBottom: 16,
-  },
-  itemPreviewRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  imagePlaceholder: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
   },
   itemDetails: {
     flex: 1,
@@ -469,53 +650,93 @@ const styles = StyleSheet.create({
   itemDetailsText: {
     color: '#333',
   },
-  generateButtonContainer: {
+  itemImage: {
+    borderRadius: 8,
+    height: 200,
+    width: 200,
+  },
+  itemPreview: {
+    marginBottom: 16,
+  },
+  itemPreviewRow: {
     alignItems: 'center',
-  },
-  warningText: {
-    marginTop: 8,
-    color: '#666',
-    fontSize: 12,
-  },
-  responseHeader: {
     flexDirection: 'row',
+    gap: 12,
+  },
+  modalContainer: {
+    backgroundColor: '#fff',
+    flex: 1,
+  },
+  modalContent: {
+    flex: 1,
+    padding: 16,
+  },
+  modalHeader: {
     alignItems: 'center',
+    borderBottomColor: '#eee',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
-    gap: 8,
+    padding: 16,
   },
-  confidenceChip: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 999,
+  modalTitle: {
+    color: '#333',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
-  confidenceText: {
-    fontSize: 12,
-    fontWeight: '600',
+  placeholderContainer: {
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderColor: '#ddd',
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    borderWidth: 2,
+    height: 200,
+    justifyContent: 'center',
+    width: 200,
+  },
+  placeholderText: {
+    color: '#666',
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: 'center',
   },
   refreshButton: {
-    padding: 8,
     borderRadius: 6,
+    padding: 8,
   },
-  generatedNameContainer: {
-    marginTop: 8,
-    marginBottom: 8,
-  },
-  generatedNameText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-  },
-  suggestionsHeader: {
-    flexDirection: 'row',
+  regenerateButton: {
     alignItems: 'center',
-    gap: 6,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 12,
+  },
+  regenerateButtonText: {
+    color: '#666',
+    fontSize: 14,
+    marginLeft: 4,
+  },
+  responseContainer: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    marginBottom: 16,
+    padding: 16,
+  },
+  responseHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'space-between',
     marginBottom: 8,
   },
-  suggestionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+  responseTitle: {
+    color: '#333',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
   },
   selectedSuggestionChip: {
     backgroundColor: '#1976d2',
@@ -524,125 +745,40 @@ const styles = StyleSheet.create({
   selectedSuggestionText: {
     color: '#fff',
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#eee',
-    marginVertical: 16,
-  },
-  customNameContainer: {
-    marginTop: 8,
-  },
-  customNameHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 6,
-  },
-  customNameTitle: {
-    color: '#333',
-    fontWeight: '600',
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 10,
-    color: '#333',
-  },
-  helperText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 6,
-  },
-  cancelButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    gap: 6,
-  },
-  cancelButtonText: {
-    color: '#666',
-  },
-  imageContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  itemImage: {
-    width: 200,
-    height: 200,
-    borderRadius: 8,
-  },
-  placeholderContainer: {
-    width: 200,
-    height: 200,
+  settingsButton: {
     backgroundColor: '#f5f5f5',
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#ddd',
-    borderStyle: 'dashed',
+    padding: 8,
   },
-  placeholderText: {
+  subtitle: {
     color: '#666',
     fontSize: 14,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  generateButton: {
-    backgroundColor: '#1976d2',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
-    borderRadius: 8,
     marginBottom: 16,
   },
-  generateButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
+  suggestionChip: {
+    backgroundColor: '#e8f5e8',
+    borderColor: '#4caf50',
+    borderRadius: 16,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
-  disabledButton: {
-    backgroundColor: '#ccc',
-    opacity: 0.6,
-  },
-  responseContainer: {
-    backgroundColor: '#f8f9fa',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  responseTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
-  },
-  aiNameText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1976d2',
-    marginBottom: 8,
-  },
-  explanationText: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    marginBottom: 12,
+  suggestionText: {
+    color: '#2e7d32',
+    fontSize: 12,
   },
   suggestionsContainer: {
     marginTop: 12,
   },
-  suggestionsTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
+  suggestionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  suggestionsHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
     marginBottom: 8,
   },
   suggestionsList: {
@@ -650,135 +786,51 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
   },
-  suggestionChip: {
-    backgroundColor: '#e8f5e8',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#4caf50',
-  },
-  suggestionText: {
-    color: '#2e7d32',
-    fontSize: 12,
-  },
-  actionsContainer: {
-    marginTop: 16,
-  },
-  customInputContainer: {
-    marginBottom: 12,
-  },
-  customInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#fff',
-  },
-  buttonsRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  regenerateButton: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
-    borderRadius: 8,
-  },
-  regenerateButtonText: {
-    color: '#666',
-    fontSize: 14,
-    marginLeft: 4,
-  },
-  acceptButton: {
-    flex: 1,
-    backgroundColor: '#4caf50',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 12,
-    borderRadius: 8,
-  },
-  acceptButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 4,
-  },
-  analysisContainer: {
-    marginTop: 16,
-    paddingTop: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  analysisTitle: {
-    fontSize: 14,
-    fontWeight: '600',
+  suggestionsTitle: {
     color: '#333',
-    marginBottom: 12,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
   },
-  analysisGrid: {
-    gap: 16,
+  tagChip: {
+    backgroundColor: '#f5f5f5',
+    borderColor: '#ddd',
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
-  analysisSection: {
-    flex: 1,
-  },
-  analysisLabel: {
-    fontSize: 12,
+  tagText: {
     color: '#666',
-    marginBottom: 4,
+    fontSize: 11,
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 4,
   },
-  tagChip: {
-    backgroundColor: '#f5f5f5',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
+  textInput: {
     borderColor: '#ddd',
+    borderRadius: 8,
+    borderWidth: 1,
+    color: '#333',
+    padding: 10,
   },
-  tagText: {
-    fontSize: 11,
-    color: '#666',
+  title: {
+    color: '#333',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  modalHeader: {
+  titleRow: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    marginBottom: 8,
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  closeButton: {
-    padding: 8,
-  },
-  modalContent: {
-    flex: 1,
-    padding: 16,
-  },
-  compactButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#f5f5f5',
-    alignItems: 'center',
-    justifyContent: 'center',
+  warningText: {
+    color: '#666',
+    fontSize: 12,
+    marginTop: 8,
   },
 });
 
@@ -801,6 +853,10 @@ export const CompactAINameGenerator: React.FC<{
       style={[styles.compactButton, (isGenerating || !item.imageUri) && styles.disabledButton]}
       onPress={handleQuickGenerate}
       disabled={isGenerating || !item.imageUri}
+      accessibilityRole="button"
+      accessibilityLabel={isGenerating ? 'Generating AI name...' : 'Generate AI name'}
+      accessibilityHint="Tap to generate an AI-powered name for this wardrobe item"
+      accessibilityState={{ disabled: isGenerating || !item.imageUri }}
     >
       {isGenerating ? (
         <ActivityIndicator size="small" color="#666" />

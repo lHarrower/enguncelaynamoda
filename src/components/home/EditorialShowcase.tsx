@@ -1,25 +1,31 @@
 /**
  * Editorial Showcase
- * 
+ *
  * A showcase component demonstrating the Editorial "Weekly Color" section
  * with premium styling and Turkish content.
  */
 
 import React, { useState } from 'react';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+
 import {
-  View,
-  ScrollView,
-  Alert,
-  StyleSheet,
-} from 'react-native';
-import { EditorialColorSection, ColorTheme, EditorialImage } from '@/components/home/EditorialColorSection';
-import { weeklyColorThemes } from '@/data/weeklyColorThemes';
+  ColorTheme,
+  EditorialColorSection,
+  EditorialImage,
+} from '@/components/home/EditorialColorSection';
+import { WeeklyColorTheme, weeklyColorThemes } from '@/data/weeklyColorThemes';
 import { DesignSystem } from '@/theme/DesignSystem';
 import { logInDev } from '@/utils/consoleSuppress';
 
 export const EditorialShowcase: React.FC = () => {
   // Adapt WeeklyColorTheme to ColorTheme shape
-  const mapToColorTheme = (w: { id: string; name: string; color: string; description: string; week: string; }): ColorTheme => ({
+  const mapToColorTheme = (w: {
+    id: string;
+    name: string;
+    color: string;
+    description: string;
+    week: string;
+  }): ColorTheme => ({
     id: w.id,
     name: w.name,
     subtitle: w.description,
@@ -30,10 +36,18 @@ export const EditorialShowcase: React.FC = () => {
     description: w.description,
     week: w.week,
     heroImage: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200',
-    editorialImages: []
+    editorialImages: [],
   });
 
-  const [currentTheme] = useState<ColorTheme>(mapToColorTheme(weeklyColorThemes[0]));
+  const safeWeekly: WeeklyColorTheme = weeklyColorThemes?.[0] ?? {
+    id: 'fallback',
+    name: 'Fallback',
+    color: '#007AFF',
+    description: 'Fallback theme',
+    mood: 'Neutral',
+    week: 'Fallback',
+  };
+  const [currentTheme] = useState<ColorTheme>(mapToColorTheme(safeWeekly));
 
   const handleExploreColor = (theme: ColorTheme) => {
     Alert.alert(
@@ -41,15 +55,15 @@ export const EditorialShowcase: React.FC = () => {
       `${theme.name} temasındaki ürünleri görüntülemek istiyor musunuz?`,
       [
         { text: 'İptal', style: 'cancel' },
-        { 
-          text: 'Keşfet', 
+        {
+          text: 'Keşfet',
           onPress: () => {
             logInDev('Navigate to color theme products:', theme.id);
             // In a real app, this would navigate to a curated product list
             // filtered by the color theme
-          }
+          },
         },
-      ]
+      ],
     );
   };
 
@@ -59,27 +73,23 @@ export const EditorialShowcase: React.FC = () => {
       `"${image.title}" hakkında daha fazla bilgi almak istiyor musunuz?`,
       [
         { text: 'İptal', style: 'cancel' },
-        { 
-          text: 'Detaylar', 
+        {
+          text: 'Detaylar',
           onPress: () => {
             logInDev('Navigate to editorial content:', image.id, theme.id);
             // In a real app, this might open:
             // - A detailed article about the styling
             // - A product page if it's a specific item
             // - A gallery with similar items
-          }
+          },
         },
-      ]
+      ],
     );
   };
 
   return (
-  <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        bounces={true}
-      >
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} bounces={true}>
         <EditorialColorSection
           colorTheme={currentTheme}
           onExploreColor={handleExploreColor}
@@ -93,10 +103,10 @@ export const EditorialShowcase: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: DesignSystem.colors.background.primary,
+    flex: 1,
   },
-  
+
   scrollView: {
     flex: 1,
   },

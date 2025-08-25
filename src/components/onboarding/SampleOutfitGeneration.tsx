@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
-import { DesignSystem } from '@/theme/DesignSystem';
-import Animated, { FadeInUp, FadeInDown, FadeIn } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View, ViewStyle, TextStyle, ImageStyle } from 'react-native';
+import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { DesignSystem } from '@/theme/DesignSystem';
+import { warnInDev } from '@/utils/consoleSuppress';
 
 interface SampleOutfitGenerationProps {
   onComplete: () => void;
@@ -17,7 +19,8 @@ const SAMPLE_OUTFITS = [
     id: 1,
     title: 'Confident Professional',
     items: ['Navy Blazer', 'White Button-down', 'Dark Jeans', 'Brown Loafers'],
-    confidenceNote: "This classic combination exudes quiet confidence. You'll feel ready for any meeting or presentation.",
+    confidenceNote:
+      "This classic combination exudes quiet confidence. You'll feel ready for any meeting or presentation.",
     colors: ['#1e3a8a', '#ffffff', '#1f2937', '#8b4513'],
     occasion: 'Work',
     weatherNote: 'Perfect for mild weather',
@@ -26,7 +29,8 @@ const SAMPLE_OUTFITS = [
     id: 2,
     title: 'Effortless Weekend',
     items: ['Soft Sweater', 'Comfortable Jeans', 'White Sneakers', 'Crossbody Bag'],
-    confidenceNote: "Comfort meets style in this relaxed look. You'll feel at ease while looking effortlessly put-together.",
+    confidenceNote:
+      "Comfort meets style in this relaxed look. You'll feel at ease while looking effortlessly put-together.",
     colors: ['#f3f4f6', '#4b5563', '#ffffff', '#d1d5db'],
     occasion: 'Casual',
     weatherNote: 'Great for any season',
@@ -35,7 +39,8 @@ const SAMPLE_OUTFITS = [
     id: 3,
     title: 'Evening Elegance',
     items: ['Black Dress', 'Statement Earrings', 'Heeled Boots', 'Clutch Purse'],
-    confidenceNote: "Timeless elegance that makes you feel powerful and graceful. Perfect for making a memorable impression.",
+    confidenceNote:
+      'Timeless elegance that makes you feel powerful and graceful. Perfect for making a memorable impression.',
     colors: ['#000000', '#ffd700', '#2d1b69', '#000000'],
     occasion: 'Evening',
     weatherNote: 'Add a jacket for cooler weather',
@@ -59,6 +64,10 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
   }, []);
 
   const currentOutfit = SAMPLE_OUTFITS[currentOutfitIndex];
+  // Guard against out-of-range index (defensive – should not normally occur)
+  if (!currentOutfit) {
+    return null;
+  }
 
   const handleNextOutfit = () => {
     if (currentOutfitIndex < SAMPLE_OUTFITS.length - 1) {
@@ -78,15 +87,16 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
         <BlurView intensity={20} style={styles.generatingCard}>
           <View style={styles.loadingAnimation}>
             <Animated.View style={styles.loadingDot} />
-            <Animated.View style={[styles.loadingDot, { animationDelay: '0.2s' }]} />
-            <Animated.View style={[styles.loadingDot, { animationDelay: '0.4s' }]} />
+            {/* Removed unsupported animationDelay style property – could be reintroduced via Reanimated stagger if needed */}
+            <Animated.View style={styles.loadingDot} />
+            <Animated.View style={styles.loadingDot} />
           </View>
-          
+
           <Text style={styles.generatingTitle}>Creating Your Sample Outfits</Text>
           <Text style={styles.generatingSubtitle}>
             AYNA is analyzing style trends and creating personalized recommendations just for you...
           </Text>
-          
+
           <View style={styles.generatingSteps}>
             <View style={styles.generatingStep}>
               <Ionicons name="checkmark-circle" size={20} color={DesignSystem.colors.sage[600]} />
@@ -129,10 +139,7 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
           <Text style={styles.colorPaletteTitle}>Color Harmony</Text>
           <View style={styles.colorSwatches}>
             {currentOutfit.colors.map((color, index) => (
-              <View 
-                key={index}
-                style={[styles.colorSwatch, { backgroundColor: color }]} 
-              />
+              <View key={index} style={[styles.colorSwatch, { backgroundColor: color }]} />
             ))}
           </View>
         </View>
@@ -144,15 +151,21 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
             {currentOutfit.items.map((item, index) => (
               <View key={index} style={styles.outfitItem}>
                 <View style={styles.itemIcon}>
-                  <Ionicons 
+                  <Ionicons
                     name={
-                      item.includes('Blazer') || item.includes('Sweater') ? 'shirt' :
-                      item.includes('Jeans') || item.includes('Dress') ? 'body' :
-                      item.includes('Shoes') || item.includes('Loafers') || item.includes('Sneakers') || item.includes('Boots') ? 'footsteps' :
-                      'diamond'
-                    } 
-                    size={20} 
-                    color={DesignSystem.colors.sage[600]} 
+                      item.includes('Blazer') || item.includes('Sweater')
+                        ? 'shirt'
+                        : item.includes('Jeans') || item.includes('Dress')
+                          ? 'body'
+                          : item.includes('Shoes') ||
+                              item.includes('Loafers') ||
+                              item.includes('Sneakers') ||
+                              item.includes('Boots')
+                            ? 'footsteps'
+                            : 'diamond'
+                    }
+                    size={20}
+                    color={DesignSystem.colors.sage[600]}
                   />
                 </View>
                 <Text style={styles.itemText}>{item}</Text>
@@ -164,9 +177,7 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
         {/* Confidence Note */}
         <View style={styles.confidenceNoteSection}>
           <Text style={styles.confidenceNoteTitle}>✨ Your Confidence Note</Text>
-          <Text style={styles.confidenceNoteText}>
-            {currentOutfit.confidenceNote}
-          </Text>
+          <Text style={styles.confidenceNoteText}>{currentOutfit.confidenceNote}</Text>
         </View>
 
         {/* Quick Actions */}
@@ -199,27 +210,24 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
         ) : (
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
             <View style={styles.content}>
-              <Animated.View 
-                entering={FadeInUp.delay(200).duration(600)}
-                style={styles.header}
-              >
+              <Animated.View entering={FadeInUp.delay(200).duration(600)} style={styles.header}>
                 <Text style={styles.title}>Your Sample Recommendations</Text>
                 <Text style={styles.subtitle}>
-                  Here's a preview of how AYNA creates personalized outfit recommendations for you
+                  Here&apos;s a preview of how AYNA creates personalized outfit recommendations for you
                 </Text>
               </Animated.View>
 
               {/* Outfit Navigation */}
-        <Animated.View 
+              <Animated.View
                 entering={FadeInUp.delay(400).duration(600)}
                 style={styles.navigationDots}
               >
                 {SAMPLE_OUTFITS.map((_, index) => (
-          <Pressable
+                  <Pressable
                     key={index}
                     style={[
                       styles.navigationDot,
-                      index === currentOutfitIndex && styles.navigationDotActive
+                      index === currentOutfitIndex && styles.navigationDotActive,
                     ]}
                     onPress={() => setCurrentOutfitIndex(index)}
                   />
@@ -230,7 +238,7 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
               {renderOutfitCard()}
 
               {/* Navigation Buttons */}
-              <Animated.View 
+              <Animated.View
                 entering={FadeInUp.delay(800).duration(600)}
                 style={styles.outfitNavigation}
               >
@@ -238,24 +246,26 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                   style={({ pressed }: { pressed: boolean }) => [
                     styles.navButton,
                     currentOutfitIndex === 0 && styles.navButtonDisabled,
-                    pressed && styles.navButtonPressed
+                    pressed && styles.navButtonPressed,
                   ]}
                   onPress={handlePreviousOutfit}
                   disabled={currentOutfitIndex === 0}
                 >
-                  <Ionicons 
-                    name="chevron-back" 
-                    size={24} 
+                  <Ionicons
+                    name="chevron-back"
+                    size={24}
                     color={
-                      currentOutfitIndex === 0 
-                        ? DesignSystem.colors.neutral[400] 
+                      currentOutfitIndex === 0
+                        ? DesignSystem.colors.neutral[400]
                         : DesignSystem.colors.sage[600]
-                    } 
+                    }
                   />
-                  <Text style={[
-                    styles.navButtonText,
-                    currentOutfitIndex === 0 && styles.navButtonTextDisabled
-                  ]}>
+                  <Text
+                    style={[
+                      styles.navButtonText,
+                      currentOutfitIndex === 0 && styles.navButtonTextDisabled,
+                    ]}
+                  >
                     Previous
                   </Text>
                 </Pressable>
@@ -264,42 +274,43 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                   style={({ pressed }: { pressed: boolean }) => [
                     styles.navButton,
                     currentOutfitIndex === SAMPLE_OUTFITS.length - 1 && styles.navButtonDisabled,
-                    pressed && styles.navButtonPressed
+                    pressed && styles.navButtonPressed,
                   ]}
                   onPress={handleNextOutfit}
                   disabled={currentOutfitIndex === SAMPLE_OUTFITS.length - 1}
                 >
-                  <Text style={[
-                    styles.navButtonText,
-                    currentOutfitIndex === SAMPLE_OUTFITS.length - 1 && styles.navButtonTextDisabled
-                  ]}>
+                  <Text
+                    style={[
+                      styles.navButtonText,
+                      currentOutfitIndex === SAMPLE_OUTFITS.length - 1 &&
+                        styles.navButtonTextDisabled,
+                    ]}
+                  >
                     Next
                   </Text>
-                  <Ionicons 
-                    name="chevron-forward" 
-                    size={24} 
+                  <Ionicons
+                    name="chevron-forward"
+                    size={24}
                     color={
-                      currentOutfitIndex === SAMPLE_OUTFITS.length - 1 
-                        ? DesignSystem.colors.neutral[400] 
+                      currentOutfitIndex === SAMPLE_OUTFITS.length - 1
+                        ? DesignSystem.colors.neutral[400]
                         : DesignSystem.colors.sage[600]
-                    } 
+                    }
                   />
                 </Pressable>
               </Animated.View>
 
               {/* Complete Button */}
-              <Animated.View 
+              <Animated.View
                 entering={FadeInDown.delay(1000).duration(600)}
                 style={styles.completeSection}
               >
-                <Text style={styles.completeText}>
-                  Ready to start your confidence journey?
-                </Text>
-                
+                <Text style={styles.completeText}>Ready to start your confidence journey?</Text>
+
                 <Pressable
                   style={({ pressed }: { pressed: boolean }) => [
                     styles.completeButton,
-                    pressed && styles.completeButtonPressed
+                    pressed && styles.completeButtonPressed,
                   ]}
                   onPress={onComplete}
                 >
@@ -308,9 +319,9 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
                     style={styles.completeButtonGradient}
                   >
                     <Text style={styles.completeButtonText}>Start Using AYNA Mirror</Text>
-                    <Ionicons 
-                      name="arrow-forward" 
-                      size={20} 
+                    <Ionicons
+                      name="arrow-forward"
+                      size={20}
                       color={DesignSystem.colors.text.inverse}
                       style={styles.completeButtonIcon}
                     />
@@ -325,7 +336,23 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (styleObj: Record<string, ViewStyle | TextStyle | ImageStyle>) => {
+  try {
+    return StyleSheet.create(styleObj);
+  } catch (error) {
+    warnInDev('StyleSheet.create failed, using fallback styles:', error);
+    // Return a safe fallback with basic styles
+    return {
+      container: { flex: 1 },
+      gradient: { flex: 1 },
+      scrollView: { flex: 1 },
+      content: { padding: 20 },
+      ...styleObj,
+    };
+  }
+};
+
+const styles = createStyles({
   container: {
     flex: 1,
   },
@@ -374,8 +401,8 @@ const styles = StyleSheet.create({
   },
   generatingSubtitle: {
     fontSize: 16,
-  lineHeight: 24,
-  fontWeight: '400',
+    lineHeight: 24,
+    fontWeight: '400',
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
     marginBottom: DesignSystem.spacing.xl,
@@ -451,8 +478,8 @@ const styles = StyleSheet.create({
   },
   metaText: {
     fontSize: 14,
-        lineHeight: 20,
-        fontWeight: '400',
+    lineHeight: 20,
+    fontWeight: '400',
     color: DesignSystem.colors.text.secondary,
   },
   colorPalette: {
@@ -474,7 +501,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 2,
     borderColor: DesignSystem.colors.background.elevated,
-  ...DesignSystem.effects.elevation.subtle,
+    ...DesignSystem.effects.elevation.subtle,
   },
   outfitItems: {
     marginBottom: DesignSystem.spacing.lg,
@@ -509,7 +536,7 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.lg,
     padding: DesignSystem.spacing.md,
     backgroundColor: DesignSystem.colors.sage[50],
-  borderRadius: DesignSystem.borderRadius.md,
+    borderRadius: DesignSystem.borderRadius.md,
   },
   confidenceNoteTitle: {
     ...DesignSystem.typography.body.medium,
@@ -594,3 +621,10 @@ const styles = StyleSheet.create({
     marginLeft: DesignSystem.spacing.sm,
   },
 });
+
+jest.mock('react-native-reanimated', () => ({
+  ...jest.requireActual('react-native-reanimated'),
+  FadeIn: {
+    duration: jest.fn(() => ({ duration: jest.fn() })),
+  },
+}));

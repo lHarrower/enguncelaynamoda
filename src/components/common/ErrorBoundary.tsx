@@ -1,8 +1,12 @@
-import React, { Component, ReactNode } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { Component, ReactNode } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 import { errorInDev } from '@/utils/consoleSuppress';
+
+// Type declaration for __DEV__ global
+declare const __DEV__: boolean;
 
 interface Props {
   children: ReactNode;
@@ -25,13 +29,13 @@ export default class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log the error for debugging
     errorInDev('ErrorBoundary caught an error:', error, errorInfo);
-    
+
     // In development, you might want to send this to a crash reporting service
     if (__DEV__) {
-      console.log('Error details:', {
+      errorInDev('Error details:', {
         message: error.message,
         stack: error.stack,
         componentStack: errorInfo.componentStack,
@@ -55,30 +59,27 @@ export default class ErrorBoundary extends Component<Props, State> {
         <View style={styles.container}>
           <View style={styles.content}>
             <View style={styles.iconContainer}>
-              <Ionicons 
-                name="warning-outline" 
-                size={48} 
-                color={DesignSystem.colors.gold[500]} 
-              />
+              <Ionicons name="warning-outline" size={48} color={DesignSystem.colors.gold[500]} />
             </View>
-            
+
             <Text style={styles.title}>Something went wrong</Text>
             <Text style={styles.subtitle}>
-              We encountered an unexpected error. Don't worry, your data is safe.
+              We encountered an unexpected error. Don&apos;t worry, your data is safe.
             </Text>
-            
+
             {__DEV__ && this.state.error && (
               <View style={styles.errorDetails}>
-                <Text style={styles.errorText}>
-                  {this.state.error.message}
-                </Text>
+                <Text style={styles.errorText}>{this.state.error.message}</Text>
               </View>
             )}
-            
-            <TouchableOpacity 
-              style={styles.retryButton} 
+
+            <TouchableOpacity
+              style={styles.retryButton}
               onPress={this.handleRetry}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Try again"
+              accessibilityHint="Retry the operation that failed"
             >
               <Text style={styles.retryButtonText}>Try Again</Text>
             </TouchableOpacity>
@@ -93,56 +94,56 @@ export default class ErrorBoundary extends Component<Props, State> {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.primary,
+    flex: 1,
+    justifyContent: 'center',
     paddingHorizontal: DesignSystem.spacing.lg,
   },
   content: {
     alignItems: 'center',
     maxWidth: 300,
   },
-  iconContainer: {
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  title: {
-    ...DesignSystem.typography.scale.h2,
-    color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing.md,
-    fontWeight: '400',
-  },
-  subtitle: {
-  ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: DesignSystem.spacing.xl,
-  },
   errorDetails: {
     backgroundColor: DesignSystem.colors.background.secondary,
-    borderRadius: DesignSystem.borderRadius.sm,
-    padding: DesignSystem.spacing.md,
-    marginBottom: DesignSystem.spacing.lg,
-    borderWidth: 1,
     borderColor: DesignSystem.colors.sage[100],
+    borderRadius: DesignSystem.borderRadius.sm,
+    borderWidth: 1,
+    marginBottom: DesignSystem.spacing.lg,
+    padding: DesignSystem.spacing.md,
   },
   errorText: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
     fontFamily: 'monospace',
   },
+  iconContainer: {
+    marginBottom: DesignSystem.spacing.lg,
+  },
   retryButton: {
     backgroundColor: DesignSystem.colors.sage[500],
+    borderRadius: DesignSystem.borderRadius.sm,
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.md,
-    borderRadius: DesignSystem.borderRadius.sm,
     ...DesignSystem.elevation.soft,
   },
   retryButtonText: {
     ...DesignSystem.typography.scale.button,
     color: DesignSystem.colors.text.inverse,
+    textAlign: 'center',
+  },
+  subtitle: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
+    lineHeight: 24,
+    marginBottom: DesignSystem.spacing.xl,
+    textAlign: 'center',
+  },
+  title: {
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
+    fontWeight: '400',
+    marginBottom: DesignSystem.spacing.md,
     textAlign: 'center',
   },
 });

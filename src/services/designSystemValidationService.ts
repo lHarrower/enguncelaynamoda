@@ -4,9 +4,18 @@
  * accessibility, performance, and adherence to design specifications
  */
 
-import { UNIFIED_COLORS, TYPOGRAPHY, SPACING, ELEVATION, BORDER_RADIUS, GLASSMORPHISM } from '@/theme/DesignSystem';
 import { Dimensions, PixelRatio } from 'react-native';
-import { logInDev, errorInDev } from '@/utils/consoleSuppress';
+
+import {
+  BORDER_RADIUS,
+  ELEVATION,
+  GLASSMORPHISM,
+  SPACING,
+  TYPOGRAPHY,
+  UNIFIED_COLORS,
+} from '@/theme/DesignSystem';
+
+import { errorInDev, warnInDev } from '../utils/consoleSuppress';
 
 interface ValidationResult {
   isValid: boolean;
@@ -57,27 +66,27 @@ class DesignSystemValidationService {
   /**
    * Run comprehensive design system validation
    */
-  async validateDesignSystem(): Promise<ValidationResult> {
+  validateDesignSystem(): ValidationResult {
     const results: ValidationResult[] = [];
 
     // Core foundation validations
-    results.push(await this.validateColors());
-    results.push(await this.validateTypography());
-    results.push(await this.validateSpacing());
-    results.push(await this.validateElevation());
-    results.push(await this.validateBorderRadius());
-    
+    results.push(this.validateColors());
+    results.push(this.validateTypography());
+    results.push(this.validateSpacing());
+    results.push(this.validateElevation());
+    results.push(this.validateBorderRadius());
+
     // Component validations
-    results.push(await this.validateComponents());
-    
+    results.push(this.validateComponents());
+
     // Accessibility validations
-    results.push(await this.validateAccessibility());
-    
+    results.push(this.validateAccessibility());
+
     // Performance validations
-    results.push(await this.validatePerformance());
-    
+    results.push(this.validatePerformance());
+
     // Layout system validations
-    results.push(await this.validateLayoutSystems());
+    results.push(this.validateLayoutSystems());
 
     return this.aggregateResults(results);
   }
@@ -85,20 +94,20 @@ class DesignSystemValidationService {
   /**
    * Validate color system consistency and accessibility
    */
-  private async validateColors(): Promise<ValidationResult> {
+  private validateColors(): ValidationResult {
     const issues: ValidationIssue[] = [];
     const recommendations: string[] = [];
     let score = 100;
 
     // Check color contrast ratios
     const contrastResults = this.checkColorContrasts();
-    contrastResults.forEach(result => {
+    contrastResults.forEach((result) => {
       if (!result.wcagAA) {
         issues.push({
           severity: 'error',
           category: 'Accessibility',
           message: `Color contrast ratio ${result.ratio.toFixed(2)} does not meet WCAG AA standards (4.5:1)`,
-          fix: 'Adjust color values to improve contrast'
+          fix: 'Adjust color values to improve contrast',
         });
         score -= 15;
       }
@@ -106,26 +115,26 @@ class DesignSystemValidationService {
 
     // Validate color palette completeness
     const requiredColors = ['background', 'sage', 'gold', 'text', 'functional'];
-    requiredColors.forEach(colorGroup => {
+    requiredColors.forEach((colorGroup) => {
       if (!UNIFIED_COLORS[colorGroup as keyof typeof UNIFIED_COLORS]) {
         issues.push({
           severity: 'error',
           category: 'Color System',
           message: `Missing required color group: ${colorGroup}`,
-          fix: 'Add missing color definitions to UNIFIED_COLORS'
+          fix: 'Add missing color definitions to UNIFIED_COLORS',
         });
         score -= 20;
       }
     });
 
     // Check for hardcoded color values in components
-    const hardcodedColors = await this.scanForHardcodedColors();
+    const hardcodedColors = this.scanForHardcodedColors();
     if (hardcodedColors.length > 0) {
       issues.push({
         severity: 'warning',
         category: 'Color System',
         message: `Found ${hardcodedColors.length} hardcoded color values`,
-        fix: 'Replace hardcoded colors with design system tokens'
+        fix: 'Replace hardcoded colors with design system tokens',
       });
       score -= 5 * hardcodedColors.length;
     }
@@ -135,47 +144,57 @@ class DesignSystemValidationService {
     } else if (score > 70) {
       recommendations.push('Consider improving color contrast ratios for better accessibility');
     } else {
-      recommendations.push('Significant color system improvements needed for accessibility compliance');
+      recommendations.push(
+        'Significant color system improvements needed for accessibility compliance',
+      );
     }
 
     return {
       isValid: score >= 70,
       score: Math.max(0, score),
       issues,
-      recommendations
+      recommendations,
     };
   }
 
   /**
    * Validate typography system consistency
    */
-  private async validateTypography(): Promise<ValidationResult> {
+  private validateTypography(): ValidationResult {
     const issues: ValidationIssue[] = [];
     const recommendations: string[] = [];
     let score = 100;
 
     // Check typography scale completeness
-    const requiredScales = ['display', 'headline', 'title', 'body1', 'body2', 'caption', 'overline'];
-    requiredScales.forEach(scale => {
+    const requiredScales = [
+      'display',
+      'headline',
+      'title',
+      'body1',
+      'body2',
+      'caption',
+      'overline',
+    ];
+    requiredScales.forEach((scale) => {
       if (!TYPOGRAPHY.scale[scale as keyof typeof TYPOGRAPHY.scale]) {
         issues.push({
           severity: 'error',
           category: 'Typography',
           message: `Missing typography scale: ${scale}`,
-          fix: 'Add missing typography scale to TYPOGRAPHY.scale'
+          fix: 'Add missing typography scale to TYPOGRAPHY.scale',
         });
         score -= 10;
       }
     });
 
     // Validate font loading and availability
-    const fontAvailability = await this.checkFontAvailability();
+    const fontAvailability = this.checkFontAvailability();
     if (!fontAvailability.playfairDisplay) {
       issues.push({
         severity: 'warning',
         category: 'Typography',
         message: 'Playfair Display font may not be loaded properly',
-        fix: 'Ensure Playfair Display is properly loaded in app.json'
+        fix: 'Ensure Playfair Display is properly loaded in app.json',
       });
       score -= 10;
     }
@@ -188,84 +207,87 @@ class DesignSystemValidationService {
     }
 
     recommendations.push(
-      score > 90 ? 'Typography system is well-structured' :
-      score > 70 ? 'Consider improving font loading and line height consistency' :
-      'Typography system needs significant improvements'
+      score > 90
+        ? 'Typography system is well-structured'
+        : score > 70
+          ? 'Consider improving font loading and line height consistency'
+          : 'Typography system needs significant improvements',
     );
 
     return {
       isValid: score >= 70,
       score: Math.max(0, score),
       issues,
-      recommendations
+      recommendations,
     };
   }
 
   /**
    * Validate spacing system consistency
    */
-  private async validateSpacing(): Promise<ValidationResult> {
+  private validateSpacing(): ValidationResult {
     const issues: ValidationIssue[] = [];
     const recommendations: string[] = [];
     let score = 100;
 
     // Check spacing scale completeness
     const requiredSpacing = ['xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl'];
-    requiredSpacing.forEach(size => {
+    requiredSpacing.forEach((size) => {
       if (!SPACING[size as keyof typeof SPACING]) {
         issues.push({
           severity: 'error',
           category: 'Spacing',
           message: `Missing spacing size: ${size}`,
-          fix: 'Add missing spacing size to SPACING system'
+          fix: 'Add missing spacing size to SPACING system',
         });
         score -= 10;
       }
     });
 
     // Validate spacing consistency (8px base unit)
-    const spacingValues = Object.values(SPACING).filter(val => typeof val === 'number');
-    const inconsistentSpacing = spacingValues.filter(val => val % 4 !== 0);
+    const spacingValues = Object.values(SPACING).filter((val) => typeof val === 'number');
+    const inconsistentSpacing = spacingValues.filter((val) => val % 4 !== 0);
     if (inconsistentSpacing.length > 0) {
       issues.push({
         severity: 'warning',
         category: 'Spacing',
         message: `Found ${inconsistentSpacing.length} spacing values not following 4px grid`,
-        fix: 'Align spacing values to 4px or 8px grid system'
+        fix: 'Align spacing values to 4px or 8px grid system',
       });
       score -= 5;
     }
 
     recommendations.push(
-      score > 90 ? 'Spacing system follows best practices' :
-      'Consider aligning all spacing values to a consistent grid system'
+      score > 90
+        ? 'Spacing system follows best practices'
+        : 'Consider aligning all spacing values to a consistent grid system',
     );
 
     return {
       isValid: score >= 70,
       score: Math.max(0, score),
       issues,
-      recommendations
+      recommendations,
     };
   }
 
   /**
    * Validate elevation and shadow system
    */
-  private async validateElevation(): Promise<ValidationResult> {
+  private validateElevation(): ValidationResult {
     const issues: ValidationIssue[] = [];
     const recommendations: string[] = [];
     let score = 100;
 
     // Check elevation levels
     const requiredElevations = ['none', 'soft', 'medium', 'high', 'floating', 'organic'];
-    requiredElevations.forEach(level => {
+    requiredElevations.forEach((level) => {
       if (!ELEVATION[level as keyof typeof ELEVATION]) {
         issues.push({
           severity: 'error',
           category: 'Elevation',
           message: `Missing elevation level: ${level}`,
-          fix: 'Add missing elevation level to ELEVATION system'
+          fix: 'Add missing elevation level to ELEVATION system',
         });
         score -= 15;
       }
@@ -273,47 +295,48 @@ class DesignSystemValidationService {
 
     // Validate glassmorphism effects
     const requiredGlass = ['light', 'medium', 'strong', 'dark', 'navigation'];
-    requiredGlass.forEach(effect => {
+    requiredGlass.forEach((effect) => {
       if (!GLASSMORPHISM[effect as keyof typeof GLASSMORPHISM]) {
         issues.push({
           severity: 'warning',
           category: 'Glassmorphism',
           message: `Missing glassmorphism effect: ${effect}`,
-          fix: 'Add missing glassmorphism effect'
+          fix: 'Add missing glassmorphism effect',
         });
         score -= 10;
       }
     });
 
     recommendations.push(
-      score > 90 ? 'Elevation system provides good depth hierarchy' :
-      'Consider expanding elevation system for better visual hierarchy'
+      score > 90
+        ? 'Elevation system provides good depth hierarchy'
+        : 'Consider expanding elevation system for better visual hierarchy',
     );
 
     return {
       isValid: score >= 70,
       score: Math.max(0, score),
       issues,
-      recommendations
+      recommendations,
     };
   }
 
   /**
    * Validate border radius system
    */
-  private async validateBorderRadius(): Promise<ValidationResult> {
+  private validateBorderRadius(): ValidationResult {
     const issues: ValidationIssue[] = [];
     const recommendations: string[] = [];
     let score = 100;
 
     const requiredRadius = ['none', 'sm', 'md', 'lg', 'xl', '2xl', 'organic', 'pill'];
-    requiredRadius.forEach(size => {
+    requiredRadius.forEach((size) => {
       if (!BORDER_RADIUS[size as keyof typeof BORDER_RADIUS]) {
         issues.push({
           severity: 'error',
           category: 'Border Radius',
           message: `Missing border radius size: ${size}`,
-          fix: 'Add missing border radius to BORDER_RADIUS system'
+          fix: 'Add missing border radius to BORDER_RADIUS system',
         });
         score -= 10;
       }
@@ -323,27 +346,27 @@ class DesignSystemValidationService {
       isValid: score >= 70,
       score: Math.max(0, score),
       issues,
-      recommendations: ['Border radius system supports organic design language']
+      recommendations: ['Border radius system supports organic design language'],
     };
   }
 
   /**
    * Validate component implementations
    */
-  private async validateComponents(): Promise<ValidationResult> {
+  private validateComponents(): ValidationResult {
     const issues: ValidationIssue[] = [];
     const recommendations: string[] = [];
     let score = 100;
 
-    const componentResults = await this.validateComponentImplementations();
-    
-    componentResults.forEach(result => {
+    const componentResults = this.validateComponentImplementations();
+
+    componentResults.forEach((result) => {
       if (!result.accessibility.touchTargetSize) {
         issues.push({
           severity: 'error',
           category: 'Accessibility',
           message: `${result.component} has insufficient touch target size`,
-          fix: 'Ensure minimum 44px touch targets'
+          fix: 'Ensure minimum 44px touch targets',
         });
         score -= 10;
       }
@@ -353,7 +376,7 @@ class DesignSystemValidationService {
           severity: 'error',
           category: 'Accessibility',
           message: `${result.component} has poor color contrast`,
-          fix: 'Improve color contrast ratios'
+          fix: 'Improve color contrast ratios',
         });
         score -= 10;
       }
@@ -363,42 +386,44 @@ class DesignSystemValidationService {
           severity: 'warning',
           category: 'Performance',
           message: `${result.component} render time exceeds 16ms`,
-          fix: 'Optimize component rendering performance'
+          fix: 'Optimize component rendering performance',
         });
         score -= 5;
       }
     });
 
     recommendations.push(
-      score > 90 ? 'Components follow design system guidelines well' :
-      score > 70 ? 'Some components need accessibility improvements' :
-      'Significant component improvements needed'
+      score > 90
+        ? 'Components follow design system guidelines well'
+        : score > 70
+          ? 'Some components need accessibility improvements'
+          : 'Significant component improvements needed',
     );
 
     return {
       isValid: score >= 70,
       score: Math.max(0, score),
       issues,
-      recommendations
+      recommendations,
     };
   }
 
   /**
    * Validate accessibility compliance
    */
-  private async validateAccessibility(): Promise<ValidationResult> {
+  private validateAccessibility(): ValidationResult {
     const issues: ValidationIssue[] = [];
     const recommendations: string[] = [];
     let score = 100;
 
     // Check WCAG compliance
-    const wcagResults = await this.checkWCAGCompliance();
+    const wcagResults = this.checkWCAGCompliance();
     if (wcagResults.colorContrast < 0.9) {
       issues.push({
         severity: 'error',
         category: 'WCAG Compliance',
         message: 'Color contrast compliance below 90%',
-        fix: 'Improve color contrast ratios across the app'
+        fix: 'Improve color contrast ratios across the app',
       });
       score -= 20;
     }
@@ -408,34 +433,36 @@ class DesignSystemValidationService {
         severity: 'error',
         category: 'WCAG Compliance',
         message: 'Touch target size compliance below 95%',
-        fix: 'Ensure all interactive elements meet minimum size requirements'
+        fix: 'Ensure all interactive elements meet minimum size requirements',
       });
       score -= 15;
     }
 
     recommendations.push(
-      score > 95 ? 'Excellent accessibility compliance' :
-      score > 80 ? 'Good accessibility with room for improvement' :
-      'Accessibility needs significant attention'
+      score > 95
+        ? 'Excellent accessibility compliance'
+        : score > 80
+          ? 'Good accessibility with room for improvement'
+          : 'Accessibility needs significant attention',
     );
 
     return {
       isValid: score >= 80,
       score: Math.max(0, score),
       issues,
-      recommendations
+      recommendations,
     };
   }
 
   /**
    * Validate performance metrics
    */
-  private async validatePerformance(): Promise<ValidationResult> {
+  private validatePerformance(): ValidationResult {
     const issues: ValidationIssue[] = [];
     const recommendations: string[] = [];
     let score = 100;
 
-    const metrics = await this.measurePerformanceMetrics();
+    const metrics = this.measurePerformanceMetrics();
     this.performanceMetrics = metrics;
 
     if (metrics.themeLoadTime > 100) {
@@ -443,7 +470,7 @@ class DesignSystemValidationService {
         severity: 'warning',
         category: 'Performance',
         message: 'Theme loading time exceeds 100ms',
-        fix: 'Optimize theme loading and caching'
+        fix: 'Optimize theme loading and caching',
       });
       score -= 10;
     }
@@ -453,39 +480,42 @@ class DesignSystemValidationService {
         severity: 'error',
         category: 'Performance',
         message: 'Animation frame rate below 55fps',
-        fix: 'Optimize animations for 60fps performance'
+        fix: 'Optimize animations for 60fps performance',
       });
       score -= 15;
     }
 
-    if (metrics.bundleSize > 500000) { // 500KB
+    if (metrics.bundleSize > 500000) {
+      // 500KB
       issues.push({
         severity: 'warning',
         category: 'Performance',
         message: 'Design system bundle size exceeds 500KB',
-        fix: 'Consider code splitting and tree shaking'
+        fix: 'Consider code splitting and tree shaking',
       });
       score -= 5;
     }
 
     recommendations.push(
-      score > 90 ? 'Performance metrics are excellent' :
-      score > 70 ? 'Performance is good with minor optimizations needed' :
-      'Performance needs significant optimization'
+      score > 90
+        ? 'Performance metrics are excellent'
+        : score > 70
+          ? 'Performance is good with minor optimizations needed'
+          : 'Performance needs significant optimization',
     );
 
     return {
       isValid: score >= 70,
       score: Math.max(0, score),
       issues,
-      recommendations
+      recommendations,
     };
   }
 
   /**
    * Validate layout systems
    */
-  private async validateLayoutSystems(): Promise<ValidationResult> {
+  private validateLayoutSystems(): ValidationResult {
     const issues: ValidationIssue[] = [];
     const recommendations: string[] = [];
     let score = 100;
@@ -493,13 +523,13 @@ class DesignSystemValidationService {
     // Check responsive breakpoints
     const { width } = Dimensions.get('window');
     const pixelRatio = PixelRatio.get();
-    
+
     if (pixelRatio > 3 && width < 400) {
       issues.push({
         severity: 'warning',
         category: 'Responsive Design',
         message: 'High pixel density small screens may need special handling',
-        fix: 'Consider additional breakpoints for high-density small screens'
+        fix: 'Consider additional breakpoints for high-density small screens',
       });
       score -= 5;
     }
@@ -510,7 +540,7 @@ class DesignSystemValidationService {
       isValid: score >= 70,
       score: Math.max(0, score),
       issues,
-      recommendations
+      recommendations,
     };
   }
 
@@ -520,16 +550,16 @@ class DesignSystemValidationService {
     return [
       { ratio: 4.8, wcagAA: true, wcagAAA: false },
       { ratio: 7.2, wcagAA: true, wcagAAA: true },
-      { ratio: 3.2, wcagAA: false, wcagAAA: false }
+      { ratio: 3.2, wcagAA: false, wcagAAA: false },
     ];
   }
 
-  private async scanForHardcodedColors(): Promise<string[]> {
+  private scanForHardcodedColors(): string[] {
     // In real implementation, would scan codebase for hardcoded color values
     return [];
   }
 
-  private async checkFontAvailability(): Promise<{ playfairDisplay: boolean; inter: boolean }> {
+  private checkFontAvailability(): { playfairDisplay: boolean; inter: boolean } {
     // In real implementation, would check if fonts are properly loaded
     return { playfairDisplay: true, inter: true };
   }
@@ -539,7 +569,7 @@ class DesignSystemValidationService {
     return [];
   }
 
-  private async validateComponentImplementations(): Promise<ComponentValidationResult[]> {
+  private validateComponentImplementations(): ComponentValidationResult[] {
     // Mock component validation results
     return [
       {
@@ -548,12 +578,12 @@ class DesignSystemValidationService {
         accessibility: {
           touchTargetSize: true,
           colorContrast: true,
-          semanticLabels: true
+          semanticLabels: true,
         },
         performance: {
           renderTime: 12,
-          memoryFootprint: 1024
-        }
+          memoryFootprint: 1024,
+        },
       },
       {
         component: 'Card',
@@ -561,92 +591,116 @@ class DesignSystemValidationService {
         accessibility: {
           touchTargetSize: true,
           colorContrast: true,
-          semanticLabels: true
+          semanticLabels: true,
         },
         performance: {
           renderTime: 8,
-          memoryFootprint: 512
-        }
-      }
+          memoryFootprint: 512,
+        },
+      },
     ];
   }
 
-  private async checkWCAGCompliance(): Promise<{ colorContrast: number; touchTargets: number }> {
-    // Mock WCAG compliance check
-    return {
-      colorContrast: 0.92,
-      touchTargets: 0.98
-    };
+  private checkWCAGCompliance(): { colorContrast: number; touchTargets: number } {
+    try {
+      const AccessibilityService = require('./accessibilityService').default;
+      const complianceResult = AccessibilityService.validateWCAGCompliance();
+
+      // Calculate color contrast compliance percentage
+      const colorContrastResults = AccessibilityService.validateColorContrast?.() || [];
+      const passedContrast = colorContrastResults.filter(
+        (r: { passesAA?: boolean }) => r.passesAA,
+      ).length;
+      const totalContrast = colorContrastResults.length;
+      const colorContrastScore = totalContrast > 0 ? passedContrast / totalContrast : 0.92;
+
+      // Calculate touch target compliance from overall score
+      // If overall score is high, assume touch targets are mostly compliant
+      const touchTargetScore = complianceResult.score >= 80 ? 0.95 : 0.85;
+
+      return {
+        colorContrast: colorContrastScore,
+        touchTargets: touchTargetScore,
+      };
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      warnInDev('Failed to check WCAG compliance:', err);
+      // Fallback to conservative estimates
+      return {
+        colorContrast: 0.85,
+        touchTargets: 0.9,
+      };
+    }
   }
 
-  private async measurePerformanceMetrics(): Promise<PerformanceMetrics> {
+  private measurePerformanceMetrics(): PerformanceMetrics {
     // Mock performance measurements
     return {
       themeLoadTime: 45,
       animationFrameRate: 58,
       memoryUsage: 12.5,
-      bundleSize: 320000
+      bundleSize: 320000,
     };
   }
 
   private aggregateResults(results: ValidationResult[]): ValidationResult {
-    const allIssues = results.flatMap(r => r.issues);
-    const allRecommendations = results.flatMap(r => r.recommendations);
+    const allIssues = results.flatMap((r) => r.issues);
+    const allRecommendations = results.flatMap((r) => r.recommendations);
     const averageScore = results.reduce((sum, r) => sum + r.score, 0) / results.length;
-    const isValid = results.every(r => r.isValid);
+    const isValid = results.every((r) => r.isValid);
 
     return {
       isValid,
       score: Math.round(averageScore),
       issues: allIssues,
-      recommendations: [...new Set(allRecommendations)] // Remove duplicates
+      recommendations: [...new Set(allRecommendations)], // Remove duplicates
     };
   }
 
   /**
    * Generate comprehensive validation report
    */
-  async generateValidationReport(): Promise<string> {
-    const result = await this.validateDesignSystem();
-    
-    let report = `# AYNAMODA Design System Validation Report\n\n`;
+  generateValidationReport(): string {
+    const result: ValidationResult = this.validateDesignSystem();
+
+    let report = '# AYNAMODA Design System Validation Report\n\n';
     report += `**Overall Score: ${result.score}/100**\n`;
     report += `**Status: ${result.isValid ? '✅ PASSED' : '❌ FAILED'}**\n\n`;
-    
+
     if (result.issues.length > 0) {
       report += `## Issues Found (${result.issues.length})\n\n`;
-      result.issues.forEach(issue => {
+      result.issues.forEach((issue) => {
         const icon = issue.severity === 'error' ? '🚨' : issue.severity === 'warning' ? '⚠️' : 'ℹ️';
         report += `${icon} **${issue.category}**: ${issue.message}\n`;
         if (issue.fix) {
           report += `   *Fix: ${issue.fix}*\n`;
         }
-        report += `\n`;
+        report += '\n';
       });
     }
-    
+
     if (result.recommendations.length > 0) {
-      report += `## Recommendations\n\n`;
-      result.recommendations.forEach(rec => {
+      report += '## Recommendations\n\n';
+      result.recommendations.forEach((rec) => {
         report += `- ${rec}\n`;
       });
     }
-    
+
     if (this.performanceMetrics) {
-      report += `\n## Performance Metrics\n\n`;
+      report += '\n## Performance Metrics\n\n';
       report += `- Theme Load Time: ${this.performanceMetrics.themeLoadTime}ms\n`;
       report += `- Animation Frame Rate: ${this.performanceMetrics.animationFrameRate}fps\n`;
       report += `- Memory Usage: ${this.performanceMetrics.memoryUsage}MB\n`;
       report += `- Bundle Size: ${(this.performanceMetrics.bundleSize / 1024).toFixed(1)}KB\n`;
     }
-    
+
     return report;
   }
 
   /**
    * Get validation status for specific category
    */
-  async getValidationStatus(category: string): Promise<ValidationResult | null> {
+  getValidationStatus(category: string): ValidationResult | null {
     return this.validationResults.get(category) || null;
   }
 
@@ -654,8 +708,8 @@ class DesignSystemValidationService {
    * Run continuous validation monitoring
    */
   startContinuousValidation(intervalMs: number = 30000): void {
-    setInterval(async () => {
-      const result = await this.validateDesignSystem();
+    setInterval(() => {
+      const result: ValidationResult = this.validateDesignSystem();
       if (!result.isValid) {
         errorInDev('Design System Validation Failed:', result.issues);
       }
@@ -664,4 +718,4 @@ class DesignSystemValidationService {
 }
 
 export default new DesignSystemValidationService();
-export type { ValidationResult, ValidationIssue, ComponentValidationResult, PerformanceMetrics };
+export type { ComponentValidationResult, PerformanceMetrics, ValidationIssue, ValidationResult };

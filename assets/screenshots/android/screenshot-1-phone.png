@@ -1,0 +1,65 @@
+<svg width="360" height="640" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FAF9F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F5F5DC;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="360" height="640" fill="url(#bg)"/>
+  
+  <!-- Status Bar -->
+  <rect x="0" y="0" width="360" height="24" fill="#000" opacity="0.1"/>
+  <text x="20" y="18" font-family="Roboto, Arial" font-size="12" font-weight="500" fill="#000">9:41</text>
+  <text x="320" y="18" font-family="Roboto, Arial" font-size="12" font-weight="500" fill="#000">100%</text>
+  
+  <!-- App Bar -->
+  <rect x="0" y="24" width="360" height="56" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
+  <text x="180" y="58" font-family="Roboto, Arial" font-size="20" font-weight="500" fill="#212121" text-anchor="middle">AYNAMODA</text>
+  
+  <!-- Welcome Card -->
+  <rect x="16" y="96" width="328" height="180" rx="12" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
+  <circle cx="180" cy="136" r="24" fill="#6200EA"/>
+  <text x="180" y="144" font-family="Roboto, Arial" font-size="18" font-weight="500" fill="#FFFFFF" text-anchor="middle">AI</text>
+  
+  <text x="180" y="170" font-family="Roboto, Arial" font-size="22" font-weight="500" fill="#212121" text-anchor="middle">Welcome to AYNAMODA</text>
+  <text x="180" y="195" font-family="Roboto, Arial" font-size="14" fill="#757575" text-anchor="middle">Your AI-powered fashion companion</text>
+  <text x="180" y="215" font-family="Roboto, Arial" font-size="14" fill="#757575" text-anchor="middle">for sustainable style choices</text>
+  
+  <rect x="32" y="235" width="296" height="32" rx="16" fill="#6200EA"/>
+  <text x="180" y="255" font-family="Roboto, Arial" font-size="14" font-weight="500" fill="#FFFFFF" text-anchor="middle">Get Started</text>
+  
+  <!-- Feature Grid -->
+  <text x="32" y="310" font-family="Roboto, Arial" font-size="18" font-weight="500" fill="#212121">Discover Features</text>
+  
+  <!-- Feature 1 -->
+  <rect x="16" y="330" width="104" height="120" rx="8" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
+  <rect x="24" y="338" width="88" height="64" rx="6" fill="#FF5722" opacity="0.1"/>
+  <text x="68" y="420" font-family="Roboto, Arial" font-size="12" font-weight="500" fill="#212121" text-anchor="middle">Smart</text>
+  <text x="68" y="435" font-family="Roboto, Arial" font-size="12" font-weight="500" fill="#212121" text-anchor="middle">Wardrobe</text>
+  
+  <!-- Feature 2 -->
+  <rect x="128" y="330" width="104" height="120" rx="8" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
+  <rect x="136" y="338" width="88" height="64" rx="6" fill="#4CAF50" opacity="0.1"/>
+  <text x="180" y="420" font-family="Roboto, Arial" font-size="12" font-weight="500" fill="#212121" text-anchor="middle">AI Style</text>
+  <text x="180" y="435" font-family="Roboto, Arial" font-size="12" font-weight="500" fill="#212121" text-anchor="middle">Assistant</text>
+  
+  <!-- Feature 3 -->
+  <rect x="240" y="330" width="104" height="120" rx="8" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
+  <rect x="248" y="338" width="88" height="64" rx="6" fill="#2196F3" opacity="0.1"/>
+  <text x="292" y="420" font-family="Roboto, Arial" font-size="12" font-weight="500" fill="#212121" text-anchor="middle">Sustainable</text>
+  <text x="292" y="435" font-family="Roboto, Arial" font-size="12" font-weight="500" fill="#212121" text-anchor="middle">Fashion</text>
+  
+  <!-- Stats Card -->
+  <rect x="16" y="470" width="328" height="80" rx="8" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
+  <text x="32" y="495" font-family="Roboto, Arial" font-size="16" font-weight="500" fill="#212121">Join the Community</text>
+  <text x="32" y="515" font-family="Roboto, Arial" font-size="12" fill="#757575">50,000+ users saving money and the planet</text>
+  <text x="32" y="535" font-family="Roboto, Arial" font-size="12" fill="#757575">through smarter fashion choices</text>
+  
+  <!-- Bottom Navigation -->
+  <rect x="0" y="580" width="360" height="60" fill="#FFFFFF" stroke="#E0E0E0" stroke-width="1"/>
+  <text x="72" y="615" font-family="Roboto, Arial" font-size="10" font-weight="500" fill="#6200EA" text-anchor="middle">Home</text>
+  <text x="180" y="615" font-family="Roboto, Arial" font-size="10" font-weight="400" fill="#757575" text-anchor="middle">Wardrobe</text>
+  <text x="288" y="615" font-family="Roboto, Arial" font-size="10" font-weight="400" fill="#757575" text-anchor="middle">Profile</text>
+</svg>

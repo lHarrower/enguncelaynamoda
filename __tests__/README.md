@@ -68,6 +68,7 @@ npm test -- --testPathPattern=performance --verbose
 ```
 
 **Performance Benchmarks:**
+
 - Daily recommendations: < 1 second
 - Feedback processing: < 500ms
 - Large wardrobe handling: < 2 seconds (200+ items)
@@ -81,6 +82,7 @@ npm test -- --testPathPattern=performance --verbose
 **Purpose:** Test complete user journeys from start to finish
 
 **Key Scenarios:**
+
 - Complete daily ritual flow (notification → recommendations → feedback)
 - Error recovery and graceful degradation
 - Performance throughout the entire flow
@@ -89,6 +91,7 @@ npm test -- --testPathPattern=performance --verbose
 - Timezone handling during travel
 
 **Example Test:**
+
 ```typescript
 it('should execute the complete daily ritual from notification to feedback', async () => {
   // 1. Schedule notification
@@ -105,6 +108,7 @@ it('should execute the complete daily ritual from notification to feedback', asy
 **Purpose:** Verify cross-service communication and data consistency
 
 **Key Areas:**
+
 - AYNA Mirror service coordination
 - Intelligence service integration
 - Notification service timing
@@ -113,6 +117,7 @@ it('should execute the complete daily ritual from notification to feedback', asy
 - Data consistency during failures
 
 **Example Test:**
+
 ```typescript
 it('should coordinate between wardrobe, intelligence, and weather services', async () => {
   // Verify service method calls
@@ -126,6 +131,7 @@ it('should coordinate between wardrobe, intelligence, and weather services', asy
 **Purpose:** Ensure high-quality, accurate, and engaging user experiences
 
 #### Confidence Note Quality Tests
+
 - Personalization based on user history
 - Reference to previous positive experiences
 - Encouragement for neglected items
@@ -134,6 +140,7 @@ it('should coordinate between wardrobe, intelligence, and weather services', asy
 - Cultural sensitivity and inclusivity
 
 #### Recommendation Accuracy Tests
+
 - Weather-appropriate suggestions
 - User preference learning
 - Occasion appropriateness (work vs. weekend)
@@ -142,6 +149,7 @@ it('should coordinate between wardrobe, intelligence, and weather services', asy
 - Balance between safe choices and exploration
 
 **Example Test:**
+
 ```typescript
 it('should recommend appropriate clothing for cold weather', async () => {
   // Setup cold weather context
@@ -156,6 +164,7 @@ it('should recommend appropriate clothing for cold weather', async () => {
 **Purpose:** Ensure sub-second response times and efficient resource usage
 
 **Key Metrics:**
+
 - Response time benchmarks
 - Concurrent operation handling
 - Memory usage optimization
@@ -163,6 +172,7 @@ it('should recommend appropriate clothing for cold weather', async () => {
 - Timeout scenario handling
 
 **Benchmark Standards:**
+
 - Daily recommendations: < 1000ms
 - Feedback processing: < 500ms
 - Style analysis: < 300ms
@@ -170,12 +180,13 @@ it('should recommend appropriate clothing for cold weather', async () => {
 - Item usage tracking: < 50ms
 
 **Example Test:**
+
 ```typescript
 it('should generate daily recommendations in under 1 second', async () => {
   const startTime = performance.now();
   const recommendations = await aynaMirrorService.generateDailyRecommendations(userId);
   const duration = performance.now() - startTime;
-  
+
   expect(duration).toBeLessThan(1000);
 });
 ```
@@ -185,6 +196,7 @@ it('should generate daily recommendations in under 1 second', async () => {
 **Purpose:** Ensure inclusive design for all users
 
 **Key Areas:**
+
 - Screen reader compatibility
 - Keyboard navigation support
 - Color and contrast accessibility
@@ -194,6 +206,7 @@ it('should generate daily recommendations in under 1 second', async () => {
 - Reduced motion preferences
 
 **Example Test:**
+
 ```typescript
 it('should provide proper accessibility labels for outfit recommendations', () => {
   // Render component
@@ -207,12 +220,14 @@ it('should provide proper accessibility labels for outfit recommendations', () =
 ### Mock Data Strategy
 
 **Consistent Mock Data:**
+
 - Standardized user profiles
 - Realistic wardrobe items
 - Weather contexts for different scenarios
 - Feedback patterns for learning tests
 
 **Mock Services:**
+
 - Supabase client with realistic response times
 - Weather service with various conditions
 - External API failures for error testing

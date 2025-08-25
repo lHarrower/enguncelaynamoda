@@ -3,6 +3,8 @@
  * Handles user interaction tracking and analytics data collection
  */
 
+import { logger } from '@/lib/logger';
+
 interface SwipeAnalytics {
   itemId: string;
   brand: string;
@@ -26,7 +28,7 @@ class AnalyticsService {
     priceRanges: [],
     categories: [],
     likedItems: [],
-    dislikedItems: []
+    dislikedItems: [],
   };
 
   /**
@@ -37,17 +39,17 @@ class AnalyticsService {
       // Store swipe data locally for now
       const existingData = this.getStoredSwipes();
       existingData.push(swipeData);
-      
+
       // In a real app, this would be stored in AsyncStorage or sent to analytics service
-      console.log('Analytics: Swipe tracked', swipeData);
-      
+      logger.info('analytics_swipe_tracked', swipeData);
+
       // Update user preferences based on swipe
       this.updatePreferences(swipeData);
-      
+
       // Future: Send to analytics service (Firebase, Mixpanel, etc.)
       // this.sendToAnalyticsService(swipeData);
     } catch (error) {
-      console.error('Analytics: Failed to track swipe', error);
+      logger.error('analytics_track_swipe_failed', error);
     }
   }
 
@@ -56,7 +58,7 @@ class AnalyticsService {
    */
   private updatePreferences(swipeData: SwipeAnalytics): void {
     const { direction, brand, itemId, price } = swipeData;
-    
+
     if (direction === 'right') {
       // User liked the item
       if (!this.preferences.likedItems.includes(itemId)) {
@@ -74,8 +76,8 @@ class AnalyticsService {
         this.preferences.dislikedItems.push(itemId);
       }
     }
-    
-    console.log('Analytics: Preferences updated', this.preferences);
+
+    logger.info('analytics_preferences_updated', this.preferences);
   }
 
   /**
@@ -96,38 +98,38 @@ class AnalyticsService {
   /**
    * Track general events
    */
-  trackEvent(eventName: string, properties: Record<string, any> = {}): void {
+  trackEvent(eventName: string, properties: Record<string, unknown> = {}): void {
     try {
       const eventData = {
         event: eventName,
         properties,
         timestamp: new Date().toISOString(),
-        userId: 'current_user' // In real app, get from auth service
-      };
-      
-      console.log('Analytics: Event tracked', eventData);
-      
+        userId: 'current_user', // In real app, get from auth service
+      } as const;
+
+      logger.info('analytics_event_tracked', eventData);
+
       // Future: Send to analytics service
       // this.sendEventToAnalyticsService(eventData);
     } catch (error) {
-      console.error('Analytics: Failed to track event', error);
+      logger.error('analytics_track_event_failed', error);
     }
   }
 
   /**
    * Track screen views
    */
-  trackScreenView(screenName: string, properties: Record<string, any> = {}): void {
+  trackScreenView(screenName: string, properties: Record<string, unknown> = {}): void {
     this.trackEvent('screen_view', {
       screen_name: screenName,
-      ...properties
+      ...properties,
     });
   }
 
   /**
    * Future: Send data to external analytics service
    */
-  private async sendToAnalyticsService(data: any): Promise<void> {
+  private async sendToAnalyticsService(data: unknown): Promise<void> {
     // Implementation for Firebase Analytics, Mixpanel, etc.
     // await analytics().logEvent('user_swipe', data);
   }

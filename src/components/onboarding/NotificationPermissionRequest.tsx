@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState } from 'react';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 // P0 Notifications: convert static import to dynamic lazy import for performance & policy compliance
-let Notifications: any;
-async function loadNotifications() {
-  if (!Notifications) Notifications = await import('expo-notifications');
+let Notifications: typeof import('expo-notifications') | null = null;
+async function loadNotifications(): Promise<typeof import('expo-notifications')> {
+  if (!Notifications) {
+    Notifications = await import('expo-notifications');
+  }
   return Notifications;
 }
-import { DesignSystem } from '@/theme/DesignSystem';
-import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+
+import { DesignSystem } from '@/theme/DesignSystem';
 import { errorInDev } from '@/utils/consoleSuppress';
 
 interface NotificationPermissionRequestProps {
@@ -19,12 +22,15 @@ interface NotificationPermissionRequestProps {
   onSkip: () => void;
 }
 
-export default function NotificationPermissionRequest({ onNext, onSkip }: NotificationPermissionRequestProps) {
+export default function NotificationPermissionRequest({
+  onNext,
+  onSkip,
+}: NotificationPermissionRequestProps) {
   const [isRequesting, setIsRequesting] = useState(false);
 
   const requestNotificationPermission = async () => {
     setIsRequesting(true);
-    
+
     try {
       const N = await loadNotifications();
       const { status: existingStatus } = await N.getPermissionsAsync();
@@ -41,8 +47,8 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
         } else {
           Alert.alert(
             'Perfect! 🎉',
-            'You\'ll receive your daily confidence boost at 6 AM every morning.',
-            [{ text: 'Continue', onPress: () => onNext(true) }]
+            "You'll receive your daily confidence boost at 6 AM every morning.",
+            [{ text: 'Continue', onPress: () => onNext(true) }],
           );
         }
       } else {
@@ -52,19 +58,22 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
           Alert.alert(
             'No Problem',
             'You can still use AYNA Mirror anytime. You can enable notifications later in settings.',
-            [{ text: 'Continue', onPress: () => onNext(false) }]
+            [{ text: 'Continue', onPress: () => onNext(false) }],
           );
         }
       }
     } catch (error) {
-      errorInDev('Failed to request notification permissions:', error);
+      errorInDev(
+        'Failed to request notification permissions:',
+        error instanceof Error ? error : String(error),
+      );
       if (process.env.NODE_ENV === 'test') {
         onNext(false);
       } else {
         Alert.alert(
           'Something went wrong',
-          'We couldn\'t set up notifications right now, but you can still use AYNA Mirror.',
-          [{ text: 'Continue', onPress: () => onNext(false) }]
+          "We couldn't set up notifications right now, but you can still use AYNA Mirror.",
+          [{ text: 'Continue', onPress: () => onNext(false) }],
         );
       }
     } finally {
@@ -79,41 +88,28 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
         style={styles.gradient}
       >
         <View style={styles.content}>
-          <Animated.View 
-            entering={FadeInUp.delay(300).duration(800)}
-            style={styles.heroSection}
-          >
+          <Animated.View entering={FadeInUp.delay(300).duration(800)} style={styles.heroSection}>
             <View style={styles.iconContainer}>
               <BlurView intensity={20} style={styles.iconBlur}>
-                <Ionicons 
-                  name="notifications" 
-                  size={64} 
-                  color={DesignSystem.colors.sage[600]} 
-                />
+                <Ionicons name="notifications" size={64} color={DesignSystem.colors.sage[600]} />
               </BlurView>
             </View>
-            
+
             <Text style={styles.title}>Your Daily Confidence Ritual</Text>
-            <Text style={styles.subtitle}>
-              Let AYNA wake you up with confidence every morning
-            </Text>
+            <Text style={styles.subtitle}>Let AYNA wake you up with confidence every morning</Text>
           </Animated.View>
 
-          <Animated.View 
+          <Animated.View
             entering={FadeInUp.delay(600).duration(800)}
             style={styles.benefitsSection}
           >
             <BlurView intensity={15} style={styles.benefitsCard}>
               <Text style={styles.benefitsTitle}>Why Daily Notifications?</Text>
-              
+
               <View style={styles.benefitsList}>
                 <View style={styles.benefitItem}>
                   <View style={styles.benefitIconContainer}>
-                    <Ionicons 
-                      name="time" 
-                      size={24} 
-                      color={DesignSystem.colors.sage[600]} 
-                    />
+                    <Ionicons name="time" size={24} color={DesignSystem.colors.sage[600]} />
                   </View>
                   <View style={styles.benefitContent}>
                     <Text style={styles.benefitTitle}>Perfect Timing</Text>
@@ -125,11 +121,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
 
                 <View style={styles.benefitItem}>
                   <View style={styles.benefitIconContainer}>
-                    <Ionicons 
-                      name="heart" 
-                      size={24} 
-                      color={DesignSystem.colors.gold[600]} 
-                    />
+                    <Ionicons name="heart" size={24} color={DesignSystem.colors.gold[600]} />
                   </View>
                   <View style={styles.benefitContent}>
                     <Text style={styles.benefitTitle}>Build Confidence</Text>
@@ -141,11 +133,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
 
                 <View style={styles.benefitItem}>
                   <View style={styles.benefitIconContainer}>
-                    <Ionicons 
-                      name="flash" 
-                      size={24} 
-                      color={DesignSystem.colors.sage[600]} 
-                    />
+                    <Ionicons name="flash" size={24} color={DesignSystem.colors.sage[600]} />
                   </View>
                   <View style={styles.benefitContent}>
                     <Text style={styles.benefitTitle}>No Decision Fatigue</Text>
@@ -157,11 +145,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
 
                 <View style={styles.benefitItem}>
                   <View style={styles.benefitIconContainer}>
-                    <Ionicons 
-                      name="trending-up" 
-                      size={24} 
-                      color={DesignSystem.colors.gold[600]} 
-                    />
+                    <Ionicons name="trending-up" size={24} color={DesignSystem.colors.gold[600]} />
                   </View>
                   <View style={styles.benefitContent}>
                     <Text style={styles.benefitTitle}>Continuous Learning</Text>
@@ -174,7 +158,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
             </BlurView>
           </Animated.View>
 
-          <Animated.View 
+          <Animated.View
             entering={FadeInUp.delay(900).duration(800)}
             style={styles.scheduleSection}
           >
@@ -191,25 +175,25 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
                 </View>
                 <View style={styles.timelineItem}>
                   <Text style={styles.timelineTime}>Later</Text>
-                  <Text style={styles.timelineEvent}>Share feedback to improve recommendations</Text>
+                  <Text style={styles.timelineEvent}>
+                    Share feedback to improve recommendations
+                  </Text>
                 </View>
               </View>
             </BlurView>
           </Animated.View>
 
-          <Animated.View 
+          <Animated.View
             entering={FadeInDown.delay(1200).duration(800)}
             style={styles.actionSection}
           >
-            <Text style={styles.actionText}>
-              Ready to transform your mornings?
-            </Text>
-            
+            <Text style={styles.actionText}>Ready to transform your mornings?</Text>
+
             <View style={styles.actionButtons}>
               <Pressable
                 style={({ pressed }: { pressed: boolean }) => [
                   styles.enableButton,
-                  pressed && styles.enableButtonPressed
+                  pressed && styles.enableButtonPressed,
                 ]}
                 onPress={requestNotificationPermission}
                 disabled={isRequesting}
@@ -218,9 +202,9 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
                   colors={[DesignSystem.colors.sage[400], DesignSystem.colors.sage[600]]}
                   style={styles.enableButtonGradient}
                 >
-                  <Ionicons 
-                    name="notifications" 
-                    size={20} 
+                  <Ionicons
+                    name="notifications"
+                    size={20}
                     color={DesignSystem.colors.neutral[50]}
                     style={styles.buttonIcon}
                   />
@@ -233,7 +217,7 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
               <Pressable
                 style={({ pressed }: { pressed: boolean }) => [
                   styles.skipButton,
-                  pressed && styles.skipButtonPressed
+                  pressed && styles.skipButtonPressed,
                 ]}
                 onPress={onSkip}
               >
@@ -252,81 +236,41 @@ export default function NotificationPermissionRequest({ onNext, onSkip }: Notifi
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  actionButtons: {
+    gap: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
+    width: '100%',
   },
-  gradient: {
-    flex: 1,
+  actionSection: {
+    alignItems: 'center' as const,
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingTop: DesignSystem.spacing.xl,
-    paddingBottom: DesignSystem.spacing.xl,
-    justifyContent: 'space-between',
-  },
-  heroSection: {
-    alignItems: 'center',
-    marginTop: DesignSystem.spacing.xl,
-  },
-  iconContainer: {
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  iconBlur: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-  ...DesignSystem.elevation.soft,
-  },
-  title: {
-    ...DesignSystem.typography.scale.h1,
-    color: DesignSystem.colors.neutral[900],
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  subtitle: {
+  actionText: {
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.neutral[600],
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  benefitsSection: {
-    flex: 1,
-    justifyContent: 'center',
-    marginVertical: DesignSystem.spacing.xl,
-  },
-  benefitsCard: {
-    borderRadius: DesignSystem.radius.organic,
-    padding: DesignSystem.spacing.xl,
-    ...DesignSystem.elevation.subtle,
-  },
-  benefitsTitle: {
-    ...DesignSystem.typography.scale.h2,
-    color: DesignSystem.colors.neutral[900],
-    textAlign: 'center',
     marginBottom: DesignSystem.spacing.lg,
-  },
-  benefitsList: {
-    gap: DesignSystem.spacing.lg,
-  },
-  benefitItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  benefitIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: DesignSystem.colors.neutral[50],
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: DesignSystem.spacing.md,
-    ...DesignSystem.elevation.subtle,
+    textAlign: 'center' as const,
   },
   benefitContent: {
     flex: 1,
+  },
+  benefitDescription: {
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.neutral[600],
+    lineHeight: 20,
+  },
+  benefitIconContainer: {
+    alignItems: 'center' as const,
+    backgroundColor: DesignSystem.colors.neutral[50],
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center' as const,
+    marginRight: DesignSystem.spacing.md,
+    width: 40,
+    ...DesignSystem.elevation.subtle,
+  },
+  benefitItem: {
+    alignItems: 'flex-start' as const,
+    flexDirection: 'row' as const,
   },
   benefitTitle: {
     ...DesignSystem.typography.body.medium,
@@ -334,82 +278,100 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: DesignSystem.spacing.xs,
   },
-  benefitDescription: {
-    ...DesignSystem.typography.body.small,
-    color: DesignSystem.colors.neutral[600],
-    lineHeight: 20,
+  benefitsCard: {
+    borderRadius: DesignSystem.radius.organic,
+    padding: DesignSystem.spacing.xl,
+    ...DesignSystem.elevation.subtle,
   },
-  scheduleSection: {
-    marginBottom: DesignSystem.spacing.xl,
+  benefitsList: {
+    gap: DesignSystem.spacing.lg,
   },
-  scheduleCard: {
-    borderRadius: DesignSystem.radius.md,
-    padding: DesignSystem.spacing.lg,
+  benefitsSection: {
+    flex: 1,
+    justifyContent: 'center',
+    marginVertical: DesignSystem.spacing.xl,
   },
-  scheduleTitle: {
-    ...DesignSystem.typography.scale.h3,
+  benefitsTitle: {
+    ...DesignSystem.typography.scale.h2,
     color: DesignSystem.colors.neutral[900],
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.lg,
+    textAlign: 'center' as const,
   },
-  scheduleTimeline: {
-    gap: DesignSystem.spacing.sm,
+  buttonIcon: {
+    marginRight: DesignSystem.spacing.sm,
   },
-  timelineItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: DesignSystem.spacing.xs,
-  },
-  timelineTime: {
-    ...DesignSystem.typography.caption.small,
-    color: DesignSystem.colors.sage[600],
-    fontWeight: '600',
-    width: 80,
-  },
-  timelineEvent: {
-    ...DesignSystem.typography.body.small,
-    color: DesignSystem.colors.neutral[600],
+  container: {
     flex: 1,
   },
-  actionSection: {
-    alignItems: 'center',
+  content: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingBottom: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: DesignSystem.spacing.xl,
   },
-  actionText: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.neutral[600],
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  actionButtons: {
-    width: '100%',
-    gap: DesignSystem.spacing.md,
-    marginBottom: DesignSystem.spacing.md,
+  disclaimerText: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.neutral[500],
+    marginTop: DesignSystem.spacing.sm,
+    textAlign: 'center' as const,
   },
   enableButton: {
     borderRadius: DesignSystem.radius.organic,
     ...DesignSystem.elevation.lift,
   },
-  enableButtonPressed: {
-    transform: [{ scale: 0.98 }],
-  },
   enableButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center' as const,
+    borderRadius: DesignSystem.radius.organic,
+    flexDirection: 'row' as const,
+    justifyContent: 'center' as const,
     paddingHorizontal: DesignSystem.spacing.xl,
     paddingVertical: DesignSystem.spacing.lg,
-    borderRadius: DesignSystem.radius.organic,
   },
-  buttonIcon: {
-    marginRight: DesignSystem.spacing.sm,
+  enableButtonPressed: {
+    transform: [{ scale: 0.98 }],
   },
   enableButtonText: {
     ...DesignSystem.typography.scale.button,
     color: DesignSystem.colors.neutral[50],
   },
+  gradient: {
+    flex: 1,
+  },
+  heroSection: {
+    alignItems: 'center' as const,
+    marginTop: DesignSystem.spacing.xl,
+  },
+  iconBlur: {
+    alignItems: 'center' as const,
+    borderRadius: 60,
+    height: 120,
+    justifyContent: 'center' as const,
+    width: 120,
+    ...DesignSystem.elevation.soft,
+  },
+  iconContainer: {
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  scheduleCard: {
+    borderRadius: DesignSystem.radius.md,
+    padding: DesignSystem.spacing.lg,
+  },
+  scheduleSection: {
+    marginBottom: DesignSystem.spacing.xl,
+  },
+  scheduleTimeline: {
+    gap: DesignSystem.spacing.sm,
+  },
+  scheduleTitle: {
+    ...DesignSystem.typography.scale.h3,
+    color: DesignSystem.colors.neutral[900],
+    marginBottom: DesignSystem.spacing.md,
+    textAlign: 'center' as const,
+  },
   skipButton: {
+    alignItems: 'center' as const,
     paddingVertical: DesignSystem.spacing.md,
-    alignItems: 'center',
   },
   skipButtonPressed: {
     opacity: 0.7,
@@ -418,10 +380,32 @@ const styles = StyleSheet.create({
     ...DesignSystem.typography.scale.button,
     color: DesignSystem.colors.neutral[400],
   },
-  disclaimerText: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.neutral[500],
-    textAlign: 'center',
-    marginTop: DesignSystem.spacing.sm,
+  subtitle: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.neutral[600],
+    lineHeight: 24,
+    textAlign: 'center' as const,
+  },
+  timelineEvent: {
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.neutral[600],
+    flex: 1,
+  },
+  timelineItem: {
+    alignItems: 'center' as const,
+    flexDirection: 'row' as const,
+    paddingVertical: DesignSystem.spacing.xs,
+  },
+  timelineTime: {
+    ...DesignSystem.typography.caption.small,
+    color: DesignSystem.colors.sage[600],
+    fontWeight: '600',
+    width: 80,
+  },
+  title: {
+    ...DesignSystem.typography.scale.h1,
+    color: DesignSystem.colors.neutral[900],
+    marginBottom: DesignSystem.spacing.sm,
+    textAlign: 'center' as const,
   },
 });

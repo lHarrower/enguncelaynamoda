@@ -3,6 +3,7 @@
 // Deploy: supabase functions deploy ai-proxy
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
+
 import { corsHeaders } from '../_shared/cors.ts';
 // Note: This proxy returns the raw OpenAI chat.completions JSON shape
 // so that client code written against OpenAI SDK continues to work
@@ -18,7 +19,8 @@ Deno.serve(async (req: Request) => {
   try {
     // Require Authorization header in production to prevent open abuse
     const authHeader = req.headers.get('Authorization');
-    const requireAuth = (Deno.env.get('REQUIRE_AUTH_FOR_AI_PROXY') || 'true').toLowerCase() === 'true';
+    const requireAuth =
+      (Deno.env.get('REQUIRE_AUTH_FOR_AI_PROXY') || 'true').toLowerCase() === 'true';
     if (requireAuth && !authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -110,8 +112,12 @@ Deno.serve(async (req: Request) => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${OPENROUTER_API_KEY}`,
       };
-      if (referer) headers['HTTP-Referer'] = referer;
-      if (title) headers['X-Title'] = title;
+      if (referer) {
+        headers['HTTP-Referer'] = referer;
+      }
+      if (title) {
+        headers['X-Title'] = title;
+      }
 
       const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',

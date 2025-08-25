@@ -1,0 +1,14 @@
+﻿
+> aynamoda@1.0.0 typecheck
+> tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.test.json --noEmit
+
+src/services/efficiencyScoreService.ts(697,99): error TS1068: Unexpected token. A constructor, method, accessor, or property was expected.
+src/services/efficiencyScoreService.ts(697,101): error TS1128: Declaration or statement expected.
+src/services/efficiencyScoreService.ts(697,102): error TS1128: Declaration or statement expected.
+src/services/efficiencyScoreService.ts(705,3): error TS1128: Declaration or statement expected.
+src/services/efficiencyScoreService.ts(707,3): error TS1128: Declaration or statement expected.
+src/services/efficiencyScoreService.ts(707,34): error TS1005: ',' expected.
+src/services/efficiencyScoreService.ts(707,43): error TS1011: An element access expression should take an argument.
+src/services/efficiencyScoreService.ts(707,45): error TS1005: ';' expected.
+src/services/efficiencyScoreService.ts(707,47): error TS1434: Unexpected keyword or identifier.
+src/services/efficiencyScoreService.ts(713,1): error TS1128: Declaration or statement expected.

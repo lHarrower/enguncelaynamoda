@@ -1,28 +1,22 @@
 /**
  * Experience Showcase
- * 
+ *
  * A showcase component demonstrating the cinematic Experience Story Block
  * with Turkish content and premium interactions.
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from 'react-native';
-import { ExperienceStoryBlock, ExperienceStory, StoryItem } from './ExperienceStoryBlock';
-import { getFeaturedStory, getAllStories } from '../../data/experienceStories';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { getAllStories, getFeaturedStory } from '../../data/experienceStories';
 import { logInDev } from '../../utils/consoleSuppress';
 import {
-  ORIGINAL_COLORS,
-  ORIGINAL_TYPOGRAPHY,
-  ORIGINAL_SPACING,
   ORIGINAL_BORDER_RADIUS,
+  ORIGINAL_COLORS,
+  ORIGINAL_SPACING,
+  ORIGINAL_TYPOGRAPHY,
 } from '../auth/originalLoginStyles';
+import { ExperienceStory, ExperienceStoryBlock, StoryItem } from './ExperienceStoryBlock';
 
 export const ExperienceShowcase: React.FC = () => {
   const [currentStory, setCurrentStory] = useState<ExperienceStory>(getFeaturedStory());
@@ -34,17 +28,17 @@ export const ExperienceShowcase: React.FC = () => {
       `"${item.moment}" temasındaki bu stili keşfetmek istiyor musunuz?\n\n${item.description}`,
       [
         { text: 'İptal', style: 'cancel' },
-        { 
-          text: 'Keşfet', 
+        {
+          text: 'Keşfet',
           onPress: () => {
             logInDev('Navigate to story item:', item.id, story.id);
             // In a real app, this would navigate to:
             // - Product details for the specific look
             // - Shopping page with similar items
             // - Style guide for the moment/occasion
-          }
+          },
         },
-      ]
+      ],
     );
   };
 
@@ -54,17 +48,20 @@ export const ExperienceShowcase: React.FC = () => {
       `"${story.title}" hikayesini tamamladınız! Benzer hikayeleri keşfetmek istiyor musunuz?`,
       [
         { text: 'Hayır', style: 'cancel' },
-        { 
-          text: 'Keşfet', 
+        {
+          text: 'Keşfet',
           onPress: () => {
             // Show next story or navigate to story collection
-            const nextStoryIndex = allStories.findIndex(s => s.id === story.id) + 1;
+            const nextStoryIndex = allStories.findIndex((s) => s.id === story.id) + 1;
             if (nextStoryIndex < allStories.length) {
-              setCurrentStory(allStories[nextStoryIndex]);
+              const next = allStories[nextStoryIndex];
+              if (next) {
+                setCurrentStory(next);
+              }
             }
-          }
+          },
         },
-      ]
+      ],
     );
   };
 
@@ -74,18 +71,12 @@ export const ExperienceShowcase: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-        bounces={true}
-      >
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} bounces={true}>
         {/* Story Selector */}
         <View style={styles.selectorSection}>
           <Text style={styles.selectorTitle}>Stil Hikayeleri</Text>
-          <Text style={styles.selectorSubtitle}>
-            Günün her anında ilham veren hikayeler
-          </Text>
-          
+          <Text style={styles.selectorSubtitle}>Günün her anında ilham veren hikayeler</Text>
+
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -97,12 +88,14 @@ export const ExperienceShowcase: React.FC = () => {
                 style={[
                   styles.storyButton,
                   {
-                    backgroundColor: currentStory.id === story.id 
-                      ? story.accentColor + '20' 
-                      : ORIGINAL_COLORS.inputBackground,
-                    borderColor: currentStory.id === story.id 
-                      ? story.accentColor 
-                      : ORIGINAL_COLORS.inputBorder,
+                    backgroundColor:
+                      currentStory.id === story.id
+                        ? story.accentColor + '20'
+                        : ORIGINAL_COLORS.inputBackground,
+                    borderColor:
+                      currentStory.id === story.id
+                        ? story.accentColor
+                        : ORIGINAL_COLORS.inputBorder,
                   },
                 ]}
                 onPress={() => handleStoryChange(story)}
@@ -111,9 +104,10 @@ export const ExperienceShowcase: React.FC = () => {
                   style={[
                     styles.storyButtonText,
                     {
-                      color: currentStory.id === story.id 
-                        ? story.accentColor 
-                        : ORIGINAL_COLORS.primaryText,
+                      color:
+                        currentStory.id === story.id
+                          ? story.accentColor
+                          : ORIGINAL_COLORS.primaryText,
                       fontWeight: currentStory.id === story.id ? '600' : '400',
                     },
                   ]}
@@ -124,9 +118,10 @@ export const ExperienceShowcase: React.FC = () => {
                   style={[
                     styles.storyButtonSubtext,
                     {
-                      color: currentStory.id === story.id 
-                        ? story.accentColor + 'CC' 
-                        : ORIGINAL_COLORS.secondaryText,
+                      color:
+                        currentStory.id === story.id
+                          ? story.accentColor + 'CC'
+                          : ORIGINAL_COLORS.secondaryText,
                     },
                   ]}
                 >
@@ -150,11 +145,11 @@ export const ExperienceShowcase: React.FC = () => {
         <View style={styles.infoSection}>
           <Text style={styles.infoTitle}>Hikaye Hakkında</Text>
           <Text style={styles.infoDescription}>
-            Bu hikaye, {currentStory.title.toLowerCase()} temasında günün farklı anlarında 
-            nasıl şık görünebileceğinizi gösteriyor. Her kart, belirli bir an ve ruh hali 
-            için özel olarak seçilmiş kombinasyonları içeriyor.
+            Bu hikaye, {currentStory.title.toLowerCase()} temasında günün farklı anlarında nasıl şık
+            görünebileceğinizi gösteriyor. Her kart, belirli bir an ve ruh hali için özel olarak
+            seçilmiş kombinasyonları içeriyor.
           </Text>
-          
+
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
               <Text style={styles.statNumber}>{currentStory.items.length}</Text>
@@ -182,8 +177,8 @@ export const ExperienceShowcase: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: ORIGINAL_COLORS.background,
+    flex: 1,
   },
 
   scrollView: {
@@ -192,9 +187,9 @@ const styles = StyleSheet.create({
 
   // Story Selector
   selectorSection: {
+    backgroundColor: ORIGINAL_COLORS.background,
     paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
     paddingVertical: 24,
-    backgroundColor: ORIGINAL_COLORS.background,
   },
 
   selectorTitle: {
@@ -207,8 +202,8 @@ const styles = StyleSheet.create({
   selectorSubtitle: {
     ...ORIGINAL_TYPOGRAPHY.subtitle,
     fontSize: 16,
-    textAlign: 'center',
     marginBottom: 24,
+    textAlign: 'center',
   },
 
   storySelector: {
@@ -217,12 +212,12 @@ const styles = StyleSheet.create({
   },
 
   storyButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    alignItems: 'center',
     borderRadius: ORIGINAL_BORDER_RADIUS.input,
     borderWidth: 2,
-    alignItems: 'center',
     minWidth: 140,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
 
   storyButtonText: {
@@ -239,9 +234,9 @@ const styles = StyleSheet.create({
 
   // Info Section
   infoSection: {
+    backgroundColor: ORIGINAL_COLORS.background,
     paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
     paddingVertical: 32,
-    backgroundColor: ORIGINAL_COLORS.background,
   },
 
   infoTitle: {
@@ -258,13 +253,13 @@ const styles = StyleSheet.create({
   },
 
   statsContainer: {
+    backgroundColor: ORIGINAL_COLORS.inputBackground,
+    borderColor: ORIGINAL_COLORS.inputBorder,
+    borderRadius: ORIGINAL_BORDER_RADIUS.input,
+    borderWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 20,
-    backgroundColor: ORIGINAL_COLORS.inputBackground,
-    borderRadius: ORIGINAL_BORDER_RADIUS.input,
-    borderWidth: 1,
-    borderColor: ORIGINAL_COLORS.inputBorder,
   },
 
   statItem: {
@@ -272,15 +267,15 @@ const styles = StyleSheet.create({
   },
 
   statNumber: {
+    color: ORIGINAL_COLORS.primaryText,
     fontSize: 24,
     fontWeight: '700',
-    color: ORIGINAL_COLORS.primaryText,
     marginBottom: 4,
   },
 
   statLabel: {
-    fontSize: 14,
     color: ORIGINAL_COLORS.secondaryText,
+    fontSize: 14,
     textAlign: 'center',
   },
 

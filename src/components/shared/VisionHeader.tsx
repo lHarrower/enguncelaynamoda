@@ -1,17 +1,12 @@
 // src/components/shared/VisionHeader.tsx
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  StatusBar,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { StatusBar, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface VisionHeaderProps {
@@ -21,7 +16,7 @@ interface VisionHeaderProps {
   onSettingsPress?: () => void;
   showBackButton?: boolean;
   showSettingsButton?: boolean;
-  style?: any;
+  style?: ViewStyle;
 }
 
 export const VisionHeader: React.FC<VisionHeaderProps> = ({
@@ -38,13 +33,10 @@ export const VisionHeader: React.FC<VisionHeaderProps> = ({
   return (
     <View style={[styles.container, { paddingTop: insets.top }, style]}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
+
       <BlurView intensity={80} style={styles.blur}>
         <LinearGradient
-          colors={[
-            'rgba(255, 255, 255, 0.95)',
-            'rgba(255, 255, 255, 0.85)',
-          ]}
+          colors={['rgba(255, 255, 255, 0.95)', 'rgba(255, 255, 255, 0.85)']}
           style={styles.gradient}
         >
           <View style={styles.content}>
@@ -54,6 +46,9 @@ export const VisionHeader: React.FC<VisionHeaderProps> = ({
                   style={styles.iconButton}
                   onPress={onBackPress}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Go back"
+                  accessibilityHint="Navigate to previous screen"
                 >
                   <Ionicons
                     name="chevron-back"
@@ -63,20 +58,21 @@ export const VisionHeader: React.FC<VisionHeaderProps> = ({
                 </TouchableOpacity>
               )}
             </View>
-            
+
             <View style={styles.centerSection}>
               <Text style={styles.title}>{title}</Text>
-              {subtitle && (
-                <Text style={styles.subtitle}>{subtitle}</Text>
-              )}
+              {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
             </View>
-            
+
             <View style={styles.rightSection}>
               {showSettingsButton && (
                 <TouchableOpacity
                   style={styles.iconButton}
                   onPress={onSettingsPress}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Settings"
+                  accessibilityHint="Open settings menu"
                 >
                   <Ionicons
                     name="settings-outline"
@@ -94,53 +90,53 @@ export const VisionHeader: React.FC<VisionHeaderProps> = ({
 };
 
 const styles = StyleSheet.create({
+  blur: {
+    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
+    borderBottomWidth: 1,
+  },
+  centerSection: {
+    alignItems: 'center',
+    flex: 1,
+  },
   container: {
-    position: 'absolute',
-    top: 0,
     left: 0,
+    position: 'absolute',
     right: 0,
+    top: 0,
     zIndex: 100,
   },
-  blur: {
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
+  content: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    minHeight: 56,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   gradient: {
     paddingBottom: DesignSystem.spacing.md,
   },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    minHeight: 56,
+  iconButton: {
+    borderRadius: DesignSystem.radius.sm,
+    padding: DesignSystem.spacing.xs,
   },
   leftSection: {
-    width: 40,
     alignItems: 'flex-start',
-  },
-  centerSection: {
-    flex: 1,
-    alignItems: 'center',
+    width: 40,
   },
   rightSection: {
-    width: 40,
     alignItems: 'flex-end',
+    width: 40,
   },
-  iconButton: {
-    padding: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.radius.sm,
+  subtitle: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    marginTop: 2,
+    textAlign: 'center',
   },
   title: {
     ...DesignSystem.typography.scale.h3,
     color: DesignSystem.colors.text.primary,
     fontWeight: '600',
     textAlign: 'center',
-  },
-  subtitle: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-    marginTop: 2,
   },
 });
 

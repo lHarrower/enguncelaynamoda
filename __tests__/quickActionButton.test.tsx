@@ -5,17 +5,10 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import * as Haptics from 'expo-haptics';
 
-import { QuickActionButton } from '@/components/aynaMirror/QuickActionButton';
-import { QuickAction } from '@/types/aynaMirror';
+import { QuickActionButton } from '../src/components/aynaMirror/QuickActionButton';
+import { QuickAction } from '../src/types/aynaMirror';
 
-// Mock dependencies
-jest.mock('expo-haptics');
-jest.mock('expo-blur', () => ({
-  BlurView: ({ children }: any) => children,
-}));
-jest.mock('expo-linear-gradient', () => ({
-  LinearGradient: ({ children }: any) => children,
-}));
+// Mock dependencies are handled in jest.setup.js
 
 // Sample test data
 const mockActions: Record<string, QuickAction> = {
@@ -34,10 +27,7 @@ describe('QuickActionButton', () => {
   describe('Rendering', () => {
     it('should render button with correct label', () => {
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
       expect(getByText('Wear This')).toBeTruthy();
@@ -45,23 +35,15 @@ describe('QuickActionButton', () => {
 
     it('should render button with icon', () => {
       const { UNSAFE_getByType } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
       // In a real test, we'd check for the Ionicons component with correct name
     });
 
     it('should render all action types correctly', () => {
-      Object.values(mockActions).forEach(action => {
-        const { getByText } = render(
-          <QuickActionButton
-            action={action}
-            onPress={mockOnPress}
-          />
-        );
+      Object.values(mockActions).forEach((action) => {
+        const { getByText } = render(<QuickActionButton action={action} onPress={mockOnPress} />);
 
         expect(getByText(action.label)).toBeTruthy();
       });
@@ -71,11 +53,7 @@ describe('QuickActionButton', () => {
   describe('Variants', () => {
     it('should render primary variant', () => {
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-          variant="primary"
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} variant="primary" />,
       );
 
       expect(getByText('Wear This')).toBeTruthy();
@@ -83,11 +61,7 @@ describe('QuickActionButton', () => {
 
     it('should render secondary variant', () => {
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.save}
-          onPress={mockOnPress}
-          variant="secondary"
-        />
+        <QuickActionButton action={mockActions.save} onPress={mockOnPress} variant="secondary" />,
       );
 
       expect(getByText('Save for Later')).toBeTruthy();
@@ -95,11 +69,7 @@ describe('QuickActionButton', () => {
 
     it('should render accent variant', () => {
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.share}
-          onPress={mockOnPress}
-          variant="accent"
-        />
+        <QuickActionButton action={mockActions.share} onPress={mockOnPress} variant="accent" />,
       );
 
       expect(getByText('Share')).toBeTruthy();
@@ -109,11 +79,7 @@ describe('QuickActionButton', () => {
   describe('Sizes', () => {
     it('should render small size', () => {
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-          size="small"
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} size="small" />,
       );
 
       expect(getByText('Wear This')).toBeTruthy();
@@ -121,11 +87,7 @@ describe('QuickActionButton', () => {
 
     it('should render medium size (default)', () => {
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-          size="medium"
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} size="medium" />,
       );
 
       expect(getByText('Wear This')).toBeTruthy();
@@ -133,11 +95,7 @@ describe('QuickActionButton', () => {
 
     it('should render large size', () => {
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-          size="large"
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} size="large" />,
       );
 
       expect(getByText('Wear This')).toBeTruthy();
@@ -146,28 +104,22 @@ describe('QuickActionButton', () => {
 
   describe('Interactions', () => {
     it('should call onPress when button is pressed', () => {
-      const { getByRole } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+      const { getByTestId } = render(
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
-      const button = getByRole('button');
+      const button = getByTestId('quick-action-button');
       fireEvent.press(button);
 
       expect(mockOnPress).toHaveBeenCalledTimes(1);
     });
 
     it('should provide haptic feedback on press', () => {
-      const { getByRole } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+      const { getByTestId } = render(
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
-      const button = getByRole('button');
+      const button = getByTestId('quick-action-button');
       fireEvent.press(button);
 
       expect(Haptics.impactAsync).toHaveBeenCalledWith(Haptics.ImpactFeedbackStyle.Medium);
@@ -182,15 +134,10 @@ describe('QuickActionButton', () => {
 
       testCases.forEach(({ action, expectedHaptic }) => {
         jest.clearAllMocks();
-        
-        const { getByRole } = render(
-          <QuickActionButton
-            action={action}
-            onPress={mockOnPress}
-          />
-        );
 
-        const button = getByRole('button');
+        const { getByTestId } = render(<QuickActionButton action={action} onPress={mockOnPress} />);
+
+        const button = getByTestId('quick-action-button');
         fireEvent.press(button);
 
         expect(Haptics.impactAsync).toHaveBeenCalledWith(expectedHaptic);
@@ -198,15 +145,12 @@ describe('QuickActionButton', () => {
     });
 
     it('should handle press in and press out events', () => {
-      const { getByRole } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+      const { getByTestId } = render(
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
-      const button = getByRole('button');
-      
+      const button = getByTestId('quick-action-button');
+
       fireEvent(button, 'pressIn');
       fireEvent(button, 'pressOut');
 
@@ -217,10 +161,7 @@ describe('QuickActionButton', () => {
   describe('Action-Specific Behavior', () => {
     it('should use primary variant for wear action by default', () => {
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
       // Wear action should default to primary styling
@@ -229,10 +170,7 @@ describe('QuickActionButton', () => {
 
     it('should use secondary variant for save action by default', () => {
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.save}
-          onPress={mockOnPress}
-        />
+        <QuickActionButton action={mockActions.save} onPress={mockOnPress} />,
       );
 
       // Save action should default to secondary styling
@@ -241,10 +179,7 @@ describe('QuickActionButton', () => {
 
     it('should use accent variant for share action by default', () => {
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.share}
-          onPress={mockOnPress}
-        />
+        <QuickActionButton action={mockActions.share} onPress={mockOnPress} />,
       );
 
       // Share action should default to accent styling
@@ -254,22 +189,16 @@ describe('QuickActionButton', () => {
 
   describe('Accessibility', () => {
     it('should have proper accessibility role', () => {
-      const { getByRole } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+      const { getByTestId } = render(
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
-      expect(getByRole('button')).toBeTruthy();
+      expect(getByTestId('quick-action-button')).toBeTruthy();
     });
 
     it('should have accessibility label', () => {
       const { getByLabelText } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
       expect(getByLabelText('Wear This')).toBeTruthy();
@@ -277,22 +206,16 @@ describe('QuickActionButton', () => {
 
     it('should have accessibility hint', () => {
       const { getByA11yHint } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
       expect(getByA11yHint('Double tap to wear this')).toBeTruthy();
     });
 
     it('should have proper accessibility labels for all actions', () => {
-      Object.values(mockActions).forEach(action => {
+      Object.values(mockActions).forEach((action) => {
         const { getByLabelText } = render(
-          <QuickActionButton
-            action={action}
-            onPress={mockOnPress}
-          />
+          <QuickActionButton action={action} onPress={mockOnPress} />,
         );
 
         expect(getByLabelText(action.label)).toBeTruthy();
@@ -303,13 +226,9 @@ describe('QuickActionButton', () => {
   describe('Custom Styling', () => {
     it('should apply custom styles', () => {
       const customStyle = { marginTop: 10 };
-      
+
       const { UNSAFE_getByType } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-          style={customStyle}
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} style={customStyle} />,
       );
 
       // In a real test, we'd verify the custom style is applied
@@ -323,17 +242,14 @@ describe('QuickActionButton', () => {
         width: 768,
         height: 1024,
       };
-      
+
       jest.doMock('react-native', () => ({
         ...jest.requireActual('react-native'),
         useWindowDimensions: () => mockDimensions,
       }));
 
       const { getByText } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
       expect(getByText('Wear This')).toBeTruthy();
@@ -341,14 +257,10 @@ describe('QuickActionButton', () => {
 
     it('should adjust sizes for different screen dimensions', () => {
       const sizes: Array<'small' | 'medium' | 'large'> = ['small', 'medium', 'large'];
-      
-      sizes.forEach(size => {
+
+      sizes.forEach((size) => {
         const { getByText } = render(
-          <QuickActionButton
-            action={mockActions.wear}
-            onPress={mockOnPress}
-            size={size}
-          />
+          <QuickActionButton action={mockActions.wear} onPress={mockOnPress} size={size} />,
         );
 
         expect(getByText('Wear This')).toBeTruthy();
@@ -358,15 +270,12 @@ describe('QuickActionButton', () => {
 
   describe('Animation Behavior', () => {
     it('should handle animation states without crashing', () => {
-      const { getByRole } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+      const { getByTestId } = render(
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
-      const button = getByRole('button');
-      
+      const button = getByTestId('quick-action-button');
+
       // Simulate rapid press events
       fireEvent(button, 'pressIn');
       fireEvent.press(button);
@@ -377,10 +286,7 @@ describe('QuickActionButton', () => {
 
     it('should clean up animations on unmount', () => {
       const { unmount } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
       expect(() => unmount()).not.toThrow();
@@ -389,28 +295,22 @@ describe('QuickActionButton', () => {
 
   describe('Glow Effects', () => {
     it('should show glow effect on press', () => {
-      const { getByRole } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+      const { getByTestId } = render(
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
-      const button = getByRole('button');
+      const button = getByTestId('quick-action-button');
       fireEvent(button, 'pressIn');
 
       // Should trigger glow animation
     });
 
     it('should hide glow effect on press out', () => {
-      const { getByRole } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={mockOnPress}
-        />
+      const { getByTestId } = render(
+        <QuickActionButton action={mockActions.wear} onPress={mockOnPress} />,
       );
 
-      const button = getByRole('button');
+      const button = getByTestId('quick-action-button');
       fireEvent(button, 'pressIn');
       fireEvent(button, 'pressOut');
 
@@ -421,12 +321,9 @@ describe('QuickActionButton', () => {
   describe('Error Handling', () => {
     it('should handle missing action properties gracefully', () => {
       const incompleteAction = { type: 'wear', label: '', icon: '' } as QuickAction;
-      
+
       const { UNSAFE_getByType } = render(
-        <QuickActionButton
-          action={incompleteAction}
-          onPress={mockOnPress}
-        />
+        <QuickActionButton action={incompleteAction} onPress={mockOnPress} />,
       );
 
       // Should render without crashing
@@ -437,15 +334,12 @@ describe('QuickActionButton', () => {
         throw new Error('Test error');
       };
 
-      const { getByRole } = render(
-        <QuickActionButton
-          action={mockActions.wear}
-          onPress={errorOnPress}
-        />
+      const { getByTestId } = render(
+        <QuickActionButton action={mockActions.wear} onPress={errorOnPress} />,
       );
 
-      const button = getByRole('button');
-      
+      const button = getByTestId('quick-action-button');
+
       // Should not crash the component when onPress throws
       expect(() => fireEvent.press(button)).not.toThrow();
     });

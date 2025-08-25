@@ -4,7 +4,7 @@ import { logger } from '@/utils/logger';
 import * as DeepLink from '@/services/deepLinkService';
 
 jest.mock('@/utils/logger', () => ({
-  logger: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), redact: (x:any)=>x },
+  logger: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), redact: (x: any) => x },
 }));
 
 // Modül ister fonksiyon, ister obje export etsin: tek bir parse(url) fonksiyonu üret.
@@ -27,7 +27,7 @@ function getParser(mod: Record<string, any>): ((url: string) => any) | null {
     }
     // default export bir obje olabilir; içinde fonksiyon arayalım
     if (k === 'default' && typeof mod.default === 'function') {
-      return (url: string) => (mod.default as any)(url);
+      return (url: string) => mod.default(url);
     }
   }
 

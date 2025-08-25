@@ -1,16 +1,17 @@
 /**
  * Card Molecule
- * 
+ *
  * A versatile container component that combines atoms to create
  * a cohesive content display unit with consistent styling.
  */
 
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
-import { CardComponentProps } from '@/types/componentProps';
-import { UNIFIED_COLORS, SPACING, ELEVATION } from '@/theme';
-import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+
 import Text from '@/components/atoms/Text';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { ELEVATION, SPACING, UNIFIED_COLORS } from '@/theme';
+import { CardComponentProps } from '@/types/componentProps';
 
 export interface CardProps extends Omit<CardComponentProps, 'variant'> {
   children: React.ReactNode;
@@ -25,181 +26,169 @@ export interface CardProps extends Omit<CardComponentProps, 'variant'> {
   image?: React.ReactNode;
 }
 
-const Card: React.FC<CardProps> = ({
-  children,
-  title,
-  subtitle,
-  variant = 'default',
-  padding = 'medium',
-  onPress,
-  disabled = false,
-  header,
-  footer,
-  image,
-  style,
-  testID,
-  accessibilityLabel,
-  ...props
-}) => {
-  const { trigger } = useHapticFeedback();
-
-  const handlePress = () => {
-    if (onPress && !disabled) {
-  trigger('light');
-      onPress();
-    }
-  };
-
-  const cardStyle = [
-    styles.base,
-    styles[variant as keyof typeof styles],
-    styles[`${padding}Padding`],
-    disabled && styles.disabled,
+const Card: React.FC<CardProps> = React.memo(
+  ({
+    children,
+    title,
+    subtitle,
+    variant = 'default',
+    padding = 'medium',
+    onPress,
+    disabled = false,
+    header,
+    footer,
+    image,
     style,
-  ];
+    testID,
+    accessibilityLabel,
+    ...props
+  }) => {
+    const { trigger } = useHapticFeedback();
 
-  const CardContainer = onPress ? TouchableOpacity : View;
+    const handlePress = () => {
+      if (onPress && !disabled) {
+        trigger('light');
+        onPress();
+      }
+    };
 
-  return (
-    <CardContainer
-      style={cardStyle}
-      onPress={handlePress}
-      disabled={disabled}
-      testID={testID}
-      accessibilityLabel={accessibilityLabel}
-      accessibilityRole={onPress ? 'button' : undefined}
-      {...props}
-    >
-      {image && (
-        <View style={styles.imageContainer}>
-          {image}
-        </View>
-      )}
-      
-      {header && (
-        <View style={styles.header}>
-          {header}
-        </View>
-      )}
-      
-      {(title || subtitle) && (
-        <View style={styles.titleContainer}>
-          {title && (
-            <Text variant="title" weight="semibold" style={styles.title}>
-              {title}
-            </Text>
-          )}
-          {subtitle && (
-            <Text variant="body" color="slate" style={styles.subtitle}>
-              {subtitle}
-            </Text>
-          )}
-        </View>
-      )}
-      
-      <View style={styles.content}>
-        {children}
-      </View>
-      
-      {footer && (
-        <View style={styles.footer}>
-          {footer}
-        </View>
-      )}
-    </CardContainer>
-  );
-};
+    const cardStyle = [
+      styles.base,
+      styles[variant as keyof typeof styles],
+      styles[`${padding}Padding`],
+      disabled && styles.disabled,
+      style,
+    ];
+
+    const CardContainer = onPress ? TouchableOpacity : View;
+
+    return (
+      <CardContainer
+        style={cardStyle}
+        onPress={handlePress}
+        disabled={disabled}
+        testID={testID}
+        accessibilityLabel={accessibilityLabel}
+        accessibilityRole={onPress ? 'button' : undefined}
+        {...props}
+      >
+        {image && <View style={styles.imageContainer}>{image}</View>}
+
+        {header && <View style={styles.header}>{header}</View>}
+
+        {(title || subtitle) && (
+          <View style={styles.titleContainer}>
+            {title && (
+              <Text variant="title" weight="semibold" style={styles.title}>
+                {title}
+              </Text>
+            )}
+            {subtitle && (
+              <Text variant="body" color="slate" style={styles.subtitle}>
+                {subtitle}
+              </Text>
+            )}
+          </View>
+        )}
+
+        <View style={styles.content}>{children}</View>
+
+        {footer && <View style={styles.footer}>{footer}</View>}
+      </CardContainer>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   base: {
-  borderRadius: 12,
     backgroundColor: UNIFIED_COLORS.neutral[50],
+    borderRadius: 12,
     overflow: 'hidden',
   },
-  
+
   // Variants
   default: {
     backgroundColor: UNIFIED_COLORS.neutral[50],
-    borderWidth: 1,
     borderColor: UNIFIED_COLORS.neutral[200],
+    borderWidth: 1,
   },
-  
+
   elevated: {
     backgroundColor: UNIFIED_COLORS.neutral[50],
     ...ELEVATION.medium,
   },
-  
+
   outlined: {
     backgroundColor: 'transparent',
-    borderWidth: 2,
     borderColor: UNIFIED_COLORS.neutral[300],
+    borderWidth: 2,
   },
-  
+
   glass: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
-    backdropFilter: 'blur(10px)',
-  },
-  
-  luxury: {
-  backgroundColor: UNIFIED_COLORS.background.primary,
     borderWidth: 1,
-  borderColor: UNIFIED_COLORS.gold[400],
+    // backdropFilter not supported in React Native; effect handled via BlurView wrappers elsewhere
+  },
+
+  luxury: {
+    backgroundColor: UNIFIED_COLORS.background.primary,
+    borderColor: UNIFIED_COLORS.gold[400],
+    borderWidth: 1,
     ...ELEVATION.high,
   },
-  
+
   // Padding variants
   nonePadding: {
     padding: 0,
   },
-  
+
   smallPadding: {
-  padding: SPACING.small,
+    padding: SPACING.small,
   },
-  
+
   mediumPadding: {
-  padding: SPACING.medium,
+    padding: SPACING.medium,
   },
-  
+
   largePadding: {
-  padding: SPACING.large,
+    padding: SPACING.large,
   },
-  
+
   disabled: {
     opacity: 0.5,
   },
-  
+
   imageContainer: {
+    marginBottom: SPACING.small,
     width: '100%',
-  marginBottom: SPACING.small,
   },
-  
+
   header: {
-  marginBottom: SPACING.small,
+    marginBottom: SPACING.small,
   },
-  
+
   titleContainer: {
-  marginBottom: SPACING.medium,
+    marginBottom: SPACING.medium,
   },
-  
+
   title: {
-  marginBottom: SPACING.xs,
+    marginBottom: SPACING.xs,
   },
-  
+
   subtitle: {
     // Additional subtitle styling if needed
   },
-  
+
   content: {
     flex: 1,
   },
-  
+
   footer: {
-  marginTop: SPACING.medium,
-  paddingTop: SPACING.small,
-    borderTopWidth: 1,
     borderTopColor: UNIFIED_COLORS.neutral[200],
+    borderTopWidth: 1,
+    marginTop: SPACING.medium,
+    paddingTop: SPACING.small,
   },
 });
 

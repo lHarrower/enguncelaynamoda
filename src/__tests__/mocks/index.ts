@@ -5,51 +5,83 @@ import { User } from '@/types';
 import { createMockWardrobeItem, createMockUser } from '@/__tests__/utils/testUtils';
 
 /**
- * Supabase Client Mock
+ * Supabase Client Mock - Enhanced for reliability
  */
+interface QueryStub {
+  select: (columns?: string) => QueryStub;
+  insert: (data?: Record<string, unknown>) => QueryStub;
+  update: (data?: Record<string, unknown>) => QueryStub;
+  delete: () => QueryStub;
+  upsert: (data?: Record<string, unknown>) => QueryStub;
+  eq: (key?: string, value?: unknown) => QueryStub;
+  neq: (key?: string, value?: unknown) => QueryStub;
+  gt: (key?: string, value?: unknown) => QueryStub;
+  gte: (key?: string, value?: unknown) => QueryStub;
+  lt: (key?: string, value?: unknown) => QueryStub;
+  lte: (key?: string, value?: unknown) => QueryStub;
+  like: (key?: string, value?: unknown) => QueryStub;
+  ilike: (key?: string, value?: unknown) => QueryStub;
+  in: (key?: string, values?: unknown[]) => QueryStub;
+  contains: (key?: string, value?: unknown) => QueryStub;
+  or: (filters?: string) => QueryStub;
+  order: (column: string, options?: Record<string, unknown>) => QueryStub;
+  limit: (count: number) => QueryStub;
+  range: (from: number, to: number) => QueryStub;
+  single: () => Promise<{ data: null; error: null }>;
+  maybeSingle: () => Promise<{ data: null; error: null }>;
+}
+
 export const mockSupabaseClient = {
   auth: {
-    signUp: jest.fn(),
-    signInWithPassword: jest.fn(),
-    signOut: jest.fn(),
-    getUser: jest.fn(),
-    getSession: jest.fn(),
-    onAuthStateChange: jest.fn(),
-    resetPasswordForEmail: jest.fn(),
-    updateUser: jest.fn(),
+    signUp: jest.fn().mockResolvedValue({
+      data: { user: null, session: null },
+      error: null,
+    }),
+    signInWithPassword: jest.fn().mockResolvedValue({
+      data: {
+        user: {
+          id: 'mock-user-id',
+          email: 'test@aynamoda.app',
+          created_at: new Date().toISOString(),
+        },
+        session: {
+          access_token: 'mock-access-token',
+          refresh_token: 'mock-refresh-token',
+          expires_at: Date.now() + 3600000,
+          user: {
+            id: 'mock-user-id',
+          },
+        },
+      },
+      error: null,
+    }),
   },
-  from: jest.fn(() => ({
-    select: jest.fn().mockReturnThis(),
-    insert: jest.fn().mockReturnThis(),
-    update: jest.fn().mockReturnThis(),
-    delete: jest.fn().mockReturnThis(),
-    eq: jest.fn().mockReturnThis(),
-    neq: jest.fn().mockReturnThis(),
-    gt: jest.fn().mockReturnThis(),
-    gte: jest.fn().mockReturnThis(),
-    lt: jest.fn().mockReturnThis(),
-    lte: jest.fn().mockReturnThis(),
-    like: jest.fn().mockReturnThis(),
-    ilike: jest.fn().mockReturnThis(),
-    in: jest.fn().mockReturnThis(),
-    contains: jest.fn().mockReturnThis(),
-    order: jest.fn().mockReturnThis(),
-    limit: jest.fn().mockReturnThis(),
-    range: jest.fn().mockReturnThis(),
-    single: jest.fn(),
-    maybeSingle: jest.fn(),
-  })),
-  storage: {
-    from: jest.fn(() => ({
-      upload: jest.fn(),
-      download: jest.fn(),
-      remove: jest.fn(),
-      list: jest.fn(),
-      getPublicUrl: jest.fn(),
-      createSignedUrl: jest.fn(),
-    })),
-  },
-  rpc: jest.fn(),
+  from: jest.fn(() => {
+    const chainable: QueryStub = {
+      select: jest.fn().mockReturnThis(),
+      insert: jest.fn().mockReturnThis(),
+      update: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+      upsert: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      neq: jest.fn().mockReturnThis(),
+      gt: jest.fn().mockReturnThis(),
+      gte: jest.fn().mockReturnThis(),
+      lt: jest.fn().mockReturnThis(),
+      lte: jest.fn().mockReturnThis(),
+      like: jest.fn().mockReturnThis(),
+      ilike: jest.fn().mockReturnThis(),
+      in: jest.fn().mockReturnThis(),
+      contains: jest.fn().mockReturnThis(),
+      or: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      range: jest.fn().mockReturnThis(),
+      single: jest.fn(() => Promise.resolve({ data: null, error: null })),
+      maybeSingle: jest.fn(() => Promise.resolve({ data: null, error: null })),
+    };
+    return chainable;
+  }),
 };
 
 /**
@@ -95,25 +127,29 @@ export const mockOpenAI = {
   chat: {
     completions: {
       create: jest.fn().mockResolvedValue({
-        choices: [{
-          message: {
-            content: JSON.stringify({
-              category: WardrobeCategory.DRESSES,
-              colors: [WardrobeColor.BLUE],
-              tags: ['casual', 'summer'],
-              style: 'bohemian',
-              confidence: 0.95,
-            }),
+        choices: [
+          {
+            message: {
+              content: JSON.stringify({
+                category: WardrobeCategory.DRESSES,
+                colors: [WardrobeColor.BLUE],
+                tags: ['casual', 'summer'],
+                style: 'bohemian',
+                confidence: 0.95,
+              }),
+            },
           },
-        }],
+        ],
       }),
     },
   },
   images: {
     analyze: jest.fn().mockResolvedValue({
-      data: [{
-        url: 'https://example.com/analyzed-image.jpg',
-      }],
+      data: [
+        {
+          url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
+        },
+      ],
     }),
   },
 };
@@ -122,7 +158,7 @@ export const mockGoogleVision = {
   labelDetection: jest.fn().mockResolvedValue({
     labelAnnotations: [
       { description: 'Dress', score: 0.95 },
-      { description: 'Blue', score: 0.90 },
+      { description: 'Blue', score: 0.9 },
       { description: 'Casual', score: 0.85 },
     ],
   }),
@@ -143,9 +179,7 @@ export const mockGoogleVision = {
     ],
   }),
   textDetection: jest.fn().mockResolvedValue({
-    textAnnotations: [
-      { description: 'Brand Name', score: 0.90 },
-    ],
+    textAnnotations: [{ description: 'Brand Name', score: 0.9 }],
   }),
 };
 
@@ -157,14 +191,16 @@ export const mockImagePicker = {
     const mockResponse = {
       didCancel: false,
       errorMessage: null,
-      assets: [{
-        uri: 'file://test-image.jpg',
-        type: 'image/jpeg',
-        fileName: 'test-image.jpg',
-        fileSize: 1024000,
-        width: 1080,
-        height: 1920,
-      }],
+      assets: [
+        {
+          uri: 'file://test-image.jpg',
+          type: 'image/jpeg',
+          fileName: 'test-image.jpg',
+          fileSize: 1024000,
+          width: 1080,
+          height: 1920,
+        },
+      ],
     };
     if (callback) callback(mockResponse);
     return Promise.resolve(mockResponse);
@@ -173,14 +209,16 @@ export const mockImagePicker = {
     const mockResponse = {
       didCancel: false,
       errorMessage: null,
-      assets: [{
-        uri: 'file://camera-image.jpg',
-        type: 'image/jpeg',
-        fileName: 'camera-image.jpg',
-        fileSize: 2048000,
-        width: 1080,
-        height: 1920,
-      }],
+      assets: [
+        {
+          uri: 'file://camera-image.jpg',
+          type: 'image/jpeg',
+          fileName: 'camera-image.jpg',
+          fileSize: 2048000,
+          width: 1080,
+          height: 1920,
+        },
+      ],
     };
     if (callback) callback(mockResponse);
     return Promise.resolve(mockResponse);
@@ -217,11 +255,11 @@ export const mockLocation = {
       country: 'United States',
       district: null,
       isoCountryCode: 'US',
-      name: '1 Hacker Way',
-      postalCode: '94301',
-      region: 'CA',
-      street: 'Hacker Way',
-      streetNumber: '1',
+      name: '123 Fashion Avenue',
+      postalCode: '10001',
+      region: 'NY',
+      street: 'Fashion Avenue',
+      streetNumber: '123',
       subregion: 'Santa Clara County',
       timezone: 'America/Los_Angeles',
     },
@@ -234,13 +272,13 @@ export const mockLocation = {
 export const mockAsyncStorage = {
   getItem: jest.fn((key: string) => {
     const storage: Record<string, string> = {
-      'user_preferences': JSON.stringify({
+      user_preferences: JSON.stringify({
         theme: 'light',
         notifications: true,
         hapticFeedback: true,
       }),
-      'wardrobe_cache': JSON.stringify([createMockWardrobeItem()]),
-      'user_profile': JSON.stringify(createMockUser()),
+      wardrobe_cache: JSON.stringify([createMockWardrobeItem()]),
+      user_profile: JSON.stringify(createMockUser()),
     };
     return Promise.resolve(storage[key] || null);
   }),
@@ -253,7 +291,7 @@ export const mockAsyncStorage = {
   clear: jest.fn(() => Promise.resolve()),
   getAllKeys: jest.fn(() => Promise.resolve(['user_preferences', 'wardrobe_cache'])),
   multiGet: jest.fn((keys: string[]) => {
-    return Promise.resolve(keys.map(key => [key, null]));
+    return Promise.resolve(keys.map((key) => [key, null]));
   }),
   multiSet: jest.fn((keyValuePairs: [string, string][]) => {
     return Promise.resolve();

@@ -1,0 +1,19 @@
+{
+  "startup": {
+    "p50": 1200,
+    "p95": 2000,
+    "coldStart": 1800,
+    "warmStart": 800
+  },
+  "jsFrameDropPct": 1.2,
+  "bundleSize": {
+    "android": 0,
+    "ios": 0,
+    "web": 0
+  },
+  "memoryUsage": {
+    "jsHeapSizeLimit": 2172649472,
+    "totalJSHeapSize": 50331648,
+    "usedJSHeapSize": 35651584
+  }
+}

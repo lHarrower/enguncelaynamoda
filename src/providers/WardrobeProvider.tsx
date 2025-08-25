@@ -1,7 +1,11 @@
 // Wardrobe Provider - Context for wardrobe management
-import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useReducer } from 'react';
+
 import { WardrobeItem } from '@/types/aynaMirror';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { warnInDev } from '@/utils/consoleSuppress';
+
+import { safeParse } from '../utils/safeJSON';
+import { secureStorage } from '../utils/secureStorage';
 
 interface WardrobeState {
   items: WardrobeItem[];
@@ -65,22 +69,20 @@ function wardrobeReducer(state: WardrobeState, action: WardrobeAction): Wardrobe
     case 'UPDATE_ITEM':
       return {
         ...state,
-        items: state.items.map(item => 
-          item.id === action.payload.id ? action.payload : item
-        ),
+        items: state.items.map((item) => (item.id === action.payload.id ? action.payload : item)),
       };
     case 'DELETE_ITEM':
       return {
         ...state,
-        items: state.items.filter(item => item.id !== action.payload),
-        favorites: state.favorites.filter(id => id !== action.payload),
+        items: state.items.filter((item) => item.id !== action.payload),
+        favorites: state.favorites.filter((id) => id !== action.payload),
       };
     case 'TOGGLE_FAVORITE':
       const isFavorite = state.favorites.includes(action.payload);
       return {
         ...state,
         favorites: isFavorite
-          ? state.favorites.filter(id => id !== action.payload)
+          ? state.favorites.filter((id) => id !== action.payload)
           : [...state.favorites, action.payload],
       };
     case 'SET_SEARCH_QUERY':
@@ -111,12 +113,17 @@ export function WardrobeProvider({ children, initialItems = [] }: WardrobeProvid
   useEffect(() => {
     const loadFavorites = async () => {
       try {
-        const stored = await AsyncStorage.getItem('wardrobe_favorites');
+        await secureStorage.initialize();
+        const stored = await secureStorage.getItem('wardrobe_favorites');
         if (stored) {
-          dispatch({ type: 'SET_FAVORITES', payload: JSON.parse(stored) });
+          const parsed = safeParse<unknown>(stored, []);
+          const favs = Array.isArray(parsed)
+            ? parsed.filter((v): v is string => typeof v === 'string')
+            : [];
+          dispatch({ type: 'SET_FAVORITES', payload: favs });
         }
       } catch (error) {
-        console.warn('Failed to load favorites:', error);
+        warnInDev('Failed to load favorites:', error);
       }
     };
     loadFavorites();
@@ -126,9 +133,10 @@ export function WardrobeProvider({ children, initialItems = [] }: WardrobeProvid
   useEffect(() => {
     const saveFavorites = async () => {
       try {
-        await AsyncStorage.setItem('wardrobe_favorites', JSON.stringify(state.favorites));
+        await secureStorage.initialize();
+        await secureStorage.setItem('wardrobe_favorites', JSON.stringify(state.favorites));
       } catch (error) {
-        console.warn('Failed to save favorites:', error);
+        warnInDev('Failed to save favorites:', error);
       }
     };
     saveFavorites();
@@ -168,15 +176,16 @@ export function WardrobeProvider({ children, initialItems = [] }: WardrobeProvid
     // Apply search filter
     if (state.searchQuery) {
       const query = state.searchQuery.toLowerCase();
-      filtered = filtered.filter(item => 
-        item.name?.toLowerCase().includes(query) ||
-        item.tags?.some(tag => tag.toLowerCase().includes(query))
+      filtered = filtered.filter(
+        (item) =>
+          item.name?.toLowerCase().includes(query) ||
+          item.tags?.some((tag) => tag.toLowerCase().includes(query)),
       );
     }
 
     // Apply category filter
     if (state.selectedCategory) {
-      filtered = filtered.filter(item => item.category === state.selectedCategory);
+      filtered = filtered.filter((item) => item.category === state.selectedCategory);
     }
 
     // Apply sorting
@@ -188,7 +197,10 @@ export function WardrobeProvider({ children, initialItems = [] }: WardrobeProvid
           return (a.category || '').localeCompare(b.category || '');
         case 'date':
         default:
-          return new Date((b as any).created_at || 0).getTime() - new Date((a as any).created_at || 0).getTime();
+          return (
+            new Date(b.createdAt || (b as any).created_at || 0).getTime() -
+            new Date(a.createdAt || (a as any).created_at || 0).getTime()
+          );
       }
     });
 
@@ -196,7 +208,7 @@ export function WardrobeProvider({ children, initialItems = [] }: WardrobeProvid
   };
 
   const getFavoriteItems = (): WardrobeItem[] => {
-    return state.items.filter(item => state.favorites.includes(item.id));
+    return state.items.filter((item) => state.favorites.includes(item.id));
   };
 
   const value: WardrobeContextType = {
@@ -213,11 +225,7 @@ export function WardrobeProvider({ children, initialItems = [] }: WardrobeProvid
     getFavoriteItems,
   };
 
-  return (
-    <WardrobeContext.Provider value={value}>
-      {children}
-    </WardrobeContext.Provider>
-  );
+  return <WardrobeContext.Provider value={value}>{children}</WardrobeContext.Provider>;
 }
 
 export function useWardrobe(): WardrobeContextType {

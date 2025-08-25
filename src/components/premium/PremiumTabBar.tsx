@@ -1,25 +1,22 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as React from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
   withSpring,
   withTiming,
-  interpolate,
-  interpolateColor,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AynamodaColors } from '../../theme/AynamodaColors';
+import { DesignSystem } from '../../theme/DesignSystem';
+
 const { width } = Dimensions.get('window');
+const TAB_BAR_HEIGHT = 64; // Base tab bar height without safe area inset
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface TabItem {
@@ -30,9 +27,9 @@ interface TabItem {
 }
 
 interface PremiumTabBarProps {
-  state: any;
-  descriptors: any;
-  navigation: any;
+  state: BottomTabBarProps['state'];
+  descriptors: BottomTabBarProps['descriptors'];
+  navigation: BottomTabBarProps['navigation'];
 }
 
 const tabs: TabItem[] = [
@@ -68,16 +65,69 @@ const tabs: TabItem[] = [
   },
 ];
 
+// Child component so hooks are used at the top level of a component, not inside a loop/callback
+const TabButton: React.FC<{
+  tab: TabItem;
+  isActive: boolean;
+  onPress: () => void;
+  onLongPress: () => void;
+}> = ({ tab, isActive, onPress, onLongPress }) => {
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(0.6);
+  const translateY = useSharedValue(0);
+
+  React.useEffect(() => {
+    scale.value = withSpring(isActive ? 1.1 : 1, DesignSystem.animations.spring.confident);
+    opacity.value = withTiming(isActive ? 1 : 0.6, { duration: 200 });
+    translateY.value = withSpring(isActive ? -2 : 0, DesignSystem.animations.spring.gentle);
+  }, [isActive, opacity, scale, translateY]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }, { translateY: translateY.value }] as any,
+    opacity: opacity.value,
+  }));
+
+  return React.createElement(
+    AnimatedTouchableOpacity,
+    {
+      style: [styles.tab, animatedStyle],
+      onPress,
+      onLongPress,
+      activeOpacity: 0.7,
+      accessibilityRole: 'tab',
+      accessibilityLabel: tab.title,
+      accessibilityHint: `Navigate to ${tab.title} screen`,
+      accessibilityState: { selected: isActive },
+    },
+    React.createElement(
+      View,
+      { style: styles.tabContent },
+      React.createElement(Ionicons, {
+        name: isActive ? tab.iconFocused : tab.icon,
+        size: 24,
+        color: isActive ? AynamodaColors.primary.terracotta : AynamodaColors.text.secondary,
+      }),
+      React.createElement(
+        Text,
+        {
+          style: [
+            styles.tabLabel,
+            {
+              color: isActive ? AynamodaColors.primary.terracotta : AynamodaColors.text.secondary,
+              fontWeight: isActive ? '600' : '400',
+            },
+          ],
+        },
+        tab.title,
+      ),
+      isActive && React.createElement(View, { style: styles.activeIndicator }),
+    ),
+  );
+};
+
 const PremiumTabBar: React.FC<PremiumTabBarProps> = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();
   const activeIndex = state.index;
-  
-  // Animation values for each tab
-  const tabAnimations = tabs.map(() => ({
-    scale: useSharedValue(1),
-    opacity: useSharedValue(0.6),
-    translateY: useSharedValue(0),
-  }));
 
   // Floating indicator animation
   const indicatorPosition = useSharedValue(0);
@@ -86,85 +136,15 @@ const PremiumTabBar: React.FC<PremiumTabBarProps> = ({ state, descriptors, navig
   React.useEffect(() => {
     // Update indicator position
     const tabWidth = (width - DesignSystem.spacing.xl * 2) / tabs.length;
-    indicatorPosition.value = withSpring(activeIndex * tabWidth, DesignSystem.animations.spring.gentle);
-
-    // Update tab animations
-    tabAnimations.forEach((anim, index) => {
-      const isActive = index === activeIndex;
-      anim.scale.value = withSpring(isActive ? 1.1 : 1, DesignSystem.animations.spring.confident);
-      anim.opacity.value = withTiming(isActive ? 1 : 0.6, { duration: 200 });
-      anim.translateY.value = withSpring(isActive ? -2 : 0, DesignSystem.animations.spring.gentle);
-    });
-  }, [activeIndex]);
-
-  const renderTab = (tab: TabItem, index: number) => {
-    const isActive = index === activeIndex;
-    const route = state.routes[index];
-    const { options } = descriptors[route.key];
-
-    const animatedStyle = useAnimatedStyle(() => {
-      return {
-        transform: [
-          { scale: tabAnimations[index].scale.value },
-          { translateY: tabAnimations[index].translateY.value },
-        ],
-        opacity: tabAnimations[index].opacity.value,
-      };
-    });
-
-    const onPress = () => {
-      const event = navigation.emit({
-        type: 'tabPress',
-        target: route.key,
-        canPreventDefault: true,
-      });
-
-      if (!isActive && !event.defaultPrevented) {
-        navigation.navigate(route.name);
-      }
-    };
-
-    const onLongPress = () => {
-      navigation.emit({
-        type: 'tabLongPress',
-        target: route.key,
-      });
-    };
-
-    return (
-      <AnimatedTouchableOpacity
-        key={tab.key}
-        style={[styles.tab, animatedStyle]}
-        onPress={onPress}
-        onLongPress={onLongPress}
-        activeOpacity={0.7}
-      >
-        <View style={styles.tabContent}>
-          <Ionicons
-            name={isActive ? tab.iconFocused : tab.icon}
-            size={24}
-            color={isActive ? DesignSystem.colors.text.primary : DesignSystem.colors.text.tertiary}
-          />
-          <Text
-            style={[
-              styles.tabLabel,
-              {
-                color: isActive ? DesignSystem.colors.text.primary : DesignSystem.colors.text.tertiary,
-                fontWeight: isActive ? '600' : '400',
-              },
-            ]}
-          >
-            {tab.title}
-          </Text>
-          {isActive && <View style={styles.activeIndicator} />}
-        </View>
-      </AnimatedTouchableOpacity>
+    indicatorPosition.value = withSpring(
+      activeIndex * tabWidth,
+      DesignSystem.animations.spring.gentle,
     );
-  };
+  }, [activeIndex, indicatorPosition]);
 
   const floatingIndicatorStyle = useAnimatedStyle(() => {
     const tabWidth = (width - DesignSystem.spacing.xl * 2) / tabs.length;
-    
+
     return {
       transform: [{ translateX: indicatorPosition.value }],
       width: tabWidth,
@@ -172,61 +152,110 @@ const PremiumTabBar: React.FC<PremiumTabBarProps> = ({ state, descriptors, navig
     };
   });
 
-  return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-      {/* Floating Background */}
-      <View style={styles.tabBarBackground}>
-        <BlurView intensity={95} tint="light" style={StyleSheet.absoluteFill} />
-        <View style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor: 'rgba(255, 255, 255, 0.8)' }
-        ]} />
-      </View>
+  return React.createElement(
+    View,
+    { style: [styles.container, { paddingBottom: insets.bottom }] },
+    React.createElement(
+      View,
+      { style: styles.tabBarBackground },
+      React.createElement(BlurView, {
+        intensity: 95,
+        tint: 'light',
+        style: StyleSheet.absoluteFill,
+      }),
+      React.createElement(LinearGradient, {
+        colors: AynamodaColors.gradients.cream,
+        style: {
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: TAB_BAR_HEIGHT + insets.bottom,
+        },
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+      }),
+    ),
+    React.createElement(Animated.View, {
+      style: [styles.floatingIndicator, floatingIndicatorStyle],
+    }),
+    React.createElement(
+      View,
+      { style: styles.tabsContainer },
+      state.routes.map((route, index) => {
+        const tab = tabs[index];
+        if (!tab) {
+          return null;
+        }
+        const isActive = index === activeIndex;
 
-      {/* Floating Indicator */}
-      <Animated.View style={[styles.floatingIndicator, floatingIndicatorStyle]} />
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
 
-      {/* Tab Items */}
-      <View style={styles.tabsContainer}>
-        {tabs.map((tab, index) => renderTab(tab, index))}
-      </View>
-    </View>
+          if (!isActive && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
+        const onLongPress = () => {
+          navigation.emit({
+            type: 'tabLongPress',
+            target: route.key,
+          });
+        };
+
+        return React.createElement(TabButton, {
+          key: tab.key,
+          tab,
+          isActive,
+          onPress,
+          onLongPress,
+        });
+      }),
+    ),
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  activeIndicator: {
+    backgroundColor: AynamodaColors.primary.terracotta,
+    borderRadius: 3,
+    bottom: -DesignSystem.spacing.md,
+    height: 6,
     position: 'absolute',
+    width: 6,
+    ...DesignSystem.elevation.soft,
+  },
+  container: {
     bottom: 0,
     left: DesignSystem.spacing.lg,
-    right: DesignSystem.spacing.lg,
     marginBottom: DesignSystem.spacing.lg,
+    position: 'absolute',
+    right: DesignSystem.spacing.lg,
+  },
+  floatingIndicator: {
+    backgroundColor: AynamodaColors.primary.terracotta,
+    borderRadius: 2,
+    height: 4,
+    position: 'absolute',
+    top: DesignSystem.spacing.xs,
+    ...DesignSystem.elevation.soft,
+  },
+  tab: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: DesignSystem.spacing.sm,
   },
   tabBarBackground: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: DesignSystem.borderRadius.xl,
     overflow: 'hidden',
     ...DesignSystem.elevation.medium,
-  },
-  floatingIndicator: {
-    position: 'absolute',
-    top: DesignSystem.spacing.xs,
-    height: 4,
-    backgroundColor: DesignSystem.colors.gold[500],
-    borderRadius: 2,
-    ...DesignSystem.elevation.soft,
-  },
-  tabsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.md,
-    paddingTop: DesignSystem.spacing.lg,
-  },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: DesignSystem.spacing.sm,
   },
   tabContent: {
     alignItems: 'center',
@@ -235,18 +264,15 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     ...DesignSystem.typography.scale.caption,
-    marginTop: DesignSystem.spacing.xs,
     fontSize: 10,
     letterSpacing: 0.5,
+    marginTop: DesignSystem.spacing.xs,
   },
-  activeIndicator: {
-    position: 'absolute',
-    bottom: -DesignSystem.spacing.md,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: DesignSystem.colors.gold[500],
-    ...DesignSystem.elevation.soft,
+  tabsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingTop: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
   },
 });
 

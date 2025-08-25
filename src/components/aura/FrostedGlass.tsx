@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
+import React from 'react';
+import { StyleSheet, View, ViewStyle } from 'react-native';
 
 interface FrostedGlassProps {
   children?: React.ReactNode;
@@ -14,15 +14,17 @@ interface FrostedGlassProps {
  * Material Honesty principle - creates believable depth and focus
  * through premium glass-like overlays
  */
-const FrostedGlass: React.FC<FrostedGlassProps> = ({ 
-  children, 
+const FrostedGlass: React.FC<FrostedGlassProps> = ({
+  children,
   style,
   variant = 'light',
-  intensity
+  intensity,
 }) => {
   const getIntensity = () => {
-    if (intensity !== undefined) return intensity;
-    
+    if (intensity !== undefined) {
+      return intensity;
+    }
+
     switch (variant) {
       case 'heavy':
         return 80;
@@ -46,20 +48,9 @@ const FrostedGlass: React.FC<FrostedGlassProps> = ({
 
   return (
     <View style={[styles.container, style]}>
-      <BlurView
-        intensity={getIntensity()}
-        tint="light"
-        style={StyleSheet.absoluteFillObject}
-      />
-      <View 
-        style={[
-          styles.overlay,
-          { backgroundColor: getBackgroundColor() }
-        ]}
-      />
-      <View style={styles.content}>
-        {children}
-      </View>
+      <BlurView intensity={getIntensity()} tint="light" style={StyleSheet.absoluteFillObject} />
+      <View style={[styles.overlay, { backgroundColor: getBackgroundColor() }]} />
+      <View style={styles.content}>{children}</View>
     </View>
   );
 };
@@ -69,12 +60,12 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
   content: {
     position: 'relative',
     zIndex: 1,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
   },
 });
 

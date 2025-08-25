@@ -1,23 +1,21 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  FlatList,
-  ImageBackground,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { StatusBar } from 'expo-status-bar';
+import React, { useCallback, useState } from 'react';
+import {
+  FlatList,
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useTheme } from '@shopify/restyle';
-import { DesignSystemType } from '@/theme/DesignSystem';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { SEMANTIC_TYPOGRAPHY, SPACING, BORDER_RADIUS, SHADOWS } from '@/constants/AppConstants';
+import { BORDER_RADIUS, SEMANTIC_TYPOGRAPHY, SPACING } from '@/constants/AppConstants';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 // Sample data for search/discovery
 const TRENDING_SEARCHES = [
@@ -29,10 +27,26 @@ const TRENDING_SEARCHES = [
 ];
 
 const CATEGORIES = [
-  { id: '1', name: 'New In', image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=300&fit=crop' },
-  { id: '2', name: 'Dresses', image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&h=300&fit=crop' },
-  { id: '3', name: 'Blazers', image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=300&fit=crop' },
-  { id: '4', name: 'Accessories', image: 'https://images.unsplash.com/photo-1506629905607-c7a8b3bb0aa3?w=400&h=300&fit=crop' },
+  {
+    id: '1',
+    name: 'New In',
+    image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=300&fit=crop',
+  },
+  {
+    id: '2',
+    name: 'Dresses',
+    image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&h=300&fit=crop',
+  },
+  {
+    id: '3',
+    name: 'Blazers',
+    image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=300&fit=crop',
+  },
+  {
+    id: '4',
+    name: 'Accessories',
+    image: 'https://images.unsplash.com/photo-1506629905607-c7a8b3bb0aa3?w=400&h=300&fit=crop',
+  },
 ];
 
 const CURATED_COLLECTIONS = [
@@ -87,80 +101,138 @@ const FEATURED_PRODUCTS = [
 ];
 
 export default function SearchScreen() {
-  const theme = useTheme<DesignSystemType>();
-  const { colors } = theme;
+  const colors = DesignSystem.colors;
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [_activeFilter, _setActiveFilter] = useState('All');
 
-  const renderCategory = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.categoryCard} activeOpacity={0.9}>
-      <ImageBackground
-        source={{ uri: item.image }}
-        style={styles.categoryImage}
-        resizeMode="cover"
+  const handleSearch = useCallback(async (query: string) => {
+    setSearchQuery(query);
+    if (query.trim()) {
+      try {
+        // Import wardrobeService dynamically to avoid circular dependencies
+        const { wardrobeService } = await import('@/services/wardrobeService');
+        const searchResults = await wardrobeService.searchItems(query);
+        // TODO: Update UI to show search results
+        console.log('Search results:', searchResults);
+      } catch (error) {
+        console.error('Search failed:', error);
+      }
+    }
+  }, []);
+
+  const handleCategoryPress = useCallback((categoryId: string) => {
+    // Implement category filtering logic here
+  }, []);
+
+  const handleCollectionPress = useCallback((collectionId: string) => {
+    // Implement collection navigation logic here
+  }, []);
+
+  const handleProductPress = useCallback((productId: string) => {
+    // Implement product navigation logic here
+  }, []);
+
+  const renderCategory = useCallback(
+    ({ item }: { item: { image: string; name: string; id: string } }) => (
+      <TouchableOpacity
+        style={styles.categoryCard}
+        activeOpacity={0.9}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.name} category`}
+        accessibilityHint={`Browse ${item.name} items`}
+        onPress={() => handleCategoryPress(item.id)}
       >
-        <LinearGradient
-          colors={['transparent', 'rgba(0, 0, 0, 0.6)']}
-          style={styles.categoryOverlay}
+        <ImageBackground
+          source={{ uri: item.image }}
+          style={styles.categoryImage}
+          resizeMode="cover"
         >
-            <Text style={[styles.categoryName, { color: colors.background?.primary || '#FAF9F6' }]}>
-            {item.name}
+          <LinearGradient
+            colors={['transparent', 'rgba(0, 0, 0, 0.6)']}
+            style={styles.categoryOverlay}
+          >
+            <Text style={[styles.categoryName, { color: colors.text.inverse }]}>{item.name}</Text>
+          </LinearGradient>
+        </ImageBackground>
+      </TouchableOpacity>
+    ),
+    [handleCategoryPress, colors.text.inverse],
+  );
+
+  const renderCollection = useCallback(
+    ({
+      item,
+    }: {
+      item: { image: string; title: string; subtitle: string; itemCount: number; id: string };
+    }) => (
+      <TouchableOpacity
+        style={styles.collectionCard}
+        activeOpacity={0.9}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.title} collection`}
+        accessibilityHint={`View ${item.title} collection with ${item.itemCount} items`}
+        onPress={() => handleCollectionPress(item.id)}
+      >
+        <ImageBackground
+          source={{ uri: item.image }}
+          style={styles.collectionImage}
+          resizeMode="cover"
+        >
+          <LinearGradient
+            colors={['transparent', 'rgba(0, 0, 0, 0.7)']}
+            style={styles.collectionOverlay}
+          >
+            <View style={styles.collectionContent}>
+              <Text style={[styles.collectionTitle, { color: colors.text.inverse }]}>
+                {item.title}
+              </Text>
+              <Text style={[styles.collectionSubtitle, { color: colors.text.inverse }]}>
+                {item.subtitle}
+              </Text>
+              <Text style={[styles.collectionCount, { color: colors.text.inverse }]}>
+                {item.itemCount} items
+              </Text>
+            </View>
+          </LinearGradient>
+        </ImageBackground>
+      </TouchableOpacity>
+    ),
+    [handleCollectionPress, colors.text.inverse],
+  );
+
+  const renderProduct = useCallback(
+    ({ item }: { item: { image: string; title: string; price: string; id: string } }) => (
+      <TouchableOpacity
+        style={styles.productCard}
+        activeOpacity={0.9}
+        accessibilityRole="button"
+        accessibilityLabel={`${item.title} product`}
+        accessibilityHint={`View ${item.title} details, priced at ${item.price}`}
+        onPress={() => handleProductPress(item.id)}
+      >
+        <ImageBackground
+          source={{ uri: item.image }}
+          style={styles.productImage}
+          resizeMode="cover"
+        />
+        <View style={styles.productInfo}>
+          <Text style={[styles.productTitle, { color: colors.text?.primary || '#212529' }]}>
+            {item.title}
           </Text>
-        </LinearGradient>
-      </ImageBackground>
-    </TouchableOpacity>
-  );
-
-  const renderCollection = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.collectionCard} activeOpacity={0.9}>
-      <ImageBackground
-        source={{ uri: item.image }}
-        style={styles.collectionImage}
-        resizeMode="cover"
-      >
-        <LinearGradient
-          colors={['transparent', 'rgba(0, 0, 0, 0.7)']}
-          style={styles.collectionOverlay}
-        >
-          <View style={styles.collectionContent}>
-            <Text style={[styles.collectionTitle, { color: colors.background?.primary || '#FAF9F6' }]}>
-              {item.title}
-            </Text>
-            <Text style={[styles.collectionSubtitle, { color: colors.background?.primary || '#FAF9F6' }]}>
-              {item.subtitle}
-            </Text>
-            <Text style={[styles.collectionCount, { color: colors.background?.primary || '#FAF9F6' }]}>
-              {item.itemCount} items
-            </Text>
-          </View>
-        </LinearGradient>
-      </ImageBackground>
-    </TouchableOpacity>
-  );
-
-  const renderProduct = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.productCard} activeOpacity={0.9}>
-      <ImageBackground
-        source={{ uri: item.image }}
-        style={styles.productImage}
-        resizeMode="cover"
-      />
-      <View style={styles.productInfo}>
-  <Text style={[styles.productTitle, { color: (colors as any).text?.primary || '#212529' }]}>
-          {item.title}
-        </Text>
-  <Text style={[styles.productPrice, { color: (colors as any).text?.secondary || '#495057' }]}>
-          {item.price}
-        </Text>
-      </View>
-    </TouchableOpacity>
+          <Text style={[styles.productPrice, { color: colors.text?.secondary || '#495057' }]}>
+            {item.price}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    ),
+    [handleProductPress, colors.text?.primary, colors.text?.secondary],
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
-      
+
       {/* Search Header */}
       <View style={styles.searchHeader}>
         <View style={styles.searchBar}>
@@ -171,17 +243,25 @@ export default function SearchScreen() {
             placeholderTextColor="#999999"
             value={searchQuery}
             onChangeText={setSearchQuery}
+            accessibilityLabel="Search input"
+            accessibilityHint="Enter text to search for items, brands, or styles"
+            accessibilityRole="search"
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <TouchableOpacity
+              onPress={() => setSearchQuery('')}
+              accessibilityRole="button"
+              accessibilityLabel="Clear search"
+              accessibilityHint="Clear the search input"
+            >
               <Ionicons name="close-circle" size={20} color="#666666" />
             </TouchableOpacity>
           )}
         </View>
       </View>
 
-      <ScrollView 
-        style={styles.scrollView} 
+      <ScrollView
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 70 + insets.bottom }}
       >
@@ -189,18 +269,25 @@ export default function SearchScreen() {
         {searchQuery.length === 0 && (
           <>
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>
-                Trending
-              </Text>
+              <Text style={styles.sectionTitle}>Trending</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View style={styles.trendingContainer}>
                   {TRENDING_SEARCHES.map((term, index) => (
                     <TouchableOpacity
                       key={index}
-                      style={[styles.trendingTag, { backgroundColor: (colors as any).surface?.primary || '#FEFEFE', borderColor: (colors as any).border || '#D1D5DB' }]}
-                      onPress={() => setSearchQuery(term)}
+                      style={[
+                        styles.trendingTag,
+                        {
+                          backgroundColor: colors.background.elevated,
+                          borderColor: colors.border.primary,
+                        },
+                      ]}
+                      onPress={() => handleSearch(term)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Search for ${term}`}
+                      accessibilityHint={`Tap to search for ${term} items`}
                     >
-                      <Text style={[styles.trendingText, { color: (colors as any).text?.primary || '#212529' }]}>
+                      <Text style={[styles.trendingText, { color: colors.text.primary }]}>
                         {term}
                       </Text>
                     </TouchableOpacity>
@@ -211,7 +298,7 @@ export default function SearchScreen() {
 
             {/* Categories */}
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: (colors as any).text?.primary || '#212529' }]}> 
+              <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
                 Shop by Category
               </Text>
               <FlatList
@@ -226,7 +313,7 @@ export default function SearchScreen() {
 
             {/* Curated Collections */}
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: (colors as any).text?.primary || '#212529' }]}> 
+              <Text style={[styles.sectionTitle, { color: colors.text?.primary || '#212529' }]}>
                 Curated Collections
               </Text>
               <FlatList
@@ -243,7 +330,7 @@ export default function SearchScreen() {
 
         {/* Search Results or Featured Products */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: (colors as any).text?.primary || '#212529' }]}> 
+          <Text style={[styles.sectionTitle, { color: colors.text?.primary || '#212529' }]}>
             {searchQuery.length > 0 ? `Results for "${searchQuery}"` : 'Featured'}
           </Text>
           <FlatList
@@ -263,26 +350,26 @@ export default function SearchScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#FFFFFF',
+    flex: 1,
   },
   searchHeader: {
+    backgroundColor: '#FFFFFF',
+    borderBottomColor: '#E0E0E0',
+    borderBottomWidth: 1,
     paddingHorizontal: 20,
     paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-    backgroundColor: '#FFFFFF',
   },
   searchBar: {
-    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingVertical: 12,
+    backgroundColor: '#F8F8F8',
+    borderColor: '#E0E0E0',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    backgroundColor: '#F8F8F8',
+    flexDirection: 'row',
     gap: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
   },
   searchInput: {
     flex: 1,
@@ -292,14 +379,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
-    paddingHorizontal: SPACING.lg,
     marginBottom: SPACING.xl,
+    paddingHorizontal: SPACING.lg,
   },
   sectionTitle: {
     ...SEMANTIC_TYPOGRAPHY.sectionTitle,
     marginBottom: SPACING.lg,
   },
-  
+
   // Trending
   trendingContainer: {
     flexDirection: 'row',
@@ -307,25 +394,25 @@ const styles = StyleSheet.create({
     paddingRight: SPACING.lg,
   },
   trendingTag: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
     borderRadius: BORDER_RADIUS.large,
     borderWidth: 1,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
   },
   trendingText: {
     ...SEMANTIC_TYPOGRAPHY.caption,
   },
-  
+
   // Categories
   categoriesContainer: {
     paddingRight: SPACING.lg,
   },
   categoryCard: {
-    width: 120,
+    borderRadius: BORDER_RADIUS.medium,
     height: 80,
     marginRight: SPACING.md,
-    borderRadius: BORDER_RADIUS.medium,
     overflow: 'hidden',
+    width: 120,
   },
   categoryImage: {
     flex: 1,
@@ -339,17 +426,17 @@ const styles = StyleSheet.create({
     ...SEMANTIC_TYPOGRAPHY.buttonSecondary,
     fontSize: 12,
   },
-  
+
   // Collections
   collectionsContainer: {
     paddingRight: SPACING.lg,
   },
   collectionCard: {
-    width: 280,
+    borderRadius: BORDER_RADIUS.medium,
     height: 160,
     marginRight: SPACING.md,
-    borderRadius: BORDER_RADIUS.medium,
     overflow: 'hidden',
+    width: 280,
   },
   collectionImage: {
     flex: 1,
@@ -368,15 +455,15 @@ const styles = StyleSheet.create({
   },
   collectionSubtitle: {
     ...SEMANTIC_TYPOGRAPHY.caption,
-    opacity: 0.9,
     marginBottom: SPACING.xs,
+    opacity: 0.9,
   },
   collectionCount: {
     ...SEMANTIC_TYPOGRAPHY.caption,
     fontSize: 11,
     opacity: 0.8,
   },
-  
+
   // Products
   productRow: {
     justifyContent: 'space-between',
@@ -386,11 +473,11 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   productImage: {
-    width: '100%',
-    height: 200,
     borderRadius: BORDER_RADIUS.small,
-    overflow: 'hidden',
+    height: 200,
     marginBottom: SPACING.sm,
+    overflow: 'hidden',
+    width: '100%',
   },
   productInfo: {
     gap: SPACING.xs,

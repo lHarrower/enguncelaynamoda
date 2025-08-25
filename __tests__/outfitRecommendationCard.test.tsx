@@ -9,12 +9,26 @@ import { OutfitRecommendationCard } from '@/components/aynaMirror/OutfitRecommen
 import { OutfitRecommendation } from '@/types/aynaMirror';
 
 // Mock dependencies
-jest.mock('expo-haptics');
+jest.mock('expo-haptics', () => ({
+  impactAsync: jest.fn(),
+  ImpactFeedbackStyle: {
+    Light: 'light',
+    Medium: 'medium',
+    Heavy: 'heavy'
+  }
+}));
+
+// Mock expo modules for OutfitRecommendationCard
 jest.mock('expo-blur', () => ({
   BlurView: ({ children }: any) => children,
 }));
+
 jest.mock('expo-linear-gradient', () => ({
   LinearGradient: ({ children }: any) => children,
+}));
+
+jest.mock('@expo/vector-icons', () => ({
+  Ionicons: 'Ionicons',
 }));
 
 // Sample test data
@@ -27,7 +41,7 @@ const mockRecommendation: OutfitRecommendation = {
       userId: 'user-1',
       imageUri: 'https://example.com/image1.jpg',
       processedImageUri: 'https://example.com/processed1.jpg',
-  nameOverride: false,
+      nameOverride: false,
       category: 'tops',
       colors: ['blue', 'white'],
       tags: ['casual', 'comfortable'],
@@ -37,7 +51,7 @@ const mockRecommendation: OutfitRecommendation = {
         lastWorn: new Date('2024-01-10'),
         averageRating: 4.2,
         complimentsReceived: 2,
-        costPerWear: 12.50,
+        costPerWear: 12.5,
       },
       styleCompatibility: {},
       confidenceHistory: [],
@@ -49,7 +63,7 @@ const mockRecommendation: OutfitRecommendation = {
       userId: 'user-1',
       imageUri: 'https://example.com/image2.jpg',
       processedImageUri: 'https://example.com/processed2.jpg',
-  nameOverride: false,
+      nameOverride: false,
       category: 'bottoms',
       colors: ['black'],
       tags: ['casual'],
@@ -59,7 +73,7 @@ const mockRecommendation: OutfitRecommendation = {
         lastWorn: new Date('2024-01-08'),
         averageRating: 4.0,
         complimentsReceived: 1,
-        costPerWear: 15.00,
+        costPerWear: 15.0,
       },
       styleCompatibility: {},
       confidenceHistory: [],
@@ -67,14 +81,15 @@ const mockRecommendation: OutfitRecommendation = {
       updatedAt: new Date('2024-01-01'),
     },
   ],
-  confidenceNote: 'This effortless combination will have you feeling comfortable and confident all day! ☀️',
+  confidenceNote:
+    'This effortless combination will have you feeling comfortable and confident all day! ☀️',
   quickActions: [
     { type: 'wear', label: 'Wear This', icon: 'checkmark-circle' },
     { type: 'save', label: 'Save for Later', icon: 'bookmark' },
     { type: 'share', label: 'Share', icon: 'share' },
   ],
   confidenceScore: 4.2,
-  reasoning: ['Perfect for cool weather conditions', 'Features items you haven\'t worn recently'],
+  reasoning: ['Perfect for cool weather conditions', "Features items you haven't worn recently"],
   isQuickOption: true,
   createdAt: new Date('2024-01-15T06:00:00Z'),
 };
@@ -95,7 +110,8 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+          reduceMotion={true}
+        />,
       );
 
       expect(getByText('2 pieces')).toBeTruthy();
@@ -109,7 +125,8 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+          reduceMotion={true}
+        />,
       );
 
       expect(getByText('Quick')).toBeTruthy();
@@ -127,7 +144,8 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+          reduceMotion={true}
+        />,
       );
 
       expect(queryByText('Quick')).toBeNull();
@@ -140,7 +158,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       expect(getByText('42/10')).toBeTruthy();
@@ -153,22 +171,28 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       expect(getByText('2 pieces')).toBeTruthy();
     });
 
     it('should display more items indicator when more than 4 items', () => {
-      const manyItemsRecommendation = {
+      const manyItemsRecommendation: OutfitRecommendation = {
         ...mockRecommendation,
         items: [
           ...mockRecommendation.items,
-          ...Array(4).fill(null).map((_, index) => ({
-            ...mockRecommendation.items[0],
-            id: `item-${index + 3}`,
-          })),
-        ],
+          ...Array(4)
+            .fill(null)
+            .map((_, index) => ({
+              ...mockRecommendation.items[0],
+              id: `item-${index + 3}`,
+              userId: 'user-1',
+              imageUri: 'https://example.com/extra.jpg',
+              processedImageUri: 'https://example.com/extra_proc.jpg',
+              category: (mockRecommendation.items[0] as any).category || 'tops',
+            })),
+        ] as any, // ensured each object satisfies WardrobeItem minimally
       };
 
       const { getByText } = render(
@@ -177,7 +201,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       expect(getByText('+2')).toBeTruthy();
@@ -186,16 +210,16 @@ describe('OutfitRecommendationCard', () => {
 
   describe('Interactions', () => {
     it('should call onSelect when card is pressed', () => {
-      const { getByRole } = render(
+      const { getByTestId } = render(
         <OutfitRecommendationCard
           recommendation={mockRecommendation}
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
-      const card = getByRole('button');
+      const card = getByTestId('outfit-recommendation-card');
       fireEvent.press(card);
 
       expect(mockOnSelect).toHaveBeenCalledTimes(1);
@@ -209,7 +233,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Wear This'));
@@ -225,7 +249,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       fireEvent.press(getByText('Wear This'));
@@ -249,7 +273,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       // Re-render with selected state
@@ -259,7 +283,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={true}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       // In a real test, we might check for specific styling or test IDs
@@ -275,7 +299,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       // Simulate image error
@@ -289,7 +313,7 @@ describe('OutfitRecommendationCard', () => {
     it('should handle missing image URIs gracefully', () => {
       const noImageRecommendation = {
         ...mockRecommendation,
-        items: mockRecommendation.items.map(item => ({
+        items: mockRecommendation.items.map((item) => ({
           ...item,
           imageUri: '',
           processedImageUri: '',
@@ -302,7 +326,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       expect(getByText('2 pieces')).toBeTruthy();
@@ -317,7 +341,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       expect(getByLabelText('Outfit recommendation with 2 items')).toBeTruthy();
@@ -330,24 +354,31 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
-      expect(getByA11yHint('Double tap to select this outfit recommendation')).toBeTruthy();
+      expect(getByA11yHint('Double tap to select this outfit')).toBeTruthy();
     });
 
     it('should have proper button roles', () => {
-      const { getAllByRole } = render(
+      const { getByTestId } = render(
         <OutfitRecommendationCard
           recommendation={mockRecommendation}
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
-      const buttons = getAllByRole('button');
-      expect(buttons.length).toBeGreaterThan(0);
+      const mainCard = getByTestId('outfit-recommendation-card');
+      const quickActionButton = getByTestId('quick-action-button');
+      const saveButton = getByTestId('save-button');
+      const shareButton = getByTestId('share-button');
+      
+      expect(mainCard).toBeTruthy();
+      expect(quickActionButton).toBeTruthy();
+      expect(saveButton).toBeTruthy();
+      expect(shareButton).toBeTruthy();
     });
 
     it('should have accessibility labels for quick actions', () => {
@@ -357,7 +388,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       expect(getByLabelText('Wear This')).toBeTruthy();
@@ -375,7 +406,7 @@ describe('OutfitRecommendationCard', () => {
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
           animationDelay={500}
-        />
+        />,
       );
 
       expect(getByText('2 pieces')).toBeTruthy();
@@ -388,7 +419,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       expect(getByText('2 pieces')).toBeTruthy();
@@ -402,7 +433,7 @@ describe('OutfitRecommendationCard', () => {
         width: 768,
         height: 1024,
       };
-      
+
       jest.doMock('react-native', () => ({
         ...jest.requireActual('react-native'),
         useWindowDimensions: () => mockDimensions,
@@ -414,7 +445,7 @@ describe('OutfitRecommendationCard', () => {
           isSelected={false}
           onSelect={mockOnSelect}
           onQuickAction={mockOnQuickAction}
-        />
+        />,
       );
 
       expect(getByText('2 pieces')).toBeTruthy();

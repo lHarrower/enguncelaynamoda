@@ -1,14 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  Animated,
-  Dimensions,
-  StatusBar,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Dimensions, Modal, StatusBar, StyleSheet, Text, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -27,8 +20,8 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
   isVisible,
   progress,
   status,
-  title = "Processing Your Photo",
-  subtitle = "Creating magic with AI..."
+  title = 'Processing Your Photo',
+  subtitle = 'Creating magic with AI...',
 }) => {
   // Animation values
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -60,7 +53,7 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
           toValue: 1,
           duration: 3000,
           useNativeDriver: true,
-        })
+        }),
       );
       rotateAnimation.start();
 
@@ -77,7 +70,7 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
             duration: 1000,
             useNativeDriver: true,
           }),
-        ])
+        ]),
       );
       pulseAnimation.start();
 
@@ -86,7 +79,7 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
         pulseAnimation.stop();
       };
     }
-  }, [isVisible]);
+  }, [isVisible, fadeAnim, pulseAnim, rotateAnim, scaleAnim]);
 
   // Update progress animation
   useEffect(() => {
@@ -98,42 +91,45 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
   }, [progress]);
 
   const getStatusInfo = (): { icon: IconName; message: string; color: string } => {
+    const primary500 = DesignSystem.colors?.primaryIndexed?.[500] || '#007AFF';
+    const textPrimary = DesignSystem.colors?.text?.primary || '#FFFFFF';
+    const textSecondary = DesignSystem.colors?.text?.secondary || '#999999';
     switch (status) {
       case 'uploading':
         return {
           icon: 'cloud-upload-outline',
           message: 'Uploading your photo...',
-          color: DesignSystem.colors.primary[500],
+          color: primary500,
         };
       case 'removing_background':
         return {
           icon: 'cut-outline',
           message: 'Removing background with AI...',
-          color: DesignSystem.colors.primary[500],
+          color: primary500,
         };
       case 'analyzing':
         return {
           icon: 'eye-outline',
           message: 'Analyzing colors and style...',
-          color: DesignSystem.colors.text.secondary,
+          color: textSecondary,
         };
       case 'processing':
         return {
           icon: 'cog-outline',
           message: 'Processing item details...',
-          color: DesignSystem.colors.text.primary,
+          color: textPrimary,
         };
       case 'complete':
         return {
           icon: 'checkmark-circle',
           message: 'Complete! ✨',
-          color: DesignSystem.colors.primary[500],
+          color: primary500,
         };
       default:
         return {
           icon: 'hourglass-outline',
           message: 'Processing...',
-          color: DesignSystem.colors.primary[500],
+          color: primary500,
         };
     }
   };
@@ -146,55 +142,64 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
     outputRange: ['0deg', '360deg'],
   });
 
-  if (!isVisible) return null;
+  if (!isVisible) {
+    return null;
+  }
 
   return (
-    <Modal
-      visible={isVisible}
-      transparent
-      animationType="none"
-      statusBarTranslucent
-    >
-      <StatusBar barStyle="light-content" backgroundColor={DesignSystem.colors.background.overlay} />
-      <Animated.View 
+    <Modal visible={isVisible} transparent animationType="none" statusBarTranslucent>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor={DesignSystem.colors?.background?.overlay || 'rgba(0,0,0,0.85)'}
+      />
+      <Animated.View
         style={[
           styles.overlay,
           {
             opacity: fadeAnim,
             backgroundColor: 'rgba(0,0,0,0.9)',
-          }
+          },
         ]}
       >
-        <Animated.View 
+        <Animated.View
           style={[
             styles.container,
             {
-              backgroundColor: DesignSystem.colors.background.elevated,
+              backgroundColor: DesignSystem.colors?.background?.elevated || '#111111',
               transform: [{ scale: scaleAnim }],
-            }
+            },
           ]}
         >
           {/* Animated Background Circles */}
           <View style={styles.backgroundCircles}>
-            <Animated.View 
+            <Animated.View
               style={[
                 styles.circle,
                 styles.circle1,
-                { backgroundColor: DesignSystem.colors.primary[500], transform: [{ rotate: spin }, { scale: pulseAnim }] }
+                {
+                  backgroundColor: DesignSystem.colors.primary[500],
+                  transform: [{ rotate: spin }, { scale: pulseAnim }],
+                },
               ]}
             />
-            <Animated.View 
+            <Animated.View
               style={[
                 styles.circle,
                 styles.circle2,
-                { backgroundColor: DesignSystem.colors.success.main, transform: [{ rotate: spin }] }
+                {
+                  backgroundColor: DesignSystem.colors?.success?.main || '#2ECC71',
+                  transform: [{ rotate: spin }],
+                },
               ]}
             />
-            <Animated.View 
+            <Animated.View
               style={[
                 styles.circle,
                 styles.circle3,
-                { backgroundColor: DesignSystem.colors.primary[500], transform: [{ scale: pulseAnim }] }
+                {
+                  backgroundColor: DesignSystem.colors?.primaryIndexed?.[500] || '#007AFF',
+                  transform: [{ scale: pulseAnim }],
+                },
               ]}
             />
           </View>
@@ -202,27 +207,39 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
           {/* Main Content */}
           <View style={styles.content}>
             {/* Status Icon */}
-            <Animated.View 
+            <Animated.View
               style={[
                 styles.iconContainer,
                 { backgroundColor: statusInfo.color + '20' },
-                { transform: [{ scale: pulseAnim }] }
+                { transform: [{ scale: pulseAnim }] },
               ]}
             >
-              <Ionicons 
-                name={statusInfo.icon} 
-                size={40} 
-                color={statusInfo.color} 
-              />
+              <Ionicons name={statusInfo.icon} size={40} color={statusInfo.color} />
             </Animated.View>
 
             {/* Title and Subtitle */}
-            <Text style={[styles.title, { color: DesignSystem.colors.text.primary }]}>{title}</Text>
-            <Text style={[styles.subtitle, { color: DesignSystem.colors.text.secondary }]}>{subtitle}</Text>
+            <Text
+              style={[styles.title, { color: DesignSystem.colors?.text?.primary || '#FFFFFF' }]}
+            >
+              {title}
+            </Text>
+            <Text
+              style={[
+                styles.subtitle,
+                { color: DesignSystem.colors?.text?.secondary || '#999999' },
+              ]}
+            >
+              {subtitle}
+            </Text>
 
             {/* Progress Circle */}
             <View style={styles.progressContainer}>
-              <View style={[styles.progressCircle, { backgroundColor: DesignSystem.colors.border.primary }]}>
+              <View
+                style={[
+                  styles.progressCircle,
+                  { backgroundColor: DesignSystem.colors?.border?.primary || '#333333' },
+                ]}
+              >
                 <Animated.View
                   style={[
                     styles.progressFill,
@@ -239,14 +256,26 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
                     },
                   ]}
                 />
-                <View style={[styles.progressInner, { backgroundColor: DesignSystem.colors.background.elevated }]}>
-                  <Text style={[styles.progressText, { color: DesignSystem.colors.text.primary }]}>{progressPercentage}%</Text>
+                <View
+                  style={[
+                    styles.progressInner,
+                    { backgroundColor: DesignSystem.colors?.background?.elevated || '#111111' },
+                  ]}
+                >
+                  <Text style={[styles.progressText, { color: DesignSystem.colors.text.primary }]}>
+                    {progressPercentage}%
+                  </Text>
                 </View>
               </View>
             </View>
 
             {/* Progress Bar */}
-            <View style={[styles.progressBar, { backgroundColor: DesignSystem.colors.border.primary }]}>
+            <View
+              style={[
+                styles.progressBar,
+                { backgroundColor: DesignSystem.colors?.border?.primary || '#333333' },
+              ]}
+            >
               <Animated.View
                 style={[
                   styles.progressBarFill,
@@ -269,31 +298,50 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
             {/* Processing Steps */}
             <View style={styles.stepsContainer}>
               {['Upload', 'Remove BG', 'Analyze', 'Complete'].map((step, index) => {
-                const stepProgress = Math.max(0, Math.min(1, (progress * 4) - index));
+                const stepProgress = Math.max(0, Math.min(1, progress * 4 - index));
                 const isActive = stepProgress > 0;
                 const isComplete = stepProgress >= 1;
-                
+
                 return (
                   <View key={step} style={styles.step}>
-                    <View 
+                    <View
                       style={[
                         styles.stepIndicator,
-                        { backgroundColor: DesignSystem.colors.border.primary },
-                        isActive && { backgroundColor: DesignSystem.colors.primary[500] },
-                        isComplete && { backgroundColor: DesignSystem.colors.success.main },
+                        { backgroundColor: DesignSystem.colors?.border?.primary || '#333333' },
+                        isActive && {
+                          backgroundColor: DesignSystem.colors?.primaryIndexed?.[500] || '#007AFF',
+                        },
+                        isComplete && {
+                          backgroundColor: DesignSystem.colors?.success?.main || '#2ECC71',
+                        },
                       ]}
                     >
                       {isComplete ? (
-                        <Ionicons name="checkmark" size={12} color={DesignSystem.colors.background.elevated} />
+                        <Ionicons
+                          name="checkmark"
+                          size={12}
+                          color={DesignSystem.colors?.background?.elevated || '#111111'}
+                        />
                       ) : (
-                        <View style={[styles.stepDot, { backgroundColor: DesignSystem.colors.background.elevated }]} />
+                        <View
+                          style={[
+                            styles.stepDot,
+                            {
+                              backgroundColor:
+                                DesignSystem.colors?.background?.elevated || '#111111',
+                            },
+                          ]}
+                        />
                       )}
                     </View>
-                    <Text 
+                    <Text
                       style={[
                         styles.stepText,
-                        { color: DesignSystem.colors.text.secondary },
-                        isActive && { color: DesignSystem.colors.text.primary, fontWeight: '600' },
+                        { color: DesignSystem.colors?.text?.secondary || '#999999' },
+                        isActive && {
+                          color: DesignSystem.colors?.text?.primary || '#FFFFFF',
+                          fontWeight: '600',
+                        },
                       ]}
                     >
                       {step}
@@ -310,150 +358,150 @@ const PhotoProcessingLoader: React.FC<PhotoProcessingLoaderProps> = ({
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  container: {
-    width: screenWidth - 60,
-    borderRadius: 24,
-    padding: 40,
-    alignItems: 'center',
-    position: 'relative',
-    overflow: 'hidden',
-  },
   backgroundCircles: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
     bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
   circle: {
-    position: 'absolute',
     borderRadius: 1000,
     opacity: 0.1,
+    position: 'absolute',
   },
   circle1: {
-    width: 200,
     height: 200,
-    top: -50,
     right: -50,
+    top: -50,
+    width: 200,
   },
   circle2: {
-    width: 150,
-    height: 150,
     bottom: -30,
+    height: 150,
     left: -30,
+    width: 150,
   },
   circle3: {
-    width: 100,
     height: 100,
-    top: '50%',
     left: -20,
+    top: '50%',
+    width: 100,
+  },
+  container: {
+    alignItems: 'center',
+    borderRadius: 24,
+    overflow: 'hidden',
+    padding: 40,
+    position: 'relative',
+    width: screenWidth - 60,
   },
   content: {
     alignItems: 'center',
     zIndex: 1,
   },
   iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 40,
+    height: 80,
+    justifyContent: 'center',
     marginBottom: 20,
+    width: 80,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 8,
+  overlay: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
   },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 30,
+  progressBar: {
+    borderRadius: 3,
+    height: 6,
+    marginBottom: 20,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  progressBarFill: {
+    borderRadius: 3,
+    height: '100%',
+  },
+  progressCircle: {
+    borderRadius: 50,
+    height: 100,
+    overflow: 'hidden',
+    position: 'relative',
+    width: 100,
   },
   progressContainer: {
     marginBottom: 20,
   },
-  progressCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    position: 'relative',
-    overflow: 'hidden',
-  },
   progressFill: {
-    width: '50%',
     height: '100%',
-    position: 'absolute',
     left: '50%',
+    position: 'absolute',
     transformOrigin: 'left center',
+    width: '50%',
   },
   progressInner: {
-    position: 'absolute',
-    top: 15,
-    left: 15,
-    right: 15,
-    bottom: 15,
-    borderRadius: 35,
-    justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 35,
+    bottom: 15,
+    justifyContent: 'center',
+    left: 15,
+    position: 'absolute',
+    right: 15,
+    top: 15,
   },
   progressText: {
     fontSize: 18,
     fontWeight: 'bold',
   },
-  progressBar: {
-    width: '100%',
-    height: 6,
-    borderRadius: 3,
-    marginBottom: 20,
-    overflow: 'hidden',
-  },
-  progressBarFill: {
-    height: '100%',
-    borderRadius: 3,
-  },
   statusMessage: {
     fontSize: 16,
     fontWeight: '600',
-    textAlign: 'center',
     marginBottom: 30,
-  },
-  stepsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    textAlign: 'center',
   },
   step: {
     alignItems: 'center',
     flex: 1,
   },
+  stepDot: {
+    borderRadius: 4,
+    height: 8,
+    width: 8,
+  },
   stepIndicator: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 12,
+    height: 24,
+    justifyContent: 'center',
     marginBottom: 8,
+    width: 24,
   },
   stepIndicatorActive: {},
   stepIndicatorComplete: {},
-  stepDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
   stepText: {
     fontSize: 12,
     textAlign: 'center',
   },
   stepTextActive: {
     fontWeight: '600',
+  },
+  stepsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
   },
 });
 

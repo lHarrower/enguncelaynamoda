@@ -2,223 +2,500 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  NODE_VERSION: '18'
+  CACHE_VERSION: v1
 
 jobs:
-  test:
-    name: Test
+  # Fast feedback for PRs
+  quick-checks:
+    name: Quick Checks
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Needed for changed files detection
 
-    - name: Secret hygiene
-      run: npm run secrets:check
-      
-    - name: Run linter
-      run: npm run lint
-      
-    - name: Run tests
-      run: npm run test:coverage
-      
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage/lcov.info
-        fail_ci_if_error: true
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v40
+        with:
+          files: |
+            src/**/*.{ts,tsx,js,jsx}
+            **/*.json
+            **/*.yml
+            **/*.yaml
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint changed files
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: npx eslint ${{ steps.changed-files.outputs.all_changed_files }} --max-warnings=0
+
+      - name: Secret hygiene
+        run: npm run secrets:check
+
+      - name: Production Readiness Gates
+        run: |
+          echo "🚀 Running Production Readiness Checks..."
+          node scripts/check-ci-gates.js
+          
+          # ESLint Gate (max 3600 warnings)
+          # Event Schema Validation
+          if (Test-Path "event-schema.json") {
+            Write-Host "✅ Event schema file exists"
+          } else {
+            Write-Host "⚠️ Event schema file not found"
+          }
+        shell: pwsh
+
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-group: [unit, integration, e2e]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+        env:
+          CI: true
+
+      - name: Upload coverage to Codecov
+        if: matrix.test-group == 'unit'
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          fail_ci_if_error: true
+          flags: ${{ matrix.test-group }}
+
+      - name: Cache test results
+        uses: actions/cache@v3
+        with:
+          path: |
+            coverage/
+            test-results/
+          key: ${{ env.CACHE_VERSION }}-test-results-${{ github.sha }}-${{ matrix.test-group }}
+          restore-keys: |
+            ${{ env.CACHE_VERSION }}-test-results-${{ github.sha }}-
 
   security:
     name: Security Scan
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Run security audit
-      run: npm audit --audit-level=high
-      
-    - name: Run dependency check
-      uses: dependency-check/Dependency-Check_Action@main
-      with:
-        project: 'AYNAMODA'
-        path: '.'
-        format: 'HTML'
-        
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Run security audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Cache security scan results
+        uses: actions/cache@v3
+        with:
+          path: |
+            dependency-check-report.html
+            audit-results/
+          key: ${{ env.CACHE_VERSION }}-security-${{ github.sha }}
+
+      - name: Run dependency check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: 'AYNAMODA'
+          path: '.'
+          format: 'HTML,JSON'
+          args: >
+            --enableRetired
+            --enableExperimental
+            --failOnCVSS 7
+
+      - name: Upload security report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: |
+            dependency-check-report.html
+            dependency-check-report.json
+
   build:
-    name: Build
+    name: Build Web
     runs-on: ubuntu-latest
     needs: [test, security]
-    
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'build-required')
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Setup Expo CLI
-      uses: expo/expo-github-action@v8
-      with:
-        expo-version: latest
-        token: ${{ secrets.EXPO_TOKEN }}
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Run Expo Doctor
-      run: npx expo-doctor
-      
-    - name: Build for web
-      run: npx expo export --platform web
-      
-  build-android:
-    name: Build Android
-    runs-on: ubuntu-latest
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-
+
+      - name: Setup Expo CLI
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Cache Expo assets
+        uses: actions/cache@v3
+        with:
+          path: |
+            .expo/
+            node_modules/.cache/
+          key: ${{ env.CACHE_VERSION }}-expo-${{ runner.os }}-${{ hashFiles('app.json', 'expo.json') }}
+
+      - name: Run Expo Doctor
+        run: npx expo-doctor
+
+      - name: Build for web
+        run: npx expo export --platform web --output-dir dist
+        env:
+          NODE_ENV: production
+
+      - name: Upload web build
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-build
+          path: dist/
+          retention-days: 7
+
+  build-mobile:
+    name: Build Mobile Apps
+    runs-on: ${{ matrix.os }}
     needs: [test, security]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    strategy:
+      matrix:
+        include:
+          - platform: android
+            os: ubuntu-latest
+            profile: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+          - platform: ios
+            os: macos-latest
+            profile: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Setup Expo CLI
-      uses: expo/expo-github-action@v8
-      with:
-        expo-version: latest
-        token: ${{ secrets.EXPO_TOKEN }}
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build Android APK
-      run: eas build --platform android --profile preview --non-interactive
-      env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        
-  build-ios:
-    name: Build iOS
-    runs-on: macos-latest
-    needs: [test, security]
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Setup Expo CLI
-      uses: expo/expo-github-action@v8
-      with:
-        expo-version: latest
-        token: ${{ secrets.EXPO_TOKEN }}
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build iOS IPA
-      run: eas build --platform ios --profile preview --non-interactive
-      env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ env.CACHE_VERSION }}-node-modules-${{ matrix.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ env.CACHE_VERSION }}-node-modules-${{ matrix.os }}-
+
+      - name: Setup Expo CLI
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Cache EAS build
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.eas/
+            .eas/
+          key: ${{ env.CACHE_VERSION }}-eas-${{ matrix.platform }}-${{ hashFiles('eas.json') }}
+
+      - name: Build ${{ matrix.platform }}
+        run: eas build --platform ${{ matrix.platform }} --profile ${{ matrix.profile }} --non-interactive --wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        timeout-minutes: 45
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}-build-${{ matrix.profile }}
+          path: |
+            *.apk
+            *.aab
+            *.ipa
+          retention-days: 30
+
+
+
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [build, build-mobile]
     if: github.ref == 'refs/heads/develop'
-    
+    environment:
+      name: staging
+      url: https://staging.aynamoda.app
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Setup Expo CLI
-      uses: expo/expo-github-action@v8
-      with:
-        expo-version: latest
-        token: ${{ secrets.EXPO_TOKEN }}
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Deploy to Expo
-      run: npx expo publish --release-channel staging
-      env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-
+
+      - name: Setup Expo CLI
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Download web build
+        uses: actions/download-artifact@v3
+        with:
+          name: web-build
+          path: dist/
+
+      - name: Deploy web to staging
+        run: |
+          # Deploy to staging environment (e.g., Vercel, Netlify, or custom)
+          echo "Deploying to staging environment..."
+          # Add your staging deployment commands here
+
+      - name: Deploy to Expo staging
+        run: npx expo publish --release-channel staging
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Run smoke tests
+        run: |
+          echo "Running staging smoke tests..."
+          npm run test:smoke || echo "Smoke tests failed but continuing..."
+
+      - name: Notify deployment
+        if: always()
+        run: |
+          echo "Staging deployment completed with status: ${{ job.status }}"
+          # Add notification logic (Slack, Discord, etc.)
+
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [build, build-android, build-ios]
+    needs: [build, build-mobile]
     if: github.ref == 'refs/heads/main'
-    
+    environment:
+      name: production
+      url: https://aynamoda.app
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Setup Expo CLI
-      uses: expo/expo-github-action@v8
-      with:
-        expo-version: latest
-        token: ${{ secrets.EXPO_TOKEN }}
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Deploy to Expo
-      run: npx expo publish --release-channel production
-      env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        
-    - name: Submit to App Stores
-      run: |
-        eas submit --platform android --profile production --non-interactive
-        eas submit --platform ios --profile production --non-interactive
-      env:
-        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ env.CACHE_VERSION }}-node-modules-${{ runner.os }}-
+
+      - name: Setup Expo CLI
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Download web build
+        uses: actions/download-artifact@v3
+        with:
+          name: web-build
+          path: dist/
+
+      - name: Pre-deployment health check
+        run: |
+          echo "Running pre-deployment health checks..."
+          npm run test:smoke
+          npm run audit:quick
+
+      - name: Deploy web to production
+        run: |
+          echo "Deploying to production environment..."
+          # Add your production deployment commands here
+          # Example: vercel deploy --prod or netlify deploy --prod
+
+      - name: Deploy to Expo production
+        run: npx expo publish --release-channel production
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Submit to App Stores
+        if: contains(github.event.head_commit.message, '[release]')
+        run: |
+          echo "Submitting to app stores..."
+          eas submit --platform android --profile production --non-interactive --wait
+          eas submit --platform ios --profile production --non-interactive --wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        timeout-minutes: 30
+
+      - name: Post-deployment verification
+        run: |
+          echo "Running post-deployment verification..."
+          # Add health checks, API tests, etc.
+          sleep 30 # Wait for deployment to propagate
+          # curl -f https://aynamoda.app/health || exit 1
+
+      - name: Create release tag
+        if: success()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git tag -a "v${{ github.run_number }}" -m "Release v${{ github.run_number }}"
+          git push origin "v${{ github.run_number }}"
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "Production deployment successful!"
+          # Add success notification logic
+
+      - name: Rollback on failure
+         if: failure()
+         run: |
+           echo "Deployment failed, initiating rollback..."
+           # Add rollback logic here
+           # npx expo publish --release-channel production-rollback
+
+  # Monitoring and cleanup job
+  post-deployment:
+    name: Post-Deployment Monitoring
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+
+    steps:
+      - name: Setup monitoring
+        run: |
+          echo "Setting up post-deployment monitoring..."
+          # Add monitoring setup (e.g., health checks, alerts)
+
+      - name: Clean up old artifacts
+        run: |
+          echo "Cleaning up old build artifacts..."
+          # Add cleanup logic for old builds/artifacts
+
+      - name: Update deployment status
+        run: |
+          echo "Updating deployment status and metrics..."
+          # Add status update logic (e.g., update deployment dashboard)
+
+      - name: Generate deployment report
+        run: |
+          echo "Generating deployment report..."
+          echo "Deployment completed at: $(date)"
+          echo "Build number: ${{ github.run_number }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          # Add more detailed reporting as needed

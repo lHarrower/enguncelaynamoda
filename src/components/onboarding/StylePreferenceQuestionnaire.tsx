@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { DesignSystem } from '@/theme/DesignSystem';
-import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 
 interface StylePreferenceQuestionnaire {
   onNext: (preferences: StylePreferences) => void;
@@ -35,8 +36,16 @@ const COLOR_OPTIONS = [
   { id: 'earth-tones', label: 'Earth Tones', colors: ['#8B4513', '#D2691E', '#CD853F', '#DEB887'] },
   { id: 'jewel-tones', label: 'Jewel Tones', colors: ['#4B0082', '#008B8B', '#B22222', '#228B22'] },
   { id: 'pastels', label: 'Pastels', colors: ['#FFB6C1', '#E6E6FA', '#F0E68C', '#98FB98'] },
-  { id: 'bold-brights', label: 'Bold & Bright', colors: ['#FF0000', '#0000FF', '#FFFF00', '#FF69B4'] },
-  { id: 'monochrome', label: 'Black & White', colors: ['#000000', '#FFFFFF', '#808080', '#C0C0C0'] },
+  {
+    id: 'bold-brights',
+    label: 'Bold & Bright',
+    colors: ['#FF0000', '#0000FF', '#FFFF00', '#FF69B4'],
+  },
+  {
+    id: 'monochrome',
+    label: 'Black & White',
+    colors: ['#000000', '#FFFFFF', '#808080', '#C0C0C0'],
+  },
 ];
 
 const OCCASION_OPTIONS = [
@@ -51,49 +60,57 @@ const OCCASION_OPTIONS = [
 ];
 
 const CONFIDENCE_NOTE_STYLES = [
-  { 
-    id: 'encouraging', 
-    label: 'Encouraging & Supportive', 
+  {
+    id: 'encouraging',
+    label: 'Encouraging & Supportive',
     example: '"You look amazing in everything you wear. Today will be no exception!"',
-    emoji: '💪'
+    emoji: '💪',
   },
-  { 
-    id: 'witty', 
-    label: 'Witty & Playful', 
-    example: '"That leather jacket hasn\'t seen the sun in a while. Today, it makes you invincible."',
-    emoji: '😄'
+  {
+    id: 'witty',
+    label: 'Witty & Playful',
+    example:
+      '"That leather jacket hasn\'t seen the sun in a while. Today, it makes you invincible."',
+    emoji: '😄',
   },
-  { 
-    id: 'poetic', 
-    label: 'Poetic & Inspiring', 
+  {
+    id: 'poetic',
+    label: 'Poetic & Inspiring',
     example: '"Like morning light through silk, this outfit brings out your natural radiance."',
-    emoji: '✨'
+    emoji: '✨',
   },
 ];
 
-export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePreferenceQuestionnaire) {
+export default function StylePreferenceQuestionnaire({
+  onNext,
+  onSkip,
+}: StylePreferenceQuestionnaire) {
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
-  const [confidenceNoteStyle, setConfidenceNoteStyle] = useState<'encouraging' | 'witty' | 'poetic'>('encouraging');
+  const [confidenceNoteStyle, setConfidenceNoteStyle] = useState<
+    'encouraging' | 'witty' | 'poetic'
+  >('encouraging');
   const [currentStep, setCurrentStep] = useState(0);
 
   const steps = ['Styles', 'Colors', 'Occasions', 'Confidence Notes'];
 
   const toggleSelection = (
-    item: string, 
-    selectedItems: string[], 
-    setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>
+    item: string,
+    selectedItems: string[],
+    setSelectedItems: React.Dispatch<React.SetStateAction<string[]>>,
   ) => {
     if (selectedItems.includes(item)) {
-      setSelectedItems(selectedItems.filter(i => i !== item));
+      setSelectedItems(selectedItems.filter((i) => i !== item));
     } else {
       setSelectedItems([...selectedItems, item]);
     }
   };
 
   const handleNext = () => {
-    if (!canProceed()) return; // Guard in handler to ensure tests can't bypass disabled state
+    if (!canProceed()) {
+      return;
+    } // Guard in handler to ensure tests can't bypass disabled state
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -116,21 +133,28 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: return selectedStyles.length > 0;
-      case 1: return selectedColors.length > 0;
-      case 2: return selectedOccasions.length > 0;
-      case 3: return true;
-      default: return false;
+      case 0:
+        return selectedStyles.length > 0;
+      case 1:
+        return selectedColors.length > 0;
+      case 2:
+        return selectedOccasions.length > 0;
+      case 3:
+        return true;
+      default:
+        return false;
     }
   };
 
   const renderStyleStep = () => (
     <Animated.View entering={FadeInUp.duration(600)} style={styles.stepContent}>
-  <Text testID="style-step-title" style={styles.stepTitle}>What's Your Style?</Text>
+      <Text testID="style-step-title" style={styles.stepTitle}>
+        What&apos;s Your Style?
+      </Text>
       <Text style={styles.stepSubtitle}>
         Select all styles that resonate with you (choose as many as you like)
       </Text>
-      
+
       <View style={styles.optionsGrid}>
         {STYLE_OPTIONS.map((style) => (
           <Pressable
@@ -138,19 +162,21 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
             style={({ pressed }: { pressed: boolean }) => [
               styles.optionCard,
               selectedStyles.includes(style.id) && styles.optionCardSelected,
-              pressed && styles.optionCardPressed
+              pressed && styles.optionCardPressed,
             ]}
             onPress={() => toggleSelection(style.id, selectedStyles, setSelectedStyles)}
           >
-            <BlurView 
-              intensity={selectedStyles.includes(style.id) ? 25 : 15} 
+            <BlurView
+              intensity={selectedStyles.includes(style.id) ? 25 : 15}
               style={styles.optionCardContent}
             >
               <Text style={styles.optionEmoji}>{style.emoji}</Text>
-              <Text style={[
-                styles.optionLabel,
-                selectedStyles.includes(style.id) && styles.optionLabelSelected
-              ]}>
+              <Text
+                style={[
+                  styles.optionLabel,
+                  selectedStyles.includes(style.id) && styles.optionLabelSelected,
+                ]}
+              >
                 {style.label}
               </Text>
             </BlurView>
@@ -163,10 +189,8 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
   const renderColorStep = () => (
     <Animated.View entering={FadeInUp.duration(600)} style={styles.stepContent}>
       <Text style={styles.stepTitle}>Color Preferences</Text>
-      <Text style={styles.stepSubtitle}>
-        Which color palettes make you feel most confident?
-      </Text>
-      
+      <Text style={styles.stepSubtitle}>Which color palettes make you feel most confident?</Text>
+
       <View style={styles.colorOptionsContainer}>
         {COLOR_OPTIONS.map((colorGroup) => (
           <Pressable
@@ -174,26 +198,25 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
             style={({ pressed }: { pressed: boolean }) => [
               styles.colorOptionCard,
               selectedColors.includes(colorGroup.id) && styles.colorOptionCardSelected,
-              pressed && styles.optionCardPressed
+              pressed && styles.optionCardPressed,
             ]}
             onPress={() => toggleSelection(colorGroup.id, selectedColors, setSelectedColors)}
           >
-            <BlurView 
-              intensity={selectedColors.includes(colorGroup.id) ? 25 : 15} 
+            <BlurView
+              intensity={selectedColors.includes(colorGroup.id) ? 25 : 15}
               style={styles.colorOptionContent}
             >
               <View style={styles.colorPalette}>
                 {colorGroup.colors.map((color, index) => (
-                  <View 
-                    key={index}
-                    style={[styles.colorSwatch, { backgroundColor: color }]} 
-                  />
+                  <View key={index} style={[styles.colorSwatch, { backgroundColor: color }]} />
                 ))}
               </View>
-              <Text style={[
-                styles.colorOptionLabel,
-                selectedColors.includes(colorGroup.id) && styles.optionLabelSelected
-              ]}>
+              <Text
+                style={[
+                  styles.colorOptionLabel,
+                  selectedColors.includes(colorGroup.id) && styles.optionLabelSelected,
+                ]}
+              >
                 {colorGroup.label}
               </Text>
             </BlurView>
@@ -207,9 +230,9 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
     <Animated.View entering={FadeInUp.duration(600)} style={styles.stepContent}>
       <Text style={styles.stepTitle}>When Do You Need Outfit Help?</Text>
       <Text style={styles.stepSubtitle}>
-        Select the occasions where you'd love confident outfit recommendations
+        Select the occasions where you&apos;d love confident outfit recommendations
       </Text>
-      
+
       <View style={styles.optionsGrid}>
         {OCCASION_OPTIONS.map((occasion) => (
           <Pressable
@@ -217,19 +240,21 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
             style={({ pressed }: { pressed: boolean }) => [
               styles.optionCard,
               selectedOccasions.includes(occasion.id) && styles.optionCardSelected,
-              pressed && styles.optionCardPressed
+              pressed && styles.optionCardPressed,
             ]}
             onPress={() => toggleSelection(occasion.id, selectedOccasions, setSelectedOccasions)}
           >
-            <BlurView 
-              intensity={selectedOccasions.includes(occasion.id) ? 25 : 15} 
+            <BlurView
+              intensity={selectedOccasions.includes(occasion.id) ? 25 : 15}
               style={styles.optionCardContent}
             >
               <Text style={styles.optionEmoji}>{occasion.emoji}</Text>
-              <Text style={[
-                styles.optionLabel,
-                selectedOccasions.includes(occasion.id) && styles.optionLabelSelected
-              ]}>
+              <Text
+                style={[
+                  styles.optionLabel,
+                  selectedOccasions.includes(occasion.id) && styles.optionLabelSelected,
+                ]}
+              >
                 {occasion.label}
               </Text>
             </BlurView>
@@ -245,7 +270,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
       <Text style={styles.stepSubtitle}>
         Choose the confidence note style that resonates with you most
       </Text>
-      
+
       <View style={styles.confidenceNotesContainer}>
         {CONFIDENCE_NOTE_STYLES.map((noteStyle) => (
           <Pressable
@@ -253,24 +278,26 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
             style={({ pressed }: { pressed: boolean }) => [
               styles.confidenceNoteCard,
               confidenceNoteStyle === noteStyle.id && styles.confidenceNoteCardSelected,
-              pressed && styles.optionCardPressed
+              pressed && styles.optionCardPressed,
             ]}
-            onPress={() => setConfidenceNoteStyle(noteStyle.id as any)}
+            onPress={() =>
+              setConfidenceNoteStyle(noteStyle.id as 'encouraging' | 'witty' | 'poetic')
+            }
           >
-            <BlurView 
-              intensity={confidenceNoteStyle === noteStyle.id ? 25 : 15} 
+            <BlurView
+              intensity={confidenceNoteStyle === noteStyle.id ? 25 : 15}
               style={styles.confidenceNoteContent}
             >
               <Text style={styles.confidenceNoteEmoji}>{noteStyle.emoji}</Text>
-              <Text style={[
-                styles.confidenceNoteTitle,
-                confidenceNoteStyle === noteStyle.id && styles.optionLabelSelected
-              ]}>
+              <Text
+                style={[
+                  styles.confidenceNoteTitle,
+                  confidenceNoteStyle === noteStyle.id && styles.optionLabelSelected,
+                ]}
+              >
                 {noteStyle.label}
               </Text>
-              <Text style={styles.confidenceNoteExample}>
-                {noteStyle.example}
-              </Text>
+              <Text style={styles.confidenceNoteExample}>{noteStyle.example}</Text>
             </BlurView>
           </Pressable>
         ))}
@@ -280,11 +307,16 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
 
   const renderCurrentStep = () => {
     switch (currentStep) {
-      case 0: return renderStyleStep();
-      case 1: return renderColorStep();
-      case 2: return renderOccasionStep();
-      case 3: return renderConfidenceNoteStep();
-      default: return renderStyleStep();
+      case 0:
+        return renderStyleStep();
+      case 1:
+        return renderColorStep();
+      case 2:
+        return renderOccasionStep();
+      case 3:
+        return renderConfidenceNoteStep();
+      default:
+        return renderStyleStep();
     }
   };
 
@@ -297,24 +329,25 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             {/* Progress Header */}
-            <Animated.View 
+            <Animated.View
               entering={FadeInUp.delay(200).duration(600)}
               style={styles.progressHeader}
             >
               <Text style={styles.headerTitle}>Tell Us About Your Style</Text>
               {/* Hidden text to stabilize tests during transitions */}
-              <Text style={{ height: 0, width: 0, opacity: 0 }}>What's Your Style?</Text>
+              <Text style={styles.hiddenText}>{"What's Your Style?"}</Text>
               <View style={styles.progressIndicator}>
                 {steps.map((step, index) => (
                   <View key={step} style={styles.progressStep}>
-                    <View style={[
-                      styles.progressDot,
-                      index <= currentStep && styles.progressDotActive
-                    ]} />
-                    <Text style={[
-                      styles.progressLabel,
-                      index === currentStep && styles.progressLabelActive
-                    ]}>
+                    <View
+                      style={[styles.progressDot, index <= currentStep && styles.progressDotActive]}
+                    />
+                    <Text
+                      style={[
+                        styles.progressLabel,
+                        index === currentStep && styles.progressLabelActive,
+                      ]}
+                    >
                       {step}
                     </Text>
                   </View>
@@ -326,7 +359,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
             {renderCurrentStep()}
 
             {/* Navigation */}
-            <Animated.View 
+            <Animated.View
               entering={FadeInDown.delay(800).duration(600)}
               style={styles.navigationSection}
             >
@@ -334,7 +367,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
                 <Pressable
                   style={({ pressed }: { pressed: boolean }) => [
                     styles.skipButton,
-                    pressed && styles.skipButtonPressed
+                    pressed && styles.skipButtonPressed,
                   ]}
                   onPress={onSkip}
                 >
@@ -346,7 +379,7 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
                     <Pressable
                       style={({ pressed }: { pressed: boolean }) => [
                         styles.backButton,
-                        pressed && styles.backButtonPressed
+                        pressed && styles.backButtonPressed,
                       ]}
                       onPress={handleBack}
                     >
@@ -358,23 +391,25 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
                     style={({ pressed }: { pressed: boolean }) => [
                       styles.continueButton,
                       !canProceed() && styles.continueButtonDisabled,
-                      pressed && styles.continueButtonPressed
+                      pressed && styles.continueButtonPressed,
                     ]}
                     onPress={handleNext}
                     disabled={!canProceed()}
                   >
                     <LinearGradient
                       colors={
-                        canProceed() 
+                        canProceed()
                           ? [DesignSystem.colors.sage[400], DesignSystem.colors.sage[600]]
                           : [DesignSystem.colors.neutral[300], DesignSystem.colors.neutral[400]]
                       }
                       style={styles.continueButtonGradient}
                     >
-                      <Text style={[
-                        styles.continueButtonText,
-                        !canProceed() && styles.continueButtonTextDisabled
-                      ]}>
+                      <Text
+                        style={[
+                          styles.continueButtonText,
+                          !canProceed() && styles.continueButtonTextDisabled,
+                        ]}
+                      >
                         {currentStep === steps.length - 1 ? 'Complete' : 'Next'}
                       </Text>
                     </LinearGradient>
@@ -389,7 +424,16 @@ export default function StylePreferenceQuestionnaire({ onNext, onSkip }: StylePr
   );
 }
 
-const styles = StyleSheet.create({
+// Safe StyleSheet create for testing
+const createStyles = (styles: Record<string, any>) => {
+  try {
+    return StyleSheet.create(styles);
+  } catch {
+    return styles;
+  }
+};
+
+const styles = createStyles({
   container: {
     flex: 1,
   },
@@ -462,7 +506,7 @@ const styles = StyleSheet.create({
   },
   optionCard: {
     borderRadius: DesignSystem.borderRadius.lg,
-  ...DesignSystem.elevation.soft,
+    ...DesignSystem.elevation.soft,
   },
   optionCardSelected: {
     ...DesignSystem.elevation.md,
@@ -494,7 +538,7 @@ const styles = StyleSheet.create({
   },
   colorOptionCard: {
     borderRadius: DesignSystem.borderRadius.lg,
-  ...DesignSystem.elevation.soft,
+    ...DesignSystem.elevation.soft,
   },
   colorOptionCardSelected: {
     ...DesignSystem.elevation.md,
@@ -527,7 +571,7 @@ const styles = StyleSheet.create({
   },
   confidenceNoteCard: {
     borderRadius: DesignSystem.borderRadius.lg,
-  ...DesignSystem.elevation.soft,
+    ...DesignSystem.elevation.soft,
   },
   confidenceNoteCardSelected: {
     ...DesignSystem.elevation.md,
@@ -611,5 +655,10 @@ const styles = StyleSheet.create({
   },
   continueButtonTextDisabled: {
     color: DesignSystem.colors.neutral[600],
+  },
+  hiddenText: {
+    height: 0,
+    width: 0,
+    opacity: 0,
   },
 });

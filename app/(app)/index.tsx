@@ -1,153 +1,475 @@
-﻿import React, { useState, useMemo } from "react";
-import { View, Text, TextInput, Image, Pressable, ScrollView, ActivityIndicator, Alert } from "react-native";
-import { createClient } from "@supabase/supabase-js";
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import React, { memo, useCallback, useMemo } from 'react';
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
-const FN_URL = "https://sntlqqerajehwgmjbkgw.functions.supabase.co/ai-analysis";
+import { AynamodaColors } from '@/theme/AynamodaColors';
+import { DesignSystem } from '@/theme/DesignSystem';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
+import { PremiumBrandShowcase } from '../../src/components/premium';
+import { ProductCardShowcase } from '../../src/components/product';
+import {
+  getResponsivePadding,
+  isTablet,
+  responsiveFontSize,
+  responsiveSpacing,
+} from '../../src/utils/responsiveUtils';
 
-export default function AnalyzeDemoScreen() {
-  // Pre-fill with a known example ID and the test image in storage (user can change).
-  const [itemId, setItemId] = useState<string>("8d6c7e3e-9b82-4da7-9827-accfb4365e7f");
-  const [imageUrl, setImageUrl] = useState<string>(
-    `${SUPABASE_URL}/storage/v1/object/public/wardrobe/test.png`
+const { width: screenWidth } = Dimensions.get('window');
+
+const HomeScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
+
+  // Memoized product data for better performance
+  const FEATURED_PRODUCTS = useMemo(
+    () => [
+      {
+        id: 1,
+        name: 'ARUOM',
+        subtitle: 'Elegant Dress',
+        price: '$89',
+        image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=300&h=400&fit=crop',
+        color: AynamodaColors.primary[400],
+        category: 'POPULER',
+      },
+      {
+        id: 2,
+        name: 'FIRED',
+        subtitle: 'Casual Coat',
+        price: '$120',
+        image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=400&fit=crop',
+        color: AynamodaColors.neutral[700],
+        category: 'POPULER',
+      },
+      {
+        id: 3,
+        name: 'AYNAMODA',
+        subtitle: 'Premium Set',
+        price: '$159',
+        image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=300&h=400&fit=crop',
+        color: AynamodaColors.secondary[400],
+        category: 'POPULER',
+      },
+      {
+        id: 4,
+        name: 'MORS',
+        subtitle: 'Stylish Outfit',
+        price: '$95',
+        image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=300&h=400&fit=crop',
+        color: AynamodaColors.primary[600],
+        category: 'POPULER',
+      },
+    ],
+    [],
   );
 
-  const [loading, setLoading] = useState(false);
-  const [cloudUrl, setCloudUrl] = useState<string | null>(null);
-  const [analysis, setAnalysis] = useState<null | {
-    mainCategory?: string;
-    subCategory?: string;
-    dominantColors?: string[];
-    detectedTags?: string[];
-  }>(null);
+  // Optimized product card renderer
+  const renderProductCard = useCallback(
+    (product: (typeof FEATURED_PRODUCTS)[0], index: number): React.ReactElement => {
+      const cardRotation = index === 0 ? 0 : index === 1 ? -3 : index === 2 ? 2 : -1;
+      const cardScale = 1 - index * 0.05;
+      const cardTranslateY = index * 15;
+      const cardOpacity = 1 - index * 0.1;
 
-  const shownImage = useMemo(() => cloudUrl ?? imageUrl, [cloudUrl, imageUrl]);
+      return (
+        <Animated.View
+          key={product.id}
+          entering={FadeInUp.delay(index * 150).springify()}
+          style={[
+            styles.productCard,
+            {
+              transform: [
+                { rotate: `${cardRotation}deg` },
+                { scale: cardScale },
+                { translateY: cardTranslateY },
+              ],
+              opacity: cardOpacity,
+              zIndex: FEATURED_PRODUCTS.length - index,
+            },
+          ]}
+        >
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() => router.push('/(app)/ayna-mirror')}
+            style={styles.cardTouchable}
+          >
+            <BlurView intensity={20} style={styles.cardBlur}>
+              <LinearGradient
+                colors={[AynamodaColors.background.elevated, AynamodaColors.background.secondary]}
+                style={styles.cardGradient}
+              >
+                {/* Category Badge */}
+                <View style={styles.categoryBadge}>
+                  <Text style={styles.categoryText}>{product.category}</Text>
+                </View>
 
-  const runAnalysis = async () => {
-    try {
-      setLoading(true);
-      setAnalysis(null);
+                {/* Product Image */}
+                <View style={styles.imageContainer}>
+                  <View style={[styles.imagePlaceholder, { backgroundColor: product.color }]}>
+                    <Ionicons name="shirt-outline" size={40} color={AynamodaColors.text.inverse} />
+                  </View>
+                </View>
 
-      // 1) Get session token
-      const { data: sess, error: sessErr } = await supabase.auth.getSession();
-      if (sessErr) throw new Error(`Session error: ${sessErr.message}`);
-      const token = sess.session?.access_token;
-      if (!token) throw new Error("No access token (are you logged in?)");
+                {/* Product Info */}
+                <View style={styles.productInfo}>
+                  <Text style={styles.productName}>{product.name}</Text>
+                  <Text style={styles.productSubtitle}>{product.subtitle}</Text>
 
-      // 2) Call Edge Function
-      const res = await fetch(FN_URL, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          apikey: SUPABASE_ANON,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ imageUrl, itemId }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json?.message || "Function error");
-
-      const newCloud = json?.cloudinary?.url ?? null;
-      const newAnalysis = json?.analysis ?? null;
-
-      setCloudUrl(newCloud);
-      setAnalysis(newAnalysis);
-
-      // 3) PATCH DB row
-      const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/wardrobe_items?id=eq.${encodeURIComponent(itemId)}`, {
-        method: "PATCH",
-        headers: {
-          apikey: SUPABASE_ANON,
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            Prefer: "return=minimal",
-        },
-        body: JSON.stringify({
-          processed_image_uri: newCloud ?? imageUrl,
-          ai_analysis_data: newAnalysis,
-        }),
-      });
-
-      if (!patchRes.ok) {
-        const txt = await patchRes.text();
-        console.warn("PATCH warning:", txt);
-      }
-
-      Alert.alert("Done", "Analysis complete ✅");
-    } catch (e: any) {
-      console.error(e);
-      Alert.alert("Error", e?.message ?? "Analyze failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+                  {/* Price */}
+                  <View style={styles.priceContainer}>
+                    <Text style={styles.price}>{product.price}</Text>
+                    <TouchableOpacity style={styles.favoriteButton}>
+                      <Ionicons name="heart-outline" size={16} color={AynamodaColors.text.accent} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </LinearGradient>
+            </BlurView>
+          </TouchableOpacity>
+        </Animated.View>
+      );
+    },
+    [router],
+  );
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, gap: 16, backgroundColor: "white", minHeight: "100%" }}>
-      <Text style={{ fontSize: 22, fontWeight: "700" }}>Analyze Demo</Text>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <LinearGradient colors={AynamodaColors.gradients.cream} style={styles.gradient}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <Animated.View entering={FadeInDown.springify()} style={styles.header}>
+            <View style={styles.headerTop}>
+              <TouchableOpacity style={styles.menuButton}>
+                <Ionicons name="menu" size={24} color={AynamodaColors.text.primary} />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.searchButton}>
+                <Ionicons name="search" size={24} color={AynamodaColors.text.primary} />
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
 
-      <View style={{ gap: 8 }}>
-        <Text style={{ fontWeight: "600" }}>Item ID</Text>
-        <TextInput
-          value={itemId}
-          onChangeText={setItemId}
-          placeholder="wardrobe_items.id"
-          style={{ borderWidth: 1, borderColor: "#ccc", padding: 10, borderRadius: 10 }}
-          autoCapitalize="none"
-        />
-      </View>
+          {/* Central Diamond Logo */}
+          <Animated.View
+            entering={FadeInUp.delay(200).springify()}
+            style={styles.centralDiamondContainer}
+          >
+            <LinearGradient colors={AynamodaColors.gradients.primary} style={styles.centralDiamond}>
+              <Ionicons name="diamond" size={40} color={AynamodaColors.text.inverse} />
+            </LinearGradient>
+            <Text style={styles.logoText}>AYNAMODA</Text>
+          </Animated.View>
 
-      <View style={{ gap: 8 }}>
-        <Text style={{ fontWeight: "600" }}>Image URL</Text>
-        <TextInput
-          value={imageUrl}
-          onChangeText={setImageUrl}
-          placeholder="https://.../your-image.png"
-          style={{ borderWidth: 1, borderColor: "#ccc", padding: 10, borderRadius: 10 }}
-          autoCapitalize="none"
-        />
-      </View>
-
-      <Pressable
-        onPress={runAnalysis}
-        disabled={loading || !itemId || !imageUrl}
-        style={{
-          backgroundColor: "#2563eb",
-          padding: 14,
-          borderRadius: 12,
-          alignItems: "center",
-          opacity: loading || !itemId || !imageUrl ? 0.6 : 1,
-        }}
-      >
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: "white", fontWeight: "700" }}>Analiz Et</Text>}
-      </Pressable>
-
-      <View style={{ gap: 8 }}>
-        <Text style={{ fontWeight: "600" }}>Preview</Text>
-        <Image
-          source={{ uri: shownImage }}
-          style={{ width: "100%", height: 260, borderRadius: 12, backgroundColor: "#eee" }}
-          resizeMode="cover"
-        />
-      </View>
-
-      {analysis && (
-        <View style={{ gap: 6 }}>
-          <Text style={{ fontWeight: "700", fontSize: 16 }}>Analysis</Text>
-          <Text>Main: {analysis.mainCategory ?? "-"}</Text>
-          <Text>Sub: {analysis.subCategory ?? "-"}</Text>
-          <Text>Tags: {analysis.detectedTags?.join(", ") ?? "-"}</Text>
-          <View style={{ flexDirection: "row", gap: 8, marginTop: 6 }}>
-            {(analysis.dominantColors ?? []).map((c) => (
-              <View key={c} style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: c, borderWidth: 1, borderColor: "#ccc" }} />
-            ))}
+          {/* Stacked Product Cards */}
+          <View style={styles.stackedCardsContainer}>
+            {FEATURED_PRODUCTS.map((product, index) => renderProductCard(product, index))}
           </View>
-        </View>
-      )}
-    </ScrollView>
-  );
-}
 
+          {/* Premium Brand Showcase */}
+          <Animated.View entering={FadeInUp.delay(300).springify()} style={styles.premiumSection}>
+            <Text style={styles.sectionTitle}>Premium Koleksiyonlar</Text>
+            <PremiumBrandShowcase />
+          </Animated.View>
+
+          {/* Product Showcase */}
+          <Animated.View
+            entering={FadeInUp.delay(400).springify()}
+            style={styles.productShowcaseSection}
+          >
+            <ProductCardShowcase
+              title="Öne Çıkan Ürünler"
+              subtitle="En beğenilen parçalar"
+              variant="standard"
+              size="medium"
+              layout="grid"
+              numColumns={2}
+              showFilters={false}
+              showSort={false}
+            />
+          </Animated.View>
+
+          {/* Quick Actions */}
+          <Animated.View entering={FadeInUp.delay(400).springify()} style={styles.quickActions}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => router.push('/(app)/ayna-mirror')}
+            >
+              <LinearGradient
+                colors={AynamodaColors.gradients.primary}
+                style={styles.actionGradient}
+              >
+                <Ionicons name="camera" size={24} color={AynamodaColors.text.inverse} />
+                <Text style={styles.actionText}>AI Ayna</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => router.push('/(app)/wardrobe')}
+            >
+              <LinearGradient
+                colors={AynamodaColors.gradients.secondary}
+                style={styles.actionGradient}
+              >
+                <Ionicons name="shirt" size={24} color={AynamodaColors.text.primary} />
+                <Text style={[styles.actionText, { color: AynamodaColors.text.primary }]}>
+                  Gardırop
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Animated.View>
+        </ScrollView>
+      </LinearGradient>
+    </View>
+  );
+};
+
+const createResponsiveStyles = () => {
+  const padding = getResponsivePadding();
+  const isTabletDevice = isTablet();
+
+  return StyleSheet.create({
+    container: {
+      backgroundColor: AynamodaColors.background.primary,
+      flex: 1,
+    },
+    gradient: {
+      flex: 1,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      paddingBottom: responsiveSpacing(DesignSystem.spacing.xxxl + DesignSystem.spacing.xl),
+      paddingHorizontal: isTabletDevice ? padding.horizontal * 1.5 : DesignSystem.spacing.lg,
+    },
+
+    // Header Styles
+    header: {
+      paddingBottom: DesignSystem.spacing.lg,
+      paddingTop: DesignSystem.spacing.lg,
+    },
+    headerTop: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: DesignSystem.spacing.md,
+      width: '100%',
+    },
+    menuButton: {
+      backgroundColor: AynamodaColors.background.elevated,
+      borderRadius: DesignSystem.borderRadius.md,
+      elevation: 3,
+      padding: DesignSystem.spacing.md,
+      shadowColor: AynamodaColors.shadow.light,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+    },
+    searchButton: {
+      backgroundColor: AynamodaColors.background.elevated,
+      borderRadius: DesignSystem.borderRadius.md,
+      elevation: 3,
+      padding: DesignSystem.spacing.md,
+      shadowColor: AynamodaColors.shadow.light,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+    },
+    // Central Diamond Logo
+    centralDiamondContainer: {
+      alignItems: 'center',
+      marginVertical: DesignSystem.spacing.xxl,
+      zIndex: 10,
+    },
+    centralDiamond: {
+      alignItems: 'center',
+      borderRadius: 50,
+      elevation: 12,
+      height: 100,
+      justifyContent: 'center',
+      marginBottom: DesignSystem.spacing.md,
+      shadowColor: AynamodaColors.shadow.colored,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.3,
+      shadowRadius: 20,
+      width: 100,
+    },
+    logoText: {
+      color: AynamodaColors.text.primary,
+      fontSize: responsiveFontSize(28),
+      fontWeight: '300',
+      letterSpacing: isTabletDevice ? 6 : 4,
+      textAlign: 'center',
+    },
+
+    // Stacked Cards Container
+    stackedCardsContainer: {
+      alignItems: 'center',
+      height: 380,
+      justifyContent: 'center',
+      marginBottom: 40,
+      paddingHorizontal: 20,
+      position: 'relative',
+    },
+    productCard: {
+      alignSelf: 'center',
+      position: 'absolute',
+      width: screenWidth * 0.75,
+    },
+    cardTouchable: {
+      borderRadius: 20,
+      overflow: 'hidden',
+    },
+    cardBlur: {
+      borderRadius: 20,
+      overflow: 'hidden',
+    },
+    cardGradient: {
+      borderColor: AynamodaColors.border.primary,
+      borderRadius: 24,
+      borderWidth: 1,
+      elevation: 10,
+      minHeight: 320,
+      padding: 20,
+      shadowColor: AynamodaColors.shadow.medium,
+      shadowOffset: { width: 0, height: 12 },
+      shadowOpacity: 0.2,
+      shadowRadius: 20,
+    },
+
+    // Category Badge
+    categoryBadge: {
+      backgroundColor: AynamodaColors.primary[500],
+      borderRadius: 8,
+      left: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      position: 'absolute',
+      top: 12,
+      zIndex: 1,
+    },
+    categoryText: {
+      color: AynamodaColors.text.inverse,
+      fontSize: 10,
+      fontWeight: '600',
+      letterSpacing: 0.5,
+    },
+
+    // Product Image
+    imageContainer: {
+      alignItems: 'center',
+      marginBottom: 20,
+      marginTop: 30,
+    },
+    imagePlaceholder: {
+      alignItems: 'center',
+      borderRadius: 16,
+      elevation: 6,
+      height: 140,
+      justifyContent: 'center',
+      shadowColor: AynamodaColors.shadow.light,
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      width: 120,
+    },
+
+    // Product Info
+    productInfo: {
+      flex: 1,
+      justifyContent: 'flex-end',
+    },
+    productName: {
+      color: AynamodaColors.text.primary,
+      fontSize: 22,
+      fontWeight: '700',
+      letterSpacing: 1,
+      marginBottom: 6,
+      textAlign: 'center',
+    },
+    productSubtitle: {
+      color: AynamodaColors.text.tertiary,
+      fontSize: 14,
+      marginBottom: 16,
+      textAlign: 'center',
+    },
+    priceContainer: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    price: {
+      color: AynamodaColors.text.accent,
+      fontSize: 20,
+      fontWeight: '800',
+    },
+    favoriteButton: {
+      backgroundColor: AynamodaColors.background.elevated,
+      borderRadius: 8,
+      padding: 8,
+    },
+
+    // Premium Section
+    premiumSection: {
+      marginVertical: DesignSystem.spacing.xl,
+      paddingHorizontal: DesignSystem.spacing.sm,
+    },
+    sectionTitle: {
+      color: AynamodaColors.text.primary,
+      fontFamily: DesignSystem.typography.fonts.body,
+      fontSize: responsiveFontSize(24),
+      fontWeight: '700',
+      marginBottom: DesignSystem.spacing.lg,
+      textAlign: 'center',
+    },
+
+    // Product Showcase Section
+    productShowcaseSection: {
+      marginVertical: DesignSystem.spacing.xl,
+      paddingHorizontal: DesignSystem.spacing.sm,
+    },
+
+    // Quick Actions
+    quickActions: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 20,
+      paddingHorizontal: 10,
+    },
+    actionButton: {
+      borderRadius: 16,
+      elevation: 6,
+      flex: 1,
+      marginHorizontal: 8,
+      overflow: 'hidden',
+      shadowColor: AynamodaColors.shadow.medium,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 1,
+      shadowRadius: 12,
+    },
+    actionGradient: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+    },
+    actionText: {
+      color: AynamodaColors.text.inverse,
+      fontFamily: DesignSystem.typography.fonts.body,
+      fontSize: responsiveFontSize(16),
+      fontWeight: '600',
+      marginLeft: responsiveSpacing(8),
+    },
+  });
+};
+
+// Create responsive styles
+const styles = createResponsiveStyles();
+
+export default memo(HomeScreen);

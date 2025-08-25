@@ -1,8 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
-import { OutfitRecommendation } from '@/types/aynaMirror';
+import { StyleSheet, Text, View } from 'react-native';
+// AYNAMODA Color Palette
+const COLORS = {
+  primary: '#8B6F47',
+  secondary: '#B8A082',
+  background: '#F5F1E8',
+  surface: '#FFFFFF',
+  text: '#2C2C2C',
+  textLight: '#B8A082',
+  border: '#E8DCC6',
+  accent: '#D4AF37',
+};
 import { QuickActionButton } from '@/components/aynaMirror/QuickActionButton';
+import { OutfitRecommendation } from '@/types/aynaMirror';
+import { IoniconsName } from '@/types/icons';
 
 interface QuickActionsSectionProps {
   selectedRecommendation: OutfitRecommendation | null;
@@ -19,22 +30,20 @@ export const QuickActionsSection: React.FC<QuickActionsSectionProps> = ({
 
   return (
     <View style={styles.quickActionsContainer}>
-      <Text style={styles.quickActionsTitle}>
-        Quick Actions
-      </Text>
+      <Text style={styles.quickActionsTitle}>Quick Actions</Text>
       <View style={styles.quickActions}>
         <QuickActionButton
-          action={{ type: 'wear', label: 'Wear This', icon: 'checkmark-circle' } as any}
+          action={{ type: 'wear', label: 'Wear This', icon: 'checkmark-circle' as IoniconsName }}
           onPress={() => onQuickAction('wear', selectedRecommendation)}
           variant="primary"
         />
         <QuickActionButton
-          action={{ type: 'save', label: 'Save for Later', icon: 'bookmark' } as any}
+          action={{ type: 'save', label: 'Save for Later', icon: 'bookmark' as IoniconsName }}
           onPress={() => onQuickAction('save', selectedRecommendation)}
           variant="secondary"
         />
         <QuickActionButton
-          action={{ type: 'share', label: 'Share', icon: 'share' } as any}
+          action={{ type: 'share', label: 'Share', icon: 'share' as IoniconsName }}
           onPress={() => onQuickAction('share', selectedRecommendation)}
           variant="accent"
         />
@@ -44,18 +53,20 @@ export const QuickActionsSection: React.FC<QuickActionsSectionProps> = ({
 };
 
 const styles = StyleSheet.create({
-  quickActionsContainer: {
-    marginTop: DesignSystem.spacing.xl,
-  },
-  quickActionsTitle: {
-    ...DesignSystem.typography.heading.h3,
-    color: DesignSystem.colors.inkGray[700],
-    marginBottom: DesignSystem.spacing.lg,
-    textAlign: 'center',
-  },
   quickActions: {
     flexDirection: 'row',
+    gap: 12,
     justifyContent: 'space-around',
-    gap: DesignSystem.spacing.md,
+  },
+  quickActionsContainer: {
+    marginTop: 24,
+  },
+  quickActionsTitle: {
+    color: COLORS.text,
+    fontFamily: 'Inter',
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 20,
+    textAlign: 'center',
   },
 });

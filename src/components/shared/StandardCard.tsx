@@ -1,25 +1,19 @@
 /**
  * Standardized Card Component
- * 
+ *
  * A reusable card component that follows AYNAMODA's design system
  * and implements the standardized CardComponentProps interface.
  */
 
-import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
-import { CardComponentProps, DEFAULT_PROPS } from '@/types/componentProps';
+import React from 'react';
+import { StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+import { CardComponentProps, DEFAULT_PROPS } from '@/types/componentProps';
 
 export interface StandardCardProps extends Omit<CardComponentProps, 'children'> {
   /** Card header content */
@@ -96,8 +90,10 @@ const StandardCard: React.FC<StandardCardProps> = ({
   ...props
 }) => {
   const handlePress = () => {
-    if (disabled || loading || !onPress) return;
-    
+    if (disabled || loading || !onPress) {
+      return;
+    }
+
     // Provide haptic feedback
     if (hapticFeedback !== 'none') {
       switch (hapticFeedback) {
@@ -112,7 +108,7 @@ const StandardCard: React.FC<StandardCardProps> = ({
           break;
       }
     }
-    
+
     onPress();
   };
 
@@ -122,7 +118,7 @@ const StandardCard: React.FC<StandardCardProps> = ({
       ...styles[`card_${size}`],
       ...(bordered && styles.bordered),
       ...(disabled && styles.disabled),
-  ...(DesignSystem.elevation as any)[elevation],
+      ...(DesignSystem.elevation[elevation as keyof typeof DesignSystem.elevation] || {}),
     };
 
     switch (variant) {
@@ -144,7 +140,9 @@ const StandardCard: React.FC<StandardCardProps> = ({
   };
 
   const renderHeader = () => {
-    if (!header && !title && !subtitle && !leftIcon && !rightIcon) return null;
+    if (!header && !title && !subtitle && !leftIcon && !rightIcon) {
+      return null;
+    }
 
     return (
       <View style={[styles.header, headerStyle]}>
@@ -157,21 +155,41 @@ const StandardCard: React.FC<StandardCardProps> = ({
               style={styles.leftIcon}
             />
           )}
-          
+
           <View style={styles.headerText}>
             {title && (
-              <Text style={[styles.title, (styles as any)[`title_${size}`], titleStyle]}>
+              <Text
+                style={[
+                  styles.title,
+                  size === 'small'
+                    ? styles.title_small
+                    : size === 'medium'
+                      ? styles.title_medium
+                      : styles.title_large,
+                  titleStyle,
+                ]}
+              >
                 {title}
               </Text>
             )}
             {subtitle && (
-              <Text style={[styles.subtitle, (styles as any)[`subtitle_${size}`], subtitleStyle]}>
+              <Text
+                style={[
+                  styles.subtitle,
+                  size === 'small'
+                    ? styles.subtitle_small
+                    : size === 'medium'
+                      ? styles.subtitle_medium
+                      : styles.subtitle_large,
+                  subtitleStyle,
+                ]}
+              >
                 {subtitle}
               </Text>
             )}
           </View>
         </View>
-        
+
         {rightIcon && (
           <TouchableOpacity
             onPress={onRightIconPress}
@@ -185,19 +203,27 @@ const StandardCard: React.FC<StandardCardProps> = ({
             />
           </TouchableOpacity>
         )}
-        
+
         {header}
       </View>
     );
   };
 
   const renderBody = () => {
-    if (!children && !description) return null;
+    if (!children && !description) {
+      return null;
+    }
 
     return (
       <View style={[styles.body, bodyStyle]}>
         {description && (
-          <Text style={[styles.description, (styles as any)[`description_${size}`], descriptionStyle]}>
+          <Text
+            style={[
+              styles.description,
+              styles[`description_${size}` as keyof typeof styles] as TextStyle,
+              descriptionStyle,
+            ]}
+          >
             {description}
           </Text>
         )}
@@ -207,22 +233,20 @@ const StandardCard: React.FC<StandardCardProps> = ({
   };
 
   const renderFooter = () => {
-    if (!footer) return null;
+    if (!footer) {
+      return null;
+    }
 
-    return (
-      <View style={[styles.footer, footerStyle]}>
-        {footer}
-      </View>
-    );
+    return <View style={[styles.footer, footerStyle]}>{footer}</View>;
   };
 
   const cardStyle = [getCardStyles(), style];
   const shouldUseGradient = variant === 'luxury' || gradientColors;
   const shouldUseBlur = variant === 'glass';
-  const finalGradientColors = (gradientColors || [
+  const finalGradientColors = gradientColors || [
     DesignSystem.colors.sage[500],
     DesignSystem.colors.sage[600],
-  ]) as readonly [string, string, ...string[]];
+  ];
 
   const cardContent = (
     <>
@@ -241,7 +265,7 @@ const StandardCard: React.FC<StandardCardProps> = ({
         style={cardStyle}
         testID={testID}
         accessibilityLabel={accessibilityLabel || title}
-        accessibilityRole={onPress ? "button" : undefined}
+        accessibilityRole={onPress ? 'button' : undefined}
         accessibilityState={{ disabled: disabled || loading }}
         {...props}
       >
@@ -261,14 +285,11 @@ const StandardCard: React.FC<StandardCardProps> = ({
         style={cardStyle}
         testID={testID}
         accessibilityLabel={accessibilityLabel || title}
-        accessibilityRole={onPress ? "button" : undefined}
+        accessibilityRole={onPress ? 'button' : undefined}
         accessibilityState={{ disabled: disabled || loading }}
         {...props}
       >
-        <LinearGradient
-          colors={finalGradientColors}
-          style={styles.gradientContainer}
-        >
+        <LinearGradient colors={finalGradientColors} style={styles.gradientContainer}>
           {cardContent}
         </LinearGradient>
       </CardWrapper>
@@ -305,58 +326,80 @@ const StandardCard: React.FC<StandardCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  blurContainer: {
+    borderRadius: DesignSystem.radius.lg,
+    flex: 1,
+  },
+  body: {
+    flex: 1,
+  },
+  bordered: {
+    borderColor: DesignSystem.colors.border.primary,
+    borderWidth: 1,
+  },
   card: {
     borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
   },
-  card_small: {
-    padding: DesignSystem.spacing.sm,
+  card_large: {
+    padding: DesignSystem.spacing.lg,
   },
   card_medium: {
     padding: DesignSystem.spacing.md,
   },
-  card_large: {
-    padding: DesignSystem.spacing.lg,
-  },
-  bordered: {
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
-  },
-  disabled: {
-    opacity: 0.6,
+  card_small: {
+    padding: DesignSystem.spacing.sm,
   },
   default: {
     backgroundColor: DesignSystem.colors.background.primary,
   },
-  primary: {
-    backgroundColor: DesignSystem.colors.sage[500],
+  description: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
+    lineHeight: 20,
   },
-  secondary: {
-    backgroundColor: DesignSystem.colors.background.secondary,
+  description_large: {
+    ...DesignSystem.typography.body.large,
+    lineHeight: 24,
+  },
+  description_medium: {
+    ...DesignSystem.typography.body.medium,
+    lineHeight: 20,
+  },
+  description_small: {
+    ...DesignSystem.typography.body.small,
+    lineHeight: 18,
+  },
+  disabled: {
+    opacity: 0.6,
+  },
+  footer: {
+    borderTopColor: DesignSystem.colors.border.secondary,
+    borderTopWidth: 1,
+    marginTop: DesignSystem.spacing.md,
+    paddingTop: DesignSystem.spacing.sm,
   },
   ghost: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
     borderColor: DesignSystem.colors.border.primary,
+    borderWidth: 1,
   },
   glass: {
     backgroundColor: 'transparent',
   },
-  luxury: {
-    backgroundColor: 'transparent',
-  },
-  minimal: {
-    backgroundColor: 'transparent',
+  gradientContainer: {
+    borderRadius: DesignSystem.radius.lg,
+    flex: 1,
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: DesignSystem.spacing.sm,
   },
   headerLeft: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     flex: 1,
   },
   headerText: {
@@ -365,70 +408,48 @@ const styles = StyleSheet.create({
   leftIcon: {
     marginRight: DesignSystem.spacing.sm,
   },
+  luxury: {
+    backgroundColor: 'transparent',
+  },
+  minimal: {
+    backgroundColor: 'transparent',
+  },
+  primary: {
+    backgroundColor: DesignSystem.colors.sage[500],
+  },
   rightIconContainer: {
     padding: DesignSystem.spacing.xs,
   },
-  title: {
-    ...DesignSystem.typography.heading.h4,
-    color: DesignSystem.colors.text.primary,
-    fontWeight: '600',
-  },
-  title_small: {
-    ...DesignSystem.typography.heading.h5,
-  },
-  title_medium: {
-    ...DesignSystem.typography.heading.h4,
-  },
-  title_large: {
-    ...DesignSystem.typography.heading.h3,
+  secondary: {
+    backgroundColor: DesignSystem.colors.background.secondary,
   },
   subtitle: {
     ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.secondary,
     marginTop: DesignSystem.spacing.xs,
   },
-  subtitle_small: {
-    ...DesignSystem.typography.scale.caption,
+  subtitle_large: {
+    ...DesignSystem.typography.body.medium,
   },
   subtitle_medium: {
     ...DesignSystem.typography.body.small,
   },
-  subtitle_large: {
-    ...DesignSystem.typography.body.medium,
+  subtitle_small: {
+    ...DesignSystem.typography.scale.caption,
   },
-  body: {
-    flex: 1,
-  },
-  description: {
-    ...DesignSystem.typography.body.medium,
+  title: {
+    ...DesignSystem.typography.heading.h4,
     color: DesignSystem.colors.text.primary,
-    lineHeight: 20,
+    fontWeight: '600',
   },
-  description_small: {
-    ...DesignSystem.typography.body.small,
-    lineHeight: 18,
+  title_large: {
+    ...DesignSystem.typography.heading.h3,
   },
-  description_medium: {
-    ...DesignSystem.typography.body.medium,
-    lineHeight: 20,
+  title_medium: {
+    ...DesignSystem.typography.heading.h4,
   },
-  description_large: {
-    ...DesignSystem.typography.body.large,
-    lineHeight: 24,
-  },
-  footer: {
-    marginTop: DesignSystem.spacing.md,
-    paddingTop: DesignSystem.spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: DesignSystem.colors.border.secondary,
-  },
-  blurContainer: {
-    flex: 1,
-    borderRadius: DesignSystem.radius.lg,
-  },
-  gradientContainer: {
-    flex: 1,
-    borderRadius: DesignSystem.radius.lg,
+  title_small: {
+    ...DesignSystem.typography.heading.h5,
   },
 });
 

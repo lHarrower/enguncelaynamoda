@@ -1,27 +1,27 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  StyleSheet,
-  Modal,
-  Alert,
-  Switch,
-  FlatList,
-  Dimensions,
-  SafeAreaView,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/theme/DesignSystem';
-import { WardrobeItem, ItemCategory } from '@/types/aynaMirror';
-import { WardrobeItemCard } from '@/components/sanctuary/WardrobeItemCard';
-import { WardrobeItemForm } from '@/components/wardrobe/WardrobeItemForm';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  Alert,
+  FlatList,
+  Modal,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
 import { AINameGenerator } from '@/components/naming/AINameGenerator';
 import { NamingPreferences } from '@/components/naming/NamingPreferences';
+import { WardrobeItemCard } from '@/components/sanctuary/WardrobeItemCard';
+import { WardrobeItemForm } from '@/components/wardrobe/WardrobeItemForm';
 import { useAINaming } from '@/hooks/useAINaming';
 import { enhancedWardrobeService } from '@/services/enhancedWardrobeService';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { ItemCategory, WardrobeItem } from '@/types/aynaMirror';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface FilterOptions {
   category: ItemCategory | 'all';
@@ -44,7 +44,7 @@ const CATEGORIES: (ItemCategory | 'all')[] = [
   'shoes',
   'accessories',
   'outerwear',
-  'activewear'
+  'activewear',
 ];
 
 export const WardrobeScreen: React.FC = () => {
@@ -63,24 +63,24 @@ export const WardrobeScreen: React.FC = () => {
   const [showSortPicker, setShowSortPicker] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isGenerating, setIsGenerating] = useState(false);
-  
+
   const [filters, setFilters] = useState<FilterOptions>({
     category: 'all',
     colors: [],
     brands: [],
     hasAIName: null,
-    searchQuery: ''
+    searchQuery: '',
   });
-  
+
   const [sortOptions, setSortOptions] = useState<SortOptions>({
     field: 'name',
-    direction: 'asc'
+    direction: 'asc',
   });
-  
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
-    severity: 'info' as 'error' | 'warning' | 'info' | 'success'
+    severity: 'info' as 'error' | 'warning' | 'info' | 'success',
   });
 
   const { generateNameForItem } = useAINaming();
@@ -89,13 +89,13 @@ export const WardrobeScreen: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-  // Use enhanced service method to load user wardrobe; fallback to empty for unauthenticated
-  const userId = 'local-user';
-  const wardrobeItems = await enhancedWardrobeService.getUserWardrobe(userId);
+      // Use enhanced service method to load user wardrobe; fallback to empty for unauthenticated
+      const userId = 'local-user';
+      const wardrobeItems = await enhancedWardrobeService.getUserWardrobe(userId);
       setItems(wardrobeItems);
     } catch (err) {
       setError('Failed to load wardrobe items');
-      console.error('Error loading items:', err);
+      errorInDev('Error loading items:', err);
     } finally {
       setLoading(false);
     }
@@ -106,12 +106,12 @@ export const WardrobeScreen: React.FC = () => {
   }, [loadItems]);
 
   const filteredAndSortedItems = React.useMemo(() => {
-    const filtered = items.filter(item => {
+    const filtered = items.filter((item) => {
       // Category filter
       if (filters.category !== 'all' && item.category !== filters.category) {
         return false;
       }
-      
+
       // Search query filter
       if (filters.searchQuery) {
         const query = filters.searchQuery.toLowerCase();
@@ -120,43 +120,47 @@ export const WardrobeScreen: React.FC = () => {
           item.brand,
           item.category,
           ...(item.colors || []),
-          ...(item.tags || [])
-        ].join(' ').toLowerCase();
-        
+          ...(item.tags || []),
+        ]
+          .join(' ')
+          .toLowerCase();
+
         if (!searchableText.includes(query)) {
           return false;
         }
       }
-      
+
       // Colors filter
       if (filters.colors.length > 0) {
         const itemColors = item.colors || [];
-        if (!filters.colors.some(color => itemColors.includes(color))) {
+        if (!filters.colors.some((color) => itemColors.includes(color))) {
           return false;
         }
       }
-      
+
       // Brands filter
       if (filters.brands.length > 0) {
         if (!item.brand || !filters.brands.includes(item.brand)) {
           return false;
         }
       }
-      
+
       // AI name filter
       if (filters.hasAIName !== null) {
         const aiNamed = !!(item.aiGeneratedName && !item.nameOverride);
-        if (filters.hasAIName !== aiNamed) return false;
+        if (filters.hasAIName !== aiNamed) {
+          return false;
+        }
       }
-      
+
       return true;
     });
 
     // Sort items
     filtered.sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-      
+      let aValue: string | number;
+      let bValue: string | number;
+
       switch (sortOptions.field) {
         case 'name':
           aValue = a.name?.toLowerCase() || '';
@@ -181,7 +185,7 @@ export const WardrobeScreen: React.FC = () => {
         default:
           return 0;
       }
-      
+
       if (aValue < bValue) {
         return sortOptions.direction === 'asc' ? -1 : 1;
       }
@@ -199,66 +203,115 @@ export const WardrobeScreen: React.FC = () => {
     // Navigate to item detail or open modal
   };
 
+  // Memoized render item for better performance
+  const renderItem = React.useCallback(
+    ({ item }: { item: WardrobeItem }) => (
+      <WardrobeItemCard
+        item={item}
+        onPress={() => handleItemPress(item)}
+        onAnalysisApplied={(
+          id: string,
+          update: { processedImageUri?: string; aiAnalysisData?: WardrobeItem['aiAnalysisData'] },
+        ) => {
+          setItems((prev) =>
+            prev.map((i) =>
+              i.id === id
+                ? ({
+                    ...i,
+                    ...('processedImageUri' in update
+                      ? { processedImageUri: update.processedImageUri }
+                      : {}),
+                    ...('aiAnalysisData' in update
+                      ? { aiAnalysisData: update.aiAnalysisData }
+                      : {}),
+                  } as any)
+                : i,
+            ),
+          );
+        }}
+      />
+    ),
+    [handleItemPress],
+  );
+
+  // Optimized keyExtractor
+  const keyExtractor = React.useCallback((item: WardrobeItem) => item.id, []);
+
+  // Optimized getItemLayout for both grid and list modes
+  const getItemLayout = React.useCallback(
+    (data: ArrayLike<WardrobeItem> | null | undefined, index: number) => {
+      const ITEM_HEIGHT = viewMode === 'grid' ? 200 : 140;
+      const ITEM_SPACING = 8;
+      const itemsPerRow = viewMode === 'grid' ? 2 : 1;
+      const rowIndex = Math.floor(index / itemsPerRow);
+
+      return {
+        length: ITEM_HEIGHT,
+        offset: (ITEM_HEIGHT + ITEM_SPACING) * rowIndex,
+        index,
+      };
+    },
+    [viewMode],
+  );
+
   const handleEditItem = (item: WardrobeItem) => {
     setSelectedItem(item);
     setShowEditForm(true);
   };
 
   const handleDeleteItem = async (itemId: string) => {
-    Alert.alert(
-      'Delete Item',
-      'Are you sure you want to delete this item?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              // Defer to legacy or implement delete in enhanced service later
-              // For now, just filter locally
-              setItems(prev => prev.filter(i => i.id !== itemId));
-              await loadItems();
-              setSnackbar({
-                open: true,
-                message: 'Item deleted successfully',
-                severity: 'success'
-              });
-            } catch (err) {
-              setSnackbar({
-                open: true,
-                message: 'Failed to delete item',
-                severity: 'error'
-              });
-            }
+    Alert.alert('Delete Item', 'Are you sure you want to delete this item?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            // Defer to legacy or implement delete in enhanced service later
+            // For now, just filter locally
+            setItems((prev) => prev.filter((i) => i.id !== itemId));
+            await loadItems();
+            setSnackbar({
+              open: true,
+              message: 'Item deleted successfully',
+              severity: 'success',
+            });
+          } catch (err) {
+            setSnackbar({
+              open: true,
+              message: 'Failed to delete item',
+              severity: 'error',
+            });
           }
-        }
-      ]
-    );
+        },
+      },
+    ]);
   };
 
   const handleSaveItem = async (itemData: Partial<WardrobeItem>) => {
     try {
       if (selectedItem) {
         // Update existing item
-  // Update locally; wiring to service can be added when API is stable
-  setItems(prev => prev.map(i => i.id === selectedItem.id ? { ...i, ...itemData } as any : i));
+        // Update locally; wiring to service can be added when API is stable
+        setItems((prev) =>
+          prev.map((i) => (i.id === selectedItem.id ? ({ ...i, ...itemData } as any) : i)),
+        );
         setSnackbar({
           open: true,
           message: 'Item updated successfully',
-          severity: 'success'
+          severity: 'success',
         });
       } else {
         // Create new item
-  // Temporary local add; service method will be integrated later
-  setItems(prev => [{ ...(itemData as any), id: `${Date.now()}` }, ...prev]);
+        // Temporary local add; service method will be integrated later
+        setItems((prev) => [{ ...(itemData as any), id: `${Date.now()}` }, ...prev]);
         setSnackbar({
           open: true,
           message: 'Item added successfully',
-          severity: 'success'
+          severity: 'success',
         });
       }
-      
+
       await loadItems();
       setShowAddForm(false);
       setShowEditForm(false);
@@ -267,7 +320,7 @@ export const WardrobeScreen: React.FC = () => {
       setSnackbar({
         open: true,
         message: 'Failed to save item',
-        severity: 'error'
+        severity: 'error',
       });
     }
   };
@@ -275,30 +328,36 @@ export const WardrobeScreen: React.FC = () => {
   const handleBulkAIGeneration = async () => {
     setIsGenerating(true);
     try {
-      const itemsToUpdate = items.filter(item => !item.name || item.name.trim() === '');
-      
+      const itemsToUpdate = items.filter((item) => !item.name || item.name.trim() === '');
+
       for (const itemLocal of itemsToUpdate) {
         try {
           const resp = await generateNameForItem(itemLocal);
           if (resp && resp.aiGeneratedName) {
-            setItems(prev => prev.map(i => i.id === itemLocal.id ? { ...i, aiGeneratedName: resp.aiGeneratedName, nameOverride: false } as any : i));
+            setItems((prev) =>
+              prev.map((i) =>
+                i.id === itemLocal.id
+                  ? ({ ...i, aiGeneratedName: resp.aiGeneratedName, nameOverride: false } as any)
+                  : i,
+              ),
+            );
           }
         } catch (err) {
-          console.error(`Failed to generate name for item ${itemLocal.id}:`, err);
+          errorInDev(`Failed to generate name for item ${itemLocal.id}:`, err);
         }
       }
-      
+
       await loadItems();
       setSnackbar({
         open: true,
         message: `Generated names for ${itemsToUpdate.length} items`,
-        severity: 'success'
+        severity: 'success',
       });
     } catch (err) {
       setSnackbar({
         open: true,
         message: 'Failed to generate AI names',
-        severity: 'error'
+        severity: 'error',
       });
     } finally {
       setIsGenerating(false);
@@ -314,9 +373,9 @@ export const WardrobeScreen: React.FC = () => {
 
   const getUniqueColors = (): string[] => {
     const colors = new Set<string>();
-    items.forEach(item => {
+    items.forEach((item) => {
       if (item.colors) {
-        item.colors.forEach(color => colors.add(color));
+        item.colors.forEach((color) => colors.add(color));
       }
     });
     return Array.from(colors).sort();
@@ -324,7 +383,7 @@ export const WardrobeScreen: React.FC = () => {
 
   const getUniqueBrands = (): string[] => {
     const brands = new Set<string>();
-    items.forEach(item => {
+    items.forEach((item) => {
       if (item.brand) {
         brands.add(item.brand);
       }
@@ -342,12 +401,19 @@ export const WardrobeScreen: React.FC = () => {
             style={styles.headerButton}
             onPress={handleBulkAIGeneration}
             disabled={isGenerating}
+            accessibilityRole="button"
+            accessibilityLabel="Bulk AI name generation"
+            accessibilityHint="Generates AI names for all items in wardrobe"
+            accessibilityState={{ disabled: isGenerating }}
           >
             <Ionicons name="refresh-outline" size={20} color={DesignSystem.colors.text.inverse} />
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.headerButton, styles.headerButtonSecondary]}
             onPress={() => setAnchorEl(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Settings menu"
+            accessibilityHint="Opens wardrobe settings and options"
           >
             <Ionicons name="settings-outline" size={20} color={DesignSystem.colors.text.primary} />
           </TouchableOpacity>
@@ -361,7 +427,9 @@ export const WardrobeScreen: React.FC = () => {
           <Text style={styles.statLabel}>Total Items</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{items.filter(item => item.aiGeneratedName && !item.nameOverride).length}</Text>
+          <Text style={styles.statValue}>
+            {items.filter((item) => item.aiGeneratedName && !item.nameOverride).length}
+          </Text>
           <Text style={styles.statLabel}>AI Named</Text>
         </View>
         <View style={styles.statItem}>
@@ -379,17 +447,22 @@ export const WardrobeScreen: React.FC = () => {
             placeholder="Search items..."
             placeholderTextColor={DesignSystem.colors.text.secondary}
             value={filters.searchQuery}
-            onChangeText={(text) => setFilters(prev => ({ ...prev, searchQuery: text }))}
+            onChangeText={(text) => setFilters((prev) => ({ ...prev, searchQuery: text }))}
           />
         </View>
         <View style={styles.filterRow}>
           <View style={styles.pickerContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.pickerButton}
               onPress={() => setShowCategoryPicker(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Category filter"
+              accessibilityHint="Opens category picker to filter items"
             >
               <Text style={styles.pickerText}>
-                {filters.category === 'all' ? 'All Categories' : filters.category.charAt(0).toUpperCase() + filters.category.slice(1)}
+                {filters.category === 'all'
+                  ? 'All Categories'
+                  : filters.category.charAt(0).toUpperCase() + filters.category.slice(1)}
               </Text>
               <Ionicons name="chevron-down" size={20} color={DesignSystem.colors.text.secondary} />
             </TouchableOpacity>
@@ -397,6 +470,9 @@ export const WardrobeScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.filterButton}
             onPress={() => setShowFilters(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Advanced filters"
+            accessibilityHint="Opens advanced filtering options"
           >
             <Ionicons name="filter" size={16} color={DesignSystem.colors.text.inverse} />
             <Text style={styles.filterButtonText}>Filters</Text>
@@ -409,10 +485,15 @@ export const WardrobeScreen: React.FC = () => {
         <View style={styles.sortContainer}>
           <TouchableOpacity
             style={styles.sortButton}
-            onPress={() => setSortOptions(prev => ({
-              ...prev,
-              direction: prev.direction === 'asc' ? 'desc' : 'asc'
-            }))}
+            onPress={() =>
+              setSortOptions((prev) => ({
+                ...prev,
+                direction: prev.direction === 'asc' ? 'desc' : 'asc',
+              }))
+            }
+            accessibilityRole="button"
+            accessibilityLabel={`Sort ${sortOptions.direction === 'asc' ? 'descending' : 'ascending'}`}
+            accessibilityHint="Toggles sort direction between ascending and descending"
           >
             <Text style={styles.sortButtonText}>Sort</Text>
             <Ionicons
@@ -424,29 +505,39 @@ export const WardrobeScreen: React.FC = () => {
         </View>
         <View style={styles.viewToggleContainer}>
           <TouchableOpacity
-            style={[
-              styles.viewToggleButton,
-              viewMode === 'grid' && styles.viewToggleButtonActive
-            ]}
+            style={[styles.viewToggleButton, viewMode === 'grid' && styles.viewToggleButtonActive]}
             onPress={() => setViewMode('grid')}
+            accessibilityRole="button"
+            accessibilityLabel="Grid view"
+            accessibilityHint="Switch to grid view layout"
+            accessibilityState={{ selected: viewMode === 'grid' }}
           >
             <Ionicons
               name="grid"
               size={20}
-              color={viewMode === 'grid' ? DesignSystem.colors.text.inverse : DesignSystem.colors.text.primary}
+              color={
+                viewMode === 'grid'
+                  ? DesignSystem.colors.text.inverse
+                  : DesignSystem.colors.text.primary
+              }
             />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.viewToggleButton,
-              viewMode === 'list' && styles.viewToggleButtonActive
-            ]}
+            style={[styles.viewToggleButton, viewMode === 'list' && styles.viewToggleButtonActive]}
             onPress={() => setViewMode('list')}
+            accessibilityRole="button"
+            accessibilityLabel="List view"
+            accessibilityHint="Switch to list view layout"
+            accessibilityState={{ selected: viewMode === 'list' }}
           >
             <Ionicons
               name="list"
               size={20}
-              color={viewMode === 'list' ? DesignSystem.colors.text.inverse : DesignSystem.colors.text.primary}
+              color={
+                viewMode === 'list'
+                  ? DesignSystem.colors.text.inverse
+                  : DesignSystem.colors.text.primary
+              }
             />
           </TouchableOpacity>
         </View>
@@ -457,7 +548,13 @@ export const WardrobeScreen: React.FC = () => {
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={20} color={DesignSystem.colors.error.main} />
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadItems}>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={loadItems}
+            accessibilityRole="button"
+            accessibilityLabel="Retry loading items"
+            accessibilityHint="Tap to retry loading wardrobe items"
+          >
             <Text style={styles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
         </View>
@@ -475,19 +572,27 @@ export const WardrobeScreen: React.FC = () => {
         ) : (
           <FlatList
             data={filteredAndSortedItems}
-            renderItem={({ item }) => (
-              <WardrobeItemCard
-                item={item}
-                onPress={() => handleItemPress(item)}
-                onAnalysisApplied={(id, update) => {
-                  setItems(prev => prev.map(i => i.id === id ? { ...i, ...('processedImageUri' in update ? { processedImageUri: update.processedImageUri } : {}), ...('aiAnalysisData' in update ? { aiAnalysisData: update.aiAnalysisData } : {}) } as any : i));
-                }}
-              />
-            )}
-            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            keyExtractor={keyExtractor}
             numColumns={viewMode === 'grid' ? 2 : 1}
             key={viewMode} // Force re-render when view mode changes
             contentContainerStyle={{ paddingBottom: 100 }}
+            // Enhanced performance optimizations
+            removeClippedSubviews={true}
+            maxToRenderPerBatch={viewMode === 'grid' ? 8 : 10}
+            windowSize={viewMode === 'grid' ? 8 : 10}
+            initialNumToRender={viewMode === 'grid' ? 6 : 8}
+            updateCellsBatchingPeriod={50}
+            getItemLayout={getItemLayout}
+            // Additional performance props
+            disableVirtualization={false}
+            legacyImplementation={false}
+            scrollEventThrottle={16}
+            // Memory optimization
+            onEndReachedThreshold={0.5}
+            onEndReached={() => {
+              // Future: implement pagination for large wardrobes
+            }}
           />
         )}
       </View>
@@ -496,6 +601,9 @@ export const WardrobeScreen: React.FC = () => {
       <TouchableOpacity
         style={styles.fab}
         onPress={() => setShowAddForm(true)}
+        accessibilityRole="button"
+        accessibilityLabel="Add new wardrobe item"
+        accessibilityHint="Opens form to add a new clothing item to your wardrobe"
       >
         <Ionicons name="add" size={24} color={DesignSystem.colors.text.inverse} />
       </TouchableOpacity>
@@ -511,18 +619,37 @@ export const WardrobeScreen: React.FC = () => {
           style={styles.menuOverlay}
           activeOpacity={1}
           onPress={() => setAnchorEl(false)}
+          accessibilityRole="button"
+          accessibilityLabel="Close settings menu"
+          accessibilityHint="Tap to close the settings menu overlay"
         >
           <View style={styles.menuContainer}>
             <TouchableOpacity
               style={styles.menuItem}
-              onPress={() => { setShowPreferences(true); setAnchorEl(false); }}
+              onPress={() => {
+                setShowPreferences(true);
+                setAnchorEl(false);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Naming Preferences"
+              accessibilityHint="Opens naming preferences settings"
             >
-              <Ionicons name="settings-outline" size={20} color={DesignSystem.colors.text.primary} />
+              <Ionicons
+                name="settings-outline"
+                size={20}
+                color={DesignSystem.colors.text.primary}
+              />
               <Text style={styles.menuItemText}>Naming Preferences</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.menuItem}
-              onPress={() => { handleBulkAIGeneration(); setAnchorEl(false); }}
+              onPress={() => {
+                handleBulkAIGeneration();
+                setAnchorEl(false);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel="Regenerate All AI Names"
+              accessibilityHint="Regenerates AI-generated names for all wardrobe items"
             >
               <Ionicons name="refresh-outline" size={20} color={DesignSystem.colors.text.primary} />
               <Text style={styles.menuItemText}>Regenerate All AI Names</Text>
@@ -541,15 +668,17 @@ export const WardrobeScreen: React.FC = () => {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Add New Item</Text>
-            <TouchableOpacity onPress={() => setShowAddForm(false)}>
+            <TouchableOpacity
+              onPress={() => setShowAddForm(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close add item form"
+              accessibilityHint="Tap to close the add new item form"
+            >
               <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
             </TouchableOpacity>
           </View>
           <View style={styles.modalContent}>
-            <WardrobeItemForm
-              onSave={handleSaveItem}
-              onCancel={() => setShowAddForm(false)}
-            />
+            <WardrobeItemForm onSave={handleSaveItem} onCancel={() => setShowAddForm(false)} />
           </View>
         </SafeAreaView>
       </Modal>
@@ -564,7 +693,12 @@ export const WardrobeScreen: React.FC = () => {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Edit Item</Text>
-            <TouchableOpacity onPress={() => setShowEditForm(false)}>
+            <TouchableOpacity
+              onPress={() => setShowEditForm(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close edit item form"
+              accessibilityHint="Tap to close the edit item form"
+            >
               <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
             </TouchableOpacity>
           </View>
@@ -591,7 +725,12 @@ export const WardrobeScreen: React.FC = () => {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Generate AI Name</Text>
-            <TouchableOpacity onPress={() => setShowAIGenerator(false)}>
+            <TouchableOpacity
+              onPress={() => setShowAIGenerator(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close AI name generator"
+              accessibilityHint="Tap to close the AI name generator"
+            >
               <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
             </TouchableOpacity>
           </View>
@@ -619,7 +758,12 @@ export const WardrobeScreen: React.FC = () => {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Naming Preferences</Text>
-            <TouchableOpacity onPress={() => setShowPreferences(false)}>
+            <TouchableOpacity
+              onPress={() => setShowPreferences(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close naming preferences"
+              accessibilityHint="Closes the naming preferences dialog"
+            >
               <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
             </TouchableOpacity>
           </View>
@@ -639,7 +783,12 @@ export const WardrobeScreen: React.FC = () => {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Advanced Filters</Text>
-            <TouchableOpacity onPress={() => setShowFilters(false)}>
+            <TouchableOpacity
+              onPress={() => setShowFilters(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close advanced filters"
+              accessibilityHint="Closes the advanced filters dialog"
+            >
               <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
             </TouchableOpacity>
           </View>
@@ -649,14 +798,25 @@ export const WardrobeScreen: React.FC = () => {
               <View style={styles.filterGroup}>
                 <Text style={styles.filterLabel}>Name Type</Text>
                 <View style={styles.pickerContainer}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.pickerButton}
                     onPress={() => setShowNameTypePicker(true)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Name type filter"
+                    accessibilityHint="Opens picker to filter items by name type"
                   >
                     <Text style={styles.pickerText}>
-                      {filters.hasAIName === null ? 'All Items' : filters.hasAIName ? 'AI Generated Names' : 'Custom Names'}
+                      {filters.hasAIName === null
+                        ? 'All Items'
+                        : filters.hasAIName
+                          ? 'AI Generated Names'
+                          : 'Custom Names'}
                     </Text>
-                    <Ionicons name="chevron-down" size={20} color={DesignSystem.colors.text.secondary} />
+                    <Ionicons
+                      name="chevron-down"
+                      size={20}
+                      color={DesignSystem.colors.text.secondary}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -665,18 +825,29 @@ export const WardrobeScreen: React.FC = () => {
               <View style={styles.filterGroup}>
                 <Text style={styles.filterLabel}>Sort By</Text>
                 <View style={styles.pickerContainer}>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.pickerButton}
                     onPress={() => setShowSortPicker(true)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Sort options"
+                    accessibilityHint="Opens picker to change sort order"
                   >
                     <Text style={styles.pickerText}>
-                      {sortOptions.field === 'name' ? 'Name' :
-                       sortOptions.field === 'category' ? 'Category' :
-                       sortOptions.field === 'createdAt' ? 'Date Added' :
-                       sortOptions.field === 'lastWorn' ? 'Last Worn' :
-                       'Wear Count'}
+                      {sortOptions.field === 'name'
+                        ? 'Name'
+                        : sortOptions.field === 'category'
+                          ? 'Category'
+                          : sortOptions.field === 'createdAt'
+                            ? 'Date Added'
+                            : sortOptions.field === 'lastWorn'
+                              ? 'Last Worn'
+                              : 'Wear Count'}
                     </Text>
-                    <Ionicons name="chevron-down" size={20} color={DesignSystem.colors.text.secondary} />
+                    <Ionicons
+                      name="chevron-down"
+                      size={20}
+                      color={DesignSystem.colors.text.secondary}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -685,26 +856,29 @@ export const WardrobeScreen: React.FC = () => {
               <View style={styles.filterGroup}>
                 <Text style={styles.filterLabel}>Colors</Text>
                 <View style={styles.chipContainer}>
-                  {getUniqueColors().map(color => (
+                  {getUniqueColors().map((color) => (
                     <TouchableOpacity
                       key={color}
-                      style={[
-                        styles.chip,
-                        filters.colors.includes(color) && styles.chipSelected
-                      ]}
+                      style={[styles.chip, filters.colors.includes(color) && styles.chipSelected]}
                       onPress={() => {
-                        setFilters(prev => ({
+                        setFilters((prev) => ({
                           ...prev,
                           colors: prev.colors.includes(color)
-                            ? prev.colors.filter(c => c !== color)
-                            : [...prev.colors, color]
+                            ? prev.colors.filter((c) => c !== color)
+                            : [...prev.colors, color],
                         }));
                       }}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${color} color filter`}
+                      accessibilityHint={`${filters.colors.includes(color) ? 'Remove' : 'Add'} ${color} color filter`}
+                      accessibilityState={{ selected: filters.colors.includes(color) }}
                     >
-                      <Text style={[
-                        styles.chipText,
-                        filters.colors.includes(color) && styles.chipTextSelected
-                      ]}>
+                      <Text
+                        style={[
+                          styles.chipText,
+                          filters.colors.includes(color) && styles.chipTextSelected,
+                        ]}
+                      >
                         {color}
                       </Text>
                     </TouchableOpacity>
@@ -716,26 +890,29 @@ export const WardrobeScreen: React.FC = () => {
               <View style={styles.filterGroup}>
                 <Text style={styles.filterLabel}>Brands</Text>
                 <View style={styles.chipContainer}>
-                  {getUniqueBrands().map(brand => (
+                  {getUniqueBrands().map((brand) => (
                     <TouchableOpacity
                       key={brand}
-                      style={[
-                        styles.chip,
-                        filters.brands.includes(brand) && styles.chipSelected
-                      ]}
+                      style={[styles.chip, filters.brands.includes(brand) && styles.chipSelected]}
                       onPress={() => {
-                        setFilters(prev => ({
+                        setFilters((prev) => ({
                           ...prev,
                           brands: prev.brands.includes(brand)
-                            ? prev.brands.filter(b => b !== brand)
-                            : [...prev.brands, brand]
+                            ? prev.brands.filter((b) => b !== brand)
+                            : [...prev.brands, brand],
                         }));
                       }}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${brand} brand filter`}
+                      accessibilityHint={`${filters.brands.includes(brand) ? 'Remove' : 'Add'} ${brand} brand filter`}
+                      accessibilityState={{ selected: filters.brands.includes(brand) }}
                     >
-                      <Text style={[
-                        styles.chipText,
-                        filters.brands.includes(brand) && styles.chipTextSelected
-                      ]}>
+                      <Text
+                        style={[
+                          styles.chipText,
+                          filters.brands.includes(brand) && styles.chipTextSelected,
+                        ]}
+                      >
                         {brand}
                       </Text>
                     </TouchableOpacity>
@@ -753,15 +930,21 @@ export const WardrobeScreen: React.FC = () => {
                   colors: [],
                   brands: [],
                   hasAIName: null,
-                  searchQuery: ''
+                  searchQuery: '',
                 });
               }}
+              accessibilityRole="button"
+              accessibilityLabel="Clear all filters"
+              accessibilityHint="Removes all applied filters and shows all items"
             >
               <Text style={styles.clearButtonText}>Clear All</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.actionButton, styles.closeButton]}
               onPress={() => setShowFilters(false)}
+              accessibilityRole="button"
+              accessibilityLabel="Close filters"
+              accessibilityHint="Closes the filter dialog"
             >
               <Text style={styles.closeButtonText}>Close</Text>
             </TouchableOpacity>
@@ -780,26 +963,37 @@ export const WardrobeScreen: React.FC = () => {
           style={styles.pickerOverlay}
           activeOpacity={1}
           onPress={() => setShowCategoryPicker(false)}
+          accessibilityRole="button"
+          accessibilityLabel="Close category picker"
+          accessibilityHint="Tap to close the category selection dialog"
         >
           <View style={styles.pickerModal}>
             <Text style={styles.pickerModalTitle}>Select Category</Text>
-            {CATEGORIES.map(category => (
+            {CATEGORIES.map((category) => (
               <TouchableOpacity
                 key={category}
                 style={[
                   styles.pickerOption,
-                  filters.category === category && styles.pickerOptionSelected
+                  filters.category === category && styles.pickerOptionSelected,
                 ]}
                 onPress={() => {
-                  setFilters(prev => ({ ...prev, category }));
+                  setFilters((prev) => ({ ...prev, category }));
                   setShowCategoryPicker(false);
                 }}
+                accessibilityRole="button"
+                accessibilityLabel={`${category === 'all' ? 'All Categories' : category.charAt(0).toUpperCase() + category.slice(1)} category`}
+                accessibilityHint={`Filter items by ${category === 'all' ? 'all categories' : category} category`}
+                accessibilityState={{ selected: filters.category === category }}
               >
-                <Text style={[
-                  styles.pickerOptionText,
-                  filters.category === category && styles.pickerOptionTextSelected
-                ]}>
-                  {category === 'all' ? 'All Categories' : category.charAt(0).toUpperCase() + category.slice(1)}
+                <Text
+                  style={[
+                    styles.pickerOptionText,
+                    filters.category === category && styles.pickerOptionTextSelected,
+                  ]}
+                >
+                  {category === 'all'
+                    ? 'All Categories'
+                    : category.charAt(0).toUpperCase() + category.slice(1)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -818,29 +1012,38 @@ export const WardrobeScreen: React.FC = () => {
           style={styles.pickerOverlay}
           activeOpacity={1}
           onPress={() => setShowNameTypePicker(false)}
+          accessibilityRole="button"
+          accessibilityLabel="Close name type picker"
+          accessibilityHint="Tap to close the name type selection dialog"
         >
           <View style={styles.pickerModal}>
             <Text style={styles.pickerModalTitle}>Select Name Type</Text>
             {[
               { value: null, label: 'All Items' },
               { value: true, label: 'AI Generated Names' },
-              { value: false, label: 'Custom Names' }
-            ].map(option => (
+              { value: false, label: 'Custom Names' },
+            ].map((option) => (
               <TouchableOpacity
                 key={option.label}
                 style={[
                   styles.pickerOption,
-                  filters.hasAIName === option.value && styles.pickerOptionSelected
+                  filters.hasAIName === option.value && styles.pickerOptionSelected,
                 ]}
                 onPress={() => {
-                  setFilters(prev => ({ ...prev, hasAIName: option.value }));
+                  setFilters((prev) => ({ ...prev, hasAIName: option.value }));
                   setShowNameTypePicker(false);
                 }}
+                accessibilityRole="button"
+                accessibilityLabel={`Select ${option.label}`}
+                accessibilityHint={`Tap to filter items by ${option.label.toLowerCase()}`}
+                accessibilityState={{ selected: filters.hasAIName === option.value }}
               >
-                <Text style={[
-                  styles.pickerOptionText,
-                  filters.hasAIName === option.value && styles.pickerOptionTextSelected
-                ]}>
+                <Text
+                  style={[
+                    styles.pickerOptionText,
+                    filters.hasAIName === option.value && styles.pickerOptionTextSelected,
+                  ]}
+                >
                   {option.label}
                 </Text>
               </TouchableOpacity>
@@ -860,6 +1063,9 @@ export const WardrobeScreen: React.FC = () => {
           style={styles.pickerOverlay}
           activeOpacity={1}
           onPress={() => setShowSortPicker(false)}
+          accessibilityRole="button"
+          accessibilityLabel="Close sort picker"
+          accessibilityHint="Tap to close the sort options dialog"
         >
           <View style={styles.pickerModal}>
             <Text style={styles.pickerModalTitle}>Sort By</Text>
@@ -868,23 +1074,29 @@ export const WardrobeScreen: React.FC = () => {
               { value: 'category', label: 'Category' },
               { value: 'createdAt', label: 'Date Added' },
               { value: 'lastWorn', label: 'Last Worn' },
-              { value: 'wearCount', label: 'Wear Count' }
-            ].map(option => (
+              { value: 'wearCount', label: 'Wear Count' },
+            ].map((option) => (
               <TouchableOpacity
                 key={option.value}
                 style={[
                   styles.pickerOption,
-                  sortOptions.field === option.value && styles.pickerOptionSelected
+                  sortOptions.field === option.value && styles.pickerOptionSelected,
                 ]}
                 onPress={() => {
-                  setSortOptions(prev => ({ ...prev, field: option.value as any }));
+                  setSortOptions((prev) => ({ ...prev, field: option.value as any }));
                   setShowSortPicker(false);
                 }}
+                accessibilityRole="button"
+                accessibilityLabel={`Sort by ${option.label}`}
+                accessibilityHint={`Tap to sort wardrobe items by ${option.label.toLowerCase()}`}
+                accessibilityState={{ selected: sortOptions.field === option.value }}
               >
-                <Text style={[
-                  styles.pickerOptionText,
-                  sortOptions.field === option.value && styles.pickerOptionTextSelected
-                ]}>
+                <Text
+                  style={[
+                    styles.pickerOptionText,
+                    sortOptions.field === option.value && styles.pickerOptionTextSelected,
+                  ]}
+                >
                   {option.label}
                 </Text>
               </TouchableOpacity>
@@ -893,27 +1105,38 @@ export const WardrobeScreen: React.FC = () => {
         </TouchableOpacity>
       </Modal>
 
-  {/* Snackbar */}
+      {/* Snackbar */}
       {snackbar.open && (
         <View style={styles.snackbarContainer}>
-          <View style={[
-            styles.snackbar,
-            snackbar.severity === 'error' && styles.snackbarError,
-            snackbar.severity === 'warning' && styles.snackbarWarning,
-            snackbar.severity === 'success' && styles.snackbarSuccess,
-            snackbar.severity === 'info' && styles.snackbarInfo
-          ]}>
+          <View
+            style={[
+              styles.snackbar,
+              snackbar.severity === 'error' && styles.snackbarError,
+              snackbar.severity === 'warning' && styles.snackbarWarning,
+              snackbar.severity === 'success' && styles.snackbarSuccess,
+              snackbar.severity === 'info' && styles.snackbarInfo,
+            ]}
+          >
             <Ionicons
               name={
-                snackbar.severity === 'error' ? 'alert-circle' :
-                snackbar.severity === 'warning' ? 'warning' :
-                snackbar.severity === 'success' ? 'checkmark-circle' : 'information-circle'
+                snackbar.severity === 'error'
+                  ? 'alert-circle'
+                  : snackbar.severity === 'warning'
+                    ? 'warning'
+                    : snackbar.severity === 'success'
+                      ? 'checkmark-circle'
+                      : 'information-circle'
               }
               size={20}
               color={DesignSystem.colors.background.primary}
             />
             <Text style={styles.snackbarText}>{snackbar.message}</Text>
-            <TouchableOpacity onPress={() => setSnackbar(prev => ({ ...prev, open: false }))}>
+            <TouchableOpacity
+              onPress={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+              accessibilityRole="button"
+              accessibilityLabel="Close notification"
+              accessibilityHint="Tap to dismiss this notification"
+            >
               <Ionicons name="close" size={20} color={DesignSystem.colors.background.primary} />
             </TouchableOpacity>
           </View>
@@ -924,221 +1147,162 @@ export const WardrobeScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  actionButton: {
+    alignItems: 'center',
+    borderRadius: DesignSystem.borderRadius.md,
     flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
+    paddingVertical: DesignSystem.spacing.md,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
-    backgroundColor: DesignSystem.colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border.primary,
-  },
-  headerTitle: {
-    fontSize: DesignSystem.typography.sizes.xl,
-    fontWeight: DesignSystem.typography.weights.bold,
-    color: DesignSystem.colors.text.primary,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: DesignSystem.spacing.sm,
-  },
-  headerButton: {
-    padding: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.borderRadius.sm,
-    backgroundColor: DesignSystem.colors.primary[500],
-  },
-  headerButtonSecondary: {
+  chip: {
     backgroundColor: DesignSystem.colors.background.tertiary,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: DesignSystem.spacing.sm,
-    backgroundColor: DesignSystem.colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border.primary,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: DesignSystem.typography.sizes.lg,
-    fontWeight: DesignSystem.typography.weights.bold,
-    color: DesignSystem.colors.text.primary,
-  },
-  statLabel: {
-    fontSize: DesignSystem.typography.sizes.sm,
-    color: DesignSystem.colors.text.secondary,
-    marginTop: DesignSystem.spacing.xs,
-  },
-  searchFilterContainer: {
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
-    backgroundColor: DesignSystem.colors.background.secondary,
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: DesignSystem.colors.background.primary,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    marginBottom: DesignSystem.spacing.sm,
-    borderWidth: 1,
     borderColor: DesignSystem.colors.border.primary,
-  },
-  searchInput: {
-    flex: 1,
-    paddingVertical: DesignSystem.spacing.sm,
-    fontSize: DesignSystem.typography.sizes.md,
-    color: DesignSystem.colors.text.primary,
-    marginLeft: DesignSystem.spacing.sm,
-  },
-  filterRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: DesignSystem.spacing.sm,
-  },
-  pickerContainer: {
-    flex: 1,
-  },
-  pickerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: DesignSystem.colors.background.primary,
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.sm,
+    borderRadius: DesignSystem.borderRadius.full,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
   },
-  pickerText: {
-    fontSize: DesignSystem.typography.sizes.md,
-    color: DesignSystem.colors.text.primary,
-  },
-  filterButton: {
+  chipContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: DesignSystem.colors.primary[500],
-    borderRadius: DesignSystem.borderRadius.md,
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
+    flexWrap: 'wrap',
     gap: DesignSystem.spacing.xs,
   },
-  filterButtonText: {
+  chipSelected: {
+    backgroundColor: DesignSystem.colors.primary[500],
+    borderColor: DesignSystem.colors.primary[500],
+  },
+  chipText: {
+    color: DesignSystem.colors.text.primary,
     fontSize: DesignSystem.typography.sizes.sm,
+  },
+  chipTextSelected: {
     color: DesignSystem.colors.text.inverse,
-    fontWeight: DesignSystem.typography.weights.medium,
   },
-  sortViewContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
-    backgroundColor: DesignSystem.colors.background.secondary,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border.primary,
-  },
-  sortContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: DesignSystem.spacing.xs,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.borderRadius.sm,
+  clearButton: {
     backgroundColor: DesignSystem.colors.background.tertiary,
+    borderColor: DesignSystem.colors.border.primary,
+    borderWidth: 1,
   },
-  sortButtonText: {
-    fontSize: DesignSystem.typography.sizes.sm,
+  clearButtonText: {
     color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.sizes.md,
     fontWeight: DesignSystem.typography.weights.medium,
   },
-  viewToggleContainer: {
-    flexDirection: 'row',
-    backgroundColor: DesignSystem.colors.background.tertiary,
-    borderRadius: DesignSystem.borderRadius.sm,
-    padding: 2,
-  },
-  viewToggleButton: {
-    padding: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.borderRadius.sm,
-  },
-  viewToggleButtonActive: {
+  closeButton: {
     backgroundColor: DesignSystem.colors.primary[500],
   },
-  errorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: DesignSystem.colors.error.light,
-    marginHorizontal: DesignSystem.spacing.md,
-    marginVertical: DesignSystem.spacing.sm,
-    padding: DesignSystem.spacing.md,
-    borderRadius: DesignSystem.borderRadius.md,
-    gap: DesignSystem.spacing.sm,
-  },
-  errorText: {
-    flex: 1,
-    fontSize: DesignSystem.typography.sizes.sm,
-    color: DesignSystem.colors.error.main,
-  },
-  retryButton: {
-    backgroundColor: DesignSystem.colors.error.main,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.borderRadius.sm,
-  },
-  retryButtonText: {
-    fontSize: DesignSystem.typography.sizes.sm,
-    color: DesignSystem.colors.error.contrast,
+  closeButtonText: {
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.sizes.md,
     fontWeight: DesignSystem.typography.weights.medium,
   },
-  itemsContainer: {
+  container: {
+    backgroundColor: DesignSystem.colors.background.primary,
     flex: 1,
-    paddingHorizontal: DesignSystem.spacing.md,
   },
   emptyContainer: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     paddingVertical: DesignSystem.spacing.xl,
   },
   emptyText: {
-    fontSize: DesignSystem.typography.sizes.md,
     color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
+    fontSize: DesignSystem.typography.sizes.md,
     marginTop: DesignSystem.spacing.md,
+    textAlign: 'center',
+  },
+  errorContainer: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.error.light,
+    borderRadius: DesignSystem.borderRadius.md,
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.sm,
+    marginHorizontal: DesignSystem.spacing.md,
+    marginVertical: DesignSystem.spacing.sm,
+    padding: DesignSystem.spacing.md,
+  },
+  errorText: {
+    color: DesignSystem.colors.error.main,
+    flex: 1,
+    fontSize: DesignSystem.typography.sizes.sm,
   },
   fab: {
-    position: 'absolute',
-    bottom: DesignSystem.spacing.lg,
-    right: DesignSystem.spacing.lg,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: DesignSystem.colors.primary[500],
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: DesignSystem.colors.primary[500],
+    borderRadius: 28,
+    bottom: DesignSystem.spacing.lg,
     elevation: 8,
+    height: 56,
+    justifyContent: 'center',
+    position: 'absolute',
+    right: DesignSystem.spacing.lg,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
+    width: 56,
   },
-  menuOverlay: {
+  filterButton: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.primary[500],
+    borderRadius: DesignSystem.borderRadius.md,
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+  },
+  filterButtonText: {
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.sizes.sm,
+    fontWeight: DesignSystem.typography.weights.medium,
+  },
+  filterGroup: {
+    gap: DesignSystem.spacing.sm,
+  },
+  filterLabel: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.sizes.md,
+    fontWeight: DesignSystem.typography.weights.medium,
+  },
+  filterRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.sm,
+  },
+  filterSection: {
+    gap: DesignSystem.spacing.lg,
+  },
+  header: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderBottomColor: DesignSystem.colors.border.primary,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+  },
+  headerActions: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.sm,
+  },
+  headerButton: {
+    backgroundColor: DesignSystem.colors.primary[500],
+    borderRadius: DesignSystem.borderRadius.sm,
+    padding: DesignSystem.spacing.xs,
+  },
+  headerButtonSecondary: {
+    backgroundColor: DesignSystem.colors.background.tertiary,
+  },
+  headerTitle: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.sizes.xl,
+    fontWeight: DesignSystem.typography.weights.bold,
+  },
+  itemsContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    paddingHorizontal: DesignSystem.spacing.md,
   },
   menuContainer: {
     backgroundColor: DesignSystem.colors.background.primary,
@@ -1147,160 +1311,82 @@ const styles = StyleSheet.create({
     paddingVertical: DesignSystem.spacing.md,
   },
   menuItem: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.md,
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.md,
-    gap: DesignSystem.spacing.md,
   },
   menuItemText: {
-    fontSize: DesignSystem.typography.sizes.md,
     color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.sizes.md,
   },
-  modalContainer: {
+  menuOverlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
+    justifyContent: 'flex-end',
   },
-  modalHeader: {
+  modalActions: {
+    borderTopColor: DesignSystem.colors.border.primary,
+    borderTopWidth: 1,
     flexDirection: 'row',
+    gap: DesignSystem.spacing.md,
     justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border.primary,
   },
-  modalTitle: {
-    fontSize: DesignSystem.typography.sizes.lg,
-    fontWeight: DesignSystem.typography.weights.bold,
-    color: DesignSystem.colors.text.primary,
+  modalContainer: {
+    backgroundColor: DesignSystem.colors.background.primary,
+    flex: 1,
   },
   modalContent: {
     flex: 1,
     padding: DesignSystem.spacing.lg,
   },
-  filterSection: {
-    gap: DesignSystem.spacing.lg,
-  },
-  filterGroup: {
-    gap: DesignSystem.spacing.sm,
-  },
-  filterLabel: {
-    fontSize: DesignSystem.typography.sizes.md,
-    fontWeight: DesignSystem.typography.weights.medium,
-    color: DesignSystem.colors.text.primary,
-  },
-  chipContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: DesignSystem.spacing.xs,
-  },
-  chip: {
-    paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.borderRadius.full,
-    backgroundColor: DesignSystem.colors.background.tertiary,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
-  },
-  chipSelected: {
-    backgroundColor: DesignSystem.colors.primary[500],
-    borderColor: DesignSystem.colors.primary[500],
-  },
-  chipText: {
-    fontSize: DesignSystem.typography.sizes.sm,
-    color: DesignSystem.colors.text.primary,
-  },
-  chipTextSelected: {
-    color: DesignSystem.colors.text.inverse,
-  },
-  modalActions: {
+  modalHeader: {
+    alignItems: 'center',
+    borderBottomColor: DesignSystem.colors.border.primary,
+    borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: DesignSystem.colors.border.primary,
-    gap: DesignSystem.spacing.md,
   },
-  actionButton: {
-    flex: 1,
-    paddingVertical: DesignSystem.spacing.md,
-    borderRadius: DesignSystem.borderRadius.md,
-    alignItems: 'center',
-  },
-  clearButton: {
-    backgroundColor: DesignSystem.colors.background.tertiary,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
-  },
-  clearButtonText: {
-    fontSize: DesignSystem.typography.sizes.md,
+  modalTitle: {
     color: DesignSystem.colors.text.primary,
-    fontWeight: DesignSystem.typography.weights.medium,
+    fontSize: DesignSystem.typography.sizes.lg,
+    fontWeight: DesignSystem.typography.weights.bold,
   },
-  closeButton: {
-    backgroundColor: DesignSystem.colors.primary[500],
-  },
-  closeButtonText: {
-    fontSize: DesignSystem.typography.sizes.md,
-    color: DesignSystem.colors.text.inverse,
-    fontWeight: DesignSystem.typography.weights.medium,
-  },
-  snackbarContainer: {
-    position: 'absolute',
-    bottom: DesignSystem.spacing.lg,
-    left: DesignSystem.spacing.md,
-    right: DesignSystem.spacing.md,
-  },
-  snackbar: {
-    flexDirection: 'row',
+  pickerButton: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.text.primary,
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderColor: DesignSystem.colors.border.primary,
     borderRadius: DesignSystem.borderRadius.md,
-    gap: DesignSystem.spacing.sm,
+    borderWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.sm,
   },
-  snackbarError: {
-    backgroundColor: DesignSystem.colors.error.main,
-  },
-  snackbarWarning: {
-    backgroundColor: DesignSystem.colors.warning?.main || '#ff9800',
-  },
-  snackbarSuccess: {
-    backgroundColor: DesignSystem.colors.success?.main || '#4caf50',
-  },
-  snackbarInfo: {
-    backgroundColor: DesignSystem.colors.info?.main || '#2196f3',
-  },
-  snackbarText: {
+  pickerContainer: {
     flex: 1,
-    fontSize: DesignSystem.typography.sizes.sm,
-    color: DesignSystem.colors.background.primary,
-  },
-  pickerOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   pickerModal: {
     backgroundColor: DesignSystem.colors.background.primary,
     borderRadius: DesignSystem.borderRadius.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    minWidth: 250,
     maxWidth: '80%',
+    minWidth: 250,
+    paddingVertical: DesignSystem.spacing.md,
   },
   pickerModalTitle: {
+    borderBottomColor: DesignSystem.colors.border.primary,
+    borderBottomWidth: 1,
+    color: DesignSystem.colors.text.primary,
     fontSize: DesignSystem.typography.sizes.lg,
     fontWeight: DesignSystem.typography.weights.bold,
-    color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
-    paddingBottom: DesignSystem.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.border.primary,
     marginBottom: DesignSystem.spacing.sm,
+    paddingBottom: DesignSystem.spacing.md,
+    textAlign: 'center',
   },
   pickerOption: {
     paddingHorizontal: DesignSystem.spacing.lg,
@@ -1310,12 +1396,149 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.primary[100] || DesignSystem.colors.primary[500] + '20',
   },
   pickerOptionText: {
-    fontSize: DesignSystem.typography.sizes.md,
     color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.sizes.md,
   },
   pickerOptionTextSelected: {
     color: DesignSystem.colors.primary[500],
     fontWeight: DesignSystem.typography.weights.medium,
+  },
+  pickerOverlay: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  pickerText: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.sizes.md,
+  },
+  retryButton: {
+    backgroundColor: DesignSystem.colors.error.main,
+    borderRadius: DesignSystem.borderRadius.sm,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
+  },
+  retryButtonText: {
+    color: DesignSystem.colors.error.contrast,
+    fontSize: DesignSystem.typography.sizes.sm,
+    fontWeight: DesignSystem.typography.weights.medium,
+  },
+  searchContainer: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderColor: DesignSystem.colors.border.primary,
+    borderRadius: DesignSystem.borderRadius.md,
+    borderWidth: 1,
+    flexDirection: 'row',
+    marginBottom: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.sm,
+  },
+  searchFilterContainer: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+  },
+  searchInput: {
+    color: DesignSystem.colors.text.primary,
+    flex: 1,
+    fontSize: DesignSystem.typography.sizes.md,
+    marginLeft: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.sm,
+  },
+  snackbar: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.text.primary,
+    borderRadius: DesignSystem.borderRadius.md,
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+  },
+  snackbarContainer: {
+    bottom: DesignSystem.spacing.lg,
+    left: DesignSystem.spacing.md,
+    position: 'absolute',
+    right: DesignSystem.spacing.md,
+  },
+  snackbarError: {
+    backgroundColor: DesignSystem.colors.error.main,
+  },
+  snackbarInfo: {
+    backgroundColor: DesignSystem.colors.info?.main || '#2196f3',
+  },
+  snackbarSuccess: {
+    backgroundColor: DesignSystem.colors.success?.main || '#4caf50',
+  },
+  snackbarText: {
+    color: DesignSystem.colors.background.primary,
+    flex: 1,
+    fontSize: DesignSystem.typography.sizes.sm,
+  },
+  snackbarWarning: {
+    backgroundColor: DesignSystem.colors.warning?.main || '#ff9800',
+  },
+  sortButton: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.tertiary,
+    borderRadius: DesignSystem.borderRadius.sm,
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
+  },
+  sortButtonText: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.sizes.sm,
+    fontWeight: DesignSystem.typography.weights.medium,
+  },
+  sortContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  sortViewContainer: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderBottomColor: DesignSystem.colors.border.primary,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statLabel: {
+    color: DesignSystem.colors.text.secondary,
+    fontSize: DesignSystem.typography.sizes.sm,
+    marginTop: DesignSystem.spacing.xs,
+  },
+  statValue: {
+    color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.sizes.lg,
+    fontWeight: DesignSystem.typography.weights.bold,
+  },
+  statsContainer: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderBottomColor: DesignSystem.colors.border.primary,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: DesignSystem.spacing.sm,
+  },
+  viewToggleButton: {
+    borderRadius: DesignSystem.borderRadius.sm,
+    padding: DesignSystem.spacing.xs,
+  },
+  viewToggleButtonActive: {
+    backgroundColor: DesignSystem.colors.primary[500],
+  },
+  viewToggleContainer: {
+    backgroundColor: DesignSystem.colors.background.tertiary,
+    borderRadius: DesignSystem.borderRadius.sm,
+    flexDirection: 'row',
+    padding: 2,
   },
 });
 

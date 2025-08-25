@@ -1,7 +1,8 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+
 import { DesignSystem } from '../../theme/DesignSystem';
 
 interface ZenCardProps {
@@ -45,7 +46,7 @@ export default function ZenCard({
 
   const getCardStyle = (): ViewStyle[] => {
     const baseStyle = [styles.card];
-    
+
     switch (variant) {
       case 'glass':
         return [...baseStyle, styles.glass];
@@ -58,18 +59,12 @@ export default function ZenCard({
     }
   };
 
-  const CardContent = () => (
-    <View style={[getCardStyle(), style]}>
-      {children}
-    </View>
-  );
+  const CardContent = () => <View style={[getCardStyle(), style]}>{children}</View>;
 
   const GlassCardContent = () => (
     <View style={[styles.card, styles.glassContainer, style]}>
       <BlurView intensity={blurIntensity} tint="light" style={styles.blurView}>
-        <View style={styles.glassOverlay}>
-          {children}
-        </View>
+        <View style={styles.glassOverlay}>{children}</View>
       </BlurView>
     </View>
   );
@@ -98,10 +93,10 @@ export default function ZenCard({
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: DesignSystem.borderRadius.lg,
-    padding: DesignSystem.spacing.lg,
-    borderWidth: 1,
     borderColor: DesignSystem.colors.sage[200],
+    borderRadius: DesignSystem.borderRadius.lg,
+    borderWidth: 1,
+    padding: DesignSystem.spacing.lg,
   },
   // Variants
   surface: {
@@ -117,25 +112,25 @@ const styles = StyleSheet.create({
     ...DesignSystem.elevation.soft,
     borderColor: DesignSystem.colors.sage[300],
   },
-  
+
   // Glass variant styles
   glassContainer: {
     backgroundColor: 'transparent',
-    padding: 0,
     borderWidth: 0,
     overflow: 'hidden',
+    padding: 0,
   },
   blurView: {
-    flex: 1,
     borderRadius: DesignSystem.borderRadius.lg,
+    flex: 1,
   },
   glassOverlay: {
-    flex: 1,
-    padding: DesignSystem.spacing.lg,
     backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: DesignSystem.borderRadius.lg,
+    borderWidth: 1,
+    flex: 1,
+    padding: DesignSystem.spacing.lg,
   },
   glass: {
     backgroundColor: 'rgba(255, 255, 255, 0.25)',

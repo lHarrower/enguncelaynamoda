@@ -4,12 +4,14 @@
 
 This specification defines the requirements for completing the AYNAMODA premium fashion application that embodies "Confidence as a Service" through a Digital Zen Garden philosophy. The project has evolved from initial concept to a sophisticated foundation with working core systems.
 
-**Project Evolution Status**: 
+**Project Evolution Status**:
+
 - **Foundation Phase**: ✅ COMPLETED (85%) - Unified DesignSystem, BentoBox layouts, EfficiencyScore service, navigation architecture
 - **Implementation Phase**: 🔄 IN PROGRESS (40%) - Theme cleanup, UI completion, feature integration
 - **Polish Phase**: ⏳ PENDING (15%) - Performance optimization, accessibility, testing
 
 **Key Architectural Achievements**:
+
 - **Design System**: Comprehensive DesignSystem.ts with 500+ tokens, Digital Zen Garden aesthetic (#FAF9F6 base, sage/gold accents)
 - **Layout Systems**: Production-ready BentoBox (StudioHomeScreen), Collage (discovery), Grid (wardrobe) implementations
 - **Service Layer**: Complete EfficiencyScore service with database integration, useEfficiencyScore hook, OnboardingService with StylePreferenceQuestionnaire
@@ -19,6 +21,7 @@ This specification defines the requirements for completing the AYNAMODA premium 
 - **Error Handling**: ErrorBoundary components and ErrorHandlingService for graceful failure management
 
 **Technical Debt & Remaining Challenges**:
+
 - **Legacy Theme Conflicts**: 6 conflicting theme files (StudioTheme, UltraPremiumTheme, AppThemeV2, Artistry, Atmospheric, Editorial)
 - **Component Migration**: ~40 components still using legacy theme imports instead of unified DesignSystem
 - **Missing UI Implementations**: Visual onboarding interface, Tinder-style discover screen, wardrobe grid with AI naming
@@ -35,7 +38,7 @@ This specification defines the requirements for completing the AYNAMODA premium 
 
 1. WHEN removing legacy themes THEN the system SHALL systematically delete 6 conflicting theme files (StudioTheme.ts, UltraPremiumTheme.ts, AppThemeV2.ts, ArtistryTheme.ts, AtmosphericTheme.ts, EditorialTheme.ts) while preserving the production-ready DesignSystem.ts with 500+ design tokens
 2. WHEN migrating component imports THEN the system SHALL update ~40 components to use standardized `import { DesignSystem } from '@/theme/DesignSystem'` pattern and validate visual consistency through automated regression testing
-3. WHEN cleaning file structure THEN the system SHALL remove duplicate folders (root components/ vs src/components/), delete legacy files (_*_legacy.tsx), and consolidate AYNAMODA_V2 duplicates while maintaining import resolution
+3. WHEN cleaning file structure THEN the system SHALL remove duplicate folders (root components/ vs src/components/), delete legacy files (\_\*\_legacy.tsx), and consolidate AYNAMODA_V2 duplicates while maintaining import resolution
 4. WHEN validating architecture THEN the system SHALL confirm that expo-router navigation, ThemeProvider context, DesignSystem integration, and all existing functionality remain operational through comprehensive integration testing
 5. WHEN measuring cleanup success THEN the system SHALL achieve zero legacy theme imports, 100% DesignSystem usage, and maintain existing component functionality with improved maintainability metrics
 
@@ -83,6 +86,6 @@ This specification defines the requirements for completing the AYNAMODA premium 
 
 1. WHEN optimizing performance THEN it SHALL implement image lazy loading and caching for wardrobe/discover screens, achieve bundle optimization through code splitting and tree shaking, maintain memory management with efficient component mounting/unmounting, ensure 60fps animations using existing React Native Reanimated integration, and establish performance monitoring with baseline metrics for production
 2. WHEN ensuring accessibility THEN it SHALL validate WCAG AA compliance with DesignSystem color contrast ratios (minimum 4.5:1), implement comprehensive screen reader support with proper ARIA labels and semantic markup, ensure minimum 44px touch targets using DesignSystem spacing, provide full keyboard navigation support, and include voice control capabilities for hands-free interaction
-3. WHEN testing quality THEN it SHALL expand the existing comprehensive test suite (__tests__/ directory) to achieve >90% coverage for new UI components, implement visual regression testing for DesignSystem consistency, validate BentoBox/Collage/Grid layout functionality, test animation performance and gesture handling, and ensure cross-platform consistency between iOS and Android
+3. WHEN testing quality THEN it SHALL expand the existing comprehensive test suite (**tests**/ directory) to achieve >90% coverage for new UI components, implement visual regression testing for DesignSystem consistency, validate BentoBox/Collage/Grid layout functionality, test animation performance and gesture handling, and ensure cross-platform consistency between iOS and Android
 4. WHEN validating user experience THEN it SHALL ensure smooth navigation between all screens using SPRING animations, implement robust error handling using existing ErrorBoundary and ErrorHandlingService with graceful fallbacks, provide elegant loading states with premium animations, ensure data persistence across app sessions, and validate complete user journeys from onboarding to discovery
 5. WHEN maintaining code quality THEN it SHALL enforce strict TypeScript typing across all components, implement consistent component prop interfaces with proper validation, follow atomic design principles throughout the component hierarchy, maintain ESLint and Prettier standards, and ensure comprehensive API documentation for all services and components

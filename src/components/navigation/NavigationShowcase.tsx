@@ -1,28 +1,22 @@
 /**
  * Navigation Showcase
- * 
+ *
  * A showcase component demonstrating the floating tab bar
  * with different content sections and scroll behavior.
  */
 
-import React, { useState, useRef } from 'react';
-import { DesignSystem } from '@/theme/DesignSystem';
-import {
-  View,
-  ScrollView,
-  Text,
-  StyleSheet,
-  Animated,
-  Alert,
-} from 'react-native';
-import { FloatingTabBar, DEFAULT_TABS, TabItem } from '@/components/navigation/FloatingTabBar';
-import { ProductCardShowcase } from '@/components/home/ProductCardShowcase';
-import { EditorialShowcase } from '@/components/home/EditorialShowcase';
+import React, { useRef, useState } from 'react';
+import { Alert, Animated, StyleSheet, Text, View } from 'react-native';
+
 import {
   ORIGINAL_COLORS,
-  ORIGINAL_TYPOGRAPHY,
   ORIGINAL_SPACING,
+  ORIGINAL_TYPOGRAPHY,
 } from '@/components/auth/originalLoginStyles';
+import { EditorialShowcase } from '@/components/home/EditorialShowcase';
+import { ProductCardShowcase } from '@/components/home/ProductCardShowcase';
+import { DEFAULT_TABS, FloatingTabBar } from '@/components/navigation/FloatingTabBar';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 // Sample content for different tabs
 const TAB_CONTENT = {
@@ -55,15 +49,11 @@ export const NavigationShowcase: React.FC = () => {
 
   const handleTabPress = (tabId: string) => {
     setActiveTab(tabId);
-    
+
     // Show different alerts based on tab
     const content = TAB_CONTENT[tabId as keyof typeof TAB_CONTENT];
     if (content) {
-      Alert.alert(
-        content.title,
-        `${content.subtitle} sekmesine geçildi.`,
-        [{ text: 'Tamam' }]
-      );
+      Alert.alert(content.title, `${content.subtitle} sekmesine geçildi.`, [{ text: 'Tamam' }]);
     }
   };
 
@@ -78,7 +68,7 @@ export const NavigationShowcase: React.FC = () => {
             <EditorialShowcase />
           </View>
         );
-      
+
       case 'search':
         return (
           <View style={styles.contentSection}>
@@ -86,31 +76,48 @@ export const NavigationShowcase: React.FC = () => {
             <Text style={styles.sectionDescription}>
               Burada arama özelliği bulunacak. Ürünleri, markaları ve stilleri arayabileceksiniz.
             </Text>
-            {/* Placeholder content */}
-            {Array.from({ length: 10 }, (_, i) => (
+            {/* Sample search results */}
+            {[
+              'Beyaz Gömlek',
+              'Siyah Pantolon',
+              'Denim Ceket',
+              'Kırmızı Elbise',
+              'Spor Ayakkabı',
+              'Vintage Tişört',
+              'Klasik Blazer',
+              'Yün Kazak',
+            ].map((item, i) => (
               <View key={i} style={styles.placeholderItem}>
-                <Text style={styles.placeholderText}>Arama Sonucu {i + 1}</Text>
+                <Text style={styles.placeholderText}>{item}</Text>
               </View>
             ))}
           </View>
         );
-      
+
       case 'favorites':
         return (
           <View style={styles.contentSection}>
             <Text style={styles.sectionTitle}>Favorilerim</Text>
             <Text style={styles.sectionDescription}>
-              Beğendiğiniz ürünler burada görünecek. Kalp ikonuna tıklayarak ürünleri favorilerinize ekleyebilirsiniz.
+              Beğendiğiniz ürünler burada görünecek. Kalp ikonuna tıklayarak ürünleri favorilerinize
+              ekleyebilirsiniz.
             </Text>
-            {/* Placeholder content */}
-            {Array.from({ length: 8 }, (_, i) => (
+            {/* Sample favorite items */}
+            {[
+              'Sevdiğim Denim Ceket',
+              'Konforlu Sneaker',
+              'Klasik Beyaz Gömlek',
+              'Favori Elbisem',
+              'Rahat Kazak',
+              'Şık Pantolon',
+            ].map((item, i) => (
               <View key={i} style={styles.placeholderItem}>
-                <Text style={styles.placeholderText}>Favori Ürün {i + 1}</Text>
+                <Text style={styles.placeholderText}>{item}</Text>
               </View>
             ))}
           </View>
         );
-      
+
       case 'profile':
         return (
           <View style={styles.contentSection}>
@@ -118,15 +125,22 @@ export const NavigationShowcase: React.FC = () => {
             <Text style={styles.sectionDescription}>
               Hesap bilgileriniz, tercihleriniz ve ayarlarınız burada yer alacak.
             </Text>
-            {/* Placeholder content */}
-            {Array.from({ length: 6 }, (_, i) => (
+            {/* Sample profile settings */}
+            {[
+              'Hesap Bilgileri',
+              'Stil Tercihleri',
+              'Bildirim Ayarları',
+              'Gizlilik Ayarları',
+              'Dil Seçimi',
+              'Yardım & Destek',
+            ].map((item, i) => (
               <View key={i} style={styles.placeholderItem}>
-                <Text style={styles.placeholderText}>Profil Ayarı {i + 1}</Text>
+                <Text style={styles.placeholderText}>{item}</Text>
               </View>
             ))}
           </View>
         );
-      
+
       default:
         return null;
     }
@@ -139,10 +153,9 @@ export const NavigationShowcase: React.FC = () => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+          useNativeDriver: false,
+        })}
         scrollEventThrottle={16}
       >
         {/* Header */}
@@ -176,17 +189,17 @@ export const NavigationShowcase: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  bottomSpacer: {
+    height: 120, // Space for floating tab bar
+  },
+
   container: {
-    flex: 1,
     backgroundColor: ORIGINAL_COLORS.background,
-  },
-
-  scrollView: {
     flex: 1,
   },
 
-  scrollContent: {
-    flexGrow: 1,
+  contentSection: {
+    paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
   },
 
   header: {
@@ -196,6 +209,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
+  headerSubtitle: {
+    ...ORIGINAL_TYPOGRAPHY.subtitle,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+
   headerTitle: {
     ...ORIGINAL_TYPOGRAPHY.title,
     fontSize: 32,
@@ -203,20 +222,26 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  headerSubtitle: {
-    ...ORIGINAL_TYPOGRAPHY.subtitle,
-    fontSize: 16,
+  placeholderItem: {
+    backgroundColor: ORIGINAL_COLORS.inputBackground,
+    borderColor: ORIGINAL_COLORS.inputBorder,
+    borderRadius: DesignSystem.borderRadius.md,
+    borderWidth: 1,
+    marginBottom: 12,
+    padding: 20,
+  },
+
+  placeholderText: {
+    ...ORIGINAL_TYPOGRAPHY.input,
     textAlign: 'center',
   },
 
-  contentSection: {
-    paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
+  scrollContent: {
+    flexGrow: 1,
   },
 
-  sectionTitle: {
-    ...ORIGINAL_TYPOGRAPHY.title,
-    fontSize: 24,
-    marginBottom: 12,
+  scrollView: {
+    flex: 1,
   },
 
   sectionDescription: {
@@ -226,26 +251,14 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
 
-  placeholderItem: {
-    backgroundColor: ORIGINAL_COLORS.inputBackground,
-  borderRadius: DesignSystem.borderRadius.md,
-    padding: 20,
+  sectionTitle: {
+    ...ORIGINAL_TYPOGRAPHY.title,
+    fontSize: 24,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: ORIGINAL_COLORS.inputBorder,
-  },
-
-  placeholderText: {
-    ...ORIGINAL_TYPOGRAPHY.input,
-    textAlign: 'center',
   },
 
   spacer: {
     height: 40,
-  },
-
-  bottomSpacer: {
-    height: 120, // Space for floating tab bar
   },
 });
 

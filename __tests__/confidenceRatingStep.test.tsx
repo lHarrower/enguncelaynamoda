@@ -2,15 +2,39 @@
 // Tests for confidence rating functionality and data validation
 
 describe('ConfidenceRatingStep', () => {
-  
   describe('Confidence Rating Labels', () => {
     it('should have correct labels for each rating level', () => {
       const confidenceLabels = [
-        { rating: 1, label: 'Not confident', emoji: '😔', description: 'I felt unsure about this outfit' },
-        { rating: 2, label: 'Slightly confident', emoji: '😐', description: 'It was okay, but not my best' },
-        { rating: 3, label: 'Moderately confident', emoji: '🙂', description: 'I felt good wearing this' },
-        { rating: 4, label: 'Very confident', emoji: '😊', description: 'I felt great and stylish' },
-        { rating: 5, label: 'Extremely confident', emoji: '🤩', description: 'I felt absolutely amazing!' },
+        {
+          rating: 1,
+          label: 'Not confident',
+          emoji: '😔',
+          description: 'I felt unsure about this outfit',
+        },
+        {
+          rating: 2,
+          label: 'Slightly confident',
+          emoji: '😐',
+          description: 'It was okay, but not my best',
+        },
+        {
+          rating: 3,
+          label: 'Moderately confident',
+          emoji: '🙂',
+          description: 'I felt good wearing this',
+        },
+        {
+          rating: 4,
+          label: 'Very confident',
+          emoji: '😊',
+          description: 'I felt great and stylish',
+        },
+        {
+          rating: 5,
+          label: 'Extremely confident',
+          emoji: '🤩',
+          description: 'I felt absolutely amazing!',
+        },
       ];
 
       confidenceLabels.forEach(({ rating, label, emoji, description }) => {
@@ -25,20 +49,18 @@ describe('ConfidenceRatingStep', () => {
     });
 
     it('should provide appropriate affirmations for high ratings', () => {
-      const highRatingMessages = [
-        "You're absolutely radiant! ✨",
-        "You're looking fantastic! 💫"
-      ];
+      const highRatingMessages = ["You're absolutely radiant! ✨", "You're looking fantastic! 💫"];
 
-      highRatingMessages.forEach(message => {
+      highRatingMessages.forEach((message) => {
         expect(typeof message).toBe('string');
         expect(message.length).toBeGreaterThan(0);
       });
     });
 
     it('should provide encouragement for low ratings', () => {
-      const encouragementMessage = 'Every outfit is a learning experience. Your style journey continues! 🌱';
-      
+      const encouragementMessage =
+        'Every outfit is a learning experience. Your style journey continues! 🌱';
+
       expect(typeof encouragementMessage).toBe('string');
       expect(encouragementMessage.length).toBeGreaterThan(0);
     });
@@ -49,12 +71,12 @@ describe('ConfidenceRatingStep', () => {
       const validRatings = [1, 2, 3, 4, 5];
       const invalidRatings = [0, 6, -1, 10];
 
-      validRatings.forEach(rating => {
+      validRatings.forEach((rating) => {
         expect(rating).toBeGreaterThanOrEqual(1);
         expect(rating).toBeLessThanOrEqual(5);
       });
 
-      invalidRatings.forEach(rating => {
+      invalidRatings.forEach((rating) => {
         expect(rating < 1 || rating > 5).toBeTruthy();
       });
     });
@@ -62,10 +84,10 @@ describe('ConfidenceRatingStep', () => {
     it('should handle rating change callback', () => {
       const mockCallback = jest.fn();
       const testRating = 4;
-      
+
       // Simulate rating change
       mockCallback(testRating);
-      
+
       expect(mockCallback).toHaveBeenCalledWith(testRating);
       expect(mockCallback).toHaveBeenCalledTimes(1);
     });

@@ -1,0 +1,217 @@
+🌟 AYNAMODA: Kapsamlı Betimleme
+1️⃣ Uygulamanın Kimliği ve Felsefesi
+
+Tanımı:
+AYNAMODA bir moda alışveriş uygulaması değildir.
+Kullanıcının mevcut gardırobunu yeniden keşfetmesine odaklanan, yapay zekâ destekli kişisel stil asistanıdır.
+
+Felsefesi:
+
+"Dolabım dolu ama giyecek hiçbir şeyim yok" sorununu çözer.
+
+Kullanıcıya “Confidence as a Service” (Özgüven Hizmeti) sunar.
+
+"Daha az al, daha çok kullan." → israf karşıtı, verimlilik yanlısı.
+
+Kullanıcının kendini huzurlu, zarif ve güçlü hissetmesini sağlar.
+
+Kullanıcıya Hissettirdiği Duygu:
+
+Huzur: Kararsızlık stresi biter.
+
+Neşeli Lüks: Günlük hayat içinde küçük ama etkili lüks deneyim.
+
+Kontrol & Güven: Dolabını, zevklerini ve alışveriş kararlarını kontrol altında tutar.
+
+2️⃣ Hedef Kitle
+
+Ana kitle:
+
+28-45 yaş arası, şehirli, çalışan kadınlar
+
+Modayı seven ama zaman sıkıntısı yaşayan
+
+Gardırobunu daha verimli kullanmak isteyen
+
+Orta vadeli genişleme:
+
+Genç kullanıcılar (Z kuşağı)
+
+Erkek kullanıcılar
+
+Sürdürülebilirlik trendini benimseyen global pazar
+
+3️⃣ Kullanıcı Yolculuğu (Experience Flow)
+1. Onboarding
+
+Uygulamaya giriş: Google / Apple ID ile hızlı kayıt
+
+İki yol:
+
+Fotoğraf yükleyerek Stil DNA çıkarma (renk, kesim, stil alışkanlıkları)
+
+Limitli Mod: Fotoğraf yüklemeden sınırlı kullanım
+
+2. Gardırop Yönetimi
+
+Kıyafet yükleme (fotoğraf çek veya galeriden yükle)
+
+AI destekli arka plan temizleme → sadece kıyafet kalır
+
+Etiketleme: kategori (üst, alt, aksesuar), renk, kumaş
+
+Favoriler: En sevilen kombinler & parçalar
+
+3. Ayna (AI Kombin Motoru)
+
+Gardıroptaki parçaları yeniden birleştirerek yeni kombinler üretir
+
+Az giyilmiş veya unutulmuş parçaları öne çıkarır
+
+Kullanıcı avatarı üzerinde kombinleri gösterir (2D → 3D görünüme kaplama teknolojisi)
+
+Kullanıcıya cesur ama uyumlu öneriler verir
+
+4. Verimlilik Puanı (Efficiency Score)
+
+Yeni bir ürün ilgini çektiğinde:
+
+Mevcut gardırobunla kaç kombin çıkarır?
+
+Matematiksel skor sunar → dürtüsel alışverişi engeller
+
+Örn: “Bu bluz → 12 yeni kombin yaratır”
+
+5. Keşfet (Butikler & Markalar)
+
+İş birlikleri yapılan butiklerden ürünler gösterilir
+
+Kullanıcıya zevklerine göre filtrelenmiş öneriler gelir
+
+Alışveriş yapılırsa uygulama komisyon kazanır
+
+4️⃣ Teknolojik Altyapı
+
+Frontend: React Native + Expo (tek kod tabanıyla Android & iOS)
+
+Backend: Supabase (Postgres DB, Auth, RLS güvenlik politikaları)
+
+Depolama: Cloudinary (fotoğraf saklama & optimize etme)
+
+AI Katmanı (AynaAI):
+
+Görsel analiz (renk, kesim, desen tanıma)
+
+Kişiselleştirme (Stil DNA çıkarma)
+
+Kombin öneri motoru (harmony & frequency analizleri)
+
+Verimlilik Puanı hesaplama
+
+Güvenlik:
+
+Environment variables ile API anahtarlarının korunması
+
+Kullanıcı verilerini istediği an silme (GDPR uyumlu)
+
+Row Level Security (her kullanıcı sadece kendi verisine erişebilir)
+
+5️⃣ Gelir Modeli
+
+Freemium:
+
+Ücretsiz sürüm: 30 parça yükleme sınırı
+
+Premium abonelik: Sınırsız parça, Ayna & Verimlilik Puanı
+
+Komisyon Geliri:
+
+“Keşfet” kısmında butiklerden alınan ürünlerden %10’a kadar komisyon
+
+Uzun Vadeli Gelir:
+
+Markalar için reklam alanları
+
+Premium stil danışmanlığı servisleri
+
+6️⃣ UI/UX Vizyonu
+
+Spotify’dan: Düzen & netlik (temiz arayüz, net kategori yapısı)
+
+Poppi’den: Akışkanlık & neşe (animasyonlar, akıcı geçişler)
+
+Gucci’den: Premium his (sofistike tipografi, zarif renk paleti)
+
+Renk Paleti:
+
+Zengin Bordo
+
+Sıcak Krem
+
+Sıvı Altın
+
+Tipografi:
+
+Başlıklar: Playfair Display (lüks & feminen)
+
+Metinler: Manrope (modern & sade)
+
+7️⃣ Kullanıcıya Sağladığı Katma Değer
+
+Karmaşık gardırop → düzenli sistem
+
+Stil kararsızlığı → güvenli kombin önerileri
+
+Dürtüsel alışveriş → mantıklı kararlar (Verimlilik Puanı)
+
+Unutulmuş parçalar → yeniden değerlendirilen kıyafetler
+
+İsraf → sürdürülebilir, bilinçli tüketim
+
+8️⃣ Pazardaki Konum
+
+Rakiplerden farkı:
+
+Trendyol Dolap → alışveriş odaklı
+
+Stitch Fix → stil danışmanlığı odaklı
+
+AYNAMODA → sahip olunan kıyafetleri en verimli şekilde kullanmaya odaklı
+
+Avantajı: Moda + AI + sürdürülebilirlik üçgeninde eşsiz bir pozisyon.
+
+Potansiyeli:
+
+Türkiye pazarında milyonlarca kullanıcı
+
+Avrupa’da sürdürülebilir moda trendi sayesinde global açılım
+
+9️⃣ Gelecek Hedefleri
+
+Kısa Vadede (0-1 yıl):
+
+Türkiye’de şehirli kadın kitlesinde yayılmak
+
+%95 test coverage, %100 Türkçeleştirilmiş sürüm
+
+Orta Vadede (1-3 yıl):
+
+Erkek kullanıcılar + genç kitle
+
+İngilizce, Almanca sürümlerle global açılım
+
+Uzun Vadede (5 yıl):
+
+10 milyon kullanıcı
+
+Moda sektöründe AI destekli kişisel stil asistanı kategorisinde lider marka olmak
+
+🏆 Özet
+
+AYNAMODA, bir moda uygulaması değil, bir kişisel stil devrimidir.
+
+Kullanıcısına özgüven, huzur ve verimlilik kazandırır.
+
+Moda + yapay zekâ + sürdürülebilirlik ekseninde, global potansiyele sahip bir uygulamadır.
+
+Premium his, feminen estetik ve kullanıcıya gerçek fayda → bu projeyi farklı kılar.

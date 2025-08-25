@@ -1,43 +1,55 @@
 // Mock for Supabase client
 const mockAuth = {
-  getUser: jest.fn(() => Promise.resolve({ data: { user: { id: 'test-user-id', email: 'test@example.com' } }, error: null })),
-  getSession: jest.fn(() => Promise.resolve({ data: { session: { user: { id: 'test-user-id' } } }, error: null })),
-  signInWithPassword: jest.fn(() => Promise.resolve({ data: { user: { id: 'test-user-id' } }, error: null })),
+  getUser: jest.fn(() =>
+    Promise.resolve({
+      data: { user: { id: 'test-user-id', email: 'user@aynamoda.com' } },
+      error: null,
+    }),
+  ),
+  getSession: jest.fn(() =>
+    Promise.resolve({ data: { session: { user: { id: 'test-user-id' } } }, error: null }),
+  ),
+  signInWithPassword: jest.fn(() =>
+    Promise.resolve({ data: { user: { id: 'test-user-id' } }, error: null }),
+  ),
   signUp: jest.fn(() => Promise.resolve({ data: { user: { id: 'test-user-id' } }, error: null })),
   signOut: jest.fn(() => Promise.resolve({ error: null })),
   onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
   resetPasswordForEmail: jest.fn(() => Promise.resolve({ error: null })),
-  updateUser: jest.fn(() => Promise.resolve({ data: { user: { id: 'test-user-id' } }, error: null })),
+  updateUser: jest.fn(() =>
+    Promise.resolve({ data: { user: { id: 'test-user-id' } }, error: null }),
+  ),
 };
 
 // Helper to create a chainable builder whose methods are jest mocks returning self
 function createQueryBuilder() {
   const builder = {};
-  const self = builder; // alias
-  const chain = (fn) => jest.fn(fn).mockReturnValue(self);
-
-  Object.assign(builder, {
-    select: chain(),
-    insert: chain(),
-    update: chain(),
-    delete: chain(),
-    upsert: chain(),
-    eq: chain(),
-    neq: chain(),
-    gt: chain(),
-    gte: chain(),
-    lt: chain(),
-    lte: chain(),
-    like: chain(),
-    ilike: chain(),
-    in: chain(),
-    contains: chain(),
-    or: chain(),
-    order: chain(),
-    limit: chain(),
-    range: chain(),
-    single: jest.fn(() => Promise.resolve({ data: { id: 'test-id', user_id: 'test-user-id' }, error: null })),
-    maybeSingle: jest.fn(() => Promise.resolve({ data: { id: 'test-id' }, error: null })),
+  
+  // Create chainable methods that return the builder
+  const chainableMethods = [
+    'select', 'insert', 'update', 'delete', 'upsert',
+    'eq', 'neq', 'gt', 'gte', 'lt', 'lte',
+    'like', 'ilike', 'in', 'contains', 'or',
+    'order', 'limit', 'range', 'not'
+  ];
+  
+  chainableMethods.forEach(method => {
+    builder[method] = jest.fn(() => builder);
+  });
+  
+  // Terminal methods that return promises
+  builder.single = jest.fn(() =>
+    Promise.resolve({ data: { id: 'test-id', user_id: 'test-user-id', usage_count: 1 }, error: null })
+  );
+  
+  builder.maybeSingle = jest.fn(() => 
+    Promise.resolve({ data: { id: 'test-id', user_id: 'test-user-id', usage_count: 0 }, error: null })
+  );
+  
+  // Add other terminal methods
+  builder.then = jest.fn((resolve) => {
+    const result = { data: [{ id: 'test-id', user_id: 'test-user-id', usage_count: 0 }], error: null };
+    return Promise.resolve(result).then(resolve);
   });
 
   return builder;

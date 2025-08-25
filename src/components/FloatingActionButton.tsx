@@ -1,9 +1,11 @@
-import React from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+
 import { SPACING } from '../constants/AppConstants';
 
 interface FloatingActionButtonProps {
@@ -19,10 +21,9 @@ export default function FloatingActionButton({
   size = 56,
   disabled = false,
 }: FloatingActionButtonProps) {
-
   const handlePress = () => {
     if (!disabled) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       onPress();
     }
   };
@@ -35,16 +36,25 @@ export default function FloatingActionButton({
           width: size,
           height: size,
           borderRadius: size / 2,
-          opacity: disabled ? 0.5 : 1,
         },
-  DesignSystem.elevation.soft,
+        disabled && styles.disabled,
+        DesignSystem.elevation.soft,
       ]}
       onPress={handlePress}
       disabled={disabled}
       activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel="Floating action button"
+      accessibilityHint="Tap to perform the primary action"
+      accessibilityState={{ disabled }}
     >
       <LinearGradient
-  colors={[DesignSystem.colors.primary[500], DesignSystem.colors.gold[500]] as const}
+        colors={
+          [
+            DesignSystem.colors.primaryIndexed[500] || '#007AFF',
+            DesignSystem.colors.gold[500] || '#C9A227',
+          ] as const
+        }
         style={[
           styles.gradient,
           {
@@ -56,11 +66,7 @@ export default function FloatingActionButton({
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <Ionicons 
-          name={icon} 
-          size={size * 0.4} 
-          color="#FFFFFF" 
-        />
+        <Ionicons name={icon} size={size * 0.4} color="#FFFFFF" />
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -68,13 +74,16 @@ export default function FloatingActionButton({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
     bottom: SPACING.xl,
-    right: SPACING.xl,
     overflow: 'hidden',
+    position: 'absolute',
+    right: SPACING.xl,
+  },
+  disabled: {
+    opacity: 0.5,
   },
   gradient: {
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });

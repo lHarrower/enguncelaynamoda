@@ -1,14 +1,7 @@
-import React, { useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-  ScrollView,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import React, { useEffect, useRef } from 'react';
+import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { DesignSystem } from '../../theme/DesignSystem';
 import { EmotionalResponse, EmotionalState } from '../../types/aynaMirror';
 
@@ -89,10 +82,13 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
   onIntensityChange,
 }) => {
   const emotionAnimations = useRef(
-    EMOTIONS.reduce((acc, emotion) => {
-      acc[emotion.state] = new Animated.Value(1);
-      return acc;
-    }, {} as Record<EmotionalState, Animated.Value>)
+    EMOTIONS.reduce(
+      (acc, emotion) => {
+        acc[emotion.state] = new Animated.Value(1);
+        return acc;
+      },
+      {} as Record<EmotionalState, Animated.Value>,
+    ),
   ).current;
 
   const intensityAnimation = useRef(new Animated.Value(1)).current;
@@ -115,7 +111,7 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
         ]).start();
       }
     });
-  }, [emotionalResponse.primary]);
+  }, [emotionalResponse.primary, emotionAnimations]);
 
   useEffect(() => {
     // Animate intensity change
@@ -131,7 +127,7 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
         useNativeDriver: true,
       }),
     ]).start();
-  }, [emotionalResponse.intensity]);
+  }, [emotionalResponse.intensity, intensityAnimation]);
 
   const handleEmotionPress = (emotion: EmotionalState) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -143,8 +139,10 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
     onIntensityChange(intensity);
   };
 
-  const selectedEmotion = EMOTIONS.find(e => e.state === emotionalResponse.primary);
-  const selectedIntensityLabel = INTENSITY_LABELS.find(i => i.value === emotionalResponse.intensity);
+  const selectedEmotion = EMOTIONS.find((e) => e.state === emotionalResponse.primary);
+  const selectedIntensityLabel = INTENSITY_LABELS.find(
+    (i) => i.value === emotionalResponse.intensity,
+  );
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -154,7 +152,7 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
         <View style={styles.emotionsGrid}>
           {EMOTIONS.map((emotion) => {
             const isSelected = emotion.state === emotionalResponse.primary;
-            
+
             return (
               <TouchableOpacity
                 key={emotion.state}
@@ -190,7 +188,7 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
         <Text style={styles.sectionTitle}>
           How {selectedIntensityLabel?.label.toLowerCase()} {selectedEmotion?.label.toLowerCase()}?
         </Text>
-        
+
         <Animated.View
           style={[
             styles.intensityContainer,
@@ -203,7 +201,7 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
             {INTENSITY_LABELS.map((item) => {
               const isSelected = item.value === emotionalResponse.intensity;
               const progress = item.value / 10;
-              
+
               return (
                 <TouchableOpacity
                   key={item.value}
@@ -212,7 +210,7 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
                     styles.intensityDot,
                     isSelected && styles.intensityDotSelected,
                     {
-                      backgroundColor: isSelected 
+                      backgroundColor: isSelected
                         ? selectedEmotion?.color || DesignSystem.colors.accent.gold
                         : DesignSystem.colors.surface.primary,
                     },
@@ -223,7 +221,7 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
               );
             })}
           </View>
-          
+
           <View style={styles.intensityLabels}>
             <Text style={styles.intensityLabelText}>Not at all</Text>
             <Text style={[styles.intensityLabelText, styles.intensityLabelCenter]}>
@@ -241,9 +239,7 @@ export const EmotionalResponseStep: React.FC<EmotionalResponseStepProps> = ({
           <Text style={[styles.summaryText, { color: selectedEmotion.color }]}>
             {selectedIntensityLabel?.label} {selectedEmotion.label.toLowerCase()}
           </Text>
-          <Text style={styles.summaryDescription}>
-            "{selectedEmotion.description}"
-          </Text>
+          <Text style={styles.summaryDescription}>{`"${selectedEmotion.description}"`}</Text>
         </View>
       )}
     </ScrollView>
@@ -254,38 +250,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  section: {
-    marginBottom: 32,
-  },
-  sectionTitle: {
-    ...DesignSystem.typography.heading.h3,
-    color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  emotionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 12,
-  },
   emotionButton: {
-    width: '45%',
     minWidth: 140,
+    width: '45%',
   },
   emotionCard: {
-    backgroundColor: DesignSystem.colors.surface.primary,
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
     alignItems: 'center',
-    borderWidth: 2,
+    backgroundColor: DesignSystem.colors.surface.primary,
     borderColor: 'transparent',
+    borderRadius: 16,
+    borderWidth: 2,
     minHeight: 100,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
   },
   emotionCardSelected: {
-    borderWidth: 2,
     backgroundColor: DesignSystem.colors.background.primary,
+    borderWidth: 2,
+  },
+  emotionDescription: {
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.secondary,
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
   emotionEmoji: {
     fontSize: 24,
@@ -295,66 +282,81 @@ const styles = StyleSheet.create({
     ...DesignSystem.typography.body.large,
     color: DesignSystem.colors.text.primary,
     fontWeight: '600',
-    textAlign: 'center',
     marginBottom: 4,
-  },
-  emotionDescription: {
-    ...DesignSystem.typography.body.small,
-    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    fontStyle: 'italic',
+  },
+  emotionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'center',
   },
   intensityContainer: {
     alignItems: 'center',
   },
-  intensitySlider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
   intensityDot: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
     alignItems: 'center',
+    borderRadius: 10,
+    height: 20,
     justifyContent: 'center',
-  },
-  intensityDotSelected: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 20,
   },
   intensityDotInner: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
     backgroundColor: 'transparent',
+    borderRadius: 4,
+    height: 8,
+    width: 8,
   },
-  intensityLabels: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: 20,
-  },
-  intensityLabelText: {
-    ...DesignSystem.typography.body.small,
-    color: DesignSystem.colors.text.tertiary,
+  intensityDotSelected: {
+    borderRadius: 12,
+    height: 24,
+    width: 24,
   },
   intensityLabelCenter: {
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     fontWeight: '600',
   },
-  summaryContainer: {
-    borderRadius: 16,
-    paddingVertical: 20,
-    paddingHorizontal: 24,
+  intensityLabelText: {
+    ...DesignSystem.typography.body.small,
+    color: DesignSystem.colors.text.tertiary,
+  },
+  intensityLabels: {
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    width: '100%',
+  },
+  intensitySlider: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+    paddingHorizontal: 20,
+    width: '100%',
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  summaryContainer: {
+    alignItems: 'center',
+    borderRadius: 16,
     marginTop: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+  },
+  summaryDescription: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
   summaryEmoji: {
     fontSize: 32,
@@ -363,13 +365,7 @@ const styles = StyleSheet.create({
   summaryText: {
     ...DesignSystem.typography.heading.h3,
     fontWeight: '600',
-    textAlign: 'center',
     marginBottom: 4,
-  },
-  summaryDescription: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    fontStyle: 'italic',
   },
 });

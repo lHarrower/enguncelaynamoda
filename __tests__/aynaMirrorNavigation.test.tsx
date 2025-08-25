@@ -17,8 +17,8 @@ import React from 'react';
 import { render, waitFor, fireEvent } from '@testing-library/react-native';
 import { router } from 'expo-router';
 import * as Linking from 'expo-linking';
-import AynaMirrorPage from '@/../app/(app)/ayna-mirror';
-import AynaMirrorSettingsPage from '@/../app/ayna-mirror-settings';
+import AynaMirrorPage from '../app/(app)/ayna-mirror';
+import AynaMirrorSettingsPage from '../app/ayna-mirror-settings';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/theme/ThemeProvider';
 import notificationHandler from '@/services/notificationHandler';
@@ -75,8 +75,10 @@ jest.mock('@/screens/AynaMirrorScreen', () => ({
   AynaMirrorScreen: ({ userId }: { userId: string }) => {
     const React = require('react');
     const { View, Text } = require('react-native');
-    return React.createElement(View, { testID: 'ayna-mirror-screen', 'data-user-id': userId },
-      React.createElement(Text, {}, 'AYNA Mirror Screen')
+    return React.createElement(
+      View,
+      { testID: 'ayna-mirror-screen', 'data-user-id': userId },
+      React.createElement(Text, {}, 'AYNA Mirror Screen'),
     );
   },
 }));
@@ -86,12 +88,18 @@ jest.mock('@/screens/AynaMirrorSettingsScreen', () => ({
   default: ({ navigation }: { navigation: any }) => {
     const React = require('react');
     const { View, Text, TouchableOpacity } = require('react-native');
-    return React.createElement(View, { testID: 'ayna-mirror-settings-screen' },
+    return React.createElement(
+      View,
+      { testID: 'ayna-mirror-settings-screen' },
       React.createElement(Text, {}, 'AYNA Mirror Settings Screen'),
-      React.createElement(TouchableOpacity, { 
-        testID: 'back-button',
-        onPress: () => navigation.goBack()
-      }, React.createElement(Text, {}, 'Back'))
+      React.createElement(
+        TouchableOpacity,
+        {
+          testID: 'back-button',
+          onPress: () => navigation.goBack(),
+        },
+        React.createElement(Text, {}, 'Back'),
+      ),
     );
   },
 }));
@@ -112,7 +120,7 @@ const mockLinking = Linking as jest.Mocked<typeof Linking>;
 describe('AYNA Mirror Navigation Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Default auth state - authenticated user
     mockUseAuth.mockReturnValue({
       user: { id: 'test-user-123' },
@@ -140,7 +148,7 @@ describe('AYNA Mirror Navigation Integration', () => {
       } as any);
 
       const { getByTestId } = render(<AynaMirrorPage />);
-      
+
       const redirect = getByTestId('redirect');
       expect(redirect).toBeTruthy();
       expect(redirect.props['data-href']).toBe('/auth/sign-in');
@@ -159,14 +167,14 @@ describe('AYNA Mirror Navigation Integration', () => {
       } as any);
 
       const { getByTestId } = render(<AynaMirrorPage />);
-      
+
       // Should render container but not redirect while loading
       expect(() => getByTestId('redirect')).toThrow();
     });
 
     it('should render AYNA Mirror screen when user is authenticated', () => {
       const { getByTestId } = render(<AynaMirrorPage />);
-      
+
       const aynaMirrorScreen = getByTestId('ayna-mirror-screen');
       expect(aynaMirrorScreen).toBeTruthy();
       expect(aynaMirrorScreen.props['data-user-id']).toBe('test-user-123');
@@ -179,21 +187,21 @@ describe('AYNA Mirror Navigation Integration', () => {
         colors: { background: '#f0f0f0' },
         isDark: false,
       };
-      
+
       mockUseTheme.mockReturnValue(mockTheme);
 
       const { getByTestId } = render(<AynaMirrorPage />);
-      
-  // The container should use theme colors
-  // Note: In actual implementation, you'd check the style prop
-  expect(mockUseTheme).toHaveBeenCalled();
+
+      // The container should use theme colors
+      // Note: In actual implementation, you'd check the style prop
+      expect(mockUseTheme).toHaveBeenCalled();
     });
   });
 
   describe('Deep Linking Integration', () => {
     it('should handle feedback deep link parameters', async () => {
       const mockParams = { feedback: 'outfit-123' };
-      
+
       // Mock useLocalSearchParams to return feedback parameter
       const { useLocalSearchParams } = require('expo-router');
       useLocalSearchParams.mockReturnValue(mockParams);
@@ -208,7 +216,7 @@ describe('AYNA Mirror Navigation Integration', () => {
       await waitFor(() => {
         expect(deep.processDeepLinkParams).toHaveBeenCalledTimes(1);
         expect(deep.processDeepLinkParams).toHaveBeenCalledWith(
-          expect.objectContaining({ feedback: 'outfit-123' })
+          expect.objectContaining({ feedback: 'outfit-123' }),
         );
       });
     });
@@ -223,7 +231,7 @@ describe('AYNA Mirror Navigation Integration', () => {
   describe('Settings Navigation', () => {
     it('should render settings screen with navigation', () => {
       const { getByTestId } = render(<AynaMirrorSettingsPage />);
-      
+
       const settingsScreen = getByTestId('ayna-mirror-settings-screen');
       expect(settingsScreen).toBeTruthy();
     });
@@ -248,7 +256,7 @@ describe('AYNA Mirror Navigation Integration', () => {
 
     it('should parse AYNA Mirror deep link correctly', () => {
       const testUrl = 'aynamoda://ayna-mirror';
-      
+
       mockLinking.parse.mockReturnValue({
         scheme: 'aynamoda',
         hostname: 'ayna-mirror',
@@ -258,14 +266,14 @@ describe('AYNA Mirror Navigation Integration', () => {
 
       // Simulate deep link handling
       const parsedUrl = Linking.parse(testUrl);
-      
+
       expect(parsedUrl.hostname).toBe('ayna-mirror');
       expect(parsedUrl.path).toBe('/ayna-mirror');
     });
 
     it('should parse feedback deep link with parameters', () => {
       const testUrl = 'aynamoda://ayna-mirror?feedback=outfit-123';
-      
+
       mockLinking.parse.mockReturnValue({
         scheme: 'aynamoda',
         hostname: 'ayna-mirror',
@@ -274,13 +282,13 @@ describe('AYNA Mirror Navigation Integration', () => {
       });
 
       const parsedUrl = Linking.parse(testUrl);
-      
+
       expect(parsedUrl.queryParams?.feedback).toBe('outfit-123');
     });
 
     it('should parse settings deep link correctly', () => {
       const testUrl = 'aynamoda://ayna-mirror/settings';
-      
+
       mockLinking.parse.mockReturnValue({
         scheme: 'aynamoda',
         hostname: 'ayna-mirror',
@@ -289,7 +297,7 @@ describe('AYNA Mirror Navigation Integration', () => {
       });
 
       const parsedUrl = Linking.parse(testUrl);
-      
+
       expect(parsedUrl.path).toBe('/ayna-mirror/settings');
     });
   });
@@ -298,20 +306,20 @@ describe('AYNA Mirror Navigation Integration', () => {
     it('should maintain proper navigation stack', async () => {
       // Test navigation from main app to AYNA Mirror
       const { rerender } = render(<AynaMirrorPage />);
-      
+
       // Verify AYNA Mirror screen is rendered
       expect(() => render(<AynaMirrorPage />)).not.toThrow();
-      
+
       // Test navigation to settings
       rerender(<AynaMirrorSettingsPage />);
-      
+
       // Both screens should be able to render without errors
       expect(() => render(<AynaMirrorSettingsPage />)).not.toThrow();
     });
 
     it('should handle authentication state changes during navigation', async () => {
       const { rerender } = render(<AynaMirrorPage />);
-      
+
       // Simulate user logout
       mockUseAuth.mockReturnValue({
         user: null,
@@ -325,7 +333,7 @@ describe('AYNA Mirror Navigation Integration', () => {
       } as any);
 
       rerender(<AynaMirrorPage />);
-      
+
       // Should redirect to auth
       const { getByTestId } = render(<AynaMirrorPage />);
       const redirect = getByTestId('redirect');
@@ -362,7 +370,7 @@ describe('Notification Handler Integration', () => {
 
   it('should initialize notification handler correctly', async () => {
     await notificationHandler.initialize();
-    
+
     expect(notificationHandler.initialize).toHaveBeenCalled();
   });
 
@@ -389,7 +397,7 @@ describe('Notification Handler Integration', () => {
 
   it('should clean up notification listeners', () => {
     notificationHandler.cleanup();
-    
+
     expect(notificationHandler.cleanup).toHaveBeenCalled();
   });
 });

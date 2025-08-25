@@ -1,14 +1,10 @@
-import { useState } from 'react';
-import * as ImagePicker from 'expo-image-picker';
-import { supabase, ENV } from '@/config/supabaseClient';
-import { useAuth } from '@/context/AuthContext';
-import { 
-  API_CONFIG, 
-  IMAGE_CONFIG, 
-  ERROR_MESSAGES,
-  SUCCESS_MESSAGES 
-} from '@/constants/AppConstants';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+
+import { supabase } from '@/config/supabaseClient';
+import { API_CONFIG, ERROR_MESSAGES, IMAGE_CONFIG } from '@/constants/AppConstants';
+import { useAuth } from '@/context/AuthContext';
+import { logger } from '@/utils/logger';
 
 // Interface for UI callbacks that the hook will use
 export interface UICallbacks {
@@ -23,7 +19,7 @@ export interface UICallbacks {
       style?: 'default' | 'cancel' | 'destructive' | 'primary';
       icon?: keyof typeof Ionicons.glyphMap;
     }>,
-    type?: 'default' | 'success' | 'warning' | 'error' | 'info'
+    type?: 'default' | 'success' | 'warning' | 'error' | 'info',
   ) => void;
   hideCustomAlert: () => void;
 }
@@ -39,10 +35,10 @@ export const useImageUploader = (callbacks: UICallbacks) => {
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
         showCustomAlert(
-          "Camera Permission Required",
-          "We need access to your camera to take photos of your wardrobe items. Please enable camera permissions in your device settings.",
-          [{ text: "OK", onPress: hideCustomAlert }],
-          "warning"
+          'Camera Permission Required',
+          'We need access to your camera to take photos of your wardrobe items. Please enable camera permissions in your device settings.',
+          [{ text: 'OK', onPress: hideCustomAlert }],
+          'warning',
         );
         return;
       }
@@ -60,16 +56,18 @@ export const useImageUploader = (callbacks: UICallbacks) => {
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const asset = result.assets[0];
-        await uploadImage(asset.uri);
+        if (asset?.uri) {
+          await uploadImage(asset.uri);
+        }
       }
     } catch (error) {
-      console.error('Camera error:', error);
+      logger.error('Camera error', { error, context: 'useImageUploader.pickImageWithCameraAsync' });
       hideLoading();
       showCustomAlert(
-        "Camera Error",
-        "There was an issue accessing your camera. Please try again.",
-        [{ text: "OK", onPress: hideCustomAlert }],
-        "error"
+        'Camera Error',
+        'There was an issue accessing your camera. Please try again.',
+        [{ text: 'OK', onPress: hideCustomAlert }],
+        'error',
       );
     }
   };
@@ -81,10 +79,10 @@ export const useImageUploader = (callbacks: UICallbacks) => {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
         showCustomAlert(
-          "Gallery Permission Required",
-          "We need access to your photo gallery to select images of your wardrobe items. Please enable gallery permissions in your device settings.",
-          [{ text: "OK", onPress: hideCustomAlert }],
-          "warning"
+          'Gallery Permission Required',
+          'We need access to your photo gallery to select images of your wardrobe items. Please enable gallery permissions in your device settings.',
+          [{ text: 'OK', onPress: hideCustomAlert }],
+          'warning',
         );
         return;
       }
@@ -102,16 +100,21 @@ export const useImageUploader = (callbacks: UICallbacks) => {
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const asset = result.assets[0];
-        await uploadImage(asset.uri);
+        if (asset?.uri) {
+          await uploadImage(asset.uri);
+        }
       }
     } catch (error) {
-      console.error('Gallery error:', error);
+      logger.error('Gallery error', {
+        error,
+        context: 'useImageUploader.pickImageWithGalleryAsync',
+      });
       hideLoading();
       showCustomAlert(
-        "Gallery Error",
-        "There was an issue accessing your photo gallery. Please try again.",
-        [{ text: "OK", onPress: hideCustomAlert }],
-        "error"
+        'Gallery Error',
+        'There was an issue accessing your photo gallery. Please try again.',
+        [{ text: 'OK', onPress: hideCustomAlert }],
+        'error',
       );
     }
   };
@@ -121,10 +124,10 @@ export const useImageUploader = (callbacks: UICallbacks) => {
     try {
       if (!user) {
         showCustomAlert(
-          "Authentication Required",
-          "Please sign in to upload images to your wardrobe.",
-          [{ text: "OK", onPress: hideCustomAlert }],
-          "warning"
+          'Authentication Required',
+          'Please sign in to upload images to your wardrobe.',
+          [{ text: 'OK', onPress: hideCustomAlert }],
+          'warning',
         );
         return;
       }
@@ -139,41 +142,44 @@ export const useImageUploader = (callbacks: UICallbacks) => {
       const blob = await response.blob();
 
       // Upload to Supabase Storage
-      console.log('Uploading image to Supabase...');
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      logger.info('Uploading image to Supabase', {
+        bucket: API_CONFIG.SUPABASE_STORAGE_BUCKET,
+        userId: user.id,
+        context: 'useImageUploader.uploadImage',
+      });
+      const { data: uploadData, error: uploadError } = await ((supabase as any).storage
         .from(API_CONFIG.SUPABASE_STORAGE_BUCKET)
         .upload(filename, blob, {
           contentType: 'image/jpeg',
-          upsert: false
-        });
+          upsert: false,
+        }) as any);
 
       if (uploadError) {
-        console.error('Upload error:', uploadError);
+        logger.error('Upload error', { uploadError, context: 'useImageUploader.uploadImage' });
         throw new Error(`Upload failed: ${uploadError.message}`);
       }
 
-      console.log('Image uploaded successfully:', uploadData.path);
+      logger.info('Image uploaded successfully', { path: uploadData?.path });
 
       // Get the public URL for the uploaded image
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = (supabase as any).storage
         .from(API_CONFIG.SUPABASE_STORAGE_BUCKET)
-        .getPublicUrl(uploadData.path);
+        .getPublicUrl(uploadData.path) as any;
 
       const imageUrl = urlData.publicUrl;
-      console.log('Public URL:', imageUrl);
+      logger.debug('Public URL generated', { imageUrl });
 
       // Analyze the image with AI
       await analyzeImageWithAI(imageUrl);
-
     } catch (error) {
-      console.error('Upload process error:', error);
+      logger.error('Upload process error', { error, context: 'useImageUploader.uploadImage' });
       hideLoading();
-      
+
       showCustomAlert(
-        "Upload Failed",
+        'Upload Failed',
         ERROR_MESSAGES.NETWORK_ERROR,
-        [{ text: "OK", onPress: hideCustomAlert }],
-        "error"
+        [{ text: 'OK', onPress: hideCustomAlert }],
+        'error',
       );
     }
   };
@@ -184,7 +190,7 @@ export const useImageUploader = (callbacks: UICallbacks) => {
     // use OpenAI vision via ai-proxy, sending the image URL and question.
     try {
       const { aiProxyChatCompletion } = await import('@/config/aiProxy');
-      const completion: any = await aiProxyChatCompletion({
+      const completion = await aiProxyChatCompletion({
         provider: 'openai',
         model: 'gpt-4o',
         messages: [
@@ -202,7 +208,10 @@ export const useImageUploader = (callbacks: UICallbacks) => {
       const content = completion?.choices?.[0]?.message?.content?.trim();
       return content || 'unknown';
     } catch (err) {
-      console.error('VQA via ai-proxy failed, returning unknown:', err);
+      logger.warn('VQA via ai-proxy failed, returning unknown', {
+        error: err,
+        context: 'useImageUploader.askQuestionToAI',
+      });
       return 'unknown';
     }
   };
@@ -210,26 +219,26 @@ export const useImageUploader = (callbacks: UICallbacks) => {
   // Analyze image with AI using Visual Question Answering
   const analyzeImageWithAI = async (imageUrl: string) => {
     try {
-      console.log('Starting AI analysis for image:', imageUrl);
+      logger.info('Starting AI analysis for image', { imageUrl });
 
       // Ask specific questions to get structured data
-      const categoryQuestion = "What is the category of this clothing item?";
-      const colorQuestion = "What are the main colors as comma separated list?";
+      const categoryQuestion = 'What is the category of this clothing item?';
+      const colorQuestion = 'What are the main colors as comma separated list?';
 
       // Get answers from the VQA model
       const categoryAnswer = await askQuestionToAI(imageUrl, categoryQuestion);
       const colorAnswer = await askQuestionToAI(imageUrl, colorQuestion);
 
-      console.log('AI Analysis Results:', {
+      logger.info('AI Analysis Results', {
         category: categoryAnswer,
-        colors: colorAnswer
+        colors: colorAnswer,
       });
 
       // Process the colors into an array
       const colorsArray = colorAnswer
         .split(',')
-        .map(color => color.trim().toLowerCase())
-        .filter(color => color.length > 0 && color !== 'unknown');
+        .map((color) => color.trim().toLowerCase())
+        .filter((color) => color.length > 0 && color !== 'unknown');
 
       // Prepare the data for database insertion
       const wardrobeItem = {
@@ -238,39 +247,45 @@ export const useImageUploader = (callbacks: UICallbacks) => {
         category: categoryAnswer !== 'unknown' ? categoryAnswer : 'clothing',
         colors: colorsArray.length > 0 ? colorsArray : ['unspecified'],
         description: categoryAnswer !== 'unknown' ? categoryAnswer : 'clothing item',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       };
 
-      console.log('Saving to database:', wardrobeItem);
+      logger.info('Saving wardrobe item', {
+        userId: user?.id,
+        category: wardrobeItem.category,
+        colors: wardrobeItem.colors,
+      });
 
       // Save to Supabase database
-      const { error: dbError } = await supabase
+      const { error: dbError } = await (supabase as any)
         .from('wardrobe_items')
         .insert([wardrobeItem]);
 
       if (dbError) {
-        console.error('Database error:', dbError);
+        logger.error('Database error saving wardrobe item', {
+          dbError,
+          context: 'useImageUploader.analyzeImageWithAI',
+        });
         throw new Error(`Failed to save to database: ${dbError.message}`);
       }
 
       hideLoading();
 
       showCustomAlert(
-        "Item Added Successfully! ✨",
+        'Item Added Successfully! ✨',
         `Your ${wardrobeItem.category} has been analyzed and added to your wardrobe with colors: ${wardrobeItem.colors.join(', ')}.`,
-        [{ text: "Awesome!", onPress: hideCustomAlert }],
-        "success"
+        [{ text: 'Awesome!', onPress: hideCustomAlert }],
+        'success',
       );
-
     } catch (error) {
-      console.error('AI analysis error:', error);
+      logger.error('AI analysis error', { error, context: 'useImageUploader.analyzeImageWithAI' });
       hideLoading();
-      
+
       showCustomAlert(
-        "AI Analysis Failed",
+        'AI Analysis Failed',
         "We couldn't analyze your image with AI right now. The image was uploaded but you may need to edit the details manually.",
-        [{ text: "OK", onPress: hideCustomAlert }],
-        "warning"
+        [{ text: 'OK', onPress: hideCustomAlert }],
+        'warning',
       );
     }
   };

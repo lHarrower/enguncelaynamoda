@@ -1,6 +1,6 @@
 /**
  * Organisms Index
- * 
+ *
  * Exports all organism components - complex UI components that combine
  * molecules and atoms to create complete interface sections and features.
  */

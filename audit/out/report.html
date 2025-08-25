@@ -1,0 +1,700 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Audit Report</title><style>
+      body{font-family:Arial,Helvetica,sans-serif;margin:20px;}
+      h1{margin-top:0}
+      .fail{color:#b30000;font-weight:bold}
+      .pass{color:#0a730a;font-weight:bold}
+      table{border-collapse:collapse;margin:10px 0;}
+      th,td{border:1px solid #ccc;padding:4px 8px;font-size:12px;}
+      code{background:#f5f5f5;padding:2px 4px;border-radius:3px;}
+    </style></head><body>
+    <h1>Denetim Raporu</h1>
+    <p>Oluşturulma: 2025-08-23T16:39:07.451Z</p>
+    <h2>Kapı Durumu</h2>
+    <ul><li class="fail">BAŞARISIZ: coverage statements 84.22% < 85.0%</li><li class="fail">BAŞARISIZ: coverage branches 61.73% < 70.0%</li><li class="fail">BAŞARISIZ: coverage lines 84.22% < 85.0%</li><li class="fail">BAŞARISIZ: coverage functions 69.96% < 80.0%</li></ul>
+    <h2>Anahtar Metrikler</h2>
+    <table><tr><th>Metrik</th><th>Mevcut</th><th>Δ</th><th>Eğilim (son 9)</th></tr>
+      <tr><td>Kapsama İfadeleri %</td><td>84.22</td><td>0</td><td><code>▇▇▇▇▇▇▇</code></td></tr>
+      <tr><td>Mutasyon Skoru %</td><td>mevcut değil</td><td></td><td><code></code></td></tr>
+  <tr><td>Yeni ESLint Hataları</td><td>0</td><td><code>▁▁▁▁▁▁▁▁▁</code></td></tr>
+  <tr><td>Güvenli Olmayan any Sayısı</td><td>160</td><td>0</td><td><code>██▃▃▃▃▂▄▄</code></td></tr>
+    </table>
+    <h2>Risk Kabulü</h2>
+    <p>Kabul edilen bulgular: 0</p>
+  <h2>Toplamlar</h2><pre>{
+  "medium": 231,
+  "low": 782
+}</pre>
+  <h2>Güvenlik Paketleri</h2><pre>{}</pre>
+    <h2>Kalite</h2><pre>{
+  "eslintErrors": 231,
+  "eslintNewErrors": 0,
+  "deadExports": 0,
+  "unsafeAnyCount": 160,
+  "unsafeAnyDelta": 0,
+  "unsafeAnyFiles": {
+    "src\\components\\onboarding\\StyleDNASurvey.tsx": 1,
+    "src\\components\\onboarding\\WelcomeGift.tsx": 2,
+    "src\\components\\premium\\PremiumHomeScreen.tsx": 1,
+    "src\\components\\premium\\PremiumProductCard.tsx": 1,
+    "src\\components\\premium\\PremiumTabBar.tsx": 1,
+    "src\\components\\product\\ProductCard.tsx": 1,
+    "src\\components\\sanctuary\\LikeButton.tsx": 1,
+    "src\\components\\sanctuary\\WardrobeItemCard.tsx": 4,
+    "src\\components\\shared\\OptimizedImage.tsx": 1,
+    "src\\components\\shared\\SectionHeader.tsx": 1,
+    "src\\components\\shared\\SwipeableCard.tsx": 1,
+    "src\\components\\shared\\SwipeStack.tsx": 1,
+    "src\\components\\shared\\VisionStats.tsx": 1,
+    "src\\components\\studio\\BentoBoxGallery.tsx": 2,
+    "src\\components\\studio\\PremiumOutfitCard.tsx": 1,
+    "src\\components\\studio\\StudioTabBar.tsx": 2,
+    "src\\components\\vision\\shared\\BentoCard.tsx": 2,
+    "src\\components\\vision\\shared\\SwipeableCard.tsx": 1,
+    "src\\components\\wardrobe\\CameraView\\index.tsx": 1,
+    "src\\components\\wardrobe\\WardrobeFilter.tsx": 1,
+    "src\\config\\i18n.ts": 1,
+    "src\\config\\monitoring.ts": 5,
+    "src\\constants\\AynaModaVisionTheme.ts": 1,
+    "src\\context\\I18nContext.tsx": 2,
+    "src\\hooks\\useErrorRecovery.ts": 1,
+    "src\\hooks\\useImageUploader.ts": 5,
+    "src\\ignore-warnings.ts": 2,
+    "src\\pages\\ai-naming-demo.tsx": 1,
+    "src\\providers\\WardrobeProvider.tsx": 2,
+    "src\\screens\\AynaMirrorScreen.tsx": 1,
+    "src\\screens\\MainRitualScreen.tsx": 1,
+    "src\\screens\\WardrobeScreen.tsx": 5,
+    "src\\services\\antiConsumptionService.ts": 15,
+    "src\\services\\aynaMirrorService.ts": 7,
+    "src\\services\\enhancedWardrobeService.ts": 18,
+    "src\\services\\styleDNAService.ts": 2,
+    "src\\services\\userPreferencesService.ts": 4,
+    "src\\services\\wardrobeService.ts": 16,
+    "src\\utils\\databaseOptimizations.ts": 5,
+    "src\\utils\\treeShaking.ts": 1,
+    "src\\__tests__\\accessibility\\Accessibility.test.tsx": 3,
+    "src\\__tests__\\components\\ErrorBoundary.test.tsx": 4,
+    "src\\__tests__\\components\\WardrobeCard.test.tsx": 1,
+    "src\\__tests__\\e2e\\WardrobeManagement.e2e.test.tsx": 1,
+    "src\\__tests__\\hooks\\useErrorRecovery.test.ts": 4,
+    "src\\__tests__\\integration\\ErrorHandling.integration.test.tsx": 5,
+    "src\\__tests__\\performance\\WardrobeService.performance.test.ts": 2,
+    "src\\__tests__\\services\\WardrobeService.test.ts": 5,
+    "src\\__tests__\\utils\\testUtils.tsx": 13
+  }
+}</pre>
+    <h2>Lisanslar</h2><pre>{
+  "deny": 0
+}</pre>
+    <h2>Gizli Bilgiler</h2><pre>{
+  "total": 0
+}</pre>
+    <h2>Ham Kapsama</h2><pre>{
+  "total": {
+    "lines": {
+      "total": 17308,
+      "covered": 14577,
+      "skipped": 0,
+      "pct": 84.22
+    },
+    "statements": {
+      "total": 17308,
+      "covered": 14577,
+      "skipped": 0,
+      "pct": 84.22
+    },
+    "functions": {
+      "total": 323,
+      "covered": 226,
+      "skipped": 0,
+      "pct": 69.96
+    },
+    "branches": {
+      "total": 2420,
+      "covered": 1494,
+      "skipped": 0,
+      "pct": 61.73
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "C:\\AYNAMODA\\src\\components\\aynaMirror\\ConfidenceNote.tsx": {
+    "lines": {
+      "total": 348,
+      "covered": 338,
+      "skipped": 0,
+      "pct": 97.12
+    },
+    "functions": {
+      "total": 4,
+      "covered": 4,
+      "skipped": 0,
+      "pct": 100
+    },
+    "statements": {
+      "total": 348,
+      "covered": 338,
+      "skipped": 0,
+      "pct": 97.12
+    },
+    "branches": {
+      "total": 37,
+      "covered": 28,
+      "skipped": 0,
+      "pct": 75.67
+    }
+  },
+  "C:\\AYNAMODA\\src\\components\\aynaMirror\\OutfitRecommendationCard.tsx": {
+    "lines": {
+      "total": 760,
+      "covered": 747,
+      "skipped": 0,
+      "pct": 98.28
+    },
+    "functions": {
+      "total": 14,
+      "covered": 8,
+      "skipped": 0,
+      "pct": 57.14
+    },
+    "statements": {
+      "total": 760,
+      "covered": 747,
+      "skipped": 0,
+      "pct": 98.28
+    },
+    "branches": {
+      "total": 97,
+      "covered": 58,
+      "skipped": 0,
+      "pct": 59.79
+    }
+  },
+  "C:\\AYNAMODA\\src\\components\\aynaMirror\\QuickActionButton.tsx": {
+    "lines": {
+      "total": 342,
+      "covered": 322,
+      "skipped": 0,
+      "pct": 94.15
+    },
+    "functions": {
+      "total": 7,
+      "covered": 7,
+      "skipped": 0,
+      "pct": 100
+    },
+    "statements": {
+      "total": 342,
+      "covered": 322,
+      "skipped": 0,
+      "pct": 94.15
+    },
+    "branches": {
+      "total": 49,
+      "covered": 28,
+      "skipped": 0,
+      "pct": 57.14
+    }
+  },
+  "C:\\AYNAMODA\\src\\components\\onboarding\\NotificationPermissionRequest.tsx": {
+    "lines": {
+      "total": 411,
+      "covered": 367,
+      "skipped": 0,
+      "pct": 89.29
+    },
+    "functions": {
+      "total": 8,
+      "covered": 3,
+      "skipped": 0,
+      "pct": 37.5
+    },
+    "statements": {
+      "total": 411,
+      "covered": 367,
+      "skipped": 0,
+      "pct": 89.29
+    },
+    "branches": {
+      "total": 12,
+      "covered": 8,
+      "skipped": 0,
+      "pct": 66.66
+    }
+  },
+  "C:\\AYNAMODA\\src\\components\\onboarding\\OnboardingFlow.tsx": {
+    "lines": {
+      "total": 96,
+      "covered": 80,
+      "skipped": 0,
+      "pct": 83.33
+    },
+    "functions": {
+      "total": 11,
+      "covered": 8,
+      "skipped": 0,
+      "pct": 72.72
+    },
+    "statements": {
+      "total": 96,
+      "covered": 80,
+      "skipped": 0,
+      "pct": 83.33
+    },
+    "branches": {
+      "total": 14,
+      "covered": 13,
+      "skipped": 0,
+      "pct": 92.85
+    }
+  },
+  "C:\\AYNAMODA\\src\\components\\onboarding\\OnboardingWelcome.tsx": {
+    "lines": {
+      "total": 216,
+      "covered": 209,
+      "skipped": 0,
+      "pct": 96.75
+    },
+    "functions": {
+      "total": 4,
+      "covered": 3,
+      "skipped": 0,
+      "pct": 75
+    },
+    "statements": {
+      "total": 216,
+      "covered": 209,
+      "skipped": 0,
+      "pct": 96.75
+    },
+    "branches": {
+      "total": 5,
+      "covered": 3,
+      "skipped": 0,
+      "pct": 60
+    }
+  },
+  "C:\\AYNAMODA\\src\\components\\onboarding\\SampleOutfitGeneration.tsx": {
+    "lines": {
+      "total": 623,
+      "covered": 394,
+      "skipped": 0,
+      "pct": 63.24
+    },
+    "functions": {
+      "total": 9,
+      "covered": 3,
+      "skipped": 0,
+      "pct": 33.33
+    },
+    "statements": {
+      "total": 623,
+      "covered": 394,
+      "skipped": 0,
+      "pct": 63.24
+    },
+    "branches": {
+      "total": 7,
+      "covered": 4,
+      "skipped": 0,
+      "pct": 57.14
+    }
+  },
+  "C:\\AYNAMODA\\src\\components\\onboarding\\StylePreferenceQuestionnaire.tsx": {
+    "lines": {
+      "total": 664,
+      "covered": 629,
+      "skipped": 0,
+      "pct": 94.72
+    },
+    "functions": {
+      "total": 22,
+      "covered": 13,
+      "skipped": 0,
+      "pct": 59.09
+    },
+    "statements": {
+      "total": 664,
+      "covered": 629,
+      "skipped": 0,
+      "pct": 94.72
+    },
+    "branches": {
+      "total": 55,
+      "covered": 51,
+      "skipped": 0,
+      "pct": 92.72
+    }
+  },
+  "C:\\AYNAMODA\\src\\components\\onboarding\\WardrobeSetupWizard.tsx": {
+    "lines": {
+      "total": 419,
+      "covered": 367,
+      "skipped": 0,
+      "pct": 87.58
+    },
+    "functions": {
+      "total": 6,
+      "covered": 2,
+      "skipped": 0,
+      "pct": 33.33
+    },
+    "statements": {
+      "total": 419,
+      "covered": 367,
+      "skipped": 0,
+      "pct": 87.58
+    },
+    "branches": {
+      "total": 22,
+      "covered": 8,
+      "skipped": 0,
+      "pct": 36.36
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\accessibilityService.ts": {
+    "lines": {
+      "total": 558,
+      "covered": 481,
+      "skipped": 0,
+      "pct": 86.2
+    },
+    "functions": {
+      "total": 18,
+      "covered": 18,
+      "skipped": 0,
+      "pct": 100
+    },
+    "statements": {
+      "total": 558,
+      "covered": 481,
+      "skipped": 0,
+      "pct": 86.2
+    },
+    "branches": {
+      "total": 84,
+      "covered": 38,
+      "skipped": 0,
+      "pct": 45.23
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\aiNamingService.ts": {
+    "lines": {
+      "total": 647,
+      "covered": 407,
+      "skipped": 0,
+      "pct": 62.9
+    },
+    "functions": {
+      "total": 12,
+      "covered": 4,
+      "skipped": 0,
+      "pct": 33.33
+    },
+    "statements": {
+      "total": 647,
+      "covered": 407,
+      "skipped": 0,
+      "pct": 62.9
+    },
+    "branches": {
+      "total": 52,
+      "covered": 32,
+      "skipped": 0,
+      "pct": 61.53
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\aynaMirrorService.ts": {
+    "lines": {
+      "total": 2885,
+      "covered": 2208,
+      "skipped": 0,
+      "pct": 76.53
+    },
+    "functions": {
+      "total": 32,
+      "covered": 23,
+      "skipped": 0,
+      "pct": 71.87
+    },
+    "statements": {
+      "total": 2885,
+      "covered": 2208,
+      "skipped": 0,
+      "pct": 76.53
+    },
+    "branches": {
+      "total": 431,
+      "covered": 229,
+      "skipped": 0,
+      "pct": 53.13
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\deepLinkService.ts": {
+    "lines": {
+      "total": 273,
+      "covered": 271,
+      "skipped": 0,
+      "pct": 99.26
+    },
+    "functions": {
+      "total": 7,
+      "covered": 7,
+      "skipped": 0,
+      "pct": 100
+    },
+    "statements": {
+      "total": 273,
+      "covered": 271,
+      "skipped": 0,
+      "pct": 99.26
+    },
+    "branches": {
+      "total": 73,
+      "covered": 70,
+      "skipped": 0,
+      "pct": 95.89
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\efficiencyScoreService.ts": {
+    "lines": {
+      "total": 707,
+      "covered": 648,
+      "skipped": 0,
+      "pct": 91.65
+    },
+    "functions": {
+      "total": 16,
+      "covered": 12,
+      "skipped": 0,
+      "pct": 75
+    },
+    "statements": {
+      "total": 707,
+      "covered": 648,
+      "skipped": 0,
+      "pct": 91.65
+    },
+    "branches": {
+      "total": 59,
+      "covered": 29,
+      "skipped": 0,
+      "pct": 49.15
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\enhancedWardrobeService.ts": {
+    "lines": {
+      "total": 1361,
+      "covered": 1174,
+      "skipped": 0,
+      "pct": 86.26
+    },
+    "functions": {
+      "total": 13,
+      "covered": 6,
+      "skipped": 0,
+      "pct": 46.15
+    },
+    "statements": {
+      "total": 1361,
+      "covered": 1174,
+      "skipped": 0,
+      "pct": 86.26
+    },
+    "branches": {
+      "total": 193,
+      "covered": 81,
+      "skipped": 0,
+      "pct": 41.96
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\errorHandlingService.ts": {
+    "lines": {
+      "total": 795,
+      "covered": 728,
+      "skipped": 0,
+      "pct": 91.57
+    },
+    "functions": {
+      "total": 10,
+      "covered": 9,
+      "skipped": 0,
+      "pct": 90
+    },
+    "statements": {
+      "total": 795,
+      "covered": 728,
+      "skipped": 0,
+      "pct": 91.57
+    },
+    "branches": {
+      "total": 160,
+      "covered": 117,
+      "skipped": 0,
+      "pct": 73.12
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\intelligenceService.ts": {
+    "lines": {
+      "total": 1750,
+      "covered": 1209,
+      "skipped": 0,
+      "pct": 69.08
+    },
+    "functions": {
+      "total": 41,
+      "covered": 33,
+      "skipped": 0,
+      "pct": 80.48
+    },
+    "statements": {
+      "total": 1750,
+      "covered": 1209,
+      "skipped": 0,
+      "pct": 69.08
+    },
+    "branches": {
+      "total": 334,
+      "covered": 197,
+      "skipped": 0,
+      "pct": 58.98
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\notificationService.ts": {
+    "lines": {
+      "total": 737,
+      "covered": 634,
+      "skipped": 0,
+      "pct": 86.02
+    },
+    "functions": {
+      "total": 30,
+      "covered": 12,
+      "skipped": 0,
+      "pct": 40
+    },
+    "statements": {
+      "total": 737,
+      "covered": 634,
+      "skipped": 0,
+      "pct": 86.02
+    },
+    "branches": {
+      "total": 112,
+      "covered": 67,
+      "skipped": 0,
+      "pct": 59.82
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\performanceOptimizationService.ts": {
+    "lines": {
+      "total": 1203,
+      "covered": 1139,
+      "skipped": 0,
+      "pct": 94.67
+    },
+    "functions": {
+      "total": 21,
+      "covered": 15,
+      "skipped": 0,
+      "pct": 71.42
+    },
+    "statements": {
+      "total": 1203,
+      "covered": 1139,
+      "skipped": 0,
+      "pct": 94.67
+    },
+    "branches": {
+      "total": 191,
+      "covered": 127,
+      "skipped": 0,
+      "pct": 66.49
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\styleDNAService.ts": {
+    "lines": {
+      "total": 742,
+      "covered": 613,
+      "skipped": 0,
+      "pct": 82.61
+    },
+    "functions": {
+      "total": 16,
+      "covered": 16,
+      "skipped": 0,
+      "pct": 100
+    },
+    "statements": {
+      "total": 742,
+      "covered": 613,
+      "skipped": 0,
+      "pct": 82.61
+    },
+    "branches": {
+      "total": 106,
+      "covered": 67,
+      "skipped": 0,
+      "pct": 63.2
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\userPreferencesService.ts": {
+    "lines": {
+      "total": 777,
+      "covered": 730,
+      "skipped": 0,
+      "pct": 93.95
+    },
+    "functions": {
+      "total": 7,
+      "covered": 6,
+      "skipped": 0,
+      "pct": 85.71
+    },
+    "statements": {
+      "total": 777,
+      "covered": 730,
+      "skipped": 0,
+      "pct": 93.95
+    },
+    "branches": {
+      "total": 113,
+      "covered": 89,
+      "skipped": 0,
+      "pct": 78.76
+    }
+  },
+  "C:\\AYNAMODA\\src\\services\\weatherService.ts": {
+    "lines": {
+      "total": 994,
+      "covered": 882,
+      "skipped": 0,
+      "pct": 88.73
+    },
+    "functions": {
+      "total": 15,
+      "covered": 14,
+      "skipped": 0,
+      "pct": 93.33
+    },
+    "statements": {
+      "total": 994,
+      "covered": 882,
+      "skipped": 0,
+      "pct": 88.73
+    },
+    "branches": {
+      "total": 214,
+      "covered": 150,
+      "skipped": 0,
+      "pct": 70.09
+    }
+  }
+}</pre>
+    <h2>Ham Mutasyon</h2><pre>undefined</pre>
+    <p><em>Analiz edilen geçmiş dosyaları: 9</em></p>
+    </body></html>

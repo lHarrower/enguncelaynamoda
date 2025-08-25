@@ -1,20 +1,21 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+
 import { useHapticFeedback } from '../../hooks/useHapticFeedback';
-import { UNIFIED_COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS } from '../../theme/DesignSystem';
+import { BORDER_RADIUS, SPACING, TYPOGRAPHY, UNIFIED_COLORS } from '../../theme/DesignSystem';
 
 export interface CategorySelectorProps {
   categories: string[];
   selectedCategory?: string;
   onCategorySelect: (category: string) => void;
-  style?: any;
+  style?: ViewStyle;
 }
 
 const CategorySelector: React.FC<CategorySelectorProps> = ({
   categories,
   selectedCategory,
   onCategorySelect,
-  style
+  style,
 }) => {
   const { triggerSelection } = useHapticFeedback();
 
@@ -25,8 +26,8 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
 
   return (
     <View style={[styles.container, style]}>
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
@@ -35,17 +36,19 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
           return (
             <TouchableOpacity
               key={category}
-              style={[
-                styles.categoryButton,
-                isSelected && styles.selectedCategoryButton
-              ]}
+              style={[styles.categoryButton, isSelected && styles.selectedCategoryButton]}
               onPress={() => handleCategoryPress(category)}
               activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel={`Category ${category}`}
+              accessibilityState={{ selected: isSelected }}
+              accessibilityHint={
+                isSelected
+                  ? `${category} category is selected`
+                  : `Tap to select ${category} category`
+              }
             >
-              <Text style={[
-                styles.categoryText,
-                isSelected && styles.selectedCategoryText
-              ]}>
+              <Text style={[styles.categoryText, isSelected && styles.selectedCategoryText]}>
                 {category}
               </Text>
             </TouchableOpacity>
@@ -57,33 +60,33 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
 };
 
 const styles = StyleSheet.create({
+  categoryButton: {
+    backgroundColor: UNIFIED_COLORS.background.secondary,
+    borderColor: UNIFIED_COLORS.sage[200],
+    borderRadius: BORDER_RADIUS.full,
+    borderWidth: 1,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+  },
+  categoryText: {
+    color: UNIFIED_COLORS.charcoal[600],
+    fontSize: TYPOGRAPHY.fontSize.sm,
+    fontWeight: TYPOGRAPHY.weights.medium,
+  },
   container: {
     paddingVertical: SPACING.sm,
   },
   scrollContent: {
-    paddingHorizontal: SPACING.md,
     gap: SPACING.sm,
-  },
-  categoryButton: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.sm,
-    borderRadius: BORDER_RADIUS.full,
-    backgroundColor: UNIFIED_COLORS.background.secondary,
-    borderWidth: 1,
-    borderColor: UNIFIED_COLORS.sage[200],
+    paddingHorizontal: SPACING.md,
   },
   selectedCategoryButton: {
     backgroundColor: UNIFIED_COLORS.sage[500],
     borderColor: UNIFIED_COLORS.sage[600],
   },
-  categoryText: {
-    fontSize: TYPOGRAPHY.fontSize.sm,
-  fontWeight: TYPOGRAPHY.weights.medium,
-    color: UNIFIED_COLORS.charcoal[600],
-  },
   selectedCategoryText: {
     color: UNIFIED_COLORS.background.primary,
-  fontWeight: TYPOGRAPHY.weights.semibold,
+    fontWeight: TYPOGRAPHY.weights.semibold,
   },
 });
 

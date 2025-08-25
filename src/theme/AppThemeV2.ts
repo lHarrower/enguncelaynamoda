@@ -1,24 +1,24 @@
-import { TextStyle, ViewStyle } from 'react-native';
+import { TextStyle } from 'react-native';
 
 // ORGANIC PALETTE - The Visual Constitution
 export const Colors = {
   // Primary Palette
-  linen: '#FAF7F2',           // Soft, warm base
-  inkGray: '#2C2C2C',         // Deep, sophisticated text
-  sageGreen: '#A8B5A0',       // Calming, natural accent
-  liquidGold: '#D4AF37',      // Luxury highlight
-  
+  linen: '#FAF7F2', // Soft, warm base
+  inkGray: '#2C2C2C', // Deep, sophisticated text
+  sageGreen: '#A8B5A0', // Calming, natural accent
+  liquidGold: '#D4AF37', // Luxury highlight
+
   // Secondary Palette
-  dustyRose: '#D4A5A5',       // Gentle feminine touch
-  charcoal: '#36454F',        // Strong contrast
-  cream: '#F5F5DC',           // Soft alternative to white
-  pearl: '#E8E8E8',           // Subtle borders and dividers
-  
+  dustyRose: '#D4A5A5', // Gentle feminine touch
+  charcoal: '#36454F', // Strong contrast
+  cream: '#F5F5DC', // Soft alternative to white
+  pearl: '#E8E8E8', // Subtle borders and dividers
+
   // Functional Colors
-  success: '#7A9A7A',         // Muted green for success states
-  warning: '#D4A574',         // Warm amber for warnings
-  error: '#C4848C',           // Soft red for errors
-  
+  success: '#7A9A7A', // Muted green for success states
+  warning: '#D4A574', // Warm amber for warnings
+  error: '#C4848C', // Soft red for errors
+
   // Transparency Layers
   linenOpacity: 'rgba(250, 247, 242, 0.95)',
   inkOpacity: 'rgba(44, 44, 44, 0.8)',
@@ -36,7 +36,7 @@ export const Typography = {
     letterSpacing: -0.5,
     color: Colors.inkGray,
   } as TextStyle,
-  
+
   title: {
     fontFamily: 'Playfair Display',
     fontSize: 24,
@@ -45,7 +45,7 @@ export const Typography = {
     letterSpacing: -0.3,
     color: Colors.inkGray,
   } as TextStyle,
-  
+
   subtitle: {
     fontFamily: 'Playfair Display',
     fontSize: 20,
@@ -54,7 +54,7 @@ export const Typography = {
     letterSpacing: 0,
     color: Colors.charcoal,
   } as TextStyle,
-  
+
   // Body Text - Manrope
   body: {
     fontFamily: 'Manrope',
@@ -64,7 +64,7 @@ export const Typography = {
     letterSpacing: 0.2,
     color: Colors.inkGray,
   } as TextStyle,
-  
+
   bodyMedium: {
     fontFamily: 'Manrope',
     fontSize: 16,
@@ -73,7 +73,7 @@ export const Typography = {
     letterSpacing: 0.2,
     color: Colors.inkGray,
   } as TextStyle,
-  
+
   caption: {
     fontFamily: 'Manrope',
     fontSize: 14,
@@ -82,7 +82,7 @@ export const Typography = {
     letterSpacing: 0.3,
     color: Colors.charcoal,
   } as TextStyle,
-  
+
   captionMedium: {
     fontFamily: 'Manrope',
     fontSize: 14,
@@ -91,7 +91,7 @@ export const Typography = {
     letterSpacing: 0.3,
     color: Colors.charcoal,
   } as TextStyle,
-  
+
   small: {
     fontFamily: 'Manrope',
     fontSize: 12,
@@ -100,7 +100,7 @@ export const Typography = {
     letterSpacing: 0.4,
     color: Colors.charcoal,
   } as TextStyle,
-  
+
   // Special Typography
   luxury: {
     fontFamily: 'Playfair Display',
@@ -110,7 +110,7 @@ export const Typography = {
     letterSpacing: -0.4,
     color: Colors.liquidGold,
   } as TextStyle,
-  
+
   accent: {
     fontFamily: 'Manrope',
     fontSize: 16,
@@ -131,7 +131,7 @@ export const Spacing = {
   xl: 32,
   xxl: 48,
   xxxl: 64,
-  
+
   // Semantic Spacing
   cardPadding: 20,
   screenPadding: 24,
@@ -148,7 +148,7 @@ export const Elevation = {
     shadowRadius: 0,
     elevation: 0,
   },
-  
+
   subtle: {
     shadowColor: Colors.inkGray,
     shadowOffset: { width: 0, height: 2 },
@@ -156,7 +156,7 @@ export const Elevation = {
     shadowRadius: 4,
     elevation: 2,
   },
-  
+
   soft: {
     shadowColor: Colors.inkGray,
     shadowOffset: { width: 0, height: 4 },
@@ -164,7 +164,7 @@ export const Elevation = {
     shadowRadius: 8,
     elevation: 4,
   },
-  
+
   medium: {
     shadowColor: Colors.inkGray,
     shadowOffset: { width: 0, height: 8 },
@@ -172,7 +172,7 @@ export const Elevation = {
     shadowRadius: 12,
     elevation: 8,
   },
-  
+
   high: {
     shadowColor: Colors.inkGray,
     shadowOffset: { width: 0, height: 12 },
@@ -191,7 +191,7 @@ export const BorderRadius = {
   xl: 16,
   xxl: 24,
   round: 50,
-  
+
   // Semantic Radius
   card: 12,
   button: 8,
@@ -217,7 +217,7 @@ export const Animation = {
   medium: 300,
   slow: 500,
   luxury: 800,
-  
+
   // Easing
   easeInOut: 'ease-in-out',
   easeOut: 'ease-out',
@@ -230,7 +230,7 @@ export const Layout = {
   screenHeight: '100%',
   headerHeight: 60,
   tabBarHeight: 80,
-  
+
   // Content Widths
   maxContentWidth: 400,
   cardWidth: '100%',
@@ -251,7 +251,14 @@ export const LuxuryTheme = {
 } as const;
 
 // Re-export legacy luxury design tokens for backward compatibility
-export { LuxuryMaterials, LuxuryMotion, LuxuryShadows, LuxuryLayout, LuxurySpacing, LuxuryTypography } from '@/constants/LuxuryTheme';
+export {
+  LuxuryLayout,
+  LuxuryMaterials,
+  LuxuryMotion,
+  LuxuryShadows,
+  LuxurySpacing,
+  LuxuryTypography,
+} from '@/constants/LuxuryTheme';
 
 // TYPE EXPORTS
 export type LuxuryThemeType = typeof LuxuryTheme;

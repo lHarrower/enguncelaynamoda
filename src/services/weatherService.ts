@@ -1,15 +1,37 @@
 // Weather Integration Service for AYNA Mirror Daily Ritual
 // Provides weather context for intelligent outfit recommendations
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
-import { logInDev, errorInDev } from '@/utils/consoleSuppress';
-import { WeatherContext, WeatherCondition } from '@/types/aynaMirror';
-import { errorHandlingService } from '@/services/errorHandlingService';
+
+import { WeatherCondition, WeatherContext } from '../types/aynaMirror';
+import { errorInDev, logInDev } from '../utils/consoleSuppress';
+import { safeParse } from '../utils/safeJSON';
+import { secureStorage } from '../utils/secureStorage';
+
+// Minimal OpenWeather typed shapes (only fields we access)
+interface OpenWeatherCurrent {
+  weather: Array<{ main?: string; description?: string }>;
+  main: { temp: number; humidity: number };
+  wind?: { speed?: number };
+  name?: string;
+}
+
+interface OpenWeatherForecastEntry {
+  dt: number; // unix seconds
+  weather: Array<{ main?: string; description?: string }>;
+  main: { temp: number; humidity: number };
+  wind?: { speed?: number };
+}
+
+interface OpenWeatherForecast {
+  list: OpenWeatherForecastEntry[];
+  city?: { name?: string };
+}
+import { errorHandlingService } from './errorHandlingService';
 
 /**
  * Weather Service for AYNA Mirror
- * 
+ *
  * Integrates with weather APIs to provide location-based weather context
  * for intelligent outfit recommendations. Includes caching for offline functionality
  * and error handling for service reliability.
@@ -35,60 +57,70 @@ export class WeatherService {
   static async getCurrentWeatherContext(userId?: string): Promise<WeatherContext> {
     // If tests have mocked getCurrentWeather, prefer that directly to avoid timer interactions
     if (process.env.NODE_ENV === 'test') {
-      const self: any = this as any;
-      const maybeMock = self.getCurrentWeather;
+      const maybeMock = (
+        this as unknown as {
+          getCurrentWeather?: { _isMockFunction?: boolean } & ((
+            u?: string,
+          ) => Promise<WeatherContext>);
+        }
+      ).getCurrentWeather;
       if (maybeMock && maybeMock._isMockFunction) {
-        return await (maybeMock as any)(userId);
+        return await maybeMock(userId);
       }
     }
-    return await errorHandlingService.executeWithRetry(
-      async () => {
-        logInDev('[WeatherService] Getting current weather context');
+    return await errorHandlingService
+      .executeWithRetry(
+        async () => {
+          logInDev('[WeatherService] Getting current weather context');
 
-  // Get user's location
-  const location = await this.getUserLocation();
-        
-        // Try to get cached weather data first
-        const cachedWeather = await this.getCachedWeatherData(location);
-        if (cachedWeather) {
-          logInDev('[WeatherService] Using cached weather data');
-          return cachedWeather;
-        }
+          // Get user's location
+          const location = await this.getUserLocation();
 
-  // Fetch fresh weather data from API
-  logInDev('[WeatherService] Fetching fresh weather data from API');
-  const weatherData: WeatherContext = await this.fetchWeatherFromAPI(location);
-        
-        // Cache the fresh data
-        await this.cacheWeatherData(location, weatherData);
-        
-        // Also cache with error handling service for cross-service access
+          // Try to get cached weather data first
+          const cachedWeather = await this.getCachedWeatherData(location);
+          if (cachedWeather) {
+            logInDev('[WeatherService] Using cached weather data');
+            return cachedWeather;
+          }
+
+          // Fetch fresh weather data from API
+          logInDev('[WeatherService] Fetching fresh weather data from API');
+          const weatherData: WeatherContext = await this.fetchWeatherFromAPI(location);
+
+          // Cache the fresh data
+          await this.cacheWeatherData(location, weatherData);
+
+          // Also cache with error handling service for cross-service access
+          if (userId) {
+            await errorHandlingService.cacheWeather(userId, weatherData);
+          }
+
+          return weatherData;
+        },
+        {
+          service: 'weather',
+          operation: 'getCurrentWeatherContext',
+          userId,
+        },
+        {
+          maxRetries: 2,
+          enableOfflineMode: true,
+        },
+      )
+      .catch(async (error) => {
+        errorInDev(
+          '[WeatherService] All retry attempts failed:',
+          error instanceof Error ? error : String(error),
+        );
+
+        // Use error handling service fallback
         if (userId) {
-          await errorHandlingService.cacheWeather(userId, weatherData);
+          return await errorHandlingService.handleWeatherServiceError(userId);
         }
-        
-        return weatherData;
-      },
-      {
-        service: 'weather',
-        operation: 'getCurrentWeatherContext',
-        userId
-      },
-      {
-        maxRetries: 2,
-        enableOfflineMode: true
-      }
-    ).catch(async (error) => {
-      errorInDev('[WeatherService] All retry attempts failed:', error);
-      
-      // Use error handling service fallback
-      if (userId) {
-        return await errorHandlingService.handleWeatherServiceError(userId);
-      }
-      
-      // Return fallback weather context
-      return this.getFallbackWeatherContext();
-    });
+
+        // Return fallback weather context
+        return this.getFallbackWeatherContext();
+      });
   }
 
   /**
@@ -109,13 +141,13 @@ export class WeatherService {
 
       const location = await this.getUserLocation();
       const cacheKey = `${this.CACHE_KEY_PREFIX}forecast_${location.latitude}_${location.longitude}`;
-      
+
       // Check cache first
       const cachedForecast = await this.getCachedData<WeatherContext[]>(cacheKey);
       if (cachedForecast) {
         logInDev('[WeatherService] Using cached forecast data');
         // Rehydrate timestamps from strings if needed
-        const hydrated = cachedForecast.map(item => ({
+        const hydrated = cachedForecast.map((item) => ({
           ...item,
           timestamp: typeof item.timestamp === 'string' ? new Date(item.timestamp) : item.timestamp,
         }));
@@ -124,15 +156,17 @@ export class WeatherService {
 
       // Fetch forecast from API
       const forecastData = await this.fetchForecastFromAPI(location, days);
-      
+
       // Cache the forecast
       await this.setCachedData(cacheKey, forecastData);
-      
-      return forecastData;
 
+      return forecastData;
     } catch (error) {
-      errorInDev('[WeatherService] Failed to get weather forecast:', error);
-      
+      errorInDev(
+        '[WeatherService] Failed to get weather forecast:',
+        error instanceof Error ? error : String(error),
+      );
+
       // Return fallback forecast
       return this.getFallbackForecast(days);
     }
@@ -144,7 +178,7 @@ export class WeatherService {
    */
   static analyzeWeatherAppropriatenessForItem(
     item: { category: string; tags: string[] },
-    weather: WeatherContext
+    weather: WeatherContext,
   ): number {
     try {
       let score = 0.5; // Base neutral score
@@ -154,18 +188,20 @@ export class WeatherService {
 
       // Temperature-based scoring
       score += this.calculateTemperatureScore(category, tags, temperature);
-      
+
       // Weather condition scoring
       score += this.calculateConditionScore(category, tags, condition);
-      
+
       // Humidity and wind considerations
       score += this.calculateEnvironmentalScore(category, tags, humidity, windSpeed);
 
       // Ensure score is within bounds
       return Math.max(0, Math.min(1, score));
-
     } catch (error) {
-      errorInDev('[WeatherService] Failed to analyze weather appropriateness:', error);
+      errorInDev(
+        '[WeatherService] Failed to analyze weather appropriateness:',
+        error instanceof Error ? error : String(error),
+      );
       return 0.5; // Neutral score on error
     }
   }
@@ -174,26 +210,30 @@ export class WeatherService {
    * Filter outfit recommendations based on weather appropriateness
    * Removes or deprioritizes items that are inappropriate for current weather
    */
-  static filterRecommendationsByWeather<T extends { items: Array<{ category: string; tags: string[] }> }>(
+  static filterRecommendationsByWeather<
+    T extends { items: Array<{ category: string; tags: string[] }> },
+  >(
     recommendations: T[],
     weather: WeatherContext,
-  minScore: number = process.env.NODE_ENV === 'test' ? 0.15 : 0.35
+    minScore: number = process.env.NODE_ENV === 'test' ? 0.15 : 0.35,
   ): T[] {
     try {
       logInDev('[WeatherService] Filtering recommendations by weather appropriateness');
 
-      const scoredRecommendations = recommendations.map(recommendation => ({
+      const scoredRecommendations = recommendations.map((recommendation) => ({
         recommendation,
-        weatherScore: this.calculateOutfitWeatherScore(recommendation.items, weather)
+        weatherScore: this.calculateOutfitWeatherScore(recommendation.items, weather),
       }));
 
       return scoredRecommendations
-        .filter(item => item.weatherScore >= minScore)
+        .filter((item) => item.weatherScore >= minScore)
         .sort((a, b) => b.weatherScore - a.weatherScore)
-        .map(item => item.recommendation);
-
+        .map((item) => item.recommendation);
     } catch (error) {
-      errorInDev('[WeatherService] Failed to filter recommendations by weather:', error);
+      errorInDev(
+        '[WeatherService] Failed to filter recommendations by weather:',
+        error instanceof Error ? error : String(error),
+      );
       return recommendations; // Return original recommendations on error
     }
   }
@@ -204,18 +244,18 @@ export class WeatherService {
    */
   static getWeatherBasedSuggestions(weather: WeatherContext): string[] {
     const suggestions: string[] = [];
-    
+
     if (!weather) {
       return ['Check the weather and dress accordingly'];
     }
-    
+
     const { temperature, condition, humidity, windSpeed } = weather;
 
     try {
       // Temperature-based suggestions
       if (temperature < 32) {
         suggestions.push('Layer up with warm outerwear');
-        suggestions.push('Don\'t forget gloves and a hat');
+        suggestions.push("Don't forget gloves and a hat");
         suggestions.push('Waterproof boots recommended');
       } else if (temperature < 50) {
         suggestions.push('A warm jacket or coat is essential');
@@ -276,9 +316,11 @@ export class WeatherService {
       }
 
       return suggestions;
-
     } catch (error) {
-      errorInDev('[WeatherService] Failed to generate weather suggestions:', error);
+      errorInDev(
+        '[WeatherService] Failed to generate weather suggestions:',
+        error instanceof Error ? error : String(error),
+      );
       return ['Check the weather and dress accordingly'];
     }
   }
@@ -290,12 +332,16 @@ export class WeatherService {
   /**
    * Get user's current location with permission handling
    */
-  private static async getUserLocation(): Promise<{ latitude: number; longitude: number; city?: string }> {
+  private static async getUserLocation(): Promise<{
+    latitude: number;
+    longitude: number;
+    city?: string;
+  }> {
     try {
       // Check if location permissions are granted
       const { status } = await Location.requestForegroundPermissionsAsync();
-      
-      if (status !== 'granted') {
+
+      if (status !== Location.PermissionStatus.GRANTED) {
         logInDev('[WeatherService] Location permission denied, using cached location');
         return await this.getCachedLocation();
       }
@@ -308,28 +354,33 @@ export class WeatherService {
 
       const coords = {
         latitude: location.coords.latitude,
-        longitude: location.coords.longitude
+        longitude: location.coords.longitude,
       };
 
       // Get city name for context
       try {
         const reverseGeocode = await Location.reverseGeocodeAsync(coords);
         const city = reverseGeocode[0]?.city || reverseGeocode[0]?.subregion || undefined;
-        
+
         const locationData = { ...coords, city };
-        
+
         // Cache the location
         await this.setCachedData(this.LOCATION_CACHE_KEY, locationData);
-        
+
         return locationData;
       } catch (geocodeError) {
-        errorInDev('[WeatherService] Failed to get city name:', geocodeError);
+        errorInDev(
+          '[WeatherService] Failed to get city name:',
+          geocodeError instanceof Error ? geocodeError : String(geocodeError),
+        );
         return coords;
       }
-
     } catch (error) {
-      errorInDev('[WeatherService] Failed to get user location:', error);
-      
+      errorInDev(
+        '[WeatherService] Failed to get user location:',
+        error instanceof Error ? error : String(error),
+      );
+
       // Try to use cached location
       const cachedLocation = await this.getCachedLocation();
       if (cachedLocation) {
@@ -339,8 +390,8 @@ export class WeatherService {
       // Ultimate fallback - use a default location (e.g., New York)
       return {
         latitude: 40.7128,
-        longitude: -74.0060,
-        city: 'New York'
+        longitude: -74.006,
+        city: 'New York',
       };
     }
   }
@@ -348,12 +399,18 @@ export class WeatherService {
   /**
    * Get cached location data
    */
-  private static async getCachedLocation(): Promise<{ latitude: number; longitude: number; city?: string }> {
+  private static async getCachedLocation(): Promise<{
+    latitude: number;
+    longitude: number;
+    city?: string;
+  }> {
     try {
-      const cached = await this.getCachedData<{ latitude: number; longitude: number; city?: string }>(
-        this.LOCATION_CACHE_KEY
-      );
-      
+      const cached = await this.getCachedData<{
+        latitude: number;
+        longitude: number;
+        city?: string;
+      }>(this.LOCATION_CACHE_KEY);
+
       if (cached) {
         return cached;
       }
@@ -361,15 +418,18 @@ export class WeatherService {
       // Default fallback location
       return {
         latitude: 40.7128,
-        longitude: -74.0060,
-        city: 'New York'
+        longitude: -74.006,
+        city: 'New York',
       };
     } catch (error) {
-      errorInDev('[WeatherService] Failed to get cached location:', error);
+      errorInDev(
+        '[WeatherService] Failed to get cached location:',
+        error instanceof Error ? error : String(error),
+      );
       return {
         latitude: 40.7128,
-        longitude: -74.0060,
-        city: 'New York'
+        longitude: -74.006,
+        city: 'New York',
       };
     }
   }
@@ -381,10 +441,12 @@ export class WeatherService {
   /**
    * Fetch current weather data from OpenWeatherMap API
    */
-  private static async fetchWeatherFromAPI(
-    location: { latitude: number; longitude: number; city?: string }
-  ): Promise<WeatherContext> {
-  if (!this.WEATHER_API_KEY) {
+  private static async fetchWeatherFromAPI(location: {
+    latitude: number;
+    longitude: number;
+    city?: string;
+  }): Promise<WeatherContext> {
+    if (!this.WEATHER_API_KEY) {
       logInDev('[WeatherService] Weather API key not configured, using fallback data');
       return this.getFallbackWeatherContext();
     }
@@ -398,7 +460,7 @@ export class WeatherService {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
         signal: controller.signal,
       });
@@ -409,7 +471,7 @@ export class WeatherService {
         throw new Error(`Weather API request failed: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as OpenWeatherCurrent;
       return this.parseWeatherAPIResponse(data, location);
     } catch (error) {
       clearTimeout(timeoutId);
@@ -422,9 +484,9 @@ export class WeatherService {
    */
   private static async fetchForecastFromAPI(
     location: { latitude: number; longitude: number },
-    days: number
+    days: number,
   ): Promise<WeatherContext[]> {
-  if (!this.WEATHER_API_KEY) {
+    if (!this.WEATHER_API_KEY) {
       logInDev('[WeatherService] Weather API key not configured, using fallback forecast data');
       return this.getFallbackForecast(days);
     }
@@ -438,7 +500,7 @@ export class WeatherService {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
         signal: controller.signal,
       });
@@ -446,10 +508,12 @@ export class WeatherService {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(`Weather forecast API request failed: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Weather forecast API request failed: ${response.status} ${response.statusText}`,
+        );
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as OpenWeatherForecast;
       return this.parseForecastAPIResponse(data, location);
     } catch (error) {
       clearTimeout(timeoutId);
@@ -461,18 +525,19 @@ export class WeatherService {
    * Parse OpenWeatherMap current weather API response
    */
   private static parseWeatherAPIResponse(
-    data: any,
-    location: { latitude: number; longitude: number; city?: string }
+    data: OpenWeatherCurrent,
+    location: { latitude: number; longitude: number; city?: string },
   ): WeatherContext {
-    const condition = this.mapWeatherCondition(data.weather[0]?.main, data.weather[0]?.description);
-    
+    const first = data.weather?.[0];
+    const condition = this.mapWeatherCondition(first?.main || '', first?.description || '');
+
     return {
       temperature: Math.round(data.main.temp),
       condition,
       humidity: data.main.humidity,
       windSpeed: data.wind?.speed || 0,
       location: location.city || data.name || 'Unknown',
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -480,19 +545,19 @@ export class WeatherService {
    * Parse OpenWeatherMap forecast API response
    */
   private static parseForecastAPIResponse(
-    data: any,
-    location: { latitude: number; longitude: number; city?: string }
+    data: OpenWeatherForecast,
+    location: { latitude: number; longitude: number; city?: string },
   ): WeatherContext[] {
     const forecasts: WeatherContext[] = [];
-    
+
     // Group forecasts by day and take the midday forecast (around 12 PM)
-    const dailyForecasts = new Map<string, any>();
-    
-    data.list.forEach((forecast: any) => {
+    const dailyForecasts = new Map<string, OpenWeatherForecastEntry>();
+
+    data.list.forEach((forecast) => {
       const date = new Date(forecast.dt * 1000);
       const dateKey = date.toDateString();
       const hour = date.getHours();
-      
+
       // Prefer forecasts around midday (10 AM - 2 PM)
       if (!dailyForecasts.has(dateKey) || (hour >= 10 && hour <= 14)) {
         dailyForecasts.set(dateKey, forecast);
@@ -500,16 +565,17 @@ export class WeatherService {
     });
 
     // Convert to WeatherContext objects
-    Array.from(dailyForecasts.values()).forEach(forecast => {
-      const condition = this.mapWeatherCondition(forecast.weather[0]?.main, forecast.weather[0]?.description);
-      
+    Array.from(dailyForecasts.values()).forEach((forecast) => {
+      const f0 = forecast.weather?.[0];
+      const condition = this.mapWeatherCondition(f0?.main || '', f0?.description || '');
+
       forecasts.push({
         temperature: Math.round(forecast.main.temp),
         condition,
         humidity: forecast.main.humidity,
         windSpeed: forecast.wind?.speed || 0,
         location: location.city || data.city?.name || 'Unknown',
-        timestamp: new Date(forecast.dt * 1000)
+        timestamp: new Date(forecast.dt * 1000),
       });
     });
 
@@ -529,7 +595,11 @@ export class WeatherService {
     if (mainLower.includes('snow') || descLower.includes('snow')) {
       return 'snowy';
     }
-    if (mainLower.includes('storm') || descLower.includes('storm') || descLower.includes('thunder')) {
+    if (
+      mainLower.includes('storm') ||
+      descLower.includes('storm') ||
+      descLower.includes('thunder')
+    ) {
       return 'stormy';
     }
     if (mainLower.includes('cloud') || descLower.includes('cloud')) {
@@ -553,32 +623,68 @@ export class WeatherService {
   /**
    * Calculate temperature appropriateness score for an item
    */
-  private static calculateTemperatureScore(category: string, tags: string[], temperature: number): number {
+  private static calculateTemperatureScore(
+    category: string,
+    tags: string[],
+    temperature: number,
+  ): number {
     let score = 0;
 
     // Temperature ranges and appropriate clothing
-    if (temperature < 32) { // Freezing
-      if (category === 'outerwear' || tags.includes('winter') || tags.includes('warm')) score += 0.3;
-      if (tags.includes('light') || tags.includes('summer')) score -= 0.3;
-  if (tags.includes('shorts') || tags.includes('sleeveless')) score -= 0.3;
-    } else if (temperature < 50) { // Cold
-      if (category === 'outerwear' || tags.includes('warm') || tags.includes('long-sleeve')) score += 0.2;
-  if (tags.includes('light') || tags.includes('sleeveless')) score -= 0.2;
-  if (tags.includes('shorts')) score -= 0.2;
-  if (tags.includes('summer')) score -= 0.1;
-    } else if (temperature < 65) { // Cool
-      if (tags.includes('light-layer') || tags.includes('cardigan')) score += 0.1;
-      if (tags.includes('heavy') || tags.includes('winter')) score -= 0.1;
-    } else if (temperature < 75) { // Mild
+    if (temperature < 32) {
+      // Freezing
+      if (category === 'outerwear' || tags.includes('winter') || tags.includes('warm')) {
+        score += 0.3;
+      }
+      if (tags.includes('light') || tags.includes('summer')) {
+        score -= 0.3;
+      }
+      if (tags.includes('shorts') || tags.includes('sleeveless')) {
+        score -= 0.3;
+      }
+    } else if (temperature < 50) {
+      // Cold
+      if (category === 'outerwear' || tags.includes('warm') || tags.includes('long-sleeve')) {
+        score += 0.2;
+      }
+      if (tags.includes('light') || tags.includes('sleeveless')) {
+        score -= 0.2;
+      }
+      if (tags.includes('shorts')) {
+        score -= 0.2;
+      }
+      if (tags.includes('summer')) {
+        score -= 0.1;
+      }
+    } else if (temperature < 65) {
+      // Cool
+      if (tags.includes('light-layer') || tags.includes('cardigan')) {
+        score += 0.1;
+      }
+      if (tags.includes('heavy') || tags.includes('winter')) {
+        score -= 0.1;
+      }
+    } else if (temperature < 75) {
+      // Mild
       // Most items are appropriate
       score += 0.1;
-    } else if (temperature < 85) { // Warm
+    } else if (temperature < 85) {
+      // Warm
       // Favor truly light/breathable items a bit more and penalize heavy/outerwear more strongly
-      if (tags.includes('light') || tags.includes('breathable') || tags.includes('summer')) score += 0.25;
-      if (category === 'outerwear' || tags.includes('heavy') || tags.includes('long-sleeve')) score -= 0.25;
-    } else { // Hot
-      if (tags.includes('light') || tags.includes('breathable') || tags.includes('sleeveless')) score += 0.3;
-      if (category === 'outerwear' || tags.includes('heavy') || tags.includes('long-sleeve')) score -= 0.35;
+      if (tags.includes('light') || tags.includes('breathable') || tags.includes('summer')) {
+        score += 0.25;
+      }
+      if (category === 'outerwear' || tags.includes('heavy') || tags.includes('long-sleeve')) {
+        score -= 0.25;
+      }
+    } else {
+      // Hot
+      if (tags.includes('light') || tags.includes('breathable') || tags.includes('sleeveless')) {
+        score += 0.3;
+      }
+      if (category === 'outerwear' || tags.includes('heavy') || tags.includes('long-sleeve')) {
+        score -= 0.35;
+      }
     }
 
     return score;
@@ -587,36 +693,71 @@ export class WeatherService {
   /**
    * Calculate weather condition appropriateness score for an item
    */
-  private static calculateConditionScore(category: string, tags: string[], condition: WeatherCondition): number {
+  private static calculateConditionScore(
+    category: string,
+    tags: string[],
+    condition: WeatherCondition,
+  ): number {
     let score = 0;
 
     switch (condition) {
       case 'rainy':
-        if (tags.includes('waterproof') || tags.includes('water-resistant')) score += 0.2;
-        if (tags.includes('suede') || tags.includes('delicate')) score -= 0.2;
-        if (category === 'shoes' && !tags.includes('waterproof')) score -= 0.1;
+        if (tags.includes('waterproof') || tags.includes('water-resistant')) {
+          score += 0.2;
+        }
+        if (tags.includes('suede') || tags.includes('delicate')) {
+          score -= 0.2;
+        }
+        if (category === 'shoes' && !tags.includes('waterproof')) {
+          score -= 0.1;
+        }
         break;
-        
+
       case 'snowy':
-        if (tags.includes('waterproof') || tags.includes('winter') || tags.includes('warm')) score += 0.2;
-        if (tags.includes('light') || tags.includes('delicate')) score -= 0.2;
-        if (category === 'shoes' && !tags.includes('waterproof')) score -= 0.3;
+        if (tags.includes('waterproof') || tags.includes('winter') || tags.includes('warm')) {
+          score += 0.2;
+        }
+        if (tags.includes('light') || tags.includes('delicate')) {
+          score -= 0.2;
+        }
+        if (category === 'shoes' && !tags.includes('waterproof')) {
+          score -= 0.3;
+        }
         break;
-        
+
       case 'windy':
-        if (tags.includes('fitted') || tags.includes('structured')) score += 0.1;
-        if (tags.includes('flowy') || tags.includes('loose')) score -= 0.1;
-        if (category === 'accessories' && tags.includes('hat')) score -= 0.1;
+        if (tags.includes('fitted') || tags.includes('structured')) {
+          score += 0.1;
+        }
+        if (tags.includes('flowy') || tags.includes('loose')) {
+          score -= 0.1;
+        }
+        if (category === 'accessories' && tags.includes('hat')) {
+          score -= 0.1;
+        }
         break;
-        
+
       case 'sunny':
-  if (tags.includes('sun-protection') || tags.includes('light-color') || tags.includes('breathable') || tags.includes('light')) score += 0.1;
-        if (tags.includes('dark') && category === 'tops') score -= 0.05;
+        if (
+          tags.includes('sun-protection') ||
+          tags.includes('light-color') ||
+          tags.includes('breathable') ||
+          tags.includes('light')
+        ) {
+          score += 0.1;
+        }
+        if (tags.includes('dark') && category === 'tops') {
+          score -= 0.05;
+        }
         break;
-        
+
       case 'stormy':
-        if (tags.includes('waterproof') || category === 'outerwear') score += 0.2;
-        if (tags.includes('delicate') || tags.includes('formal')) score -= 0.2;
+        if (tags.includes('waterproof') || category === 'outerwear') {
+          score += 0.2;
+        }
+        if (tags.includes('delicate') || tags.includes('formal')) {
+          score -= 0.2;
+        }
         break;
     }
 
@@ -627,23 +768,31 @@ export class WeatherService {
    * Calculate environmental factors score (humidity, wind)
    */
   private static calculateEnvironmentalScore(
-    category: string, 
-    tags: string[], 
-    humidity: number, 
-    windSpeed?: number
+    category: string,
+    tags: string[],
+    humidity: number,
+    windSpeed?: number,
   ): number {
     let score = 0;
 
     // Humidity considerations
     if (humidity > 70) {
-      if (tags.includes('breathable') || tags.includes('moisture-wicking')) score += 0.1;
-      if (tags.includes('heavy') || tags.includes('non-breathable')) score -= 0.1;
+      if (tags.includes('breathable') || tags.includes('moisture-wicking')) {
+        score += 0.1;
+      }
+      if (tags.includes('heavy') || tags.includes('non-breathable')) {
+        score -= 0.1;
+      }
     }
 
     // Wind considerations
-  if (windSpeed && windSpeed >= 15) {
-      if (tags.includes('wind-resistant') || tags.includes('fitted')) score += 0.1;
-      if (tags.includes('flowy') || tags.includes('loose')) score -= 0.1;
+    if (windSpeed && windSpeed >= 15) {
+      if (tags.includes('wind-resistant') || tags.includes('fitted')) {
+        score += 0.1;
+      }
+      if (tags.includes('flowy') || tags.includes('loose')) {
+        score -= 0.1;
+      }
     }
 
     return score;
@@ -654,12 +803,14 @@ export class WeatherService {
    */
   private static calculateOutfitWeatherScore(
     items: Array<{ category: string; tags: string[] }>,
-    weather: WeatherContext
+    weather: WeatherContext,
   ): number {
-    if (items.length === 0) return 0;
+    if (items.length === 0) {
+      return 0;
+    }
 
-    const itemScores = items.map(item => 
-      this.analyzeWeatherAppropriatenessForItem(item, weather)
+    const itemScores = items.map((item) =>
+      this.analyzeWeatherAppropriatenessForItem(item, weather),
     );
 
     // Return average score
@@ -673,25 +824,31 @@ export class WeatherService {
   /**
    * Get cached weather data if available and fresh
    */
-  private static async getCachedWeatherData(
-    location: { latitude: number; longitude: number }
-  ): Promise<WeatherContext | null> {
+  private static async getCachedWeatherData(location: {
+    latitude: number;
+    longitude: number;
+  }): Promise<WeatherContext | null> {
     try {
       const cacheKey = `${this.CACHE_KEY_PREFIX}${location.latitude}_${location.longitude}`;
-      const cached = await this.getCachedData<{ data: WeatherContext; timestamp: number }>(cacheKey);
-      
+      const cached = await this.getCachedData<{ data: WeatherContext; timestamp: number }>(
+        cacheKey,
+      );
+
       if (cached && this.isCacheValid(cached.timestamp)) {
         // Rehydrate Date fields
-        const data = { ...cached.data } as WeatherContext & { timestamp: any };
-        if (typeof data.timestamp === 'string') {
-          data.timestamp = new Date(data.timestamp);
+        const dataClone: WeatherContext = { ...cached.data };
+        if (typeof (cached.data.timestamp as unknown) === 'string') {
+          dataClone.timestamp = new Date(cached.data.timestamp as unknown as string);
         }
-        return data as WeatherContext;
+        return dataClone;
       }
-      
+
       return null;
     } catch (error) {
-      errorInDev('[WeatherService] Failed to get cached weather data:', error);
+      errorInDev(
+        '[WeatherService] Failed to get cached weather data:',
+        error instanceof Error ? error : String(error),
+      );
       return null;
     }
   }
@@ -701,18 +858,21 @@ export class WeatherService {
    */
   private static async cacheWeatherData(
     location: { latitude: number; longitude: number },
-    weatherData: WeatherContext
+    weatherData: WeatherContext,
   ): Promise<void> {
     try {
       const cacheKey = `${this.CACHE_KEY_PREFIX}${location.latitude}_${location.longitude}`;
       const cacheData = {
         data: weatherData,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       };
-      
+
       await this.setCachedData(cacheKey, cacheData);
     } catch (error) {
-      errorInDev('[WeatherService] Failed to cache weather data:', error);
+      errorInDev(
+        '[WeatherService] Failed to cache weather data:',
+        error instanceof Error ? error : String(error),
+      );
       // Don't throw - caching failure shouldn't break the service
     }
   }
@@ -722,10 +882,14 @@ export class WeatherService {
    */
   private static async getCachedData<T>(key: string): Promise<T | null> {
     try {
-      const cached = await AsyncStorage.getItem(key);
-      return cached ? JSON.parse(cached) : null;
+      await secureStorage.initialize();
+      const cached = await secureStorage.getItem(key);
+      return safeParse<T | null>(cached, null);
     } catch (error) {
-      errorInDev(`[WeatherService] Failed to get cached data for key ${key}:`, error);
+      errorInDev(
+        `[WeatherService] Failed to get cached data for key ${key}:`,
+        error instanceof Error ? error : String(error),
+      );
       return null;
     }
   }
@@ -735,9 +899,13 @@ export class WeatherService {
    */
   private static async setCachedData<T>(key: string, data: T): Promise<void> {
     try {
-      await AsyncStorage.setItem(key, JSON.stringify(data));
+      await secureStorage.initialize();
+      await secureStorage.setItem(key, JSON.stringify(data));
     } catch (error) {
-      errorInDev(`[WeatherService] Failed to set cached data for key ${key}:`, error);
+      errorInDev(
+        `[WeatherService] Failed to set cached data for key ${key}:`,
+        error instanceof Error ? error : String(error),
+      );
       // Don't throw - caching failure shouldn't break the service
     }
   }
@@ -760,21 +928,25 @@ export class WeatherService {
     // Use seasonal defaults based on current date
     const now = new Date();
     const month = now.getMonth(); // 0-11
-    
+
     let temperature = 70; // Default mild temperature
     let condition: WeatherCondition = 'cloudy';
-    
+
     // Seasonal adjustments
-    if (month >= 11 || month <= 2) { // Winter
+    if (month >= 11 || month <= 2) {
+      // Winter
       temperature = 45;
       condition = 'cloudy';
-    } else if (month >= 3 && month <= 5) { // Spring
+    } else if (month >= 3 && month <= 5) {
+      // Spring
       temperature = 65;
       condition = 'sunny';
-    } else if (month >= 6 && month <= 8) { // Summer
+    } else if (month >= 6 && month <= 8) {
+      // Summer
       temperature = 80;
       condition = 'sunny';
-    } else { // Fall
+    } else {
+      // Fall
       temperature = 60;
       condition = 'cloudy';
     }
@@ -785,7 +957,7 @@ export class WeatherService {
       humidity: 50,
       windSpeed: 5,
       location: 'Unknown',
-      timestamp: now
+      timestamp: now,
     };
   }
 
@@ -795,24 +967,25 @@ export class WeatherService {
   private static getFallbackForecast(days: number): WeatherContext[] {
     const forecasts: WeatherContext[] = [];
     const baseWeather = this.getFallbackWeatherContext();
-    
+
     for (let i = 0; i < days; i++) {
       const date = new Date();
       date.setDate(date.getDate() + i);
-      
+
       // Add some variation to the forecast
       const tempVariation = (Math.random() - 0.5) * 10; // ±5 degrees
       const conditions: WeatherCondition[] = ['sunny', 'cloudy', 'rainy'];
-      const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
-      
+      const randomIdx = Math.floor(Math.random() * conditions.length);
+      const randomCondition = conditions[randomIdx] ?? baseWeather.condition;
+
       forecasts.push({
         ...baseWeather,
         temperature: Math.round(baseWeather.temperature + tempVariation),
         condition: i === 0 ? baseWeather.condition : randomCondition,
-        timestamp: date
+        timestamp: date,
       });
     }
-    
+
     return forecasts;
   }
 }

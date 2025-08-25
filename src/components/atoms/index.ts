@@ -1,6 +1,6 @@
 /**
  * Atoms Index
- * 
+ *
  * Exports all atomic components - the smallest, most basic UI elements
  * that cannot be broken down further without losing their meaning.
  */

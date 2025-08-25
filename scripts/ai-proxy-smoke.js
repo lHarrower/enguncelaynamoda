@@ -5,7 +5,9 @@
 //  - npm run ai:smoke:vision  # OpenAI vision completion
 
 // Load .env if present
-try { require('dotenv').config(); } catch {}
+try {
+  require('dotenv').config();
+} catch {}
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -17,7 +19,9 @@ const SUPABASE_URL = getEnv('EXPO_PUBLIC_SUPABASE_URL', 'SUPABASE_URL');
 const SUPABASE_ANON = getEnv('EXPO_PUBLIC_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY');
 
 if (!SUPABASE_URL || !SUPABASE_ANON) {
-  console.error('Missing Supabase envs. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY.');
+  console.error(
+    'Missing Supabase envs. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY.',
+  );
   process.exit(1);
 }
 

@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
+
 import { useHapticFeedback } from '../../hooks/useHapticFeedback';
-import { UNIFIED_COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS } from '../../theme/DesignSystem';
+import { BORDER_RADIUS, SPACING, TYPOGRAPHY, UNIFIED_COLORS } from '../../theme/DesignSystem';
 
 export interface ColorPickerProps {
   colors: string[];
@@ -9,7 +10,7 @@ export interface ColorPickerProps {
   onColorSelect: (color: string) => void;
   onColorDeselect?: (color: string) => void;
   multiSelect?: boolean;
-  style?: any;
+  style?: ViewStyle;
   title?: string;
 }
 
@@ -35,15 +36,15 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   onColorDeselect,
   multiSelect = false,
   style,
-  title = 'Colors'
+  title = 'Colors',
 }) => {
   const { triggerSelection } = useHapticFeedback();
 
   const handleColorPress = (color: string) => {
     triggerSelection();
-    
+
     const isSelected = selectedColors.includes(color);
-    
+
     if (isSelected && onColorDeselect) {
       onColorDeselect(color);
     } else if (!isSelected) {
@@ -57,11 +58,9 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
 
   return (
     <View style={[styles.container, style]}>
-      {title && (
-        <Text style={styles.title}>{title}</Text>
-      )}
-      <ScrollView 
-        horizontal 
+      {title && <Text style={styles.title}>{title}</Text>}
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
@@ -73,10 +72,14 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
               style={[
                 styles.colorButton,
                 { backgroundColor: color },
-                isSelected && styles.selectedColorButton
+                isSelected && styles.selectedColorButton,
               ]}
               onPress={() => handleColorPress(color)}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={`Color ${color}`}
+              accessibilityState={{ selected: isSelected }}
+              accessibilityHint={isSelected ? 'Color is selected' : 'Tap to select this color'}
             >
               {isSelected && (
                 <View style={styles.checkmark}>
@@ -92,28 +95,27 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: SPACING.sm,
+  checkmark: {
+    alignItems: 'center',
+    backgroundColor: UNIFIED_COLORS.background.primary,
+    borderRadius: BORDER_RADIUS.full,
+    height: 20,
+    justifyContent: 'center',
+    width: 20,
   },
-  title: {
-    fontSize: TYPOGRAPHY.fontSize.md,
-  fontWeight: TYPOGRAPHY.weights.semibold,
+  checkmarkText: {
     color: UNIFIED_COLORS.charcoal[800],
-    marginBottom: SPACING.sm,
-    paddingHorizontal: SPACING.md,
-  },
-  scrollContent: {
-    paddingHorizontal: SPACING.md,
-    gap: SPACING.sm,
+    fontSize: 12,
+    fontWeight: TYPOGRAPHY.weights.bold,
   },
   colorButton: {
-    width: 40,
-    height: 40,
+    alignItems: 'center',
+    borderColor: UNIFIED_COLORS.background.primary,
     borderRadius: BORDER_RADIUS.full,
     borderWidth: 2,
-    borderColor: UNIFIED_COLORS.background.primary,
+    elevation: 3,
+    height: 40,
     justifyContent: 'center',
-    alignItems: 'center',
     shadowColor: UNIFIED_COLORS.charcoal[900],
     shadowOffset: {
       width: 0,
@@ -121,25 +123,26 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    elevation: 3,
+    width: 40,
+  },
+  container: {
+    paddingVertical: SPACING.sm,
+  },
+  scrollContent: {
+    gap: SPACING.sm,
+    paddingHorizontal: SPACING.md,
   },
   selectedColorButton: {
     borderColor: UNIFIED_COLORS.charcoal[800],
     borderWidth: 3,
     transform: [{ scale: 1.1 }],
   },
-  checkmark: {
-    width: 20,
-    height: 20,
-    borderRadius: BORDER_RADIUS.full,
-    backgroundColor: UNIFIED_COLORS.background.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkmarkText: {
-    fontSize: 12,
-  fontWeight: TYPOGRAPHY.weights.bold,
+  title: {
     color: UNIFIED_COLORS.charcoal[800],
+    fontSize: TYPOGRAPHY.fontSize.md,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    marginBottom: SPACING.sm,
+    paddingHorizontal: SPACING.md,
   },
 });
 

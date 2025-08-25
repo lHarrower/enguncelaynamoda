@@ -1,24 +1,14 @@
 // Premium Outfit Card - Beautiful 2D Cards Like Designer Printed Cards
 // Clean, elegant, instantly understandable with perfect typography
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
-import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width } = Dimensions.get('window');
 
@@ -56,8 +46,8 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
 
   const getCardDimensions = () => {
     const spacing = DesignSystem.spacing.xl;
-    const availableWidth = width - (spacing * 2);
-    
+    const availableWidth = width - spacing * 2;
+
     switch (size) {
       case 'small':
         return { width: availableWidth * 0.45, height: 200 };
@@ -74,11 +64,11 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
 
   // Handle press animation
   const handlePressIn = () => {
-  scale.value = withSpring(0.98, DesignSystem.animations.spring.smooth);
+    scale.value = withSpring(0.98, DesignSystem.animations.spring.smooth);
   };
 
   const handlePressOut = () => {
-  scale.value = withSpring(1, DesignSystem.animations.spring.gentle);
+    scale.value = withSpring(1, DesignSystem.animations.spring.gentle);
   };
 
   const handlePress = () => {
@@ -123,35 +113,42 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
         onPressOut={handlePressOut}
         onPress={handlePress}
         activeOpacity={1}
+        accessibilityRole="button"
+        accessibilityLabel={`${outfit.title} outfit with ${outfit.confidence}% style match`}
+        accessibilityHint="Tap to view outfit details"
       >
         {/* Image Section */}
         <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: outfit.image }}
-            style={styles.outfitImage}
-            resizeMode="cover"
-          />
-          
+          <Image source={{ uri: outfit.image }} style={styles.outfitImage} resizeMode="cover" />
+
           {/* Like Button */}
           <TouchableOpacity
             style={styles.likeButton}
             onPress={handleLike}
             activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={isLiked ? 'Remove from favorites' : 'Add to favorites'}
+            accessibilityHint={
+              isLiked
+                ? 'Tap to remove this outfit from your favorites'
+                : 'Tap to add this outfit to your favorites'
+            }
+            accessibilityState={{ selected: isLiked }}
           >
             <Animated.View style={likeStyle}>
               <Ionicons
                 name={isLiked ? 'heart' : 'heart-outline'}
                 size={20}
-                color={isLiked ? DesignSystem.colors.error[500] : DesignSystem.colors.text.secondary}
+                color={
+                  isLiked ? DesignSystem.colors.error[500] : DesignSystem.colors.text.secondary
+                }
               />
             </Animated.View>
           </TouchableOpacity>
 
           {/* Confidence Badge */}
           <View style={styles.confidenceBadge}>
-            <Text style={styles.confidenceText}>
-              {outfit.confidence}%
-            </Text>
+            <Text style={styles.confidenceText}>{outfit.confidence}%</Text>
           </View>
         </View>
 
@@ -183,14 +180,8 @@ const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
           <View style={styles.confidenceContainer}>
             <View style={styles.confidenceBar}>
               <LinearGradient
-                colors={[
-                  DesignSystem.colors.sage[500],
-                  DesignSystem.colors.amber[500],
-                ]}
-                style={[
-                  styles.confidenceFill,
-                  { width: `${outfit.confidence}%` }
-                ]}
+                colors={[DesignSystem.colors.sage[500], DesignSystem.colors.amber[500]]}
+                style={[styles.confidenceFill, { width: `${outfit.confidence}%` }]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               />
@@ -235,36 +226,36 @@ const styles = StyleSheet.create({
     borderRadius: DesignSystem.radius.lg,
     overflow: 'hidden',
   },
-  
+
   // Image Section
   imageContainer: {
-    position: 'relative',
     height: '60%',
+    position: 'relative',
   },
   outfitImage: {
-    width: '100%',
     height: '100%',
+    width: '100%',
   },
   likeButton: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 16,
+    height: 32,
     justifyContent: 'center',
+    position: 'absolute',
+    right: 12,
+    top: 12,
+    width: 32,
     ...DesignSystem.elevation.soft,
   },
   confidenceBadge: {
-    position: 'absolute',
-    top: 12,
-    left: 12,
     backgroundColor: DesignSystem.colors.sage[500],
+    borderRadius: 12,
+    left: 12,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
+    position: 'absolute',
+    top: 12,
     ...DesignSystem.elevation.soft,
   },
   confidenceText: {
@@ -273,26 +264,26 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
-  
+
   // Content Section
   contentContainer: {
     flex: 1,
-    padding: DesignSystem.spacing.md,
     justifyContent: 'space-between',
+    padding: DesignSystem.spacing.md,
   },
   titleSection: {
     marginBottom: 8,
   },
   outfitTitle: {
-  ...DesignSystem.typography.body.medium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     marginBottom: 2,
   },
   outfitSubtitle: {
-  ...DesignSystem.typography.body.small,
+    ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.secondary,
   },
-  
+
   // Tags
   tagsContainer: {
     flexDirection: 'row',
@@ -301,45 +292,45 @@ const styles = StyleSheet.create({
   },
   tag: {
     backgroundColor: DesignSystem.colors.sage[100],
+    borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 8,
   },
   tagText: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.sage[600],
     fontSize: 10,
   },
-  
+
   // Confidence Bar
   confidenceContainer: {
     marginBottom: 8,
   },
   confidenceBar: {
-    height: 4,
     backgroundColor: DesignSystem.colors.background.tertiary,
     borderRadius: 2,
+    height: 4,
     marginBottom: 4,
     overflow: 'hidden',
   },
   confidenceFill: {
-    height: '100%',
     borderRadius: 2,
+    height: '100%',
   },
   confidenceLabel: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
     fontSize: 10,
   },
-  
+
   // Meta Information
   metaContainer: {
     flexDirection: 'row',
     gap: 12,
   },
   metaItem: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     gap: 4,
   },
   metaText: {

@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withDelay,
   Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
 } from 'react-native-reanimated';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface CinematicTransitionProps {
@@ -34,7 +35,7 @@ export const CinematicTransition: React.FC<CinematicTransitionProps> = ({
         withTiming(1, {
           duration: DesignSystem.motion.duration.smooth,
           easing: Easing.out(Easing.cubic),
-        })
+        }),
       );
 
       translateY.value = withDelay(
@@ -42,7 +43,7 @@ export const CinematicTransition: React.FC<CinematicTransitionProps> = ({
         withTiming(0, {
           duration: DesignSystem.motion.duration.smooth,
           easing: Easing.out(Easing.cubic),
-        })
+        }),
       );
 
       scale.value = withDelay(
@@ -50,7 +51,7 @@ export const CinematicTransition: React.FC<CinematicTransitionProps> = ({
         withTiming(1, {
           duration: DesignSystem.motion.duration.smooth,
           easing: Easing.out(Easing.cubic),
-        })
+        }),
       );
 
       // Call completion callback
@@ -76,21 +77,14 @@ export const CinematicTransition: React.FC<CinematicTransitionProps> = ({
         easing: Easing.in(Easing.cubic),
       });
     }
-  }, [isVisible, delay]);
+  }, [isVisible, delay, onTransitionComplete, opacity, scale, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
+    transform: [{ translateY: translateY.value }, { scale: scale.value }] as any,
   }));
 
-  return (
-    <Animated.View style={[styles.container, animatedStyle]}>
-      {children}
-    </Animated.View>
-  );
+  return <Animated.View style={[styles.container, animatedStyle]}>{children}</Animated.View>;
 };
 
 const styles = StyleSheet.create({

@@ -1,18 +1,19 @@
 // Kinetic Typography - Text as Performance Art
 // Typography that glides, settles, and shimmers with liquid gold accents
 
-import React, { useEffect } from 'react';
-import { Text, StyleSheet, View } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withDelay,
-  withSequence,
-  withRepeat,
-  interpolate,
-} from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface KineticTypographyProps {
@@ -20,7 +21,7 @@ interface KineticTypographyProps {
   variant?: 'poetry' | 'gallery' | 'whisper' | 'statement' | 'elegant' | 'kinetic';
   animation?: 'glide' | 'shimmer' | 'breathe' | 'float' | 'pulse' | 'none';
   delay?: number;
-  style?: any;
+  style?: object;
   shimmerWords?: string[]; // Words to highlight with shimmer effect
   onAnimationComplete?: () => void;
 }
@@ -32,7 +33,7 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
   delay = 0,
   style,
   shimmerWords = [],
-  onAnimationComplete,
+  onAnimationComplete: _onAnimationComplete,
 }) => {
   // Animation values
   const opacity = useSharedValue(0);
@@ -53,13 +54,13 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
       case 'whisper':
         return DesignSystem.typography.scale.caption;
       case 'statement':
-          return DesignSystem.typography.heading.h1;
+        return DesignSystem.typography.heading.h1;
       case 'elegant':
         return DesignSystem.typography.body.medium;
       case 'kinetic':
         return DesignSystem.typography.heading.h3;
       default:
-          return DesignSystem.typography.body.medium;
+        return DesignSystem.typography.body.medium;
     }
   };
 
@@ -92,21 +93,21 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
             delay,
             withTiming(1, {
               duration: 800,
-            })
+            }),
           );
-          
+
           translateY.value = withDelay(
             delay,
             withTiming(0, {
               duration: 800,
-            })
+            }),
           );
-          
+
           blur.value = withDelay(
             delay,
             withTiming(0, {
               duration: 600,
-            })
+            }),
           );
           break;
 
@@ -114,71 +115,59 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
           // Initial appearance
           opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
           translateY.value = withDelay(delay, withTiming(0, { duration: 400 }));
-          
+
           // Continuous shimmer effect
           shimmer.value = withDelay(
             delay + 400,
             withRepeat(
-              withSequence(
-                withTiming(1, { duration: 1500 }),
-                withTiming(0, { duration: 1500 })
-              ),
+              withSequence(withTiming(1, { duration: 1500 }), withTiming(0, { duration: 1500 })),
               -1,
-              true
-            )
+              true,
+            ),
           );
           break;
 
         case 'breathe':
           opacity.value = withDelay(delay, withTiming(1, { duration: 600 }));
           translateY.value = withDelay(delay, withTiming(0, { duration: 600 }));
-          
+
           // Breathing animation
           breathe.value = withDelay(
             delay + 600,
             withRepeat(
-              withSequence(
-                withTiming(1.02, { duration: 3000 }),
-                withTiming(1, { duration: 3000 })
-              ),
+              withSequence(withTiming(1.02, { duration: 3000 }), withTiming(1, { duration: 3000 })),
               -1,
-              true
-            )
+              true,
+            ),
           );
           break;
 
         case 'float':
           opacity.value = withDelay(delay, withTiming(1, { duration: 600 }));
           scale.value = withDelay(delay, withTiming(1, { duration: 600 }));
-          
+
           // Floating animation
           translateY.value = withDelay(
             delay + 600,
             withRepeat(
-              withSequence(
-                withTiming(-8, { duration: 4000 }),
-                withTiming(0, { duration: 4000 })
-              ),
+              withSequence(withTiming(-8, { duration: 4000 }), withTiming(0, { duration: 4000 })),
               -1,
-              true
-            )
+              true,
+            ),
           );
           break;
 
         case 'pulse':
           opacity.value = withDelay(delay, withTiming(1, { duration: 400 }));
-          
+
           // Pulsing animation
           scale.value = withDelay(
             delay + 400,
             withRepeat(
-              withSequence(
-                withTiming(1.05, { duration: 1000 }),
-                withTiming(1, { duration: 1000 })
-              ),
+              withSequence(withTiming(1.05, { duration: 1000 }), withTiming(1, { duration: 1000 })),
               -1,
-              true
-            )
+              true,
+            ),
           );
           break;
 
@@ -193,7 +182,7 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
     };
 
     startAnimation();
-  }, [animation, delay]);
+  }, [animation, delay, blur, breathe, opacity, scale, shimmer, translateY]);
 
   // Animated styles
   const animatedStyle = useAnimatedStyle(() => {
@@ -217,7 +206,9 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
   const renderTextWithShimmer = () => {
     if (shimmerWords.length === 0) {
       return (
-        <Text style={[getTypographyStyle(), { color: getTextColor() }, style]}>
+        <Text
+          style={[getTypographyStyle(), styles.textWithColor, { color: getTextColor() }, style]}
+        >
           {children}
         </Text>
       );
@@ -227,10 +218,10 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
     return (
       <Text style={[getTypographyStyle(), { color: getTextColor() }, style]}>
         {words.map((word, index) => {
-          const isShimmerWord = shimmerWords.some(shimmerWord => 
-            word.toLowerCase().includes(shimmerWord.toLowerCase())
+          const isShimmerWord = shimmerWords.some((shimmerWord) =>
+            word.toLowerCase().includes(shimmerWord.toLowerCase()),
           );
-          
+
           if (isShimmerWord) {
             return (
               <Text key={index}>
@@ -249,11 +240,7 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
                     ]}
                   >
                     <LinearGradient
-                      colors={[
-                        'transparent',
-                        DesignSystem.colors.sage[400],
-                        'transparent',
-                      ]}
+                      colors={['transparent', DesignSystem.colors.sage[400], 'transparent']}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={StyleSheet.absoluteFill}
@@ -264,7 +251,7 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
               </Text>
             );
           }
-          
+
           return (
             <Text key={index}>
               {word}
@@ -276,11 +263,7 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
     );
   };
 
-  return (
-    <Animated.View style={animatedStyle}>
-      {renderTextWithShimmer()}
-    </Animated.View>
-  );
+  return <Animated.View style={animatedStyle}>{renderTextWithShimmer()}</Animated.View>;
 };
 
 // Preset components for common use cases
@@ -309,7 +292,9 @@ export const KineticText: React.FC<Omit<KineticTypographyProps, 'variant'>> = (p
 );
 
 const styles = StyleSheet.create({
-  // Additional styles can be added here if needed
+  textWithColor: {
+    // Base text style for color application
+  },
 });
 
 export default KineticTypography;

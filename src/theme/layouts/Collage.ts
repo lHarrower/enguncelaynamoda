@@ -1,18 +1,19 @@
 /**
  * Collage Layout System
  * Part of AYNAMODA Unified Design System
- * 
+ *
  * Provides overlapping card layouts for discovery screens
  * Inspired by fashion magazine collages with dynamic, organic arrangements
  * Following Digital Zen Garden philosophy with intentional asymmetry
  */
 
-import { ViewStyle, Dimensions } from 'react-native';
-import { SPACING, BORDER_RADIUS, ELEVATION, UNIFIED_COLORS } from '@/theme/tokens';
+import { Dimensions, ViewStyle } from 'react-native';
+
+import { BORDER_RADIUS, ELEVATION, SPACING, UNIFIED_COLORS } from '@/theme/tokens';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const COLLAGE_PADDING = SPACING.lg;
-const AVAILABLE_WIDTH = screenWidth - (COLLAGE_PADDING * 2);
+const AVAILABLE_WIDTH = screenWidth - COLLAGE_PADDING * 2;
 const AVAILABLE_HEIGHT = screenHeight - 200; // Account for navigation and status bar
 
 export const COLLAGE_LAYOUTS = {
@@ -25,14 +26,14 @@ export const COLLAGE_LAYOUTS = {
       justifyContent: 'center',
       alignItems: 'center',
     } as ViewStyle,
-    
+
     // Main card container
     cardStack: {
       width: AVAILABLE_WIDTH,
       height: AVAILABLE_HEIGHT * 0.8,
       position: 'relative',
     } as ViewStyle,
-    
+
     // Individual card in stack
     card: {
       position: 'absolute',
@@ -43,28 +44,28 @@ export const COLLAGE_LAYOUTS = {
       ...ELEVATION.floating,
       overflow: 'hidden',
     } as ViewStyle,
-    
+
     // Card positions in stack (for layering effect)
     cardPositions: {
       top: {
         zIndex: 3,
         transform: [{ scale: 1 }, { translateY: 0 }],
       } as ViewStyle,
-      
+
       middle: {
         zIndex: 2,
         transform: [{ scale: 0.95 }, { translateY: 8 }],
         opacity: 0.8,
       } as ViewStyle,
-      
+
       bottom: {
         zIndex: 1,
         transform: [{ scale: 0.9 }, { translateY: 16 }],
         opacity: 0.6,
-      } as ViewStyle
-    }
+      } as ViewStyle,
+    },
   },
-  
+
   // Overlapping grid for discovery
   overlappingGrid: {
     container: {
@@ -72,7 +73,7 @@ export const COLLAGE_LAYOUTS = {
       paddingHorizontal: SPACING.md,
       paddingVertical: SPACING.lg,
     } as ViewStyle,
-    
+
     // Grid item with overlap
     gridItem: {
       position: 'absolute',
@@ -81,7 +82,7 @@ export const COLLAGE_LAYOUTS = {
       ...ELEVATION.medium,
       overflow: 'hidden',
     } as ViewStyle,
-    
+
     // Predefined positions for organic layout
     positions: {
       primary: {
@@ -91,7 +92,7 @@ export const COLLAGE_LAYOUTS = {
         left: SPACING.lg,
         zIndex: 3,
       } as ViewStyle,
-      
+
       secondary: {
         width: AVAILABLE_WIDTH * 0.5,
         height: AVAILABLE_WIDTH * 0.7,
@@ -99,7 +100,7 @@ export const COLLAGE_LAYOUTS = {
         right: SPACING.lg,
         zIndex: 2,
       } as ViewStyle,
-      
+
       tertiary: {
         width: AVAILABLE_WIDTH * 0.45,
         height: AVAILABLE_WIDTH * 0.6,
@@ -107,24 +108,24 @@ export const COLLAGE_LAYOUTS = {
         left: SPACING.xl,
         zIndex: 1,
       } as ViewStyle,
-      
+
       quaternary: {
         width: AVAILABLE_WIDTH * 0.4,
         height: AVAILABLE_WIDTH * 0.55,
         bottom: SPACING.xl,
         right: SPACING.xl + 20,
         zIndex: 1,
-      } as ViewStyle
-    }
+      } as ViewStyle,
+    },
   },
-  
+
   // Magazine-style collage
   magazineCollage: {
     container: {
       flex: 1,
       paddingHorizontal: SPACING.sm,
     } as ViewStyle,
-    
+
     // Large feature card
     featureCard: {
       width: AVAILABLE_WIDTH * 0.7,
@@ -138,7 +139,7 @@ export const COLLAGE_LAYOUTS = {
       zIndex: 3,
       transform: [{ rotate: '-2deg' }],
     } as ViewStyle,
-    
+
     // Small accent cards
     accentCard1: {
       width: AVAILABLE_WIDTH * 0.4,
@@ -152,7 +153,7 @@ export const COLLAGE_LAYOUTS = {
       zIndex: 2,
       transform: [{ rotate: '3deg' }],
     } as ViewStyle,
-    
+
     accentCard2: {
       width: AVAILABLE_WIDTH * 0.35,
       height: AVAILABLE_WIDTH * 0.45,
@@ -165,7 +166,7 @@ export const COLLAGE_LAYOUTS = {
       zIndex: 2,
       transform: [{ rotate: '-1deg' }],
     } as ViewStyle,
-    
+
     accentCard3: {
       width: AVAILABLE_WIDTH * 0.3,
       height: AVAILABLE_WIDTH * 0.4,
@@ -177,8 +178,8 @@ export const COLLAGE_LAYOUTS = {
       ...ELEVATION.soft,
       zIndex: 1,
       transform: [{ rotate: '2deg' }],
-    } as ViewStyle
-  }
+    } as ViewStyle,
+  },
 } as const;
 
 // Card interaction states
@@ -190,29 +191,29 @@ export const COLLAGE_INTERACTIONS = {
       ...ELEVATION.high,
       transform: [{ scale: 1.02 }],
     } as ViewStyle,
-    
+
     // Swipe right (like)
     swipeRight: {
       borderWidth: 3,
       borderColor: UNIFIED_COLORS.success[500],
       backgroundColor: UNIFIED_COLORS.sage[100],
     } as ViewStyle,
-    
+
     // Swipe left (pass)
     swipeLeft: {
       borderWidth: 3,
       borderColor: UNIFIED_COLORS.error[500],
       backgroundColor: UNIFIED_COLORS.background.secondary,
     } as ViewStyle,
-    
+
     // Swipe up (super like)
     swipeUp: {
       borderWidth: 3,
       borderColor: UNIFIED_COLORS.gold[500],
       backgroundColor: UNIFIED_COLORS.gold[100],
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Tap interactions
   tap: {
     // Card being tapped
@@ -220,7 +221,7 @@ export const COLLAGE_INTERACTIONS = {
       transform: [{ scale: 0.98 }],
       ...ELEVATION.medium,
     } as ViewStyle,
-    
+
     // Card details overlay
     detailsOverlay: {
       position: 'absolute',
@@ -232,9 +233,9 @@ export const COLLAGE_INTERACTIONS = {
       paddingVertical: SPACING.xl,
       borderBottomLeftRadius: BORDER_RADIUS.xxl,
       borderBottomRightRadius: BORDER_RADIUS.xxl,
-    } as ViewStyle
+    } as ViewStyle,
   },
-  
+
   // Long press interactions
   longPress: {
     // Card being long pressed
@@ -243,8 +244,8 @@ export const COLLAGE_INTERACTIONS = {
       ...ELEVATION.floating,
       borderWidth: 2,
       borderColor: UNIFIED_COLORS.sage[300],
-    } as ViewStyle
-  }
+    } as ViewStyle,
+  },
 } as const;
 
 // Efficiency score indicator overlay
@@ -262,7 +263,7 @@ export const EFFICIENCY_INDICATOR = {
     alignItems: 'center',
     zIndex: 10,
   } as ViewStyle,
-  
+
   // Different efficiency levels
   levels: {
     high: {
@@ -270,19 +271,19 @@ export const EFFICIENCY_INDICATOR = {
       borderColor: UNIFIED_COLORS.success[500],
       backgroundColor: UNIFIED_COLORS.sage[100],
     } as ViewStyle,
-    
+
     medium: {
       borderWidth: 3,
       borderColor: UNIFIED_COLORS.gold[500],
       backgroundColor: UNIFIED_COLORS.gold[100],
     } as ViewStyle,
-    
+
     low: {
       borderWidth: 3,
       borderColor: UNIFIED_COLORS.error[500],
       backgroundColor: UNIFIED_COLORS.background.secondary,
-    } as ViewStyle
-  }
+    } as ViewStyle,
+  },
 } as const;
 
 // Animation configurations for collage layouts
@@ -295,21 +296,21 @@ export const COLLAGE_ANIMATIONS = {
       initialOpacity: 0,
       initialTransform: [{ scale: 0.8 }, { translateY: 50 }],
     },
-    
+
     slideInRotate: {
       duration: 600,
       easing: 'easeOutCubic',
       initialTransform: [{ translateX: 100 }, { rotate: '10deg' }],
     },
-    
+
     organicFloat: {
       duration: 800,
       easing: 'easeOutQuart',
       initialOpacity: 0,
       initialTransform: [{ translateY: 30 }, { scale: 0.9 }],
-    }
+    },
   },
-  
+
   // Swipe animations
   swipe: {
     duration: 300,
@@ -320,14 +321,14 @@ export const COLLAGE_ANIMATIONS = {
       up: [{ translateY: -screenHeight }, { scale: 1.1 }],
     },
   },
-  
+
   // Hover/focus animations
   hover: {
     duration: 200,
     easing: 'easeOutCubic',
     transform: [{ scale: 1.02 }],
     elevation: ELEVATION.high,
-  }
+  },
 } as const;
 
 // Responsive configurations for different screen sizes
@@ -337,43 +338,44 @@ export const COLLAGE_RESPONSIVE = {
     overlapRatio: 0.15,
     rotationRange: 2, // degrees
   },
-  
+
   medium: {
     cardSpacing: SPACING.md,
     overlapRatio: 0.2,
     rotationRange: 3,
   },
-  
+
   large: {
     cardSpacing: SPACING.lg,
     overlapRatio: 0.25,
     rotationRange: 4,
-  }
+  },
 } as const;
 
 // Helper functions
-export const getCollageCardPosition = (index: number, total: number, layoutType: 'stack' | 'grid' | 'magazine') => {
+export const getCollageCardPosition = (
+  index: number,
+  total: number,
+  layoutType: 'stack' | 'grid' | 'magazine',
+) => {
   switch (layoutType) {
     case 'stack':
       return {
         zIndex: total - index,
-        transform: [
-          { scale: 1 - (index * 0.05) },
-          { translateY: index * 8 }
-        ],
-        opacity: 1 - (index * 0.2)
+        transform: [{ scale: 1 - index * 0.05 }, { translateY: index * 8 }],
+        opacity: 1 - index * 0.2,
       };
-    
+
     case 'grid':
       const positions = Object.values(COLLAGE_LAYOUTS.overlappingGrid.positions);
       return positions[index % positions.length];
-    
+
     case 'magazine':
       const rotations = [-2, 3, -1, 2, -3];
       return {
-        transform: [{ rotate: `${rotations[index % rotations.length]}deg` }]
+        transform: [{ rotate: `${rotations[index % rotations.length]}deg` }],
       };
-    
+
     default:
       return {};
   }

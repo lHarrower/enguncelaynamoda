@@ -1,19 +1,23 @@
 # Database Setup Instructions
 
 ## Current Issue
+
 The app is running but the database tables are missing:
-- `public.wardrobeItems` 
+
+- `public.wardrobeItems`
 - `public.user_preferences`
 
 ## Quick Fix
 
 ### Option 1: Run SQL in Supabase Dashboard
+
 1. Go to your Supabase project dashboard: https://supabase.com/dashboard
 2. Navigate to the SQL Editor
 3. Copy and paste the contents of `scripts/setup-database.sql`
 4. Click "Run" to execute the SQL
 
 ### Option 2: Use Supabase CLI (if Docker is available)
+
 ```bash
 # Start local Supabase (requires Docker)
 npx supabase start
@@ -26,9 +30,11 @@ npx supabase db reset
 ```
 
 ### Option 3: Manual Table Creation
+
 If you prefer to create tables manually, here are the essential tables:
 
 #### wardrobeItems Table
+
 ```sql
 CREATE TABLE public.wardrobeItems (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -61,6 +67,7 @@ CREATE TABLE public.wardrobeItems (
 ```
 
 #### user_preferences Table
+
 ```sql
 CREATE TABLE public.user_preferences (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -80,9 +87,11 @@ CREATE TABLE public.user_preferences (
 ```
 
 ## After Setup
+
 Once the tables are created, the AYNA Mirror will work properly and the database errors will be resolved.
 
 ## Current Status ✅
+
 - ✅ App is running successfully
 - ✅ Navigation integration working
 - ✅ Authentication working

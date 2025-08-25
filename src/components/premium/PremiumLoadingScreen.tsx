@@ -1,20 +1,16 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming,
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
   withRepeat,
   withSequence,
-  interpolate,
+  withTiming,
 } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
+
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 
@@ -44,46 +40,34 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
 
     // Breathing animation for logo
     breathingScale.value = withRepeat(
-      withSequence(
-        withTiming(1.05, { duration: 2000 }),
-        withTiming(1, { duration: 2000 })
-      ),
+      withSequence(withTiming(1.05, { duration: 2000 }), withTiming(1, { duration: 2000 })),
       -1,
-      false
+      false,
     );
 
     // Shimmer effect
-    shimmerPosition.value = withRepeat(
-      withTiming(width, { duration: 2000 }),
-      -1,
-      false
-    );
+    shimmerPosition.value = withRepeat(withTiming(width, { duration: 2000 }), -1, false);
 
     // Particle animation
     particleOpacity.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 1500 }),
-        withTiming(0, { duration: 1500 })
-      ),
+      withSequence(withTiming(1, { duration: 1500 }), withTiming(0, { duration: 1500 })),
       -1,
-      false
+      false,
     );
-  }, []);
+  }, [breathingScale, logoOpacity, logoScale, particleOpacity, shimmerPosition]);
 
   useEffect(() => {
     if (showProgress) {
-      progressValue.value = withTiming(progress, { 
-        duration: 500
+      progressValue.value = withTiming(progress, {
+        duration: 500,
       });
     }
-  }, [progress, showProgress]);
+  }, [progress, showProgress, progressValue]);
 
   const logoAnimatedStyle = useAnimatedStyle(() => {
     return {
       opacity: logoOpacity.value,
-      transform: [
-        { scale: logoScale.value * breathingScale.value },
-      ],
+      transform: [{ scale: logoScale.value * breathingScale.value }],
     };
   });
 
@@ -116,7 +100,6 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
           {
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
-            animationDelay: `${index * 200}ms`,
           },
         ]}
       />
@@ -139,9 +122,7 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
       />
 
       {/* Floating Particles */}
-      <View style={styles.particlesContainer}>
-        {renderFloatingParticles()}
-      </View>
+      <View style={styles.particlesContainer}>{renderFloatingParticles()}</View>
 
       {/* Main Content */}
       <View style={styles.content}>
@@ -150,15 +131,15 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
           <View style={styles.logoBackground}>
             <LinearGradient
               colors={[
-              DesignSystem.colors.gold[400],
-              DesignSystem.colors.gold[500],
-              DesignSystem.colors.gold[600],
-            ]}
+                DesignSystem.colors.gold[400],
+                DesignSystem.colors.gold[500],
+                DesignSystem.colors.gold[600],
+              ]}
               style={styles.logoGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             />
-            
+
             {/* Shimmer Effect */}
             <Animated.View style={[styles.shimmer, shimmerAnimatedStyle]}>
               <LinearGradient
@@ -169,7 +150,7 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
               />
             </Animated.View>
           </View>
-          
+
           <Text style={styles.logoText}>AYNAMODA</Text>
           <Text style={styles.logoSubtext}>Style Sanctuary</Text>
         </Animated.View>
@@ -177,7 +158,7 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
         {/* Loading Message */}
         <View style={styles.messageContainer}>
           <Text style={styles.loadingMessage}>{message}</Text>
-          
+
           {/* Progress Bar */}
           {showProgress && (
             <View style={styles.progressContainer}>
@@ -187,20 +168,12 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
               <Text style={styles.progressText}>{Math.round(progress)}%</Text>
             </View>
           )}
-          
+
           {/* Loading Dots */}
           {!showProgress && (
             <View style={styles.dotsContainer}>
               {[0, 1, 2].map((index) => (
-                <Animated.View
-                  key={index}
-                  style={[
-                    styles.dot,
-                    {
-                      animationDelay: `${index * 200}ms`,
-                    },
-                  ]}
-                />
+                <Animated.View key={index} style={styles.dot} />
               ))}
             </View>
           )}
@@ -209,7 +182,7 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
         {/* Inspirational Quote */}
         <View style={styles.quoteContainer}>
           <Text style={styles.quote}>
-            "Style is a way to say who you are without having to speak"
+            &quot;Style is a way to say who you are without having to speak&quot;
           </Text>
           <Text style={styles.quoteAuthor}>— Rachel Zoe</Text>
         </View>
@@ -220,123 +193,123 @@ const PremiumLoadingScreen: React.FC<PremiumLoadingScreenProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
-  particlesContainer: {
-    ...StyleSheet.absoluteFillObject,
-    overflow: 'hidden',
-  },
-  particle: {
-    position: 'absolute',
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-  backgroundColor: DesignSystem.colors.gold[300],
-  ...DesignSystem.elevation.soft,
   },
   content: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: DesignSystem.spacing.xl,
   },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: DesignSystem.spacing.xxxl,
-  },
-  logoBackground: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: DesignSystem.spacing.xl,
-    overflow: 'hidden',
-  ...DesignSystem.elevation.floating,
-  },
-  logoGradient: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  shimmer: {
-    position: 'absolute',
-    top: 0,
-    left: -50,
-    width: 50,
-    height: '100%',
-  },
-  shimmerGradient: {
-    flex: 1,
-  },
-  logoText: {
-  ...DesignSystem.typography.heading.h1,
-    color: DesignSystem.colors.text.primary,
-    fontWeight: '700',
-    letterSpacing: 3,
-    marginBottom: DesignSystem.spacing.xs,
-  },
-  logoSubtext: {
-  ...DesignSystem.typography.caption.medium,
-    color: DesignSystem.colors.text.secondary,
-  },
-  messageContainer: {
-    alignItems: 'center',
-    marginBottom: DesignSystem.spacing.xxxl,
-  },
-  loadingMessage: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing.xl,
-  },
-  progressContainer: {
-    alignItems: 'center',
-    width: 200,
-  },
-  progressTrack: {
-    width: '100%',
-    height: 4,
-    backgroundColor: DesignSystem.colors.border.secondary,
-    borderRadius: 2,
-    overflow: 'hidden',
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  progressBar: {
-    height: '100%',
-  backgroundColor: DesignSystem.colors.gold[500],
-  borderRadius: 2,
-  ...DesignSystem.elevation.soft,
-  },
-  progressText: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.tertiary,
+  dot: {
+    backgroundColor: DesignSystem.colors.gold[500],
+    borderRadius: 4,
+    height: 8,
+    opacity: 0.3,
+    width: 8,
   },
   dotsContainer: {
     flexDirection: 'row',
     gap: DesignSystem.spacing.sm,
   },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  backgroundColor: DesignSystem.colors.gold[500],
-    opacity: 0.3,
+  loadingMessage: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.xl,
+    textAlign: 'center',
   },
-  quoteContainer: {
+  logoBackground: {
+    borderRadius: 60,
+    height: 120,
+    marginBottom: DesignSystem.spacing.xl,
+    overflow: 'hidden',
+    width: 120,
+    ...DesignSystem.elevation.floating,
+  },
+  logoContainer: {
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
+    marginBottom: DesignSystem.spacing.xxxl,
+  },
+  logoGradient: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  logoSubtext: {
+    ...DesignSystem.typography.caption.medium,
+    color: DesignSystem.colors.text.secondary,
+  },
+  logoText: {
+    ...DesignSystem.typography.heading.h1,
+    color: DesignSystem.colors.text.primary,
+    fontWeight: '700',
+    letterSpacing: 3,
+    marginBottom: DesignSystem.spacing.xs,
+  },
+  messageContainer: {
+    alignItems: 'center',
+    marginBottom: DesignSystem.spacing.xxxl,
+  },
+  particle: {
+    backgroundColor: DesignSystem.colors.gold[300],
+    borderRadius: 2,
+    height: 4,
+    position: 'absolute',
+    width: 4,
+    ...DesignSystem.elevation.soft,
+  },
+  particlesContainer: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+  },
+  progressBar: {
+    backgroundColor: DesignSystem.colors.gold[500],
+    borderRadius: 2,
+    height: '100%',
+    ...DesignSystem.elevation.soft,
+  },
+  progressContainer: {
+    alignItems: 'center',
+    width: 200,
+  },
+  progressText: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
+  },
+  progressTrack: {
+    backgroundColor: DesignSystem.colors.border.secondary,
+    borderRadius: 2,
+    height: 4,
+    marginBottom: DesignSystem.spacing.sm,
+    overflow: 'hidden',
+    width: '100%',
   },
   quote: {
-  ...DesignSystem.typography.body.large,
-  fontStyle: 'italic',
+    ...DesignSystem.typography.body.large,
     color: DesignSystem.colors.text.tertiary,
-    textAlign: 'center',
+    fontStyle: 'italic',
     marginBottom: DesignSystem.spacing.sm,
+    textAlign: 'center',
   },
   quoteAuthor: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
     opacity: 0.7,
+  },
+  quoteContainer: {
+    alignItems: 'center',
+    paddingHorizontal: DesignSystem.spacing.lg,
+  },
+  shimmer: {
+    height: '100%',
+    left: -50,
+    position: 'absolute',
+    top: 0,
+    width: 50,
+  },
+  shimmerGradient: {
+    flex: 1,
   },
 });
 

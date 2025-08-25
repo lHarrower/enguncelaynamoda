@@ -1,0 +1,76 @@
+<svg width="1024" height="500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6200EA;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#3F51B5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2196F3;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#F8F9FA;stop-opacity:0.95" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1024" height="500" fill="url(#bgGradient)"/>
+  
+  <!-- Decorative Elements -->
+  <circle cx="100" cy="100" r="60" fill="#FFFFFF" opacity="0.1"/>
+  <circle cx="924" cy="400" r="80" fill="#FFFFFF" opacity="0.1"/>
+  <circle cx="850" cy="150" r="40" fill="#FFFFFF" opacity="0.15"/>
+  
+  <!-- Main Content Card -->
+  <rect x="80" y="80" width="864" height="340" rx="24" fill="url(#cardGradient)" stroke="#FFFFFF" stroke-width="2" opacity="0.95"/>
+  
+  <!-- Logo/Icon -->
+  <circle cx="200" cy="200" r="50" fill="#6200EA"/>
+  <text x="200" y="220" font-family="Roboto, Arial" font-size="36" font-weight="700" fill="#FFFFFF" text-anchor="middle">AI</text>
+  
+  <!-- Main Title -->
+  <text x="300" y="180" font-family="Roboto, Arial" font-size="48" font-weight="700" fill="#2C2C2E">AYNAMODA</text>
+  <text x="300" y="220" font-family="Roboto, Arial" font-size="24" font-weight="400" fill="#6200EA">AI-Powered Fashion Companion</text>
+  
+  <!-- Feature Highlights -->
+  <text x="300" y="270" font-family="Roboto, Arial" font-size="18" font-weight="500" fill="#424242">✨ Smart Wardrobe Organization</text>
+  <text x="300" y="300" font-family="Roboto, Arial" font-size="18" font-weight="500" fill="#424242">🤖 Personalized Style Recommendations</text>
+  <text x="300" y="330" font-family="Roboto, Arial" font-size="18" font-weight="500" fill="#424242">🌱 Sustainable Fashion Choices</text>
+  <text x="300" y="360" font-family="Roboto, Arial" font-size="18" font-weight="500" fill="#424242">📊 Style Analytics & Insights</text>
+  
+  <!-- Phone Mockup -->
+  <rect x="700" y="120" width="180" height="320" rx="24" fill="#2C2C2E"/>
+  <rect x="710" y="140" width="160" height="280" rx="16" fill="#FAF9F6"/>
+  
+  <!-- Phone Screen Content -->
+  <rect x="720" y="150" width="140" height="30" rx="15" fill="#6200EA"/>
+  <text x="790" y="170" font-family="Roboto, Arial" font-size="14" font-weight="600" fill="#FFFFFF" text-anchor="middle">AYNAMODA</text>
+  
+  <!-- Wardrobe Items in Phone -->
+  <rect x="730" y="200" width="35" height="45" rx="4" fill="#FF6B6B" opacity="0.3"/>
+  <rect x="775" y="200" width="35" height="45" rx="4" fill="#4ECDC4" opacity="0.3"/>
+  <rect x="820" y="200" width="35" height="45" rx="4" fill="#45B7D1" opacity="0.3"/>
+  
+  <rect x="730" y="255" width="35" height="45" rx="4" fill="#96CEB4" opacity="0.3"/>
+  <rect x="775" y="255" width="35" height="45" rx="4" fill="#FFEAA7" opacity="0.3"/>
+  <rect x="820" y="255" width="35" height="45" rx="4" fill="#DDA0DD" opacity="0.3"/>
+  
+  <!-- AI Recommendation Badge -->
+  <rect x="730" y="320" width="120" height="40" rx="20" fill="#4CAF50"/>
+  <text x="790" y="345" font-family="Roboto, Arial" font-size="12" font-weight="600" fill="#FFFFFF" text-anchor="middle">AI Recommended</text>
+  
+  <!-- Stats/Numbers -->
+  <text x="120" y="460" font-family="Roboto, Arial" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">50K+</text>
+  <text x="120" y="480" font-family="Roboto, Arial" font-size="12" fill="#FFFFFF" text-anchor="middle" opacity="0.9">Happy Users</text>
+  
+  <text x="250" y="460" font-family="Roboto, Arial" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">89%</text>
+  <text x="250" y="480" font-family="Roboto, Arial" font-size="12" fill="#FFFFFF" text-anchor="middle" opacity="0.9">Wardrobe Efficiency</text>
+  
+  <text x="380" y="460" font-family="Roboto, Arial" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">$2.3K</text>
+  <text x="380" y="480" font-family="Roboto, Arial" font-size="12" fill="#FFFFFF" text-anchor="middle" opacity="0.9">Average Savings</text>
+  
+  <text x="510" y="460" font-family="Roboto, Arial" font-size="16" font-weight="600" fill="#FFFFFF" text-anchor="middle">25%</text>
+  <text x="510" y="480" font-family="Roboto, Arial" font-size="12" fill="#FFFFFF" text-anchor="middle" opacity="0.9">Carbon Reduction</text>
+  
+  <!-- Call to Action -->
+  <text x="900" y="460" font-family="Roboto, Arial" font-size="18" font-weight="600" fill="#FFFFFF" text-anchor="middle">Download Now!</text>
+  <text x="900" y="480" font-family="Roboto, Arial" font-size="12" fill="#FFFFFF" text-anchor="middle" opacity="0.9">Transform Your Style</text>
+</svg>

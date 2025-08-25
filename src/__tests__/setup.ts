@@ -18,6 +18,13 @@ jest.mock('react-native', () => {
   const RN = jest.requireActual('react-native');
   return {
     ...RN,
+    AccessibilityInfo: {
+      isScreenReaderEnabled: jest.fn().mockResolvedValue(false),
+      isReduceMotionEnabled: jest.fn().mockResolvedValue(false),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      announceForAccessibility: jest.fn(),
+    },
     Dimensions: {
       get: jest.fn(() => ({ width: 375, height: 812 })),
       addEventListener: jest.fn(),
@@ -64,14 +71,17 @@ jest.mock('react-native', () => {
         NEVER_ASK_AGAIN: 'never_ask_again',
       },
     },
+    useWindowDimensions: jest.fn(() => ({ width: 400, height: 800 })),
   };
 });
 
 // Mock React Navigation
 jest.mock('@react-navigation/native', () => {
-  const actualNav = jest.requireActual('@react-navigation/native');
+  const React = require('react');
   return {
-    ...actualNav,
+    NavigationContainer: React.forwardRef(({ children, ...props }: any, ref: any) => {
+      return React.createElement('View', { ref, ...props }, children);
+    }),
     useNavigation: () => ({
       navigate: jest.fn(),
       goBack: jest.fn(),
@@ -80,6 +90,7 @@ jest.mock('@react-navigation/native', () => {
       isFocused: jest.fn(() => true),
       addListener: jest.fn(),
       removeListener: jest.fn(),
+      getState: jest.fn(() => ({ routes: [], index: 0 })),
     }),
     useRoute: () => ({
       params: {},
@@ -88,13 +99,29 @@ jest.mock('@react-navigation/native', () => {
     }),
     useFocusEffect: jest.fn(),
     useIsFocused: () => true,
+    useNavigationState: jest.fn(() => ({ routes: [], index: 0 })),
+    createNavigationContainerRef: () => ({
+      current: {
+        navigate: jest.fn(),
+        goBack: jest.fn(),
+        dispatch: jest.fn(),
+        getState: jest.fn(() => ({ routes: [], index: 0 })),
+      },
+    }),
   };
 });
 
 // Mock React Native Reanimated
 jest.mock('react-native-reanimated', () => {
   const Reanimated = require('react-native-reanimated/mock');
+
   Reanimated.default.call = () => {};
+  Reanimated.FadeIn = {
+    duration: jest.fn().mockReturnValue({}),
+  };
+  Reanimated.withTiming = jest.fn();
+  Reanimated.withSpring = jest.fn();
+
   return Reanimated;
 });
 
@@ -140,26 +167,30 @@ jest.mock('react-native-vector-icons/Ionicons', () => 'Ionicons');
 jest.mock('react-native-image-picker', () => ({
   launchImageLibrary: jest.fn((options, callback) => {
     callback({
-      assets: [{
-        uri: 'file://test-image.jpg',
-        type: 'image/jpeg',
-        fileName: 'test-image.jpg',
-        fileSize: 1024,
-        width: 300,
-        height: 400,
-      }],
+      assets: [
+        {
+          uri: 'file://test-image.jpg',
+          type: 'image/jpeg',
+          fileName: 'test-image.jpg',
+          fileSize: 1024,
+          width: 300,
+          height: 400,
+        },
+      ],
     });
   }),
   launchCamera: jest.fn((options, callback) => {
     callback({
-      assets: [{
-        uri: 'file://camera-image.jpg',
-        type: 'image/jpeg',
-        fileName: 'camera-image.jpg',
-        fileSize: 2048,
-        width: 400,
-        height: 600,
-      }],
+      assets: [
+        {
+          uri: 'file://camera-image.jpg',
+          type: 'image/jpeg',
+          fileName: 'camera-image.jpg',
+          fileSize: 2048,
+          width: 400,
+          height: 600,
+        },
+      ],
     });
   }),
   MediaType: {
@@ -194,22 +225,28 @@ jest.mock('@react-native-firebase/firestore', () => ({
     collection: jest.fn(() => ({
       doc: jest.fn(() => ({
         set: jest.fn(() => Promise.resolve()),
-        get: jest.fn(() => Promise.resolve({
-          exists: true,
-          data: () => ({ id: 'test-doc', name: 'Test Document' }),
-        })),
+        get: jest.fn(() =>
+          Promise.resolve({
+            exists: true,
+            data: () => ({ id: 'test-doc', name: 'Test Document' }),
+          }),
+        ),
         update: jest.fn(() => Promise.resolve()),
         delete: jest.fn(() => Promise.resolve()),
         onSnapshot: jest.fn(),
       })),
       add: jest.fn(() => Promise.resolve({ id: 'new-doc-id' })),
       where: jest.fn(() => ({
-        get: jest.fn(() => Promise.resolve({
-          docs: [{
-            id: 'doc1',
-            data: () => ({ name: 'Document 1' }),
-          }],
-        })),
+        get: jest.fn(() =>
+          Promise.resolve({
+            docs: [
+              {
+                id: 'doc1',
+                data: () => ({ name: 'Document 1' }),
+              },
+            ],
+          }),
+        ),
       })),
     })),
   }),
@@ -221,22 +258,30 @@ jest.mock('openai', () => {
     OpenAI: jest.fn().mockImplementation(() => ({
       chat: {
         completions: {
-          create: jest.fn(() => Promise.resolve({
-            choices: [{
-              message: {
-                content: 'Test AI response',
-              },
-            }],
-          })),
+          create: jest.fn(() =>
+            Promise.resolve({
+              choices: [
+                {
+                  message: {
+                    content: 'Test AI response',
+                  },
+                },
+              ],
+            }),
+          ),
         },
       },
       images: {
-        analyze: jest.fn(() => Promise.resolve({
-          data: [{
-            description: 'A beautiful dress',
-            confidence: 0.95,
-          }],
-        })),
+        analyze: jest.fn(() =>
+          Promise.resolve({
+            data: [
+              {
+                description: 'A beautiful dress',
+                confidence: 0.95,
+              },
+            ],
+          }),
+        ),
       },
     })),
   };
@@ -244,17 +289,29 @@ jest.mock('openai', () => {
 
 jest.mock('@google-cloud/vision', () => ({
   ImageAnnotatorClient: jest.fn().mockImplementation(() => ({
-    labelDetection: jest.fn(() => Promise.resolve([{
-      labelAnnotations: [{
-        description: 'Clothing',
-        score: 0.9,
-      }],
-    }])),
-    textDetection: jest.fn(() => Promise.resolve([{
-      textAnnotations: [{
-        description: 'Brand Name',
-      }],
-    }])),
+    labelDetection: jest.fn(() =>
+      Promise.resolve([
+        {
+          labelAnnotations: [
+            {
+              description: 'Clothing',
+              score: 0.9,
+            },
+          ],
+        },
+      ]),
+    ),
+    textDetection: jest.fn(() =>
+      Promise.resolve([
+        {
+          textAnnotations: [
+            {
+              description: 'Brand Name',
+            },
+          ],
+        },
+      ]),
+    ),
   })),
 }));
 
@@ -273,14 +330,73 @@ jest.mock('react-native-haptic-feedback', () => ({
 }));
 
 // Mock Network Info
-jest.mock('@react-native-netinfo/netinfo', () => ({
-  fetch: jest.fn(() => Promise.resolve({
-    isConnected: true,
-    type: 'wifi',
-    isInternetReachable: true,
-  })),
+jest.mock('@react-native-community/netinfo', () => ({
+  fetch: jest.fn(() =>
+    Promise.resolve({
+      isConnected: true,
+      isInternetReachable: true,
+    }),
+  ),
   addEventListener: jest.fn(() => jest.fn()),
 }));
+
+// Mock Supabase
+jest.mock('../../config/supabase', () => ({
+  supabaseClient: jest.fn(() => ({
+    from: jest.fn(() => ({
+      select: jest.fn().mockReturnThis(),
+      insert: jest.fn().mockReturnThis(),
+      update: jest.fn().mockReturnThis(),
+      delete: jest.fn().mockReturnThis(),
+    })),
+  })),
+}));
+
+// Define global mocks
+const mocks = {
+  asyncStorage: {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+  },
+  hapticFeedback: jest.fn(),
+  netInfo: {
+    isConnected: {
+      fetch: jest.fn(() => Promise.resolve(true)),
+    },
+  },
+  reanimated: {
+    withTiming: jest.fn(),
+    withSpring: jest.fn(),
+    FadeIn: {
+      duration: jest.fn().mockReturnValue({}),
+    },
+  },
+  imagePicker: jest.fn(),
+  location: jest.fn(),
+};
+
+if (!global.mocks) {
+  global.mocks = mocks;
+}
+
+// Ensure global mocks are initialized
+if (!global.mocks) {
+  global.mocks = mocks;
+}
+
+// Define global mocks object and warnInDev
+if (!global.mocks) {
+  global.mocks = {
+    asyncStorage: {},
+    netInfo: {},
+    hapticFeedback: {},
+    imagePicker: {},
+    location: {},
+  };
+}
+
+global.warnInDev = jest.fn();
 
 // Global test utilities
 global.console = {
@@ -327,5 +443,5 @@ export const mockRoute = {
 export const flushPromises = () => new Promise(setImmediate);
 
 export const waitForNextUpdate = async () => {
-  await new Promise(resolve => setTimeout(resolve, 0));
+  await new Promise((resolve) => setTimeout(resolve, 0));
 };

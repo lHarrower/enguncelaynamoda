@@ -1,15 +1,16 @@
-import React, { useRef } from 'react';
-import { 
-  TouchableOpacity, 
-  Text, 
-  StyleSheet, 
-  ViewStyle, 
-  TextStyle,
-  Animated,
-  View
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useRef } from 'react';
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+
 import { DesignSystem } from '../../theme/DesignSystem';
 
 interface AuraButtonProps {
@@ -60,10 +61,10 @@ const AuraButton: React.FC<AuraButtonProps> = ({
             duration: 1200,
             useNativeDriver: false,
           }),
-        ])
+        ]),
       ).start();
     }
-  }, [variant, disabled]);
+  }, [variant, disabled, shimmerAnim]);
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -88,13 +89,13 @@ const AuraButton: React.FC<AuraButtonProps> = ({
     if (!disabled) {
       // Haptic harmony
       if (haptic === 'impact') {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       } else if (haptic === 'selection') {
-        Haptics.selectionAsync();
+        void Haptics.selectionAsync();
       } else {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
-      
+
       onPress();
     }
   };
@@ -126,7 +127,8 @@ const AuraButton: React.FC<AuraButtonProps> = ({
     const baseStyle: TextStyle = {
       ...DesignSystem.typography.body.medium,
       fontWeight: '600',
-      color: variant === 'primary' ? DesignSystem.colors.text.inverse : DesignSystem.colors.sage[500],
+      color:
+        variant === 'primary' ? DesignSystem.colors.text.inverse : DesignSystem.colors.sage[500],
       opacity: disabled ? 0.5 : 1,
     };
     return baseStyle;
@@ -141,19 +143,13 @@ const AuraButton: React.FC<AuraButtonProps> = ({
 
   const content = (
     <View style={styles.contentContainer}>
-      <Text style={[getTextStyle(), textStyle]}>
-        {title}
-      </Text>
+      <Text style={[getTextStyle(), textStyle]}>{title}</Text>
     </View>
   );
 
   return (
     <Animated.View
-      style={[
-        { transform: [{ scale: scaleAnim }] },
-        fullWidth && styles.fullWidth,
-        style,
-      ]}
+      style={[{ transform: [{ scale: scaleAnim }] }, fullWidth && styles.fullWidth, style]}
     >
       <TouchableOpacity
         onPress={handlePress}
@@ -161,6 +157,10 @@ const AuraButton: React.FC<AuraButtonProps> = ({
         onPressOut={handlePressOut}
         disabled={disabled}
         activeOpacity={0.9}
+        accessibilityRole="button"
+        accessibilityLabel={title}
+        accessibilityHint={`Aura ${variant} button${disabled ? ', disabled' : ''}`}
+        accessibilityState={{ disabled }}
         style={[
           styles.button,
           getSizeStyles(),
@@ -204,41 +204,41 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...DesignSystem.elevation.medium,
   },
-  fullWidth: {
-    width: '100%',
-  },
-  secondary: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.sage[500],
-    ...DesignSystem.elevation.soft,
-  },
-  ghost: {
-    backgroundColor: 'transparent',
-    shadowOpacity: 0,
-    elevation: 0,
+  contentContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   disabled: {
     opacity: 0.6,
   },
+  fullWidth: {
+    width: '100%',
+  },
+  ghost: {
+    backgroundColor: 'transparent',
+    elevation: 0,
+    shadowOpacity: 0,
+  },
   gradient: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'center',
     position: 'relative',
   },
-  contentContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  secondary: {
+    backgroundColor: 'transparent',
+    borderColor: DesignSystem.colors.sage[500],
+    borderWidth: 1,
+    ...DesignSystem.elevation.soft,
   },
   shimmer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     backgroundColor: DesignSystem.colors.gold[500] + '30',
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 });
 

@@ -23,7 +23,11 @@ if (trackedEnv === '.env') {
 
 const matches = run('git grep -n "EXPO_PUBLIC_OPENAI_API_KEY"');
 if (matches) {
-  console.warn('WARNING: Found references to EXPO_PUBLIC_OPENAI_API_KEY in the repository. Avoid bundling sensitive AI keys in the client.');
+  console.warn(
+    'WARNING: Found references to EXPO_PUBLIC_OPENAI_API_KEY in the repository. Avoid bundling sensitive AI keys in the client.',
+  );
 }
 
-if (hasError) process.exit(1);
+if (hasError) {
+  process.exit(1);
+}

@@ -1,40 +1,51 @@
 // Editorial Bento Gallery - High-Fashion Editorial Spread
 // Dynamic, asymmetrical layouts with typography as art, inspired by Spotify Design
 
-import React, { useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { ReactNode, useEffect } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
+  Dimensions,
   Image,
   ImageBackground,
-  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withDelay,
   interpolate,
+  SharedValue,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
+
 import { DesignSystem } from '@/theme/DesignSystem';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
 
 const { width, height } = Dimensions.get('window');
 
-interface BentoItem {
+interface BentoItemContent {
+  image?: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+  value?: string;
+  label?: string;
+  trend?: number;
+  gradient?: readonly [string, string, ...string[]];
+}
+
+export interface BentoItem {
   id: string;
   type: 'hero' | 'image' | 'typography' | 'metric' | 'glass' | 'gradient';
   span: 1 | 2; // Grid span
   height: 'small' | 'medium' | 'large';
   title?: string;
   subtitle?: string;
-  content: any;
+  content: BentoItemContent;
   onPress?: () => void;
 }
 
@@ -42,8 +53,45 @@ interface EditorialBentoGalleryProps {
   items: BentoItem[];
   columns?: number;
   spacing?: number;
-  style?: any;
+  style?: ViewStyle;
 }
+
+interface AnimatedEditorialItemProps {
+  item: BentoItem;
+  index: number;
+  galleryAnimation: SharedValue<number>;
+  children: React.ReactNode;
+}
+
+const AnimatedEditorialItem: React.FC<AnimatedEditorialItemProps> = ({
+  item,
+  index,
+  galleryAnimation,
+  children,
+}) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    const delay = index * 0.1;
+    const progress = Math.max(0, Math.min(1, galleryAnimation.value - delay));
+
+    return {
+      opacity: interpolate(progress, [0, 1], [0, 1]),
+      transform: [
+        {
+          translateY: interpolate(progress, [0, 1], [40, 0]),
+        },
+        {
+          scale: interpolate(progress, [0, 1], [0.95, 1]),
+        },
+      ],
+    };
+  });
+
+  return (
+    <Animated.View key={item.id} style={animatedStyle}>
+      {children}
+    </Animated.View>
+  );
+};
 
 const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
   items,
@@ -59,7 +107,7 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
     galleryAnimation.value = withTiming(1, {
       duration: 1200,
     });
-  }, []);
+  }, [galleryAnimation]);
 
   const getItemHeight = (height: string) => {
     switch (height) {
@@ -92,7 +140,7 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
         },
       ]}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         item.onPress?.();
       }}
       activeOpacity={0.9}
@@ -103,11 +151,7 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
         imageStyle={styles.heroBackgroundImage}
       >
         <LinearGradient
-          colors={[
-            'transparent',
-            'rgba(0, 0, 0, 0.4)',
-            'rgba(0, 0, 0, 0.8)',
-          ]}
+          colors={['transparent', 'rgba(0, 0, 0, 0.4)', 'rgba(0, 0, 0, 0.8)']}
           style={styles.heroGradient}
         >
           {/* Typography as Art - Overlapping with image */}
@@ -131,25 +175,19 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
         },
       ]}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         item.onPress?.();
       }}
       activeOpacity={0.9}
     >
-      <Image
-        source={{ uri: item.content.image }}
-        style={styles.imageContent}
-        resizeMode="cover"
-      />
-      
+      <Image source={{ uri: item.content.image }} style={styles.imageContent} resizeMode="cover" />
+
       {/* Floating Typography */}
       {item.title && (
         <View style={styles.floatingTypography}>
           <BlurView intensity={20} style={styles.typographyBlur}>
             <Text style={styles.floatingTitle}>{item.title}</Text>
-            {item.subtitle && (
-              <Text style={styles.floatingSubtitle}>{item.subtitle}</Text>
-            )}
+            {item.subtitle && <Text style={styles.floatingSubtitle}>{item.subtitle}</Text>}
           </BlurView>
         </View>
       )}
@@ -168,23 +206,20 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
         },
       ]}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         item.onPress?.();
       }}
       activeOpacity={0.9}
     >
       <LinearGradient
-        colors={item.content.gradient || [
-          DesignSystem.colors.sage[300],
-        DesignSystem.colors.sage[400],
-        ]}
+        colors={
+          item.content.gradient || [DesignSystem.colors.sage[300], DesignSystem.colors.sage[400]]
+        }
         style={styles.typographyGradient}
       >
         <View style={styles.typographyContent}>
           <Text style={styles.editorialHeadline}>{item.title}</Text>
-          {item.subtitle && (
-            <Text style={styles.editorialSubheadline}>{item.subtitle}</Text>
-          )}
+          {item.subtitle && <Text style={styles.editorialSubheadline}>{item.subtitle}</Text>}
           {item.content.icon && (
             <Ionicons
               name={item.content.icon}
@@ -210,7 +245,7 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
         },
       ]}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         item.onPress?.();
       }}
       activeOpacity={0.9}
@@ -226,12 +261,10 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
               color={
                 item.content.trend > 0
                   ? DesignSystem.colors.success[500]
-          : DesignSystem.colors.error[500]
+                  : DesignSystem.colors.error[500]
               }
             />
-            <Text style={styles.metricTrendText}>
-              {Math.abs(item.content.trend)}%
-            </Text>
+            <Text style={styles.metricTrendText}>{Math.abs(item.content.trend)}%</Text>
           </View>
         )}
       </View>
@@ -249,7 +282,7 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
         },
       ]}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         item.onPress?.();
       }}
       activeOpacity={0.9}
@@ -265,9 +298,7 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
             />
           )}
           <Text style={styles.glassTitle}>{item.title}</Text>
-          {item.subtitle && (
-            <Text style={styles.glassSubtitle}>{item.subtitle}</Text>
-          )}
+          {item.subtitle && <Text style={styles.glassSubtitle}>{item.subtitle}</Text>}
         </View>
       </BlurView>
     </TouchableOpacity>
@@ -284,7 +315,7 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
         },
       ]}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         item.onPress?.();
       }}
       activeOpacity={0.9}
@@ -297,32 +328,13 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
       >
         <View style={styles.gradientInner}>
           <Text style={styles.gradientTitle}>{item.title}</Text>
-          {item.subtitle && (
-            <Text style={styles.gradientSubtitle}>{item.subtitle}</Text>
-          )}
+          {item.subtitle && <Text style={styles.gradientSubtitle}>{item.subtitle}</Text>}
         </View>
       </LinearGradient>
     </TouchableOpacity>
   );
 
   const renderItem = (item: BentoItem, index: number) => {
-    const animatedStyle = useAnimatedStyle(() => {
-      const delay = index * 0.1;
-      const progress = Math.max(0, Math.min(1, galleryAnimation.value - delay));
-      
-      return {
-        opacity: interpolate(progress, [0, 1], [0, 1]),
-        transform: [
-          { 
-            translateY: interpolate(progress, [0, 1], [40, 0]) 
-          },
-          { 
-            scale: interpolate(progress, [0, 1], [0.95, 1]) 
-          },
-        ],
-      };
-    });
-
     let itemComponent;
     switch (item.type) {
       case 'hero':
@@ -348,9 +360,14 @@ const EditorialBentoGallery: React.FC<EditorialBentoGalleryProps> = ({
     }
 
     return (
-      <Animated.View key={item.id} style={animatedStyle}>
+      <AnimatedEditorialItem
+        key={item.id}
+        item={item}
+        index={index}
+        galleryAnimation={galleryAnimation}
+      >
         {itemComponent}
-      </Animated.View>
+      </AnimatedEditorialItem>
     );
   };
 
@@ -403,22 +420,22 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
-    marginBottom: 16,
     gap: 16,
+    marginBottom: 16,
   },
   bentoItem: {
-    borderRadius: 24,
-    overflow: 'hidden',
     backgroundColor: 'rgba(255, 255, 255, 0.02)',
-    borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 24,
+    borderWidth: 1,
+    overflow: 'hidden',
   },
-  
+
   // Hero Item Styles
   heroItem: {
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
   },
   heroBackground: {
     flex: 1,
@@ -445,16 +462,16 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.text.tertiary,
     fontSize: 16,
   },
-  
+
   // Image Item Styles
   imageContent: {
-    flex: 1,
     borderRadius: 24,
+    flex: 1,
   },
   floatingTypography: {
-    position: 'absolute',
     bottom: 16,
     left: 16,
+    position: 'absolute',
     right: 16,
   },
   typographyBlur: {
@@ -471,17 +488,17 @@ const styles = StyleSheet.create({
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
   },
-  
+
   // Typography Item Styles
   typographyItem: {
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   typographyGradient: {
-    flex: 1,
-    borderRadius: 24,
-    justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 24,
+    flex: 1,
+    justifyContent: 'center',
   },
   typographyContent: {
     alignItems: 'center',
@@ -490,25 +507,25 @@ const styles = StyleSheet.create({
   editorialHeadline: {
     ...DesignSystem.typography.scale.h2,
     color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
     fontSize: 28,
     marginBottom: 8,
+    textAlign: 'center',
   },
   editorialSubheadline: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
-    textAlign: 'center',
     fontSize: 14,
+    textAlign: 'center',
   },
   typographyIcon: {
     marginTop: 12,
   },
-  
+
   // Metric Item Styles
   metricItem: {
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    justifyContent: 'center',
   },
   metricContent: {
     alignItems: 'center',
@@ -526,8 +543,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   metricTrend: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     marginTop: 8,
   },
   metricTrendText: {
@@ -535,16 +552,16 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.text.tertiary,
     marginLeft: 4,
   },
-  
+
   // Glass Item Styles
   glassContent: {
-    flex: 1,
     borderRadius: 24,
+    flex: 1,
   },
   glassInner: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
   glassIcon: {
@@ -553,33 +570,33 @@ const styles = StyleSheet.create({
   glassTitle: {
     ...DesignSystem.typography.scale.body1,
     color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
     fontWeight: '500',
     marginBottom: 6,
+    textAlign: 'center',
   },
   glassSubtitle: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
     textAlign: 'center',
   },
-  
+
   // Gradient Item Styles
   gradientContent: {
-    flex: 1,
     borderRadius: 24,
+    flex: 1,
   },
   gradientInner: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
   gradientTitle: {
     ...DesignSystem.typography.scale.body1,
     color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
     fontWeight: '600',
     marginBottom: 6,
+    textAlign: 'center',
   },
   gradientSubtitle: {
     ...DesignSystem.typography.scale.caption,

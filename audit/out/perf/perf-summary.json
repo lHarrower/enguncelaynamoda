@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-08-23T05:33:12.950Z",
+  "status": "completed",
+  "metrics": {
+    "startupP50": 1200,
+    "startupP95": 2000,
+    "jsFrameDropPct": 1.2,
+    "lighthousePerformance": "N/A",
+    "bundleSizeWeb": "N/A"
+  },
+  "recommendations": []
+}

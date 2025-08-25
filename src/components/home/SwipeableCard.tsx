@@ -1,20 +1,22 @@
 import React from 'react';
-import { useWindowDimensions, StyleSheet } from 'react-native';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  interpolate,
   Extrapolate,
+  interpolate,
   runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
+
 import StyleMatchCard from '@/components/home/StyleMatchCard';
+import { WardrobeItem } from '@/types';
 
 interface SwipeableCardProps {
-  item: any;
-  onSwipe: (item: any, direction: 'left' | 'right') => void;
+  item: WardrobeItem;
+  onSwipe: (item: WardrobeItem, direction: 'left' | 'right') => void;
 }
 
 const SwipeableCard: React.FC<SwipeableCardProps> = ({ item, onSwipe }) => {
@@ -48,7 +50,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({ item, onSwipe }) => {
       const swipeThreshold = screenWidth * 0.3;
       if (Math.abs(event.translationX) > swipeThreshold) {
         const direction = event.translationX > 0 ? 'right' : 'left';
-        
+
         translateY.value = withTiming(-800, { duration: 400 });
         rotation.value = withTiming(direction === 'right' ? 15 : -15, { duration: 400 });
         translateX.value = withTiming(event.translationX * 1.2, { duration: 400 });
@@ -68,7 +70,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({ item, onSwipe }) => {
       { translateY: translateY.value },
       { rotate: `${rotation.value}deg` },
       { scale: scale.value },
-    ],
+    ] as any,
   }));
 
   const likeOpacity = useAnimatedStyle(() => ({
@@ -83,7 +85,14 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({ item, onSwipe }) => {
     <GestureDetector gesture={gesture}>
       <Animated.View style={styles.container}>
         <StyleMatchCard
-          item={item}
+          item={{
+            id: item.id,
+            brand: item.brand || 'AYNAMODA',
+            product: item.name || item.aiGeneratedName || 'Fashion Item',
+            price: item.purchasePrice ? `$${item.purchasePrice}` : '$0',
+            discount: '0%',
+            image: item.imageUri || '',
+          }}
           style={animatedStyle}
           likeOpacity={likeOpacity}
           dislikeOpacity={dislikeOpacity}
@@ -96,8 +105,8 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({ item, onSwipe }) => {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

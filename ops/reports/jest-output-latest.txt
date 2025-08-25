@@ -1,0 +1,273 @@
+﻿node.exe : PASS __tests__/services/accessibilityService.test.ts
+At line:1 char:1
++ & "C:\nvm4w\nvmnodejs\nodejs/node.exe" "C:\nvm4w\nvmnodejs\nodejs/nod ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PASS __tests__/...Service.test.ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+PASS __tests__/notificationService.test.ts
+PASS __tests__/services/notificationService.test.ts
+PASS __tests__/onboardingFlow.test.tsx
+PASS __tests__/outfitRecommendationCard.test.tsx
+PASS __tests__/confidenceNote.test.tsx
+PASS __tests__/quickActionButton.test.tsx
+PASS __tests__/aynaMirrorNavigation.test.tsx
+PASS __tests__/accessibility/inclusiveDesign.test.tsx
+PASS __tests__/aynaMirrorScreen.test.tsx
+PASS __tests__/quickActionButton.minimal.test.tsx
+PASS __tests__/integration/crossServiceCommunication.test.ts
+PASS __tests__/performance/performanceBenchmarks.test.ts
+PASS __tests__/e2e/dailyRitualFlow.test.ts
+PASS __tests__/performanceOptimization.test.ts
+PASS __tests__/ux/recommendationAccuracy.test.ts
+PASS __tests__/aynaMirror.test.ts
+PASS __tests__/ux/confidenceNoteQuality.test.ts
+PASS __tests__/enhancedWardrobeService.test.ts
+PASS __tests__/errorHandlingIntegration.test.ts
+PASS __tests__/quickActionButton.debug.test.tsx
+PASS __tests__/weatherService.test.ts
+PASS __tests__/intelligenceService.test.ts
+PASS __tests__/aynaMirrorIntegration.test.ts
+PASS __tests__/errorHandlingService.test.ts
+PASS __tests__/services/aynaMirrorService.test.ts
+PASS __tests__/aynaMirrorService.test.ts
+PASS __tests__/services/deepLinkService.test.ts
+PASS __tests__/services/aiNamingService.test.ts
+PASS __tests__/userPreferencesIntegration.test.ts
+PASS __tests__/userPreferencesService.test.ts
+PASS __tests__/strategy.test.ts
+PASS __tests__/quickActionButton.simple.test.tsx
+PASS __tests__/onboardingService.test.ts
+PASS __tests__/emotionalResponseStep.test.tsx
+PASS __tests__/deepLinkService.behavior.test.ts
+PASS __tests__/styleDNAService.test.ts
+PASS __tests__/feedbackCollector.test.tsx
+PASS __tests__/confidenceRatingStep.test.tsx
+PASS __tests__/supabaseError.test.ts
+PASS __tests__/deepLinkService.test.ts
+PASS __tests__/shopYourClosetFirst.test.tsx
+FAIL __tests__/efficiencyScoreService.test.ts
+  ÔùÅ Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not
+ configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     ÔÇó If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     ÔÇó If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     ÔÇó To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     ÔÇó If you need a custom transformation specify a "transform" option in your config.
+     ÔÇó If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    SyntaxError: C:\AYNAMODA\src\services\efficiencyScoreService.ts: Unexpected token (697:98)
+
+    [0m [90m 695 |[39m     [36mconst[39m availableCategories [33m=[39m [36mnew[39m [33mSet[39m(items[33m.[39mmap(item [33m=>[3
+9m item[33m.[39mcategory))[33m;[39m
+     [90m 696 |[39m     [36mconst[39m missingCategories [33m=[39m essentialCategories[33m.[39mfilter(cat [33m=>[39m [33m![39mavai
+lableCategories[33m.[39mhas(cat))[33m;[39m
+    [31m[1m>[22m[39m[90m 697 |[39m     [36mconst[39m gapAnalysis [33m=[39m [33mMath[39m[33m.[39mmax([35m0[39m[33m,[39m [35
+m1[39m [33m-[39m (missingCategories[33m.[39mlength [33m/[39m essentialCategories[33m.[39mlength))[33m;[39m}]}}}
+     [90m     |[39m                                                                                                   [31m[1m^[22m[39m
+     [90m 698 |[39m
+     [90m 699 |[39m     [36mreturn[39m {
+     [90m 700 |[39m       qualityScore[33m,[39m[0m
+
+    [0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { efficiencyScoreService } [36mfrom[39m [32m'@/services/efficiencyScoreService
+'[39m[33m;[39m
+     [90m   |[39m [31m[1m^[22m[39m
+     [90m 2 |[39m [36mimport[39m { enhancedWardrobeService } [36mfrom[39m [32m'@/services/enhancedWardrobeService'[39m[33m;[39m
+     [90m 3 |[39m [36mimport[39m { supabase } [36mfrom[39m [32m'@/config/supabaseClient'[39m[33m;[39m
+     [90m 4 |[39m[0m
+
+      at constructor (node_modules/@babel/parser/src/parse-error.ts:95:45)
+      at TypeScriptParserMixin.toParseError [as raise] (node_modules/@babel/parser/src/tokenizer/index.ts:1503:19)
+      at TypeScriptParserMixin.raise [as unexpected] (node_modules/@babel/parser/src/tokenizer/index.ts:1543:16)
+      at TypeScriptParserMixin.unexpected [as parsePropertyName] (node_modules/@babel/parser/src/parser/expression.ts:2441:18)
+      at TypeScriptParserMixin.parsePropertyName [as parseClassElementName] (node_modules/@babel/parser/src/parser/statement.ts:2142:10)
+      at TypeScriptParserMixin.parseClassElementName (node_modules/@babel/parser/src/parser/statement.ts:1986:22)
+      at TypeScriptParserMixin.parseClassMemberWithIsStatic (node_modules/@babel/parser/src/plugins/typescript/index.ts:3302:13)
+      at parseClassMemberWithIsStatic (node_modules/@babel/parser/src/plugins/typescript/index.ts:3245:16)
+      at TypeScriptParserMixin.callParseClassMemberWithIsStatic [as parseClassMember] (node_modules/@babel/parser/src/plugins/typescript/inde
+x.ts:3256:9)
+      at parseClassMember (node_modules/@babel/parser/src/parser/statement.ts:1846:14)
+      at TypeScriptParserMixin.callback [as withSmartMixTopicForbiddingContext] (node_modules/@babel/parser/src/parser/expression.ts:3166:14)
+      at TypeScriptParserMixin.withSmartMixTopicForbiddingContext [as parseClassBody] (node_modules/@babel/parser/src/parser/statement.ts:181
+8:10)
+      at TypeScriptParserMixin.parseClassBody (node_modules/@babel/parser/src/parser/statement.ts:1769:22)
+      at TypeScriptParserMixin.parseClass (node_modules/@babel/parser/src/plugins/typescript/index.ts:4218:22)
+      at TypeScriptParserMixin.parseClass (node_modules/@babel/parser/src/parser/statement.ts:527:21)
+      at TypeScriptParserMixin.parseStatementContent (node_modules/@babel/parser/src/plugins/typescript/index.ts:3185:20)
+      at TypeScriptParserMixin.parseStatementContent [as parseStatementLike] (node_modules/@babel/parser/src/parser/statement.ts:477:17)
+      at TypeScriptParserMixin.parseStatementLike [as parseModuleItem] (node_modules/@babel/parser/src/parser/statement.ts:414:17)
+      at TypeScriptParserMixin.parseModuleItem [as parseBlockOrModuleBlockBody] (node_modules/@babel/parser/src/parser/statement.ts:1438:16)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody [as parseBlockBody] (node_modules/@babel/parser/src/parser/statement.ts:1412:10)
+      at TypeScriptParserMixin.parseBlockBody [as parseProgram] (node_modules/@babel/parser/src/parser/statement.ts:229:10)
+      at TypeScriptParserMixin.parseProgram [as parseTopLevel] (node_modules/@babel/parser/src/parser/statement.ts:203:25)
+      at TypeScriptParserMixin.parseTopLevel (node_modules/@babel/parser/src/parser/index.ts:93:10)
+      at TypeScriptParserMixin.parse (node_modules/@babel/parser/src/plugins/typescript/index.ts:4309:20)
+      at parse (node_modules/@babel/parser/src/index.ts:92:38)
+      at parser (node_modules/@babel/core/src/parser/index.ts:28:19)
+          at parser.next (<anonymous>)
+      at normalizeFile (node_modules/@babel/core/src/transformation/normalize-file.ts:49:24)
+          at normalizeFile.next (<anonymous>)
+      at run (node_modules/@babel/core/src/transformation/index.ts:40:36)
+          at run.next (<anonymous>)
+      at transform (node_modules/@babel/core/src/transform.ts:29:20)
+          at transform.next (<anonymous>)
+      at evaluateSync (node_modules/gensync/index.js:251:28)
+      at sync (node_modules/gensync/index.js:89:14)
+      at fn (node_modules/@babel/core/src/errors/rewrite-stack-trace.ts:99:14)
+      at transformSync (node_modules/@babel/core/src/transform.ts:66:52)
+      at Object.require (__tests__/efficiencyScoreService.test.ts:1:1)
+
+
+        Failed to write coverage reports:
+        ERROR: Error: Cannot find module 'json-summary,text'
+Require stack:
+- C:\AYNAMODA\node_modules\istanbul-reports\index.js
+- C:\AYNAMODA\node_modules\@jest\reporters\build\CoverageReporter.js
+- C:\AYNAMODA\node_modules\@jest\reporters\build\index.js
+- C:\AYNAMODA\node_modules\@jest\core\build\TestScheduler.js
+- C:\AYNAMODA\node_modules\@jest\core\build\index.js
+- C:\AYNAMODA\node_modules\jest-cli\build\run.js
+- C:\AYNAMODA\node_modules\jest-cli\build\index.js
+- C:\AYNAMODA\node_modules\jest-cli\bin\jest.js
+- C:\AYNAMODA\node_modules\jest\bin\jest.js
+        STACK: Error: Cannot find module 'json-summary,text'
+Require stack:
+- C:\AYNAMODA\node_modules\istanbul-reports\index.js
+- C:\AYNAMODA\node_modules\@jest\reporters\build\CoverageReporter.js
+- C:\AYNAMODA\node_modules\@jest\reporters\build\index.js
+- C:\AYNAMODA\node_modules\@jest\core\build\TestScheduler.js
+- C:\AYNAMODA\node_modules\@jest\core\build\index.js
+- C:\AYNAMODA\node_modules\jest-cli\build\run.js
+- C:\AYNAMODA\node_modules\jest-cli\build\index.js
+- C:\AYNAMODA\node_modules\jest-cli\bin\jest.js
+- C:\AYNAMODA\node_modules\jest\bin\jest.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1365:15)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1021:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1026:22)
+    at Function._load (node:internal/modules/cjs/loader:1175:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.require (node:internal/modules/cjs/loader:1445:12)
+    at require (node:internal/modules/helpers:135:16)
+    at Object.create (C:\AYNAMODA\node_modules\istanbul-reports\index.js:19:20)
+    at C:\AYNAMODA\node_modules\@jest\reporters\build\CoverageReporter.js:184:20
+    at Array.forEach (<anonymous>)
+    at CoverageReporter.onRunComplete (C:\AYNAMODA\node_modules\@jest\reporters\build\CoverageReporter.js:178:25)
+    at ReporterDispatcher.onRunComplete (C:\AYNAMODA\node_modules\@jest\core\build\ReporterDispatcher.js:71:9)
+    at TestScheduler.scheduleTests (C:\AYNAMODA\node_modules\@jest\core\build\TestScheduler.js:306:5)
+    at runJest (C:\AYNAMODA\node_modules\@jest\core\build\runJest.js:367:19)
+    at _run10000 (C:\AYNAMODA\node_modules\@jest\core\build\cli\index.js:343:7)
+    at runCLI (C:\AYNAMODA\node_modules\@jest\core\build\cli\index.js:198:3)
+    at Object.run (C:\AYNAMODA\node_modules\jest-cli\build\run.js:130:37)
+      
+Summary of all failing tests
+FAIL __tests__/efficiencyScoreService.test.ts
+  ÔùÅ Test suite failed to run
+
+    Jest encountered an unexpected token
+
+    Jest failed to parse a file. This happens e.g. when your code or its dependencies use non-standard JavaScript syntax, or when Jest is not
+ configured to support such syntax.
+
+    Out of the box Jest supports Babel, which will be used to transform your files into valid JS based on your Babel configuration.
+
+    By default "node_modules" folder is ignored by transformers.
+
+    Here's what you can do:
+     ÔÇó If you are trying to use ECMAScript Modules, see https://jestjs.io/docs/ecmascript-modules for how to enable it.
+     ÔÇó If you are trying to use TypeScript, see https://jestjs.io/docs/getting-started#using-typescript
+     ÔÇó To have some of your "node_modules" files transformed, you can specify a custom "transformIgnorePatterns" in your config.
+     ÔÇó If you need a custom transformation specify a "transform" option in your config.
+     ÔÇó If you simply want to mock your non-JS modules (e.g. binary assets) you can stub them out with the "moduleNameMapper" config option.
+
+    You'll find more details and examples of these config options in the docs:
+    https://jestjs.io/docs/configuration
+    For information about custom transformations, see:
+    https://jestjs.io/docs/code-transformation
+
+    Details:
+
+    SyntaxError: C:\AYNAMODA\src\services\efficiencyScoreService.ts: Unexpected token (697:98)
+
+    [0m [90m 695 |[39m     [36mconst[39m availableCategories [33m=[39m [36mnew[39m [33mSet[39m(items[33m.[39mmap(item [33m=>[3
+9m item[33m.[39mcategory))[33m;[39m
+     [90m 696 |[39m     [36mconst[39m missingCategories [33m=[39m essentialCategories[33m.[39mfilter(cat [33m=>[39m [33m![39mavai
+lableCategories[33m.[39mhas(cat))[33m;[39m
+    [31m[1m>[22m[39m[90m 697 |[39m     [36mconst[39m gapAnalysis [33m=[39m [33mMath[39m[33m.[39mmax([35m0[39m[33m,[39m [35
+m1[39m [33m-[39m (missingCategories[33m.[39mlength [33m/[39m essentialCategories[33m.[39mlength))[33m;[39m}]}}}
+     [90m     |[39m                                                                                                   [31m[1m^[22m[39m
+     [90m 698 |[39m
+     [90m 699 |[39m     [36mreturn[39m {
+     [90m 700 |[39m       qualityScore[33m,[39m[0m
+
+    [0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { efficiencyScoreService } [36mfrom[39m [32m'@/services/efficiencyScoreService
+'[39m[33m;[39m
+     [90m   |[39m [31m[1m^[22m[39m
+     [90m 2 |[39m [36mimport[39m { enhancedWardrobeService } [36mfrom[39m [32m'@/services/enhancedWardrobeService'[39m[33m;[39m
+     [90m 3 |[39m [36mimport[39m { supabase } [36mfrom[39m [32m'@/config/supabaseClient'[39m[33m;[39m
+     [90m 4 |[39m[0m
+
+      at constructor (node_modules/@babel/parser/src/parse-error.ts:95:45)
+      at TypeScriptParserMixin.toParseError [as raise] (node_modules/@babel/parser/src/tokenizer/index.ts:1503:19)
+      at TypeScriptParserMixin.raise [as unexpected] (node_modules/@babel/parser/src/tokenizer/index.ts:1543:16)
+      at TypeScriptParserMixin.unexpected [as parsePropertyName] (node_modules/@babel/parser/src/parser/expression.ts:2441:18)
+      at TypeScriptParserMixin.parsePropertyName [as parseClassElementName] (node_modules/@babel/parser/src/parser/statement.ts:2142:10)
+      at TypeScriptParserMixin.parseClassElementName (node_modules/@babel/parser/src/parser/statement.ts:1986:22)
+      at TypeScriptParserMixin.parseClassMemberWithIsStatic (node_modules/@babel/parser/src/plugins/typescript/index.ts:3302:13)
+      at parseClassMemberWithIsStatic (node_modules/@babel/parser/src/plugins/typescript/index.ts:3245:16)
+      at TypeScriptParserMixin.callParseClassMemberWithIsStatic [as parseClassMember] (node_modules/@babel/parser/src/plugins/typescript/inde
+x.ts:3256:9)
+      at parseClassMember (node_modules/@babel/parser/src/parser/statement.ts:1846:14)
+      at TypeScriptParserMixin.callback [as withSmartMixTopicForbiddingContext] (node_modules/@babel/parser/src/parser/expression.ts:3166:14)
+      at TypeScriptParserMixin.withSmartMixTopicForbiddingContext [as parseClassBody] (node_modules/@babel/parser/src/parser/statement.ts:181
+8:10)
+      at TypeScriptParserMixin.parseClassBody (node_modules/@babel/parser/src/parser/statement.ts:1769:22)
+      at TypeScriptParserMixin.parseClass (node_modules/@babel/parser/src/plugins/typescript/index.ts:4218:22)
+      at TypeScriptParserMixin.parseClass (node_modules/@babel/parser/src/parser/statement.ts:527:21)
+      at TypeScriptParserMixin.parseStatementContent (node_modules/@babel/parser/src/plugins/typescript/index.ts:3185:20)
+      at TypeScriptParserMixin.parseStatementContent [as parseStatementLike] (node_modules/@babel/parser/src/parser/statement.ts:477:17)
+      at TypeScriptParserMixin.parseStatementLike [as parseModuleItem] (node_modules/@babel/parser/src/parser/statement.ts:414:17)
+      at TypeScriptParserMixin.parseModuleItem [as parseBlockOrModuleBlockBody] (node_modules/@babel/parser/src/parser/statement.ts:1438:16)
+      at TypeScriptParserMixin.parseBlockOrModuleBlockBody [as parseBlockBody] (node_modules/@babel/parser/src/parser/statement.ts:1412:10)
+      at TypeScriptParserMixin.parseBlockBody [as parseProgram] (node_modules/@babel/parser/src/parser/statement.ts:229:10)
+      at TypeScriptParserMixin.parseProgram [as parseTopLevel] (node_modules/@babel/parser/src/parser/statement.ts:203:25)
+      at TypeScriptParserMixin.parseTopLevel (node_modules/@babel/parser/src/parser/index.ts:93:10)
+      at TypeScriptParserMixin.parse (node_modules/@babel/parser/src/plugins/typescript/index.ts:4309:20)
+      at parse (node_modules/@babel/parser/src/index.ts:92:38)
+      at parser (node_modules/@babel/core/src/parser/index.ts:28:19)
+          at parser.next (<anonymous>)
+      at normalizeFile (node_modules/@babel/core/src/transformation/normalize-file.ts:49:24)
+          at normalizeFile.next (<anonymous>)
+      at run (node_modules/@babel/core/src/transformation/index.ts:40:36)
+          at run.next (<anonymous>)
+      at transform (node_modules/@babel/core/src/transform.ts:29:20)
+          at transform.next (<anonymous>)
+      at evaluateSync (node_modules/gensync/index.js:251:28)
+      at sync (node_modules/gensync/index.js:89:14)
+      at fn (node_modules/@babel/core/src/errors/rewrite-stack-trace.ts:99:14)
+      at transformSync (node_modules/@babel/core/src/transform.ts:66:52)
+      at Object.require (__tests__/efficiencyScoreService.test.ts:1:1)
+
+
+Test Suites: 1 failed, 42 passed, 43 total
+Tests:       597 passed, 597 total
+Snapshots:   0 total
+Time:        17.519 s, estimated 44 s
+Ran all test suites.
+Test results written to: ops\reports\jest.json

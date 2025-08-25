@@ -4,12 +4,8 @@ import { supabase } from '@/config/supabaseClient';
 import { WardrobeItemRecord, UsageStats, UtilizationStats, ItemCategory } from '@/types/aynaMirror';
 
 // Mock Supabase client
-jest.mock('@/config/supabaseClient', () => ({
-  supabase: {
-    from: jest.fn(),
-    rpc: jest.fn()
-  }
-}));
+jest.mock('@/config/supabaseClient');
+const mockSupabase = supabase as jest.Mocked<typeof supabase>;
 
 describe('EnhancedWardrobeService', () => {
   let service: EnhancedWardrobeService;
@@ -18,8 +14,8 @@ describe('EnhancedWardrobeService', () => {
 
   beforeEach(() => {
     service = new EnhancedWardrobeService();
-    mockSupabaseFrom = supabase.from as jest.MockedFunction<any>;
-    mockSupabaseRpc = supabase.rpc as jest.MockedFunction<any>;
+    mockSupabaseFrom = mockSupabase.from;
+    mockSupabaseRpc = mockSupabase.rpc;
     jest.clearAllMocks();
   });
 
@@ -34,7 +30,7 @@ describe('EnhancedWardrobeService', () => {
         processed_image_uri: 'processed-test-image.jpg',
         category: 'tops',
         colors: ['#FF0000'],
-        brand: 'TestBrand'
+        brand: 'TestBrand',
       };
 
       const mockResponse = {
@@ -45,26 +41,28 @@ describe('EnhancedWardrobeService', () => {
         confidence_score: 0,
         tags: ['casual', 'everyday', 'branded'],
         created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
+        updated_at: '2024-01-01T00:00:00Z',
       };
 
       const mockChain = {
         insert: jest.fn().mockReturnThis(),
         select: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockResponse, error: null })
+        single: jest.fn().mockResolvedValue({ data: mockResponse, error: null }),
       };
 
       mockSupabaseFrom.mockReturnValue(mockChain);
 
       const result = await service.saveClothingItem(mockItem);
 
-  expect(mockSupabaseFrom).toHaveBeenCalledWith('wardrobe_items');
-      expect(mockChain.insert).toHaveBeenCalledWith([{
-        ...mockItem,
-        usage_count: 0,
-        confidence_score: 0,
-        tags: expect.arrayContaining(['casual', 'everyday', 'branded'])
-      }]);
+      expect(mockSupabaseFrom).toHaveBeenCalledWith('wardrobe_items');
+      expect(mockChain.insert).toHaveBeenCalledWith([
+        {
+          ...mockItem,
+          usage_count: 0,
+          confidence_score: 0,
+          tags: expect.arrayContaining(['casual', 'everyday', 'branded']),
+        },
+      ]);
       expect(result).toEqual(mockResponse);
     });
 
@@ -73,7 +71,7 @@ describe('EnhancedWardrobeService', () => {
         image_uri: 'test-image.jpg',
         processed_image_uri: 'processed-test-image.jpg',
         category: '',
-        colors: ['#FF0000']
+        colors: ['#FF0000'],
       };
 
       const mockResponse = {
@@ -84,13 +82,13 @@ describe('EnhancedWardrobeService', () => {
         confidence_score: 0,
         tags: ['casual', 'everyday'],
         created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
+        updated_at: '2024-01-01T00:00:00Z',
       };
 
       const mockChain = {
         insert: jest.fn().mockReturnThis(),
         select: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockResponse, error: null })
+        single: jest.fn().mockResolvedValue({ data: mockResponse, error: null }),
       };
 
       mockSupabaseFrom.mockReturnValue(mockChain);
@@ -105,7 +103,7 @@ describe('EnhancedWardrobeService', () => {
         image_uri: 'test-image.jpg',
         processed_image_uri: 'processed-test-image.jpg',
         category: 'tops',
-        colors: []
+        colors: [],
       };
 
       const mockResponse = {
@@ -116,13 +114,13 @@ describe('EnhancedWardrobeService', () => {
         confidence_score: 0,
         tags: ['casual', 'everyday'],
         created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
+        updated_at: '2024-01-01T00:00:00Z',
       };
 
       const mockChain = {
         insert: jest.fn().mockReturnThis(),
         select: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockResponse, error: null })
+        single: jest.fn().mockResolvedValue({ data: mockResponse, error: null }),
       };
 
       mockSupabaseFrom.mockReturnValue(mockChain);
@@ -137,13 +135,13 @@ describe('EnhancedWardrobeService', () => {
         image_uri: 'test-image.jpg',
         processed_image_uri: 'processed-test-image.jpg',
         category: 'tops',
-        colors: ['#FF0000']
+        colors: ['#FF0000'],
       };
 
       const mockChain = {
         insert: jest.fn().mockReturnThis(),
         select: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: null, error: { message: 'Database error' } })
+        single: jest.fn().mockResolvedValue({ data: null, error: { message: 'Database error' } }),
       };
 
       mockSupabaseFrom.mockReturnValue(mockChain);
@@ -155,42 +153,45 @@ describe('EnhancedWardrobeService', () => {
   describe('getUserWardrobe', () => {
     it('should retrieve and transform user wardrobe items', async () => {
       const mockUserId = 'user-123';
-      const mockRecords: WardrobeItemRecord[] = [{
-        id: 'item-1',
-        user_id: mockUserId,
-        image_uri: 'image1.jpg',
-        processed_image_uri: 'processed1.jpg',
-        category: 'tops',
-        colors: ['#FF0000'],
-        brand: 'TestBrand',
-        size: 'M',
-        purchase_price: 50,
-        tags: ['casual'],
-        notes: 'Test item',
-        usage_count: 5,
-        last_worn: '2024-01-01',
-        confidence_score: 4.5,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
-      }];
+      const mockRecords: WardrobeItemRecord[] = [
+        {
+          id: 'item-1',
+          user_id: mockUserId,
+          image_uri: 'image1.jpg',
+          processed_image_uri: 'processed1.jpg',
+          category: 'tops',
+          colors: ['#FF0000'],
+          brand: 'TestBrand',
+          size: 'M',
+          purchase_price: 50,
+          tags: ['casual'],
+          notes: 'Test item',
+          usage_count: 5,
+          last_worn: '2024-01-01',
+          confidence_score: 4.5,
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+        },
+      ];
 
       const mockChain = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
-        order: jest.fn().mockResolvedValue({ data: mockRecords, error: null })
+        order: jest.fn().mockResolvedValue({ data: mockRecords, error: null }),
       };
 
       mockSupabaseFrom.mockReturnValue(mockChain);
 
       const result = await service.getUserWardrobe(mockUserId);
 
-  expect(mockSupabaseFrom).toHaveBeenCalledWith('wardrobe_items');
+      expect(mockSupabaseFrom).toHaveBeenCalledWith('wardrobe_items');
       expect(mockChain.select).toHaveBeenCalledWith('*');
       expect(mockChain.eq).toHaveBeenCalledWith('user_id', mockUserId);
       expect(mockChain.order).toHaveBeenCalledWith('created_at', { ascending: false });
       expect(result).toHaveLength(1);
-      expect(result[0].id).toBe('item-1');
-      expect(result[0].usageStats.costPerWear).toBe(10); // 50 / 5
+      const firstItem = result[0]!; // result length asserted above
+      expect(firstItem.id).toBe('item-1');
+      expect(firstItem.usageStats.costPerWear).toBe(10); // 50 / 5
     });
   });
 
@@ -209,7 +210,7 @@ describe('EnhancedWardrobeService', () => {
 
       expect(mockSupabaseRpc).toHaveBeenCalledWith('track_item_usage', {
         item_id: itemId,
-        outfit_id: outfitId
+        outfit_id: outfitId,
       });
     });
 
@@ -222,7 +223,7 @@ describe('EnhancedWardrobeService', () => {
 
       expect(mockSupabaseRpc).toHaveBeenCalledWith('track_item_usage', {
         item_id: itemId,
-        outfit_id: null
+        outfit_id: null,
       });
     });
 
@@ -242,13 +243,13 @@ describe('EnhancedWardrobeService', () => {
         usage_count: 10,
         last_worn: '2024-01-15',
         confidence_score: 4.2,
-        purchase_price: 100
+        purchase_price: 100,
       };
 
       const mockChain = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockData, error: null })
+        single: jest.fn().mockResolvedValue({ data: mockData, error: null }),
       };
 
       mockSupabaseFrom.mockReturnValue(mockChain);
@@ -261,7 +262,7 @@ describe('EnhancedWardrobeService', () => {
         lastWorn: new Date('2024-01-15'),
         averageRating: 4.2,
         complimentsReceived: 0,
-        costPerWear: 10 // 100 / 10
+        costPerWear: 10, // 100 / 10
       });
     });
 
@@ -272,13 +273,13 @@ describe('EnhancedWardrobeService', () => {
         usage_count: 5,
         last_worn: '2024-01-15',
         confidence_score: 3.8,
-        purchase_price: null
+        purchase_price: null,
       };
 
       const mockChain = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockData, error: null })
+        single: jest.fn().mockResolvedValue({ data: mockData, error: null }),
       };
 
       mockSupabaseFrom.mockReturnValue(mockChain);
@@ -293,15 +294,17 @@ describe('EnhancedWardrobeService', () => {
     it('should return neglected items', async () => {
       const userId = 'user-123';
       const daysSince = 30;
-      const mockNeglectedData = [{
-        id: 'item-1',
-        image_uri: 'image1.jpg',
-        category: 'tops',
-        colors: ['#FF0000'],
-        brand: 'TestBrand',
-        last_worn: '2023-12-01',
-        days_since_worn: 45
-      }];
+      const mockNeglectedData = [
+        {
+          id: 'item-1',
+          image_uri: 'image1.jpg',
+          category: 'tops',
+          colors: ['#FF0000'],
+          brand: 'TestBrand',
+          last_worn: '2023-12-01',
+          days_since_worn: 45,
+        },
+      ];
 
       const mockFullItem = {
         id: 'item-1',
@@ -317,7 +320,7 @@ describe('EnhancedWardrobeService', () => {
         last_worn: '2023-12-01',
         confidence_score: 3.0,
         created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
+        updated_at: '2024-01-01T00:00:00Z',
       };
 
       mockSupabaseRpc.mockResolvedValue({ data: mockNeglectedData, error: null });
@@ -325,21 +328,26 @@ describe('EnhancedWardrobeService', () => {
       const mockChain = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockFullItem, error: null })
+        in: jest.fn().mockResolvedValue({ data: [mockFullItem], error: null }),
+        single: jest.fn().mockResolvedValue({ data: mockFullItem, error: null }),
       };
 
       mockSupabaseFrom.mockReturnValue(mockChain);
 
       const result = await service.getNeglectedItems(userId, daysSince);
 
-      expect(mockSupabaseRpc).toHaveBeenCalledWith('get_neglected_items', expect.objectContaining({
-        user_uuid: userId,
-        days_threshold: daysSince,
-        p_user_id: userId,
-        p_days_since: daysSince,
-      }));
+      expect(mockSupabaseRpc).toHaveBeenCalledWith(
+        'get_neglected_items',
+        expect.objectContaining({
+          user_uuid: userId,
+          days_threshold: daysSince,
+          p_user_id: userId,
+          p_days_since: daysSince,
+        }),
+      );
       expect(result).toHaveLength(1);
-      expect(result[0].id).toBe('item-1');
+      const neglectedFirst = result[0]!;
+      expect(neglectedFirst.id).toBe('item-1');
     });
   });
 
@@ -350,19 +358,19 @@ describe('EnhancedWardrobeService', () => {
   describe('calculateCostPerWear', () => {
     it('should calculate cost per wear correctly', async () => {
       const itemId = 'item-123';
-      
+
       const mockData = {
         id: itemId,
         usage_count: 8,
         last_worn: '2024-01-15',
         confidence_score: 4.0,
-        purchase_price: 100
+        purchase_price: 100,
       };
 
       const mockChain = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
-        single: jest.fn().mockResolvedValue({ data: mockData, error: null })
+        single: jest.fn().mockResolvedValue({ data: mockData, error: null }),
       };
 
       mockSupabaseFrom.mockReturnValue(mockChain);
@@ -376,27 +384,29 @@ describe('EnhancedWardrobeService', () => {
   describe('getWardrobeUtilizationStats', () => {
     it('should return comprehensive utilization statistics', async () => {
       const userId = 'user-123';
-      const mockStats = [{
-        total_items: 50,
-        active_items: 35,
-        neglected_items: 15,
-        average_cost_per_wear: '15.75',
-        utilization_percentage: '70.00'
-      }];
+      const mockStats = [
+        {
+          total_items: 50,
+          active_items: 35,
+          neglected_items: 15,
+          average_cost_per_wear: '15.75',
+          utilization_percentage: '70.00',
+        },
+      ];
 
       mockSupabaseRpc.mockResolvedValue({ data: mockStats, error: null });
 
       const result = await service.getWardrobeUtilizationStats(userId);
 
       expect(mockSupabaseRpc).toHaveBeenCalledWith('get_wardrobe_utilization_stats', {
-        user_uuid: userId
+        user_uuid: userId,
       });
       expect(result).toEqual({
         totalItems: 50,
         activeItems: 35,
         neglectedItems: 15,
         averageCostPerWear: 15.75,
-        utilizationPercentage: 70.00
+        utilizationPercentage: 70.0,
       });
     });
   });
@@ -408,7 +418,7 @@ describe('EnhancedWardrobeService', () => {
   describe('categorizeItemAutomatically', () => {
     it('should return default category for auto-categorization', async () => {
       const imageUri = 'test-image.jpg';
-      
+
       const result = await service.categorizeItemAutomatically(imageUri);
 
       expect(result).toBe('tops');
@@ -416,7 +426,7 @@ describe('EnhancedWardrobeService', () => {
 
     it('should handle categorization errors gracefully', async () => {
       const imageUri = 'invalid-image.jpg';
-      
+
       const result = await service.categorizeItemAutomatically(imageUri);
 
       expect(result).toBe('tops'); // Should return fallback
@@ -426,7 +436,7 @@ describe('EnhancedWardrobeService', () => {
   describe('extractItemColors', () => {
     it('should return default colors for extraction', async () => {
       const imageUri = 'test-image.jpg';
-      
+
       const result = await service.extractItemColors(imageUri);
 
       expect(result).toEqual(['#000000']);
@@ -434,7 +444,7 @@ describe('EnhancedWardrobeService', () => {
 
     it('should handle color extraction errors gracefully', async () => {
       const imageUri = 'invalid-image.jpg';
-      
+
       const result = await service.extractItemColors(imageUri);
 
       expect(result).toEqual(['#000000']); // Should return fallback
@@ -444,7 +454,7 @@ describe('EnhancedWardrobeService', () => {
   describe('suggestItemTags', () => {
     it('should suggest tags based on category', async () => {
       const item = { category: 'tops' as ItemCategory };
-      
+
       const result = await service.suggestItemTags(item);
 
       expect(result).toContain('casual');
@@ -461,34 +471,34 @@ describe('EnhancedWardrobeService', () => {
     });
 
     it('should suggest neutral tag for neutral colors', async () => {
-      const item = { 
+      const item = {
         category: 'tops' as ItemCategory,
-        colors: ['#000000', '#FFFFFF'] 
+        colors: ['#000000', '#FFFFFF'],
       };
-      
+
       const result = await service.suggestItemTags(item);
 
       expect(result).toContain('neutral');
     });
 
     it('should suggest branded tag when brand is present', async () => {
-      const item = { 
+      const item = {
         category: 'tops' as ItemCategory,
-        brand: 'Nike'
+        brand: 'Nike',
       };
-      
+
       const result = await service.suggestItemTags(item);
 
       expect(result).toContain('branded');
     });
 
     it('should remove duplicate tags', async () => {
-      const item = { 
+      const item = {
         category: 'tops' as ItemCategory,
         colors: ['#000000'],
-        brand: 'TestBrand'
+        brand: 'TestBrand',
       };
-      
+
       const result = await service.suggestItemTags(item);
 
       const uniqueTags = [...new Set(result)];
@@ -511,7 +521,7 @@ describe('EnhancedWardrobeService', () => {
 
       expect(mockSupabaseRpc).toHaveBeenCalledWith('update_item_confidence_score', {
         item_id: itemId,
-        new_rating: rating
+        new_rating: rating,
       });
     });
 
@@ -521,7 +531,9 @@ describe('EnhancedWardrobeService', () => {
 
       mockSupabaseRpc.mockResolvedValue({ error: { message: 'Update failed' } });
 
-      await expect(service.updateItemConfidenceScore(itemId, rating)).rejects.toThrow('Update failed');
+      await expect(service.updateItemConfidenceScore(itemId, rating)).rejects.toThrow(
+        'Update failed',
+      );
     });
   });
 
@@ -548,20 +560,20 @@ describe('EnhancedWardrobeService', () => {
         last_worn: '2024-01-15',
         confidence_score: 4.5,
         created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
+        updated_at: '2024-01-01T00:00:00Z',
       };
 
       // Access the private method through getUserWardrobe which uses it
       const mockChain = {
         select: jest.fn().mockReturnThis(),
         eq: jest.fn().mockReturnThis(),
-        order: jest.fn().mockResolvedValue({ data: [mockRecord], error: null })
+        order: jest.fn().mockResolvedValue({ data: [mockRecord], error: null }),
       };
 
       mockSupabaseFrom.mockReturnValue(mockChain);
 
       const result = await service.getUserWardrobe('user-123');
-      const transformedItem = result[0];
+      const transformedItem = result[0]!; // result length implied by mock data
 
       expect(transformedItem.id).toBe('item-1');
       expect(transformedItem.userId).toBe('user-123');

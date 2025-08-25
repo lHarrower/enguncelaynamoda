@@ -1,0 +1,484 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AYNAMODA Event Schema",
+  "description": "Event tracking schema for AYNAMODA mobile application",
+  "version": "1.0.0",
+  "definitions": {
+    "baseEvent": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "description": "Unique identifier for the event",
+          "pii": "none",
+          "piiReason": "Random UUID, no personal data"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when event occurred",
+          "pii": "none",
+          "piiReason": "Event timestamp, no personal data"
+        },
+        "userId": {
+          "type": "string",
+          "description": "User identifier (anonymized)",
+          "pii": "pseudonymized",
+          "piiReason": "Hashed/anonymized user identifier, cannot be reversed to identify individual"
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Session identifier",
+          "pii": "none",
+          "piiReason": "Temporary session UUID, no personal data"
+        },
+        "platform": {
+          "type": "string",
+          "enum": ["ios", "android"],
+          "description": "Platform where event occurred",
+          "pii": "none",
+          "piiReason": "Device platform type, not personally identifiable"
+        },
+        "appVersion": {
+          "type": "string",
+          "description": "Application version",
+          "pii": "none",
+          "piiReason": "App version number, no personal data"
+        },
+        "deviceInfo": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "type": "string",
+              "pii": "low",
+              "piiReason": "Device model may be used for fingerprinting but not directly identifiable"
+            },
+            "osVersion": {
+              "type": "string",
+              "pii": "none",
+              "piiReason": "OS version, not personally identifiable"
+            },
+            "screenSize": {
+              "type": "string",
+              "pii": "low",
+              "piiReason": "Screen dimensions may contribute to device fingerprinting"
+            }
+          },
+          "pii": "low",
+          "piiReason": "Device characteristics may contribute to fingerprinting when combined"
+        }
+      },
+      "required": ["eventId", "timestamp", "platform", "appVersion"]
+    }
+  },
+  "events": {
+    "app_launch": {
+      "allOf": [
+        {"$ref": "#/definitions/baseEvent"},
+        {
+          "properties": {
+            "eventType": {"const": "app_launch"},
+            "launchType": {
+              "type": "string",
+              "enum": ["cold_start", "warm_start", "hot_start"]
+            },
+            "launchTime": {
+              "type": "number",
+              "description": "Launch time in milliseconds"
+            }
+          },
+          "required": ["eventType", "launchType"]
+        }
+      ]
+    },
+    "screen_view": {
+      "allOf": [
+        {"$ref": "#/definitions/baseEvent"},
+        {
+          "properties": {
+            "eventType": {"const": "screen_view"},
+            "screenName": {
+              "type": "string",
+              "enum": [
+                "home",
+                "discover",
+                "wardrobe",
+                "profile",
+                "settings",
+                "ayna_mirror",
+                "search",
+                "onboarding",
+                "auth_signup",
+                "auth_login"
+              ]
+            },
+            "previousScreen": {"type": "string"},
+            "timeSpent": {
+              "type": "number",
+              "description": "Time spent on previous screen in seconds"
+            }
+          },
+          "required": ["eventType", "screenName"]
+        }
+      ]
+    },
+    "user_interaction": {
+      "allOf": [
+        {"$ref": "#/definitions/baseEvent"},
+        {
+          "properties": {
+            "eventType": {"const": "user_interaction"},
+            "interactionType": {
+              "type": "string",
+              "enum": [
+                "button_tap",
+                "swipe",
+                "scroll",
+                "long_press",
+                "pinch_zoom",
+                "search",
+                "filter",
+                "sort"
+              ]
+            },
+            "elementId": {"type": "string"},
+            "elementType": {"type": "string"},
+            "coordinates": {
+              "type": "object",
+              "properties": {
+                "x": {"type": "number"},
+                "y": {"type": "number"}
+              }
+            }
+          },
+          "required": ["eventType", "interactionType"]
+        }
+      ]
+    },
+    "product_interaction": {
+      "allOf": [
+        {"$ref": "#/definitions/baseEvent"},
+        {
+          "properties": {
+            "eventType": {
+              "const": "product_interaction",
+              "pii": "none",
+              "piiReason": "Event type constant, no personal data"
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "view",
+                "like",
+                "unlike",
+                "share",
+                "add_to_wardrobe",
+                "remove_from_wardrobe",
+                "try_on",
+                "purchase_intent"
+              ],
+              "pii": "low",
+              "piiReason": "User actions may reveal preferences and shopping behavior patterns"
+            },
+            "productId": {
+              "type": "string",
+              "pii": "none",
+              "piiReason": "Product identifier, not personally identifiable"
+            },
+            "productCategory": {
+              "type": "string",
+              "pii": "low",
+              "piiReason": "Product category preferences may indicate personal style and interests"
+            },
+            "productBrand": {
+              "type": "string",
+              "pii": "low",
+              "piiReason": "Brand preferences may indicate economic status and personal taste"
+            },
+            "productPrice": {
+              "type": "number",
+              "pii": "medium",
+              "piiReason": "Price points may indicate economic status and purchasing power"
+            },
+            "source": {
+              "type": "string",
+              "enum": ["discover", "search", "recommendations", "wardrobe"],
+              "pii": "none",
+              "piiReason": "Source of product interaction, not personally identifiable"
+            }
+          },
+          "required": ["eventType", "action", "productId"]
+        }
+      ]
+    },
+    "ayna_mirror_usage": {
+      "allOf": [
+        {"$ref": "#/definitions/baseEvent"},
+        {
+          "properties": {
+            "eventType": {"const": "ayna_mirror_usage"},
+            "action": {
+              "type": "string",
+              "enum": [
+                "start_session",
+                "end_session",
+                "take_photo",
+                "apply_filter",
+                "try_product",
+                "save_look",
+                "share_look"
+              ]
+            },
+            "sessionDuration": {
+              "type": "number",
+              "description": "Session duration in seconds"
+            },
+            "productsTriedCount": {"type": "number"},
+            "filtersUsed": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          },
+          "required": ["eventType", "action"]
+        }
+      ]
+    },
+    "search_interaction": {
+      "allOf": [
+        {"$ref": "#/definitions/baseEvent"},
+        {
+          "properties": {
+            "eventType": {
+              "const": "search_interaction",
+              "pii": "none",
+              "piiReason": "Event type constant, no personal data"
+            },
+            "query": {
+              "type": "string",
+              "pii": "medium",
+              "piiReason": "Search queries may reveal personal preferences, interests, or intentions",
+              "dataMinimization": "Consider hashing or truncating after analytics processing"
+            },
+            "searchType": {
+              "type": "string",
+              "enum": ["text", "voice", "image", "barcode"],
+              "pii": "none",
+              "piiReason": "Search method type, not personally identifiable"
+            },
+            "resultsCount": {
+              "type": "number",
+              "pii": "none",
+              "piiReason": "Number of search results, no personal data"
+            },
+            "selectedResultIndex": {
+              "type": "number",
+              "pii": "none",
+              "piiReason": "Index of selected result, no personal data"
+            },
+            "filters": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": "string",
+                  "pii": "low",
+                  "piiReason": "Product category preferences may indicate personal style"
+                },
+                "brand": {
+                  "type": "string",
+                  "pii": "low",
+                  "piiReason": "Brand preferences may indicate economic status or personal taste"
+                },
+                "priceRange": {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "type": "number",
+                      "pii": "medium",
+                      "piiReason": "Price range may indicate economic status or purchasing power"
+                    },
+                    "max": {
+                      "type": "number",
+                      "pii": "medium",
+                      "piiReason": "Price range may indicate economic status or purchasing power"
+                    }
+                  },
+                  "pii": "medium",
+                  "piiReason": "Price preferences may reveal economic status"
+                },
+                "size": {
+                  "type": "string",
+                  "pii": "medium",
+                  "piiReason": "Clothing size may reveal physical characteristics"
+                },
+                "color": {
+                  "type": "string",
+                  "pii": "low",
+                  "piiReason": "Color preferences may indicate personal taste"
+                }
+              },
+              "pii": "medium",
+              "piiReason": "Combined filter preferences may create detailed personal profile"
+            }
+          },
+          "required": ["eventType", "query", "searchType"]
+        }
+      ]
+    },
+    "error_event": {
+      "allOf": [
+        {"$ref": "#/definitions/baseEvent"},
+        {
+          "properties": {
+            "eventType": {
+              "const": "error_event",
+              "pii": "none",
+              "piiReason": "Event type constant, no personal data"
+            },
+            "errorType": {
+              "type": "string",
+              "enum": [
+                "network_error",
+                "api_error",
+                "ui_error",
+                "camera_error",
+                "storage_error",
+                "auth_error",
+                "unknown_error"
+              ],
+              "pii": "none",
+              "piiReason": "Error category classification, no personal data"
+            },
+            "errorMessage": {
+              "type": "string",
+              "pii": "high",
+              "piiReason": "Error messages may contain file paths, user data, or system information",
+              "dataMinimization": "Sanitize error messages to remove file paths, user data, and sensitive system info"
+            },
+            "errorCode": {
+              "type": "string",
+              "pii": "none",
+              "piiReason": "Standardized error codes, no personal data"
+            },
+            "stackTrace": {
+              "type": "string",
+              "pii": "high",
+              "piiReason": "Stack traces may contain file paths, function names, and system information",
+              "dataMinimization": "Sanitize stack traces to remove absolute file paths and sensitive system details"
+            },
+            "context": {
+              "type": "object",
+              "description": "Additional context about where error occurred",
+              "pii": "medium",
+              "piiReason": "Context may contain user state, screen names, or user actions",
+              "dataMinimization": "Review context data to ensure no sensitive user information is included"
+            }
+          },
+          "required": ["eventType", "errorType", "errorMessage"]
+        }
+      ]
+    },
+    "performance_metric": {
+      "allOf": [
+        {"$ref": "#/definitions/baseEvent"},
+        {
+          "properties": {
+            "eventType": {"const": "performance_metric"},
+            "metricType": {
+              "type": "string",
+              "enum": [
+                "app_launch_time",
+                "screen_load_time",
+                "api_response_time",
+                "image_load_time",
+                "memory_usage",
+                "battery_usage",
+                "network_usage"
+              ]
+            },
+            "value": {"type": "number"},
+            "unit": {
+              "type": "string",
+              "enum": ["ms", "seconds", "mb", "kb", "percentage"]
+            },
+            "context": {"type": "string"}
+          },
+          "required": ["eventType", "metricType", "value", "unit"]
+        }
+      ]
+    }
+  },
+  "validation": {
+    "rules": [
+      "All events must include required base properties",
+      "Timestamps must be in ISO 8601 format",
+      "User IDs must be anonymized/hashed",
+      "No PII (Personally Identifiable Information) should be included",
+      "Event payloads should not exceed 64KB",
+      "Batch size should not exceed 100 events",
+      "All fields must have PII classification labels",
+      "High PII risk fields require data minimization strategies"
+    ]
+  },
+  "piiClassification": {
+    "description": "PII (Personally Identifiable Information) classification system for GDPR/CCPA compliance",
+    "levels": {
+      "none": {
+        "description": "No personal information, safe to collect and process",
+        "examples": ["event types", "timestamps", "app versions", "error codes"],
+        "retention": "Standard retention policy applies",
+        "processing": "No special handling required"
+      },
+      "low": {
+        "description": "Indirect personal information that may indicate preferences",
+        "examples": ["product categories", "brand preferences", "color choices"],
+        "retention": "Standard retention with aggregation after 30 days",
+        "processing": "Can be used for analytics, consider aggregation for long-term storage"
+      },
+      "medium": {
+        "description": "Information that may reveal personal characteristics or economic status",
+        "examples": ["price ranges", "clothing sizes", "search queries"],
+        "retention": "Limited retention, anonymize after 30 days",
+        "processing": "Requires user consent, implement data minimization"
+      },
+      "high": {
+        "description": "Information that may directly identify individuals or reveal sensitive data",
+        "examples": ["error messages with file paths", "stack traces", "detailed context"],
+        "retention": "Minimal retention, sanitize immediately",
+        "processing": "Requires explicit consent, mandatory sanitization before storage"
+      },
+      "pseudonymized": {
+        "description": "Originally personal data that has been anonymized/hashed",
+        "examples": ["hashed user IDs", "anonymized session identifiers"],
+        "retention": "Standard retention, cannot be reversed to identify individuals",
+        "processing": "Safe for analytics, ensure hashing is irreversible"
+      }
+    },
+    "dataMinimizationStrategies": {
+      "sanitization": "Remove or mask sensitive information from error messages and stack traces",
+      "aggregation": "Combine individual data points into statistical summaries",
+      "hashing": "Use irreversible hashing for identifiers",
+      "truncation": "Limit length of free-text fields like search queries",
+      "filtering": "Remove known sensitive patterns (emails, phone numbers, addresses)"
+    },
+    "auditRequirements": {
+      "ciValidation": "All new fields must include pii and piiReason properties",
+      "reviewProcess": "Medium and high PII fields require privacy team review",
+      "documentation": "All PII classifications must be documented with reasoning",
+      "monitoring": "Automated scanning for PII patterns in collected data"
+    }
+  },
+  "privacy": {
+    "dataRetention": "90 days for raw events, aggregated data may be retained longer",
+    "anonymization": "All user identifiers are hashed using SHA-256 with salt",
+    "compliance": ["GDPR", "CCPA", "KVKK", "PIPEDA"],
+    "optOut": "Users can opt-out of analytics tracking in settings",
+    "dataMinimization": "Automatic sanitization of high PII risk fields before storage",
+    "consentManagement": "Granular consent for different data collection categories",
+    "dataSubjectRights": {
+      "access": "Users can request their collected analytics data",
+      "deletion": "Users can request deletion of their analytics data",
+      "portability": "Analytics data can be exported in JSON format",
+      "rectification": "Users can correct inaccurate preference data"
+    }
+  }
+}

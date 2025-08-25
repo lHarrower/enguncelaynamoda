@@ -1,510 +1,404 @@
-import React, { useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  ScrollView,
-  Animated,
-  Image,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import * as React from 'react';
+const { useState, useRef } = React;
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
-const { width, height } = Dimensions.get('window');
+import { IoniconsName } from '@/types/icons';
+import { warnInDev } from '@/utils/consoleSuppress';
+
+import { DesignSystem } from '../../theme/DesignSystem';
+
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 interface StyleDNAQuestion {
   id: string;
   question: string;
-  subtitle: string;
-  type: 'color' | 'style' | 'mood' | 'occasion';
-  options: {
+  options: Array<{
     id: string;
-    label: string;
+    text: string;
     value: string;
-    visual?: string;
-    colors?: string[];
-    description?: string;
-  }[];
+    color?: string;
+    image?: any;
+  }>;
 }
 
 const STYLE_DNA_QUESTIONS: StyleDNAQuestion[] = [
   {
-    id: 'color_palette',
-    question: 'Which color palette speaks to your soul?',
-    subtitle: 'Colors reveal the essence of your style DNA',
-    type: 'color',
+    id: 'color_preference',
+    question: 'Hangi renk paleti seni daha çok çekiyor?',
     options: [
-      {
-        id: 'warm_earth',
-        label: 'Warm Earth',
-        value: 'warm_earth',
-        colors: ['#D4A574', '#B8956A', '#8B7355', '#6B5B47'],
-        description: 'Grounded, natural, confident'
-      },
-      {
-        id: 'cool_serenity',
-        label: 'Cool Serenity',
-        value: 'cool_serenity',
-        colors: ['#7BA7BC', '#9BB5C4', '#B8CDD9', '#D4E4EA'],
-        description: 'Calm, sophisticated, peaceful'
-      },
-      {
-        id: 'bold_power',
-        label: 'Bold Power',
-        value: 'bold_power',
-        colors: ['#2C3E50', '#E74C3C', '#F39C12', '#FFFFFF'],
-        description: 'Strong, decisive, impactful'
-      },
-      {
-        id: 'soft_elegance',
-        label: 'Soft Elegance',
-        value: 'soft_elegance',
-        colors: ['#F8E8E7', '#E6D7D3', '#D4C4BF', '#C2B2AB'],
-        description: 'Gentle, refined, graceful'
-      }
-    ]
+      { id: 'warm', text: 'Sıcak Tonlar', value: 'warm', color: '#FF6B6B' },
+      { id: 'cool', text: 'Soğuk Tonlar', value: 'cool', color: '#4ECDC4' },
+      { id: 'neutral', text: 'Nötr Tonlar', value: 'neutral', color: '#95A5A6' },
+      { id: 'bold', text: 'Cesur Renkler', value: 'bold', color: '#9B59B6' },
+    ],
   },
   {
-    id: 'sunday_coffee',
-    question: 'Your perfect Sunday coffee moment?',
-    subtitle: 'How you relax reveals your authentic style',
-    type: 'mood',
+    id: 'style_preference',
+    question: 'Hangi stil daha çok sana uygun?',
     options: [
-      {
-        id: 'cozy_home',
-        label: 'Cozy at Home',
-        value: 'cozy_home',
-        visual: '🏠☕',
-        description: 'Soft knits, comfortable elegance'
-      },
-      {
-        id: 'chic_cafe',
-        label: 'Chic Café',
-        value: 'chic_cafe',
-        visual: '☕✨',
-        description: 'Effortless sophistication'
-      },
-      {
-        id: 'nature_walk',
-        label: 'Nature Walk',
-        value: 'nature_walk',
-        visual: '🌿☕',
-        description: 'Natural, grounded style'
-      },
-      {
-        id: 'rooftop_view',
-        label: 'Rooftop View',
-        value: 'rooftop_view',
-        visual: '🏙️☕',
-        description: 'Urban, confident edge'
-      }
-    ]
+      { id: 'minimalist', text: 'Minimalist', value: 'minimalist' },
+      { id: 'bohemian', text: 'Bohem', value: 'bohemian' },
+      { id: 'classic', text: 'Klasik', value: 'classic' },
+      { id: 'edgy', text: 'Cesur', value: 'edgy' },
+    ],
   },
   {
-    id: 'style_energy',
-    question: 'What energy do you want to radiate?',
-    subtitle: 'Your inner light shapes your outer expression',
-    type: 'mood',
+    id: 'occasion_preference',
+    question: 'En çok hangi durumlar için kıyafet seçiyorsun?',
     options: [
-      {
-        id: 'calm_strength',
-        label: 'Calm Strength',
-        value: 'calm_strength',
-        description: 'Quiet confidence that commands respect'
-      },
-      {
-        id: 'creative_spark',
-        label: 'Creative Spark',
-        value: 'creative_spark',
-        description: 'Artistic flair with unique touches'
-      },
-      {
-        id: 'warm_approachable',
-        label: 'Warm & Approachable',
-        value: 'warm_approachable',
-        description: 'Inviting elegance that draws people in'
-      },
-      {
-        id: 'bold_magnetic',
-        label: 'Bold & Magnetic',
-        value: 'bold_magnetic',
-        description: 'Striking presence that turns heads'
-      }
-    ]
+      { id: 'casual', text: 'Günlük', value: 'casual' },
+      { id: 'work', text: 'İş', value: 'work' },
+      { id: 'evening', text: 'Gece', value: 'evening' },
+      { id: 'special', text: 'Özel Etkinlik', value: 'special' },
+    ],
   },
   {
-    id: 'special_occasion',
-    question: 'For a special evening, you choose...',
-    subtitle: 'Your celebration style reveals your aspirations',
-    type: 'occasion',
+    id: 'fit_preference',
+    question: 'Hangi kesim seni daha rahat hissettiriyor?',
     options: [
-      {
-        id: 'timeless_classic',
-        label: 'Timeless Classic',
-        value: 'timeless_classic',
-        description: 'Elegant pieces that never go out of style'
-      },
-      {
-        id: 'modern_edge',
-        label: 'Modern Edge',
-        value: 'modern_edge',
-        description: 'Contemporary cuts with unexpected details'
-      },
-      {
-        id: 'romantic_feminine',
-        label: 'Romantic Feminine',
-        value: 'romantic_feminine',
-        description: 'Flowing fabrics and delicate touches'
-      },
-      {
-        id: 'power_statement',
-        label: 'Power Statement',
-        value: 'power_statement',
-        description: 'Bold pieces that command attention'
-      }
-    ]
+      { id: 'loose', text: 'Bol', value: 'loose' },
+      { id: 'fitted', text: 'Vücuda Oturan', value: 'fitted' },
+      { id: 'structured', text: 'Yapısal', value: 'structured' },
+      { id: 'flowy', text: 'Akışkan', value: 'flowy' },
+    ],
   },
   {
     id: 'texture_preference',
-    question: 'Which texture calls to you?',
-    subtitle: 'Touch reveals the soul of your style',
-    type: 'style',
+    question: 'Hangi kumaş dokusunu tercih ediyorsun?',
     options: [
-      {
-        id: 'soft_luxe',
-        label: 'Soft Luxe',
-        value: 'soft_luxe',
-        description: 'Cashmere, silk, flowing fabrics'
-      },
-      {
-        id: 'structured_sharp',
-        label: 'Structured Sharp',
-        value: 'structured_sharp',
-        description: 'Crisp cotton, tailored lines'
-      },
-      {
-        id: 'natural_organic',
-        label: 'Natural Organic',
-        value: 'natural_organic',
-        description: 'Linen, cotton, earthy textures'
-      },
-      {
-        id: 'rich_dramatic',
-        label: 'Rich Dramatic',
-        value: 'rich_dramatic',
-        description: 'Velvet, leather, statement textures'
-      }
-    ]
-  }
+      { id: 'smooth', text: 'Pürüzsüz', value: 'smooth' },
+      { id: 'textured', text: 'Dokulu', value: 'textured' },
+      { id: 'soft', text: 'Yumuşak', value: 'soft' },
+      { id: 'structured', text: 'Sert', value: 'structured' },
+    ],
+  },
 ];
 
 interface StyleDNASurveyProps {
-  onComplete: (styleDNA: any) => void;
+  onComplete: (answers: Record<string, string>) => void;
+  onSkip: () => void;
 }
 
-export default function StyleDNASurvey({ onComplete }: StyleDNASurveyProps) {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+const StyleDNASurvey: React.FC<StyleDNASurveyProps> = ({ onComplete, onSkip }) => {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  
-  const slideAnim = useRef(new Animated.Value(0)).current;
-  const fadeAnim = useRef(new Animated.Value(1)).current;
-  const progressAnim = useRef(new Animated.Value(0)).current;
 
-  const currentQuestion = STYLE_DNA_QUESTIONS[currentStep];
-  const progress = (currentStep + 1) / STYLE_DNA_QUESTIONS.length;
+  const progressValue = useSharedValue(0);
+  const slideValue = useSharedValue(0);
+
+  const currentQuestion = STYLE_DNA_QUESTIONS[currentQuestionIndex];
+  const progress = (currentQuestionIndex + 1) / STYLE_DNA_QUESTIONS.length;
 
   React.useEffect(() => {
-    Animated.timing(progressAnim, {
-      toValue: progress,
-      duration: 500,
-      useNativeDriver: false,
-    }).start();
-  }, [currentStep]);
+    progressValue.value = withTiming(progress, { duration: 300 });
+  }, [currentQuestionIndex, progress, progressValue]);
 
-  const handleOptionSelect = (option: any) => {
-    setSelectedOption(option.id);
+  const progressStyle = useAnimatedStyle(() => {
+    return {
+      width: `${progressValue.value * 100}%`,
+    };
+  });
+
+  const handleOptionSelect = (optionId: string, value: string) => {
+    setSelectedOption(optionId);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    
-    // Auto-advance after selection
+
     setTimeout(() => {
-      handleNext(option);
-    }, 800);
+      handleNext(value);
+    }, 200);
   };
 
-  const handleNext = (selectedOptionData: any) => {
+  const handleNext = (value: string) => {
+    if (!currentQuestion) {
+      return;
+    }
+
     const newAnswers = {
       ...answers,
-      [currentQuestion.id]: selectedOptionData
+      [currentQuestion.id]: value,
     };
     setAnswers(newAnswers);
+    setSelectedOption(null);
 
-    if (currentStep < STYLE_DNA_QUESTIONS.length - 1) {
-      // Animate to next question
-      Animated.sequence([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: -width,
-          duration: 0,
-          useNativeDriver: true,
-        }),
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        })
-      ]).start(() => {
-        setCurrentStep(currentStep + 1);
-        setSelectedOption(null);
-        slideAnim.setValue(0);
+    if (currentQuestionIndex < STYLE_DNA_QUESTIONS.length - 1) {
+      slideValue.value = withSpring(-screenWidth, {
+        damping: 20,
+        stiffness: 90,
       });
+
+      setTimeout(() => {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        slideValue.value = withSpring(0, {
+          damping: 20,
+          stiffness: 90,
+        });
+      }, 150);
     } else {
-      // Survey complete
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
       onComplete(newAnswers);
     }
   };
 
-  const renderColorOption = (option: any) => (
-    <TouchableOpacity
-      key={option.id}
-      style={[
-        styles.colorOption,
-        selectedOption === option.id && styles.selectedOption
-      ]}
-      onPress={() => handleOptionSelect(option)}
-      activeOpacity={0.8}
-    >
-      <View style={styles.colorPalette}>
-        {option.colors.map((color: string, index: number) => (
-          <View
-            key={index}
-            style={[
-              styles.colorSwatch,
-              { backgroundColor: color },
-              index === 0 && styles.firstSwatch,
-              index === option.colors.length - 1 && styles.lastSwatch
-            ]}
-          />
-        ))}
-      </View>
-      <Text style={styles.optionLabel}>{option.label}</Text>
-      <Text style={styles.optionDescription}>{option.description}</Text>
-    </TouchableOpacity>
+  const renderColorOption = (option: StyleDNAQuestion['options'][0]) => {
+    const isSelected = selectedOption === option.id;
+
+    return React.createElement(
+      TouchableOpacity,
+      {
+        key: option.id,
+        style: [
+          styles.colorOption,
+          { backgroundColor: option.color },
+          isSelected && styles.selectedOption,
+        ],
+        onPress: () => handleOptionSelect(option.id, option.value),
+        activeOpacity: 0.8,
+      },
+      React.createElement(Text, { style: styles.colorOptionText }, option.text),
+      isSelected &&
+        React.createElement(Ionicons, {
+          name: 'checkmark-circle' as IoniconsName,
+          size: 24,
+          color: 'white',
+          style: styles.checkIcon,
+        }),
+    );
+  };
+
+  const renderStandardOption = (option: StyleDNAQuestion['options'][0]) => {
+    const isSelected = selectedOption === option.id;
+
+    return React.createElement(
+      TouchableOpacity,
+      {
+        key: option.id,
+        style: [styles.standardOption, isSelected && styles.selectedStandardOption],
+        onPress: () => handleOptionSelect(option.id, option.value),
+        activeOpacity: 0.8,
+      },
+      React.createElement(
+        Text,
+        {
+          style: [styles.standardOptionText, isSelected && styles.selectedStandardOptionText],
+        },
+        option.text,
+      ),
+      isSelected &&
+        React.createElement(Ionicons, {
+          name: 'checkmark-circle' as IoniconsName,
+          size: 20,
+          color: DesignSystem.colors.primary[500],
+        }),
+    );
+  };
+
+  return React.createElement(
+    LinearGradient,
+    {
+      colors: [DesignSystem.colors.surface.primary, DesignSystem.colors.surface.secondary],
+      style: styles.container,
+    },
+    React.createElement(
+      View,
+      { style: styles.header },
+      React.createElement(
+        View,
+        { style: styles.progressContainer },
+        React.createElement(
+          View,
+          { style: styles.progressBackground },
+          React.createElement(Animated.View, { style: [styles.progressBar, progressStyle] }),
+        ),
+        React.createElement(
+          Text,
+          { style: styles.progressText },
+          `${currentQuestionIndex + 1} / ${STYLE_DNA_QUESTIONS.length}`,
+        ),
+      ),
+      React.createElement(
+        TouchableOpacity,
+        { onPress: onSkip, style: styles.skipButton },
+        React.createElement(Text, { style: styles.skipText }, 'Atla'),
+      ),
+    ),
+    React.createElement(
+      ScrollView,
+      {
+        style: styles.content,
+        showsVerticalScrollIndicator: false,
+        contentContainerStyle: styles.scrollContent,
+      },
+      React.createElement(
+        View,
+        { style: styles.questionContainer },
+        React.createElement(Text, { style: styles.questionText }, currentQuestion?.question || ''),
+        React.createElement(
+          View,
+          { style: styles.optionsContainer },
+          currentQuestion?.options?.map((option) =>
+            currentQuestion.id === 'color_preference'
+              ? renderColorOption(option)
+              : renderStandardOption(option),
+          ) || [],
+        ),
+      ),
+      React.createElement(
+        View,
+        { style: styles.decorativeElements },
+        React.createElement(View, { style: [styles.decorativeCircle, styles.topLeft] }),
+        React.createElement(View, { style: [styles.decorativeCircle, styles.bottomRight] }),
+      ),
+    ),
   );
+};
 
-  const renderStandardOption = (option: any) => (
-    <TouchableOpacity
-      key={option.id}
-      style={[
-        styles.standardOption,
-        selectedOption === option.id && styles.selectedOption
-      ]}
-      onPress={() => handleOptionSelect(option)}
-      activeOpacity={0.8}
-    >
-      {option.visual && (
-        <Text style={styles.optionVisual}>{option.visual}</Text>
-      )}
-      <Text style={styles.optionLabel}>{option.label}</Text>
-      <Text style={styles.optionDescription}>{option.description}</Text>
-    </TouchableOpacity>
-  );
+const createStyles = (styleObj: Record<string, any>) => {
+  try {
+    return StyleSheet.create(styleObj);
+  } catch (error) {
+    warnInDev('StyleSheet.create failed, using fallback styles:', error);
+    // Return a safe fallback with basic styles
+    return {
+      container: { flex: 1 },
+      gradient: { flex: 1 },
+      scrollView: { flex: 1 },
+      content: { padding: 20 },
+      ...styleObj,
+    };
+  }
+};
 
-  return (
-    <LinearGradient
-      colors={['#F8F6F0', '#FFFFFF', '#F8F6F0']}
-      style={styles.container}
-    >
-      {/* Progress Bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressTrack}>
-          <Animated.View
-            style={[
-              styles.progressFill,
-              {
-                width: progressAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0%', '100%'],
-                }),
-              },
-            ]}
-          />
-        </View>
-        <Text style={styles.progressText}>
-          {currentStep + 1} of {STYLE_DNA_QUESTIONS.length}
-        </Text>
-      </View>
-
-      <Animated.View
-        style={[
-          styles.questionContainer,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateX: slideAnim }],
-          },
-        ]}
-      >
-        {/* Question Header */}
-        <View style={styles.questionHeader}>
-          <Text style={styles.questionTitle}>{currentQuestion.question}</Text>
-          <Text style={styles.questionSubtitle}>{currentQuestion.subtitle}</Text>
-        </View>
-
-        {/* Options */}
-        <ScrollView
-          style={styles.optionsContainer}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.optionsContent}
-        >
-          {currentQuestion.type === 'color'
-            ? currentQuestion.options.map(renderColorOption)
-            : currentQuestion.options.map(renderStandardOption)
-          }
-        </ScrollView>
-      </Animated.View>
-
-      {/* Decorative Elements */}
-      <View style={styles.decorativeElements}>
-        <View style={[styles.decorativeCircle, styles.topLeft]} />
-        <View style={[styles.decorativeCircle, styles.bottomRight]} />
-      </View>
-    </LinearGradient>
-  );
-}
-
-const styles = StyleSheet.create({
+const styles = createStyles({
   container: {
     flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
     paddingTop: 60,
+    paddingBottom: 20,
   },
   progressContainer: {
-    paddingHorizontal: 24,
-    marginBottom: 40,
+    flex: 1,
+    marginRight: 20,
   },
-  progressTrack: {
+  progressBackground: {
     height: 4,
-    backgroundColor: 'rgba(212, 165, 116, 0.2)',
+    backgroundColor: DesignSystem.colors.neutral[200],
     borderRadius: 2,
     overflow: 'hidden',
   },
-  progressFill: {
+  progressBar: {
     height: '100%',
-    backgroundColor: '#D4A574',
+    backgroundColor: DesignSystem.colors.primary[500],
     borderRadius: 2,
   },
   progressText: {
-    fontSize: 14,
-    color: '#8B7355',
-    textAlign: 'center',
+    fontSize: 12,
+    color: DesignSystem.colors.text.secondary,
     marginTop: 8,
-    fontFamily: 'Inter_400Regular',
+    fontFamily: DesignSystem.typography.fontFamily.body,
+  },
+  skipButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  skipText: {
+    fontSize: 16,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+  },
+  content: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
   },
   questionContainer: {
     flex: 1,
-    paddingHorizontal: 24,
+    justifyContent: 'center',
+    paddingVertical: 40,
   },
-  questionHeader: {
-    marginBottom: 32,
-    alignItems: 'center',
-  },
-  questionTitle: {
-    fontSize: 24,
-    fontFamily: 'PlayfairDisplay_600SemiBold',
-    color: '#2C3E50',
+  questionText: {
+    fontSize: 28,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+    color: DesignSystem.colors.text.primary,
     textAlign: 'center',
-    marginBottom: 8,
-    lineHeight: 32,
-  },
-  questionSubtitle: {
-    fontSize: 16,
-    fontFamily: 'Inter_400Regular',
-    color: '#8B7355',
-    textAlign: 'center',
-    lineHeight: 22,
+    marginBottom: 40,
+    lineHeight: 36,
   },
   optionsContainer: {
-    flex: 1,
-  },
-  optionsContent: {
-    paddingBottom: 40,
+    gap: 16,
   },
   colorOption: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    height: 80,
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
+    justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
+    position: 'relative',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  standardOption: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 16,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
   },
   selectedOption: {
-    borderColor: '#D4A574',
-    backgroundColor: 'rgba(212, 165, 116, 0.1)',
-    transform: [{ scale: 1.02 }],
+    transform: [{ scale: 0.98 }],
+    shadowOpacity: 0.2,
   },
-  colorPalette: {
-    flexDirection: 'row',
-    marginBottom: 12,
-    borderRadius: 8,
-    overflow: 'hidden',
-    elevation: 2,
-  },
-  colorSwatch: {
-    width: 40,
-    height: 40,
-  },
-  firstSwatch: {
-    borderTopLeftRadius: 8,
-    borderBottomLeftRadius: 8,
-  },
-  lastSwatch: {
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
-  },
-  optionVisual: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  optionLabel: {
+  colorOptionText: {
     fontSize: 18,
-    fontFamily: 'Inter_600SemiBold',
-    color: '#2C3E50',
-    marginBottom: 4,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+    color: 'white',
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  checkIcon: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+  },
+  standardOption: {
+    height: 60,
+    borderRadius: 12,
+    backgroundColor: DesignSystem.colors.surface.primary,
+    borderWidth: 2,
+    borderColor: DesignSystem.colors.neutral[200],
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+  },
+  selectedStandardOption: {
+    borderColor: DesignSystem.colors.primary[500],
+    backgroundColor: DesignSystem.colors.primary[100],
+  },
+  standardOptionText: {
+    fontSize: 16,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    color: DesignSystem.colors.text.primary,
+    flex: 1,
     textAlign: 'center',
   },
-  optionDescription: {
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
-    color: '#8B7355',
-    textAlign: 'center',
-    lineHeight: 20,
+  selectedStandardOptionText: {
+    color: DesignSystem.colors.primary[500],
+    fontFamily: DesignSystem.typography.fontFamily.heading,
   },
   decorativeElements: {
     position: 'absolute',
@@ -516,17 +410,20 @@ const styles = StyleSheet.create({
   },
   decorativeCircle: {
     position: 'absolute',
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(212, 165, 116, 0.05)',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: DesignSystem.colors.primary[100],
+    opacity: 0.1,
   },
   topLeft: {
-    top: -60,
-    left: -60,
+    top: -50,
+    left: -50,
   },
   bottomRight: {
-    bottom: -60,
-    right: -60,
+    bottom: -50,
+    right: -50,
   },
 });
+
+export default StyleDNASurvey;

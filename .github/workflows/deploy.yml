@@ -9,16 +9,16 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout Repository Code
         uses: actions/checkout@v4
-        
+
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
           version: latest
-          
+
       - name: Link Supabase Project & Deploy All Functions
         # CORRECTED a typo here: secrets.PROJECT_ID -> secrets.SUPABASE_PROJECT_ID
         run: |

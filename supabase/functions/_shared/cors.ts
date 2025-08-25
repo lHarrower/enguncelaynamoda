@@ -1,9 +1,8 @@
 // CORS headers configuration for Supabase Edge Functions
 // Centralized CORS headers for Edge Functions
 // In production, restrict to a single allowed origin via ALLOWED_ORIGIN env var.
-const allowedOrigin = (typeof Deno !== 'undefined' && Deno.env?.get)
-  ? (Deno.env.get('ALLOWED_ORIGIN') || '*')
-  : '*';
+const allowedOrigin =
+  typeof Deno !== 'undefined' && Deno.env?.get ? Deno.env.get('ALLOWED_ORIGIN') || '*' : '*';
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': allowedOrigin,

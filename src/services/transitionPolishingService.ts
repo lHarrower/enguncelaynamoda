@@ -1,14 +1,17 @@
 // Transition Polishing Service - Smooth Animation & Transition Management
 // Provides consistent, high-quality transitions throughout the app
 
-import { Animated, Easing } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { DesignSystem } from '@/theme/DesignSystem';
-import { logInDev, errorInDev } from '@/utils/consoleSuppress';
+import { Animated, Easing } from 'react-native';
+
+import { fireAndForget } from '../utils/asyncUtils';
+// import { DesignSystem } from '../theme/DesignSystem';
+// import { logInDev, errorInDev } from '../utils/consoleSuppress';
+import { errorInDev } from '../utils/consoleSuppress';
 
 export interface TransitionConfig {
   duration: number;
-  easing: any;
+  easing: (value: number) => number;
   useNativeDriver: boolean;
   hapticFeedback?: 'light' | 'medium' | 'heavy' | 'selection';
   delay?: number;
@@ -46,9 +49,9 @@ class TransitionPolishingService {
         duration: 200,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
-        hapticFeedback: 'light'
+        hapticFeedback: 'light',
       },
-      description: 'Fast, responsive transitions for immediate feedback'
+      description: 'Fast, responsive transitions for immediate feedback',
     });
 
     // Smooth and elegant transitions
@@ -58,9 +61,9 @@ class TransitionPolishingService {
         duration: 300,
         easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
         useNativeDriver: true,
-        hapticFeedback: 'medium'
+        hapticFeedback: 'medium',
       },
-      description: 'Smooth, polished transitions for general use'
+      description: 'Smooth, polished transitions for general use',
     });
 
     // Bouncy and playful transitions
@@ -70,9 +73,9 @@ class TransitionPolishingService {
         duration: 400,
         easing: Easing.bounce,
         useNativeDriver: true,
-        hapticFeedback: 'medium'
+        hapticFeedback: 'medium',
       },
-      description: 'Playful bounce effect for engaging interactions'
+      description: 'Playful bounce effect for engaging interactions',
     });
 
     // Gentle and subtle transitions
@@ -82,9 +85,9 @@ class TransitionPolishingService {
         duration: 500,
         easing: Easing.out(Easing.sin),
         useNativeDriver: true,
-        hapticFeedback: 'light'
+        hapticFeedback: 'light',
       },
-      description: 'Subtle, gentle transitions for background changes'
+      description: 'Subtle, gentle transitions for background changes',
     });
 
     // Spring-based transitions
@@ -94,9 +97,9 @@ class TransitionPolishingService {
         duration: 350,
         easing: Easing.elastic(1.2),
         useNativeDriver: true,
-        hapticFeedback: 'medium'
+        hapticFeedback: 'medium',
       },
-      description: 'Spring-like motion for natural feel'
+      description: 'Spring-like motion for natural feel',
     });
 
     // Navigation transitions
@@ -106,9 +109,9 @@ class TransitionPolishingService {
         duration: 250,
         easing: Easing.out(Easing.quad),
         useNativeDriver: true,
-        hapticFeedback: 'selection'
+        hapticFeedback: 'selection',
       },
-      description: 'Optimized for screen transitions and navigation'
+      description: 'Optimized for screen transitions and navigation',
     });
 
     // Modal transitions
@@ -118,9 +121,9 @@ class TransitionPolishingService {
         duration: 300,
         easing: Easing.out(Easing.back(1.1)),
         useNativeDriver: true,
-        hapticFeedback: 'medium'
+        hapticFeedback: 'medium',
       },
-      description: 'Elegant modal appearance and dismissal'
+      description: 'Elegant modal appearance and dismissal',
     });
 
     // Loading transitions
@@ -129,9 +132,9 @@ class TransitionPolishingService {
       config: {
         duration: 800,
         easing: Easing.inOut(Easing.ease),
-        useNativeDriver: true
+        useNativeDriver: true,
       },
-      description: 'Smooth loading state transitions'
+      description: 'Smooth loading state transitions',
     });
   }
 
@@ -140,7 +143,7 @@ class TransitionPolishingService {
     animatedValue: Animated.Value,
     toValue: number,
     preset: string = 'smooth',
-    customConfig?: Partial<TransitionConfig>
+    customConfig?: Partial<TransitionConfig>,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const presetConfig = this.transitionPresets.get(preset)?.config;
@@ -150,7 +153,7 @@ class TransitionPolishingService {
       }
 
       const config = { ...presetConfig, ...customConfig };
-      
+
       // Trigger haptic feedback if specified
       if (config.hapticFeedback) {
         this.triggerHapticFeedback(config.hapticFeedback);
@@ -160,8 +163,8 @@ class TransitionPolishingService {
         toValue,
         duration: config.duration,
         easing: config.easing,
-  useNativeDriver: config.useNativeDriver ?? false,
-        delay: config.delay || 0
+        useNativeDriver: config.useNativeDriver ?? false,
+        delay: config.delay || 0,
       });
 
       animation.start((finished) => {
@@ -175,12 +178,9 @@ class TransitionPolishingService {
   }
 
   // Animate multiple properties in sequence
-  animateSequence(
-    sequence: AnimationSequence,
-    animationId?: string
-  ): Promise<void> {
+  animateSequence(sequence: AnimationSequence, animationId?: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      const animations = sequence.animations.map(({ property, toValue, config }) => {
+      const animations = sequence.animations.map(({ property: _property, toValue, config }) => {
         // This would need to be adapted based on how you pass animated values
         // For now, we'll create a generic timing animation
         return Animated.timing(new Animated.Value(0), {
@@ -188,7 +188,7 @@ class TransitionPolishingService {
           duration: config.duration,
           easing: config.easing,
           useNativeDriver: config.useNativeDriver,
-          delay: config.delay || 0
+          delay: config.delay || 0,
         });
       });
 
@@ -204,7 +204,7 @@ class TransitionPolishingService {
         if (animationId) {
           this.activeAnimations.delete(animationId);
         }
-        
+
         if (finished) {
           resolve();
         } else {
@@ -218,26 +218,18 @@ class TransitionPolishingService {
   createFadeTransition(
     animatedValue: Animated.Value,
     fadeIn: boolean = true,
-    preset: string = 'smooth'
+    preset: string = 'smooth',
   ): Promise<void> {
-    return this.animateProperty(
-      animatedValue,
-      fadeIn ? 1 : 0,
-      preset
-    );
+    return this.animateProperty(animatedValue, fadeIn ? 1 : 0, preset);
   }
 
   // Create scale transition
   createScaleTransition(
     animatedValue: Animated.Value,
     scaleUp: boolean = true,
-    preset: string = 'spring'
+    preset: string = 'spring',
   ): Promise<void> {
-    return this.animateProperty(
-      animatedValue,
-      scaleUp ? 1 : 0.8,
-      preset
-    );
+    return this.animateProperty(animatedValue, scaleUp ? 1 : 0.8, preset);
   }
 
   // Create slide transition
@@ -245,7 +237,7 @@ class TransitionPolishingService {
     animatedValue: Animated.Value,
     direction: 'up' | 'down' | 'left' | 'right',
     distance: number = 100,
-    preset: string = 'smooth'
+    preset: string = 'smooth',
   ): Promise<void> {
     const toValue = direction === 'up' || direction === 'left' ? -distance : distance;
     return this.animateProperty(animatedValue, toValue, preset);
@@ -255,7 +247,7 @@ class TransitionPolishingService {
   createRotationTransition(
     animatedValue: Animated.Value,
     degrees: number = 360,
-    preset: string = 'smooth'
+    preset: string = 'smooth',
   ): Promise<void> {
     return this.animateProperty(animatedValue, degrees, preset);
   }
@@ -265,15 +257,10 @@ class TransitionPolishingService {
     animatedValues: Animated.Value[],
     toValue: number,
     staggerDelay: number = 100,
-    preset: string = 'smooth'
+    preset: string = 'smooth',
   ): Promise<void[]> {
     const animations = animatedValues.map((value, index) => {
-      return this.animateProperty(
-        value,
-        toValue,
-        preset,
-        { delay: index * staggerDelay }
-      );
+      return this.animateProperty(value, toValue, preset, { delay: index * staggerDelay });
     });
 
     return Promise.all(animations);
@@ -283,7 +270,7 @@ class TransitionPolishingService {
   createEntranceAnimation(
     opacity: Animated.Value,
     scale: Animated.Value,
-    translateY: Animated.Value
+    translateY: Animated.Value,
   ): Promise<void> {
     // Reset values
     opacity.setValue(0);
@@ -295,20 +282,20 @@ class TransitionPolishingService {
         toValue: 1,
         duration: 300,
         easing: Easing.out(Easing.cubic),
-        useNativeDriver: true
+        useNativeDriver: true,
       }),
       Animated.timing(scale, {
         toValue: 1,
         duration: 300,
         easing: Easing.out(Easing.back(1.1)),
-        useNativeDriver: true
+        useNativeDriver: true,
       }),
       Animated.timing(translateY, {
         toValue: 0,
         duration: 300,
         easing: Easing.out(Easing.cubic),
-        useNativeDriver: true
-      })
+        useNativeDriver: true,
+      }),
     ];
 
     return new Promise((resolve, reject) => {
@@ -326,27 +313,27 @@ class TransitionPolishingService {
   createExitAnimation(
     opacity: Animated.Value,
     scale: Animated.Value,
-    translateY: Animated.Value
+    translateY: Animated.Value,
   ): Promise<void> {
     const animations = [
       Animated.timing(opacity, {
         toValue: 0,
         duration: 200,
         easing: Easing.in(Easing.cubic),
-        useNativeDriver: true
+        useNativeDriver: true,
       }),
       Animated.timing(scale, {
         toValue: 0.8,
         duration: 200,
         easing: Easing.in(Easing.back(1.1)),
-        useNativeDriver: true
+        useNativeDriver: true,
       }),
       Animated.timing(translateY, {
         toValue: -20,
         duration: 200,
         easing: Easing.in(Easing.cubic),
-        useNativeDriver: true
-      })
+        useNativeDriver: true,
+      }),
     ];
 
     return new Promise((resolve, reject) => {
@@ -361,25 +348,22 @@ class TransitionPolishingService {
   }
 
   // Create loading animation (continuous)
-  createLoadingAnimation(
-    animatedValue: Animated.Value,
-    animationId: string = 'loading'
-  ): void {
+  createLoadingAnimation(animatedValue: Animated.Value, animationId: string = 'loading'): void {
     const animation = Animated.loop(
       Animated.sequence([
         Animated.timing(animatedValue, {
           toValue: 1,
           duration: 1000,
           easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(animatedValue, {
           toValue: 0,
           duration: 1000,
           easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true
-        })
-      ])
+          useNativeDriver: true,
+        }),
+      ]),
     );
 
     this.activeAnimations.set(animationId, animation);
@@ -391,7 +375,7 @@ class TransitionPolishingService {
     animatedValue: Animated.Value,
     minValue: number = 0.8,
     maxValue: number = 1.2,
-    duration: number = 1000
+    duration: number = 1000,
   ): void {
     const animation = Animated.loop(
       Animated.sequence([
@@ -399,47 +383,44 @@ class TransitionPolishingService {
           toValue: maxValue,
           duration: duration / 2,
           easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(animatedValue, {
           toValue: minValue,
           duration: duration / 2,
           easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true
-        })
-      ])
+          useNativeDriver: true,
+        }),
+      ]),
     );
 
     animation.start();
   }
 
   // Create shake animation for error states
-  createShakeAnimation(
-    animatedValue: Animated.Value,
-    intensity: number = 10
-  ): Promise<void> {
+  createShakeAnimation(animatedValue: Animated.Value, intensity: number = 10): Promise<void> {
     return new Promise((resolve, reject) => {
       const shakeAnimation = Animated.sequence([
         Animated.timing(animatedValue, {
           toValue: intensity,
           duration: 50,
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(animatedValue, {
           toValue: -intensity,
           duration: 50,
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(animatedValue, {
           toValue: intensity,
           duration: 50,
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(animatedValue, {
           toValue: 0,
           duration: 50,
-          useNativeDriver: true
-        })
+          useNativeDriver: true,
+        }),
       ]);
 
       // Trigger error haptic feedback
@@ -456,10 +437,7 @@ class TransitionPolishingService {
   }
 
   // Create success animation
-  createSuccessAnimation(
-    scale: Animated.Value,
-    opacity: Animated.Value
-  ): Promise<void> {
+  createSuccessAnimation(scale: Animated.Value, opacity: Animated.Value): Promise<void> {
     return new Promise((resolve, reject) => {
       // Trigger success haptic feedback
       this.triggerHapticFeedback('medium');
@@ -470,20 +448,20 @@ class TransitionPolishingService {
             toValue: 1.2,
             duration: 150,
             easing: Easing.out(Easing.back(1.5)),
-            useNativeDriver: true
+            useNativeDriver: true,
           }),
           Animated.timing(opacity, {
             toValue: 1,
             duration: 150,
-            useNativeDriver: true
-          })
+            useNativeDriver: true,
+          }),
         ]),
         Animated.timing(scale, {
           toValue: 1,
           duration: 200,
           easing: Easing.out(Easing.cubic),
-          useNativeDriver: true
-        })
+          useNativeDriver: true,
+        }),
       ]);
 
       successAnimation.start((finished) => {
@@ -499,7 +477,7 @@ class TransitionPolishingService {
   // Create card flip animation
   createCardFlipAnimation(
     animatedValue: Animated.Value,
-    flipToBack: boolean = true
+    flipToBack: boolean = true,
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const flipAnimation = Animated.sequence([
@@ -507,14 +485,14 @@ class TransitionPolishingService {
           toValue: 90,
           duration: 150,
           easing: Easing.in(Easing.ease),
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(animatedValue, {
           toValue: flipToBack ? 180 : 0,
           duration: 150,
           easing: Easing.out(Easing.ease),
-          useNativeDriver: true
-        })
+          useNativeDriver: true,
+        }),
       ]);
 
       flipAnimation.start((finished) => {
@@ -532,20 +510,20 @@ class TransitionPolishingService {
     try {
       switch (type) {
         case 'light':
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          fireAndForget(Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light), 'haptic-light');
           break;
         case 'medium':
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          fireAndForget(Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium), 'haptic-medium');
           break;
         case 'heavy':
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          fireAndForget(Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy), 'haptic-heavy');
           break;
         case 'selection':
-          Haptics.selectionAsync();
+          fireAndForget(Haptics.selectionAsync(), 'haptic-selection');
           break;
       }
     } catch (error) {
-      errorInDev('Haptic feedback not available:', error);
+      errorInDev('Haptic feedback not available:', error instanceof Error ? error : String(error));
     }
   }
 
@@ -560,7 +538,7 @@ class TransitionPolishingService {
 
   // Stop all animations
   stopAllAnimations(): void {
-    this.activeAnimations.forEach((animation, id) => {
+    this.activeAnimations.forEach((animation, _id) => {
       animation.stop();
     });
     this.activeAnimations.clear();
@@ -576,36 +554,24 @@ class TransitionPolishingService {
     this.transitionPresets.set(name, {
       name,
       config,
-      description
+      description,
     });
   }
 
   // Create theme-aware transition
-  createThemeTransition(
-    animatedValue: Animated.Value,
-    isDarkMode: boolean
-  ): Promise<void> {
+  createThemeTransition(animatedValue: Animated.Value, isDarkMode: boolean): Promise<void> {
     // Smooth transition for theme changes
-    return this.animateProperty(
-      animatedValue,
-      isDarkMode ? 1 : 0,
-      'gentle',
-      { duration: 400 }
-    );
+    return this.animateProperty(animatedValue, isDarkMode ? 1 : 0, 'gentle', { duration: 400 });
   }
 
   // Create navigation transition with direction
   createNavigationTransition(
     animatedValue: Animated.Value,
     direction: 'forward' | 'backward',
-    distance: number = 100
+    distance: number = 100,
   ): Promise<void> {
     const toValue = direction === 'forward' ? distance : -distance;
-    return this.animateProperty(
-      animatedValue,
-      toValue,
-      'navigation'
-    );
+    return this.animateProperty(animatedValue, toValue, 'navigation');
   }
 
   // Create modal presentation transition
@@ -613,7 +579,7 @@ class TransitionPolishingService {
     opacity: Animated.Value,
     scale: Animated.Value,
     translateY: Animated.Value,
-    isPresenting: boolean = true
+    isPresenting: boolean = true,
   ): Promise<void> {
     if (isPresenting) {
       // Reset values for presentation
@@ -626,20 +592,20 @@ class TransitionPolishingService {
           toValue: 1,
           duration: 300,
           easing: Easing.out(Easing.cubic),
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(scale, {
           toValue: 1,
           duration: 300,
           easing: Easing.out(Easing.back(1.1)),
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(translateY, {
           toValue: 0,
           duration: 300,
           easing: Easing.out(Easing.cubic),
-          useNativeDriver: true
-        })
+          useNativeDriver: true,
+        }),
       ]);
 
       return new Promise((resolve, reject) => {
@@ -658,20 +624,20 @@ class TransitionPolishingService {
           toValue: 0,
           duration: 250,
           easing: Easing.in(Easing.cubic),
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(scale, {
           toValue: 0.9,
           duration: 250,
           easing: Easing.in(Easing.cubic),
-          useNativeDriver: true
+          useNativeDriver: true,
         }),
         Animated.timing(translateY, {
           toValue: 50,
           duration: 250,
           easing: Easing.in(Easing.cubic),
-          useNativeDriver: true
-        })
+          useNativeDriver: true,
+        }),
       ]);
 
       return new Promise((resolve, reject) => {

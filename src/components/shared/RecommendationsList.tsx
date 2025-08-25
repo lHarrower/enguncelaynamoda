@@ -1,9 +1,19 @@
-import React from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import React, { useCallback } from 'react';
+import { FlatList, ListRenderItem, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle } from 'react-native-reanimated';
-import { DesignSystem } from '@/theme/DesignSystem';
-import { OutfitRecommendation } from '@/types/aynaMirror';
+// AYNAMODA Color Palette
+const COLORS = {
+  primary: '#8B6F47',
+  secondary: '#B8A082',
+  background: '#F5F1E8',
+  surface: '#FFFFFF',
+  text: '#2C2C2C',
+  textLight: '#B8A082',
+  border: '#E8DCC6',
+  accent: '#D4AF37',
+};
 import { OutfitRecommendationCard } from '@/components/aynaMirror/OutfitRecommendationCard';
+import { OutfitRecommendation } from '@/types/aynaMirror';
 
 interface RecommendationsListProps {
   recommendations: OutfitRecommendation[];
@@ -26,28 +36,61 @@ export const RecommendationsList: React.FC<RecommendationsListProps> = ({
     transform: [{ translateY: contentTranslateY.value }],
   }));
 
+  const renderRecommendation: ListRenderItem<OutfitRecommendation> = useCallback(
+    ({ item: recommendation, index }) => (
+      <OutfitRecommendationCard
+        recommendation={recommendation}
+        isSelected={selectedRecommendation?.id === recommendation.id}
+        onSelect={() => onRecommendationSelect(recommendation)}
+        showInlineActions={false}
+        showConfidenceNote={false}
+        a11yLabelPrefix={
+          selectedRecommendation?.id === recommendation.id
+            ? 'Outfit recommendation'
+            : 'Recommendation'
+        }
+        animationDelay={index * 100}
+      />
+    ),
+    [selectedRecommendation?.id, onRecommendationSelect],
+  );
+
+  const keyExtractor = useCallback((item: OutfitRecommendation) => item.id, []);
+
+  const getItemLayout = useCallback(
+    (_: ArrayLike<OutfitRecommendation> | null | undefined, index: number) => ({
+      length: 200, // Estimated item height
+      offset: 200 * index + dimensions.cardSpacing * index,
+      index,
+    }),
+    [dimensions.cardSpacing],
+  );
+
   return (
-    <Animated.View style={[styles.content as any, contentAnimatedStyle as any]}>
-      <ScrollView
-        style={styles.scrollView as any}
-        contentContainerStyle={styles.scrollContent as any}
+    <Animated.View style={[styles.content, contentAnimatedStyle]}>
+      <FlatList
+        data={recommendations}
+        renderItem={renderRecommendation}
+        keyExtractor={keyExtractor}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-      >
-        <View style={recommendationsContainer(dimensions)}>
-      {recommendations.map((recommendation, index) => (
-            <OutfitRecommendationCard
-              key={recommendation.id}
-              recommendation={recommendation}
-              isSelected={selectedRecommendation?.id === recommendation.id}
-              onSelect={() => onRecommendationSelect(recommendation)}
-              showInlineActions={false}
-              showConfidenceNote={false}
-        a11yLabelPrefix={selectedRecommendation?.id === recommendation.id ? 'Outfit recommendation' : 'Recommendation'}
-              animationDelay={index * 100}
-            />
-          ))}
-        </View>
-      </ScrollView>
+        // Performance optimizations
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={5}
+        windowSize={10}
+        initialNumToRender={3}
+        updateCellsBatchingPeriod={50}
+        getItemLayout={getItemLayout}
+        // Memory optimization
+        disableVirtualization={false}
+        legacyImplementation={false}
+        scrollEventThrottle={16}
+        ItemSeparatorComponent={() => <View style={{ height: dimensions.cardSpacing }} />}
+        // Prevent nested VirtualizedList warnings
+        nestedScrollEnabled={true}
+        scrollEnabled={true}
+      />
     </Animated.View>
   );
 };
@@ -56,17 +99,17 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: 48,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+  },
   scrollView: {
     flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingTop: DesignSystem.spacing.xl,
-    paddingBottom: DesignSystem.spacing.xxxl,
   },
 });
 
 const recommendationsContainer = (dimensions: { cardSpacing: number }) => ({
   gap: dimensions.cardSpacing,
-  marginBottom: DesignSystem.spacing.xxl,
+  marginBottom: 32,
 });

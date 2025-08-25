@@ -1,20 +1,9 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  interpolate,
-} from 'react-native-reanimated';
-import { DesignSystem } from '@/theme/DesignSystem';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+
 import { WeeklyColorStory } from '@/data/editorialContent';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
 const cardWidth = screenWidth * 0.8;
@@ -24,10 +13,7 @@ interface WeeklyColorCardProps {
   onPress?: () => void;
 }
 
-export const WeeklyColorCard: React.FC<WeeklyColorCardProps> = ({
-  story,
-  onPress,
-}) => {
+export const WeeklyColorCard: React.FC<WeeklyColorCardProps> = ({ story, onPress }) => {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
@@ -60,23 +46,21 @@ export const WeeklyColorCard: React.FC<WeeklyColorCardProps> = ({
           <Image source={{ uri: story.image }} style={styles.image} />
           <View style={styles.overlay} />
           <View style={styles.colorSwatch}>
-            <View
-              style={[styles.colorCircle, { backgroundColor: story.color }]}
-            />
+            <View style={[styles.colorCircle, { backgroundColor: story.color }]} />
           </View>
         </View>
-        
+
         <View style={styles.content}>
           <Text style={styles.subtitle}>{story.subtitle}</Text>
           <Text style={styles.title}>{story.title}</Text>
           <Text style={styles.colorName}>{story.colorName}</Text>
           <Text style={styles.description}>{story.description}</Text>
-          
+
           <View style={styles.moodContainer}>
             <Text style={styles.moodLabel}>Mood</Text>
             <Text style={styles.mood}>{story.mood}</Text>
           </View>
-          
+
           <View style={styles.stylingContainer}>
             <Text style={styles.stylingLabel}>Styling Tips</Text>
             {story.styling.map((tip, index) => (
@@ -92,99 +76,99 @@ export const WeeklyColorCard: React.FC<WeeklyColorCardProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: cardWidth,
-    backgroundColor: DesignSystem.colors.background.elevated,
-    borderRadius: DesignSystem.radius.lg,
-    overflow: 'hidden',
-    ...DesignSystem.elevation.soft,
-    marginBottom: DesignSystem.spacing.lg,
+  colorCircle: {
+    borderRadius: 12,
+    height: 24,
+    width: 24,
   },
-  imageContainer: {
-    position: 'relative',
-    height: 300,
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+  colorName: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.sage[500],
+    marginBottom: 12,
   },
   colorSwatch: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
     backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: DesignSystem.radius.full,
     padding: 8,
+    position: 'absolute',
+    right: 16,
+    top: 16,
     ...DesignSystem.elevation.soft,
   },
-  colorCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+  container: {
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderRadius: DesignSystem.radius.lg,
+    overflow: 'hidden',
+    width: cardWidth,
+    ...DesignSystem.elevation.soft,
+    marginBottom: DesignSystem.spacing.lg,
   },
   content: {
     padding: DesignSystem.spacing.lg,
   },
-  subtitle: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.secondary,
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  title: {
-    ...DesignSystem.typography.scale.h2,
-    color: DesignSystem.colors.text.primary,
-    marginBottom: 8,
-  },
-  colorName: {
-  ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.sage[500],
-    marginBottom: 12,
-  },
   description: {
-  ...DesignSystem.typography.body.medium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     marginBottom: 20,
+  },
+  image: {
+    height: '100%',
+    resizeMode: 'cover',
+    width: '100%',
+  },
+  imageContainer: {
+    height: 300,
+    position: 'relative',
+  },
+  mood: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.gold[500],
   },
   moodContainer: {
     marginBottom: 16,
   },
   moodLabel: {
     ...DesignSystem.typography.scale.caption,
-    fontWeight: '500',
     color: DesignSystem.colors.text.primary,
+    fontWeight: '500',
+    letterSpacing: 0.5,
     marginBottom: 4,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
-  mood: {
-  ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.gold[500],
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
   stylingContainer: {
     marginTop: 8,
   },
   stylingLabel: {
     ...DesignSystem.typography.scale.caption,
-    fontWeight: '500',
     color: DesignSystem.colors.text.primary,
+    fontWeight: '500',
+    letterSpacing: 0.5,
     marginBottom: 8,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   stylingTip: {
-  ...DesignSystem.typography.body.small,
+    ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.secondary,
     marginBottom: 4,
+  },
+  subtitle: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    letterSpacing: 0.5,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+  },
+  title: {
+    ...DesignSystem.typography.scale.h2,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: 8,
   },
 });

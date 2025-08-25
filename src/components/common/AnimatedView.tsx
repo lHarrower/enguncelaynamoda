@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { ViewStyle, StyleProp } from 'react-native';
+import { StyleProp, ViewStyle } from 'react-native';
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
-  withTiming,
+  useSharedValue,
   withDelay,
+  withTiming,
 } from 'react-native-reanimated';
 
 interface AnimatedViewProps {
@@ -38,4 +38,4 @@ const AnimatedView: React.FC<AnimatedViewProps> = ({
   return <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>;
 };
 
-export default AnimatedView; 
+export default AnimatedView;

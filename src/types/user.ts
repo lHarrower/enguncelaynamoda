@@ -1,4 +1,4 @@
-// User Types - User profile and authentication related types
+// Kullanıcı Tipleri - Kullanıcı profili ve kimlik doğrulama ile ilgili tipler
 
 import { WardrobeColor } from './wardrobe';
 
@@ -21,6 +21,9 @@ export interface UserAppPreferences {
   autoBackup: boolean;
   aiSuggestions: boolean;
   privacyMode: boolean;
+  autoSync?: boolean;
+  preferredColors?: string[];
+  stylePreferences?: string[];
 }
 
 export interface UserProfile {
@@ -30,15 +33,20 @@ export interface UserProfile {
   lifestyle: string;
   budget: 'low' | 'medium' | 'high';
   sustainabilityGoals: string[];
+  bio?: string;
+  location?: string;
+  website?: string;
+  socialLinks?: Record<string, string>;
 }
 
 export interface UserSubscription {
   plan: 'free' | 'premium' | 'pro';
   status: 'active' | 'inactive' | 'cancelled' | 'expired';
   expiresAt: Date;
+  features?: string[];
 }
 
-// Helper functions
+// Yardımcı fonksiyonlar
 export const createDefaultUser = (id: string, email: string, name: string): User => {
   return {
     id,

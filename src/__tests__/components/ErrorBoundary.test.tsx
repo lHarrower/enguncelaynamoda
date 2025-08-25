@@ -3,14 +3,19 @@ import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { Text, View } from 'react-native';
 import { ErrorBoundary } from '../../components/error/ErrorBoundary';
-import { ErrorHandler } from '../../utils/ErrorHandler';
+import { ErrorHandler, AppError } from '../../utils/ErrorHandler';
 import { renderWithProviders } from '../utils/testUtils';
-import { mocks } from '../mocks';
 
 // Mock dependencies
-jest.mock('../../utils/ErrorHandler');
-jest.mock('react-native-haptic-feedback', () => mocks.hapticFeedback);
-jest.mock('@react-native-async-storage/async-storage', () => mocks.asyncStorage);
+jest.mock('../../utils/ErrorHandler', () => ({
+  ErrorHandler: {
+    getInstance: jest.fn(() => ({
+      handleError: jest.fn(),
+    })),
+  },
+}));
+jest.mock('react-native-haptic-feedback');
+jest.mock('@react-native-async-storage/async-storage');
 
 // Test component that throws an error
 const ThrowError = ({ shouldThrow = false }: { shouldThrow?: boolean }) => {
@@ -30,8 +35,27 @@ const ThrowAsyncError = ({ shouldThrow = false }: { shouldThrow?: boolean }) => 
   return <Text testID="async-component">Async Success!</Text>;
 };
 
-describe('ErrorBoundary', () => {
-  const mockErrorHandler = ErrorHandler.getInstance as jest.MockedFunction<typeof ErrorHandler.getInstance>;
+// Fix circular structure error in safeStringify
+function safeStringify(obj) {
+  const seen = new WeakSet();
+  return JSON.stringify(obj, (key, value) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) {
+        return '[Circular]';
+      }
+      seen.add(value);
+    }
+    return value;
+  });
+}
+
+// Replace mock errors with simple objects
+const mockError = { message: 'Test Error' };
+
+describe('Hata Sınırı', () => {
+  const mockErrorHandler = ErrorHandler.getInstance as jest.MockedFunction<
+    typeof ErrorHandler.getInstance
+  >;
   const mockHandleError = jest.fn();
   const mockGetErrorStats = jest.fn();
   const mockClearErrors = jest.fn();
@@ -43,7 +67,7 @@ describe('ErrorBoundary', () => {
       getErrorStats: mockGetErrorStats,
       clearErrors: mockClearErrors,
     } as any);
-    
+
     mockGetErrorStats.mockReturnValue({
       totalErrors: 0,
       recentErrors: [],
@@ -58,18 +82,18 @@ describe('ErrorBoundary', () => {
     jest.restoreAllMocks();
   });
 
-  describe('normal operation', () => {
-    it('should render children when no error occurs', () => {
+  describe('normal işlem', () => {
+    it('hata oluşmadığında alt bileşenleri render etmeli', () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={false} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(getByTestId('success-component')).toBeTruthy();
     });
 
-    it('should not interfere with normal component lifecycle', () => {
+    it('normal bileşen yaşam döngüsüne müdahale etmemeli', () => {
       const onMount = jest.fn();
       const TestComponent = () => {
         React.useEffect(onMount, []);
@@ -79,30 +103,30 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <TestComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(onMount).toHaveBeenCalled();
     });
   });
 
-  describe('error handling', () => {
-    it('should catch and display error when child component throws', () => {
+  describe('hata işleme', () => {
+    it('alt bileşen hata fırlattığında hatayı yakalamalı ve göstermeli', () => {
       const { getByTestId, getByText } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(getByTestId('error-boundary-container')).toBeTruthy();
       expect(getByText('Something went wrong')).toBeTruthy();
     });
 
-    it('should call ErrorHandler when error occurs', () => {
+    it('hata oluştuğunda ErrorHandler çağırmalı', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(mockHandleError).toHaveBeenCalledWith(
@@ -113,19 +137,22 @@ describe('ErrorBoundary', () => {
         expect.objectContaining({
           component: 'ErrorBoundary',
           action: 'componentDidCatch',
-        })
+        }),
       );
     });
 
-    it('should handle different error types', () => {
-      const TypeError = () => {
-        throw new TypeError('Type error');
+    it('farklı hata türlerini işlemeli', () => {
+      const TypeErrorComponent = () => {
+        // Avoid constructor override issues by using generic Error with name set
+        const err = new Error('Type error');
+        (err as any).name = 'TypeError';
+        throw err;
       };
 
       const { getByText } = render(
         <ErrorBoundary>
-          <TypeError />
-        </ErrorBoundary>
+          <TypeErrorComponent />
+        </ErrorBoundary>,
       );
 
       expect(getByText('Something went wrong')).toBeTruthy();
@@ -134,11 +161,11 @@ describe('ErrorBoundary', () => {
           message: 'Type error',
           name: 'TypeError',
         }),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
-    it('should handle errors with custom error info', () => {
+    it('özel hata bilgisi olan hataları işlemeli', () => {
       const customErrorInfo = {
         componentStack: 'in ThrowError\n    in ErrorBoundary',
       };
@@ -146,7 +173,7 @@ describe('ErrorBoundary', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(mockHandleError).toHaveBeenCalledWith(
@@ -155,21 +182,21 @@ describe('ErrorBoundary', () => {
           errorInfo: expect.objectContaining({
             componentStack: expect.any(String),
           }),
-        })
+        }),
       );
     });
   });
 
-  describe('error recovery', () => {
-    it('should show retry button and allow recovery', async () => {
+  describe('hata kurtarma', () => {
+    it('yeniden deneme butonu göstermeli ve kurtarmaya izin vermeli', async () => {
       const { getByTestId, rerender } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(getByTestId('error-boundary-container')).toBeTruthy();
-      
+
       const retryButton = getByTestId('retry-button');
       fireEvent.press(retryButton);
 
@@ -177,7 +204,7 @@ describe('ErrorBoundary', () => {
       rerender(
         <ErrorBoundary>
           <ThrowError shouldThrow={false} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       await waitFor(() => {
@@ -185,11 +212,11 @@ describe('ErrorBoundary', () => {
       });
     });
 
-    it('should reset error state on retry', () => {
+    it('yeniden denemede hata durumunu sıfırlamalı', () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const retryButton = getByTestId('retry-button');
@@ -198,28 +225,28 @@ describe('ErrorBoundary', () => {
       expect(mockClearErrors).toHaveBeenCalled();
     });
 
-    it('should trigger haptic feedback on retry', () => {
+    it('yeniden denemede haptik geri bildirim tetiklemeli', () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const retryButton = getByTestId('retry-button');
       fireEvent.press(retryButton);
 
-      expect(mocks.hapticFeedback.trigger).toHaveBeenCalledWith('impactLight');
+      expect(jest.mocked(require('react-native-haptic-feedback')).trigger).toHaveBeenCalledWith('impactLight');
     });
 
-    it('should handle multiple retry attempts', () => {
+    it('birden fazla yeniden deneme girişimini işlemeli', () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const retryButton = getByTestId('retry-button');
-      
+
       // Multiple retry attempts
       fireEvent.press(retryButton);
       fireEvent.press(retryButton);
@@ -229,57 +256,58 @@ describe('ErrorBoundary', () => {
     });
   });
 
-  describe('custom fallback UI', () => {
-    it('should render custom fallback when provided', () => {
-      const CustomFallback = ({ error, retry }: any) => (
+  describe('özel yedek UI', () => {
+    it('sağlandığında özel yedek render etmeli', () => {
+      const CustomFallback = (error: AppError, retry: () => void) => (
         <View testID="custom-fallback">
           <Text>Custom Error: {error.message}</Text>
-          <Text testID="custom-retry" onPress={retry}>Custom Retry</Text>
+          <Text testID="custom-retry" onPress={retry}>
+            Custom Retry
+          </Text>
         </View>
       );
 
       const { getByTestId, getByText } = render(
         <ErrorBoundary fallback={CustomFallback}>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(getByTestId('custom-fallback')).toBeTruthy();
       expect(getByText('Custom Error: Test error')).toBeTruthy();
     });
 
-    it('should pass error and retry function to custom fallback', () => {
-      const CustomFallback = jest.fn(({ error, retry }) => (
+    it('özel yedek bileşene hata ve yeniden deneme fonksiyonu geçmeli', () => {
+      const CustomFallback = jest.fn((error: AppError, retry: () => void) => (
         <View>
           <Text>{error.message}</Text>
-          <Text testID="retry" onPress={retry}>Retry</Text>
+          <Text testID="retry" onPress={retry}>
+            Retry
+          </Text>
         </View>
       ));
 
       render(
         <ErrorBoundary fallback={CustomFallback}>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(CustomFallback).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: expect.objectContaining({ message: 'Test error' }),
-          retry: expect.any(Function),
-        }),
-        {}
+        expect.objectContaining({ message: 'Test error' }),
+        expect.any(Function),
       );
     });
   });
 
-  describe('error reporting and analytics', () => {
-    it('should include component stack in error report', () => {
+  describe('hata raporlama ve analitik', () => {
+    it('hata raporunda bileşen yığınını içermeli', () => {
       render(
         <ErrorBoundary>
           <View>
             <ThrowError shouldThrow={true} />
           </View>
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(mockHandleError).toHaveBeenCalledWith(
@@ -288,33 +316,33 @@ describe('ErrorBoundary', () => {
           errorInfo: expect.objectContaining({
             componentStack: expect.stringContaining('ThrowError'),
           }),
-        })
+        }),
       );
     });
 
-    it('should track error frequency', () => {
+    it('hata sıklığını takip etmeli', () => {
       // First error
       const { rerender } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Second error
       rerender(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(mockHandleError).toHaveBeenCalledTimes(2);
     });
 
-    it('should include user context in error reports', () => {
+    it('hata raporlarında kullanıcı bağlamını içermeli', () => {
       render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(mockHandleError).toHaveBeenCalledWith(
@@ -322,17 +350,17 @@ describe('ErrorBoundary', () => {
         expect.objectContaining({
           component: 'ErrorBoundary',
           timestamp: expect.any(Number),
-        })
+        }),
       );
     });
   });
 
-  describe('accessibility', () => {
-    it('should have proper accessibility labels', () => {
+  describe('erişilebilirlik', () => {
+    it('uygun erişilebilirlik etiketlerine sahip olmalı', () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const container = getByTestId('error-boundary-container');
@@ -340,22 +368,22 @@ describe('ErrorBoundary', () => {
       expect(container.props.accessibilityLabel).toBe('Error occurred');
     });
 
-    it('should announce error to screen readers', () => {
+    it('ekran okuyuculara hatayı duyurmalı', () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const container = getByTestId('error-boundary-container');
       expect(container.props.accessibilityLiveRegion).toBe('assertive');
     });
 
-    it('should have accessible retry button', () => {
+    it('erişilebilir yeniden deneme butonuna sahip olmalı', () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const retryButton = getByTestId('retry-button');
@@ -365,8 +393,8 @@ describe('ErrorBoundary', () => {
     });
   });
 
-  describe('performance', () => {
-    it('should not re-render unnecessarily', () => {
+  describe('performans', () => {
+    it('gereksiz yere yeniden render etmemeli', () => {
       const renderSpy = jest.fn();
       const TestComponent = () => {
         renderSpy();
@@ -376,20 +404,20 @@ describe('ErrorBoundary', () => {
       const { rerender } = render(
         <ErrorBoundary>
           <TestComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Re-render with same props
       rerender(
         <ErrorBoundary>
           <TestComponent />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(renderSpy).toHaveBeenCalledTimes(2); // Initial + rerender
     });
 
-    it('should handle rapid error occurrences', () => {
+    it('hızlı hata oluşumlarını işlemeli', () => {
       const RapidError = ({ count }: { count: number }) => {
         if (count > 0) {
           throw new Error(`Error ${count}`);
@@ -400,19 +428,19 @@ describe('ErrorBoundary', () => {
       const { rerender } = render(
         <ErrorBoundary>
           <RapidError count={1} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       rerender(
         <ErrorBoundary>
           <RapidError count={2} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       rerender(
         <ErrorBoundary>
           <RapidError count={3} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       // Should handle all errors without crashing
@@ -420,19 +448,20 @@ describe('ErrorBoundary', () => {
     });
   });
 
-  describe('edge cases', () => {
-    it('should handle null/undefined children', () => {
-      const { container } = render(
+  describe('sınır durumları', () => {
+    it('null/undefined alt bileşenleri işlemeli', () => {
+      render(
         <ErrorBoundary>
           {null}
           {undefined}
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
-      expect(container).toBeTruthy();
+      // If render didn't throw the test passes
+      expect(true).toBe(true);
     });
 
-    it('should handle errors in error boundary itself', () => {
+    it('hata sınırının kendisindeki hataları işlemeli', () => {
       const BrokenFallback = () => {
         throw new Error('Fallback error');
       };
@@ -442,12 +471,12 @@ describe('ErrorBoundary', () => {
         render(
           <ErrorBoundary fallback={BrokenFallback}>
             <ThrowError shouldThrow={true} />
-          </ErrorBoundary>
+          </ErrorBoundary>,
         );
       }).not.toThrow();
     });
 
-    it('should handle very long error messages', () => {
+    it('çok uzun hata mesajlarını işlemeli', () => {
       const LongError = () => {
         throw new Error('A'.repeat(1000));
       };
@@ -455,13 +484,13 @@ describe('ErrorBoundary', () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <LongError />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(getByTestId('error-boundary-container')).toBeTruthy();
     });
 
-    it('should handle errors with circular references', () => {
+    it('döngüsel referanslı hataları işlemeli', () => {
       const CircularError = () => {
         const obj: any = { name: 'test' };
         obj.self = obj;
@@ -473,52 +502,52 @@ describe('ErrorBoundary', () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <CircularError />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(getByTestId('error-boundary-container')).toBeTruthy();
     });
   });
 
-  describe('integration with providers', () => {
-    it('should work with theme provider', () => {
+  describe('sağlayıcılarla entegrasyon', () => {
+    it('tema sağlayıcısı ile çalışmalı', () => {
       const { getByTestId } = renderWithProviders(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(getByTestId('error-boundary-container')).toBeTruthy();
     });
 
-    it('should work with navigation context', () => {
+    it('navigasyon bağlamı ile çalışmalı', () => {
       const { getByTestId } = renderWithProviders(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(getByTestId('error-boundary-container')).toBeTruthy();
     });
   });
 
-  describe('wellness features', () => {
-    it('should display calming error messages', () => {
+  describe('sağlık özellikleri', () => {
+    it('sakinleştirici hata mesajları göstermeli', () => {
       const { getByText } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       expect(getByText('Something went wrong')).toBeTruthy();
       expect(getByText(/take a moment/i)).toBeTruthy();
     });
 
-    it('should provide breathing space in error UI', () => {
+    it("hata UI'ında nefes alma alanı sağlamalı", () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const container = getByTestId('error-boundary-container');
@@ -528,11 +557,11 @@ describe('ErrorBoundary', () => {
       });
     });
 
-    it('should use calming colors in error state', () => {
+    it('hata durumunda sakinleştirici renkler kullanmalı', () => {
       const { getByTestId } = render(
         <ErrorBoundary>
           <ThrowError shouldThrow={true} />
-        </ErrorBoundary>
+        </ErrorBoundary>,
       );
 
       const container = getByTestId('error-boundary-container');

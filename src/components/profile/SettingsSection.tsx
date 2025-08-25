@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface SettingsSectionProps {
@@ -9,16 +10,14 @@ interface SettingsSectionProps {
 }
 
 export const SettingsSection: React.FC<SettingsSectionProps> = ({ title, children }) => {
-
-
   const styles = StyleSheet.create({
     section: {
       marginTop: DesignSystem.spacing.xxxl,
     },
     sectionTitle: {
+      color: DesignSystem.colors.text.primary,
       fontSize: 18,
       fontWeight: 'bold',
-      color: DesignSystem.colors.text.primary,
       marginBottom: DesignSystem.spacing.lg,
       paddingHorizontal: DesignSystem.spacing.xl,
     },
@@ -41,58 +40,65 @@ interface MenuItemProps {
   rightElement?: React.ReactNode;
 }
 
-export const MenuItem: React.FC<MenuItemProps> = ({ 
-  icon, 
-  title, 
-  subtitle, 
-  onPress, 
+export const MenuItem: React.FC<MenuItemProps> = ({
+  icon,
+  title,
+  subtitle,
+  onPress,
   showArrow = true,
-  rightElement 
+  rightElement,
 }) => {
-
-
   const styles = StyleSheet.create({
+    chevronOpacity: {
+      opacity: 0.5,
+    },
     menuItem: {
-      flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: DesignSystem.spacing.lg,
-      paddingHorizontal: DesignSystem.spacing.lg,
       backgroundColor: DesignSystem.colors.background.elevated,
+      borderColor: DesignSystem.colors.border.primary,
       borderRadius: 12,
+      borderWidth: 1,
+      elevation: 3,
+      flexDirection: 'row',
       marginBottom: DesignSystem.spacing.md,
       marginHorizontal: DesignSystem.spacing.xl,
+      paddingHorizontal: DesignSystem.spacing.lg,
+      paddingVertical: DesignSystem.spacing.lg,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
-      elevation: 3,
-      borderWidth: 1,
-      borderColor: DesignSystem.colors.border.primary,
     },
     menuItemContent: {
       flex: 1,
       marginLeft: DesignSystem.spacing.md,
     },
-    menuItemTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: DesignSystem.colors.text.primary,
+    menuItemRight: {
+      alignItems: 'center',
+      flexDirection: 'row',
     },
     menuItemSubtitle: {
-      fontSize: 14,
       color: DesignSystem.colors.text.primary,
-      opacity: 0.7,
+      fontSize: 14,
       marginTop: 2,
+      opacity: 0.7,
     },
-    menuItemRight: {
-      flexDirection: 'row',
-      alignItems: 'center',
+    menuItemTitle: {
+      color: DesignSystem.colors.text.primary,
+      fontSize: 16,
+      fontWeight: '600',
     },
   });
 
   return (
-    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-  <Ionicons name={icon} size={24} color={DesignSystem.colors.text.accent} />
+    <TouchableOpacity
+      style={styles.menuItem}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityHint={subtitle || 'Tap to open this setting'}
+    >
+      <Ionicons name={icon} size={24} color={DesignSystem.colors.text.accent} />
       <View style={styles.menuItemContent}>
         <Text style={styles.menuItemTitle}>{title}</Text>
         {subtitle && <Text style={styles.menuItemSubtitle}>{subtitle}</Text>}
@@ -100,11 +106,11 @@ export const MenuItem: React.FC<MenuItemProps> = ({
       <View style={styles.menuItemRight}>
         {rightElement}
         {showArrow && (
-          <Ionicons 
-            name="chevron-forward" 
-            size={16} 
-            color={DesignSystem.colors.text.primary} 
-            style={{ opacity: 0.5 }} 
+          <Ionicons
+            name="chevron-forward"
+            size={16}
+            color={DesignSystem.colors.text.primary}
+            style={styles.chevronOpacity}
           />
         )}
       </View>
@@ -120,59 +126,57 @@ interface SwitchItemProps {
   onValueChange: (value: boolean) => void;
 }
 
-export const SwitchItem: React.FC<SwitchItemProps> = ({ 
-  icon, 
-  title, 
-  subtitle, 
-  value, 
-  onValueChange 
+export const SwitchItem: React.FC<SwitchItemProps> = ({
+  icon,
+  title,
+  subtitle,
+  value,
+  onValueChange,
 }) => {
-
-
   const styles = StyleSheet.create({
     switchContainer: {
-      flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: DesignSystem.spacing.lg,
-      paddingHorizontal: DesignSystem.spacing.lg,
       backgroundColor: DesignSystem.colors.background.elevated,
+      borderColor: DesignSystem.colors.border.primary,
       borderRadius: 12,
+      borderWidth: 1,
+      elevation: 3,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
       marginBottom: DesignSystem.spacing.md,
       marginHorizontal: DesignSystem.spacing.xl,
+      paddingHorizontal: DesignSystem.spacing.lg,
+      paddingVertical: DesignSystem.spacing.lg,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
-      elevation: 3,
-      borderWidth: 1,
-      borderColor: DesignSystem.colors.border.primary,
     },
     switchContent: {
-      flexDirection: 'row',
       alignItems: 'center',
+      flexDirection: 'row',
       flex: 1,
+    },
+    switchSubtitle: {
+      color: DesignSystem.colors.text.primary,
+      fontSize: 14,
+      marginTop: 2,
+      opacity: 0.7,
     },
     switchText: {
       marginLeft: DesignSystem.spacing.md,
     },
     switchTitle: {
+      color: DesignSystem.colors.text.primary,
       fontSize: 16,
       fontWeight: '600',
-      color: DesignSystem.colors.text.primary,
-    },
-    switchSubtitle: {
-      fontSize: 14,
-      color: DesignSystem.colors.text.primary,
-      opacity: 0.7,
-      marginTop: 2,
     },
   });
 
   return (
     <View style={styles.switchContainer}>
       <View style={styles.switchContent}>
-  <Ionicons name={icon} size={24} color={DesignSystem.colors.text.accent} />
+        <Ionicons name={icon} size={24} color={DesignSystem.colors.text.accent} />
         <View style={styles.switchText}>
           <Text style={styles.switchTitle}>{title}</Text>
           {subtitle && <Text style={styles.switchSubtitle}>{subtitle}</Text>}
@@ -181,9 +185,18 @@ export const SwitchItem: React.FC<SwitchItemProps> = ({
       <Switch
         value={value}
         onValueChange={onValueChange}
-        trackColor={{ false: DesignSystem.colors.border.primary, true: DesignSystem.colors.gold[500] }}
+        trackColor={{
+          false: DesignSystem.colors.border.primary,
+          true: DesignSystem.colors.gold[500],
+        }}
         thumbColor={DesignSystem.colors.background.elevated}
       />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  chevronOpacity: {
+    opacity: 0.5,
+  },
+});

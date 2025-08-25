@@ -3,9 +3,22 @@ module.exports = {
   preset: 'react-native',
   testEnvironment: 'node',
   coverageProvider: 'v8',
+  
+  // ESM support for dynamic imports
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  globals: {
+    'ts-jest': {
+      useESM: true
+    }
+  },
+  
+  // Node.js options for dynamic imports
+  testEnvironmentOptions: {
+    customExportConditions: ['node', 'node-addons'],
+  },
 
   // Test dosyaları
-  roots: ['<rootDir>/__tests__'],
+  roots: ['<rootDir>/__tests__', '<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/__tests__/**/*.test.tsx'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
 
@@ -20,7 +33,7 @@ module.exports = {
 
   // Expo/RN ESM paketleri için transpile istisnaları
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|expo-location|expo-modules-core|@expo|expo|expo-haptics|expo-notifications|expo-image-picker|expo-web-browser|expo-auth-session|expo-apple-authentication|@testing-library|react-native-reanimated|expo-linear-gradient|expo-blur|expo-device)/)',
+    'node_modules/(?!(react-native|@react-native|@react-navigation|expo-location|expo-modules-core|@expo|expo|expo-haptics|expo-notifications|expo-image-picker|expo-web-browser|expo-auth-session|expo-apple-authentication|@testing-library|react-native-reanimated|expo-linear-gradient|expo-blur|expo-device)/)',
   ],
 
   // Modül eşleştirmeleri (mocks ve aliaslar)
@@ -29,10 +42,14 @@ module.exports = {
     '^react-native-reanimated$': '<rootDir>/__mocks__/react-native-reanimated.js',
     '^react-native-reanimated/(.*)$': '<rootDir>/__mocks__/react-native-reanimated.js',
 
-    '^@/config/supabaseClient$': '<rootDir>/__mocks__/supabaseClient.js',
+    '^@/config/supabase$': '<rootDir>/__mocks__/supabaseClient.js',
+    '^@/config/supabase': '<rootDir>/src/__mocks__/supabase.ts',
+    '^@/services/aynaMirrorService$': '<rootDir>/__mocks__/aynaMirrorService.js',
+    '^@/services/weatherService$': '<rootDir>/__mocks__/weatherService.js',
     '^@/hooks/useSafeTheme$': '<rootDir>/__mocks__/useSafeTheme.js',
     '^react-native-url-polyfill/auto$': '<rootDir>/__mocks__/react-native-url-polyfill.js',
     '^@react-native-async-storage/async-storage$': '<rootDir>/__mocks__/async-storage.js',
+    '^@/utils/secureStorage$': '<rootDir>/__mocks__/secureStorage.js',
 
     '^expo-location$': '<rootDir>/__mocks__/expo-location.js',
     '^expo-linear-gradient$': '<rootDir>/__mocks__/expo-linear-gradient.js',
@@ -49,11 +66,10 @@ module.exports = {
     '^@expo/vector-icons$': '<rootDir>/__mocks__/expo-vector-icons.js',
 
     '^@/theme/DesignSystem$': '<rootDir>/__mocks__/DesignSystem.js',
+    '^@/components/aynaMirror/OutfitRecommendationCard$': '<rootDir>/__mocks__/OutfitRecommendationCard.js',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  testPathIgnorePatterns: [
-    '/node_modules/',
-  ],
+  testPathIgnorePatterns: ['/node_modules/'],
 
   // Kapsam (coverage) ayarları
   collectCoverageFrom: [
@@ -68,4 +84,7 @@ module.exports = {
   // Jest varsayılanları
   resetMocks: false,
   clearMocks: false,
+
+  // Global test timeout
+  testTimeout: 30000,
 };

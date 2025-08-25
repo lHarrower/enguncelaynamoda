@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { useSafeTheme } from '@/hooks/useSafeTheme';
 import { antiConsumptionService, ShoppingBehaviorData } from '@/services/antiConsumptionService';
 import { DesignSystem } from '@/theme/DesignSystem';
+
 import { errorInDev } from '../../utils/consoleSuppress';
 
 interface ShoppingBehaviorTrackerProps {
@@ -29,11 +24,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadBehaviorData();
-  }, [userId]);
-
-  const loadBehaviorData = async () => {
+  const loadBehaviorData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -42,11 +33,15 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
       onBehaviorTracked?.(data);
     } catch (err) {
       setError('Failed to load shopping behavior data');
-      errorInDev('Error loading shopping behavior data:', err);
+      errorInDev('Error loading shopping behavior data:', err instanceof Error ? err : String(err));
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    void loadBehaviorData();
+  }, [loadBehaviorData]);
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-US', {
@@ -58,29 +53,51 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
   };
 
   const getStreakMessage = (days: number): string => {
-    if (days === 0) return "Ready for a fresh start!";
-    if (days < 7) return `${days} day${days !== 1 ? 's' : ''} strong!`;
-    if (days < 30) return `${days} days of mindful choices!`;
-    if (days < 90) return `${Math.floor(days / 7)} weeks of conscious living!`;
+    if (days === 0) {
+      return 'Ready for a fresh start!';
+    }
+    if (days < 7) {
+      return `${days} day${days !== 1 ? 's' : ''} strong!`;
+    }
+    if (days < 30) {
+      return `${days} days of mindful choices!`;
+    }
+    if (days < 90) {
+      return `${Math.floor(days / 7)} weeks of conscious living!`;
+    }
     return `${Math.floor(days / 30)} months of sustainable style!`;
   };
 
   const getReductionColor = (percentage: number): string => {
-    if (percentage > 50) return DesignSystem.colors.success[500];
-    if (percentage > 20) return DesignSystem.colors.warning[500];
-    if (percentage > 0) return DesignSystem.colors.primary[500];
-    return DesignSystem.colors.error[500];
+    if (percentage > 50) {
+      return DesignSystem.colors.success[500] || '#16A34A';
+    }
+    if (percentage > 20) {
+      return DesignSystem.colors.warning[500] || '#F59E0B';
+    }
+    if (percentage > 0) {
+      return DesignSystem.colors.primary[500] || '#007AFF';
+    }
+    return DesignSystem.colors.error[500] || '#DC2626';
   };
 
   const getReductionIcon = (percentage: number): string => {
-    if (percentage > 50) return 'leaf';
-    if (percentage > 20) return 'trending-down';
-    if (percentage > 0) return 'remove';
+    if (percentage > 50) {
+      return 'leaf';
+    }
+    if (percentage > 20) {
+      return 'trending-down';
+    }
+    if (percentage > 0) {
+      return 'remove';
+    }
     return 'trending-up';
   };
 
   const showCelebration = () => {
-    if (!behaviorData) return;
+    if (!behaviorData) {
+      return;
+    }
 
     let message = '';
     let title = '';
@@ -96,7 +113,8 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
       message = `You've saved ${formatCurrency(behaviorData.totalSavings)} by shopping your closet first!`;
     } else {
       title = '✨ Keep Going!';
-      message = 'Every mindful choice counts. You\'re building a more sustainable relationship with fashion.';
+      message =
+        "Every mindful choice counts. You're building a more sustainable relationship with fashion.";
     }
 
     Alert.alert(title, message, [{ text: 'Amazing!', style: 'default' }]);
@@ -118,7 +136,13 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle-outline" size={48} color={DesignSystem.colors.error[500]} />
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadBehaviorData}>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => void loadBehaviorData()}
+            accessibilityRole="button"
+            accessibilityLabel="Try again"
+            accessibilityHint="Retry loading shopping behavior data"
+          >
             <Text style={styles.retryButtonText}>Try Again</Text>
           </TouchableOpacity>
         </View>
@@ -162,7 +186,13 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
           <Text style={styles.streakMessage}>{streakMessage}</Text>
         </View>
         {behaviorData.streakDays > 7 && (
-          <TouchableOpacity style={styles.celebrateButton} onPress={showCelebration}>
+          <TouchableOpacity
+            style={styles.celebrateButton}
+            onPress={showCelebration}
+            accessibilityRole="button"
+            accessibilityLabel="Celebrate achievement"
+            accessibilityHint="Show celebration message for your shopping streak"
+          >
             <Ionicons name="sparkles" size={16} color="white" />
             <Text style={styles.celebrateButtonText}>Celebrate</Text>
           </TouchableOpacity>
@@ -172,21 +202,21 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
       {/* Monthly Comparison */}
       <View style={styles.comparisonContainer}>
         <Text style={styles.sectionTitle}>This Month vs Last Month</Text>
-        
+
         <View style={styles.comparisonGrid}>
           <View style={styles.comparisonCard}>
             <Text style={styles.comparisonValue}>{behaviorData.monthlyPurchases}</Text>
             <Text style={styles.comparisonLabel}>This Month</Text>
           </View>
-          
+
           <View style={styles.comparisonArrow}>
-            <Ionicons 
+            <Ionicons
               name={reductionIcon as keyof typeof Ionicons.glyphMap}
-              size={24} 
-              color={reductionColor} 
+              size={24}
+              color={reductionColor}
             />
           </View>
-          
+
           <View style={styles.comparisonCard}>
             <Text style={styles.comparisonValue}>{behaviorData.previousMonthPurchases}</Text>
             <Text style={styles.comparisonLabel}>Last Month</Text>
@@ -224,32 +254,36 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
         <View style={styles.achievementsList}>
           {behaviorData.streakDays >= 7 && (
             <View style={styles.achievementItem}>
-              <Ionicons name="calendar-outline" size={20} color={DesignSystem.colors.primary[500]} />
+              <Ionicons
+                name="calendar-outline"
+                size={20}
+                color={DesignSystem.colors.primary[500]}
+              />
               <Text style={styles.achievementText}>7-Day Mindful Streak</Text>
             </View>
           )}
-          
+
           {behaviorData.streakDays >= 30 && (
             <View style={styles.achievementItem}>
               <Ionicons name="trophy-outline" size={20} color={DesignSystem.colors.warning[500]} />
               <Text style={styles.achievementText}>30-Day Champion</Text>
             </View>
           )}
-          
+
           {behaviorData.reductionPercentage > 25 && (
             <View style={styles.achievementItem}>
               <Ionicons name="leaf" size={20} color={DesignSystem.colors.success[500]} />
               <Text style={styles.achievementText}>Eco Warrior</Text>
             </View>
           )}
-          
+
           {behaviorData.totalSavings > 100 && (
             <View style={styles.achievementItem}>
               <Ionicons name="wallet" size={20} color={DesignSystem.colors.error[500]} />
               <Text style={styles.achievementText}>Money Saver</Text>
             </View>
           )}
-          
+
           {behaviorData.streakDays >= 90 && (
             <View style={styles.achievementItem}>
               <Ionicons name="star" size={20} color={DesignSystem.colors.warning[500]} />
@@ -267,20 +301,24 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
             <View style={styles.insightItem}>
               <Ionicons name="trending-down" size={16} color={DesignSystem.colors.success[500]} />
               <Text style={styles.insightText}>
-                Excellent progress! You're successfully reducing impulse purchases.
+                Excellent progress! You&apos;re successfully reducing impulse purchases.
               </Text>
             </View>
           )}
-          
+
           {behaviorData.streakDays > 14 && (
             <View style={styles.insightItem}>
-              <Ionicons name="checkmark-circle" size={16} color={DesignSystem.colors.primary[500]} />
+              <Ionicons
+                name="checkmark-circle"
+                size={16}
+                color={DesignSystem.colors.primary[500]}
+              />
               <Text style={styles.insightText}>
-                You're building strong mindful shopping habits. Keep it up!
+                You&apos;re building strong mindful shopping habits. Keep it up!
               </Text>
             </View>
           )}
-          
+
           {behaviorData.monthlyPurchases === 0 && (
             <View style={styles.insightItem}>
               <Ionicons name="star" size={16} color={DesignSystem.colors.warning[500]} />
@@ -289,12 +327,16 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
               </Text>
             </View>
           )}
-          
+
           {behaviorData.reductionPercentage < 0 && (
             <View style={styles.insightItem}>
-              <Ionicons name="information-circle" size={16} color={DesignSystem.colors.primary[500]} />
+              <Ionicons
+                name="information-circle"
+                size={16}
+                color={DesignSystem.colors.primary[500]}
+              />
               <Text style={styles.insightText}>
-                Consider using the "Shop Your Closet First" feature before making purchases.
+                Consider using the &quot;Shop Your Closet First&quot; feature before making purchases.
               </Text>
             </View>
           )}
@@ -314,271 +356,280 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
   );
 };
 
-const createStyles = (colors: any) => StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background.primary,
+const createStyles = (colors: {
+  background: { primary: string; secondary: string };
+  text: { primary: string; secondary: string };
+  semantic: { error: string; success: string };
+  primary: { [key: number]: string };
+  border: { primary: string };
+}) =>
+  StyleSheet.create({
+    achievementItem: {
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 20,
+      flexDirection: 'row',
+      marginBottom: 8,
+      marginRight: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
     },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.semantic.error,
-    textAlign: 'center',
-    marginTop: 16,
-    marginBottom: 20,
-  },
-  retryButton: {
-    backgroundColor: colors.primary[500],
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  noDataContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  noDataTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  noDataText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  header: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: `${colors.semantic.success}20`,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.text.secondary,
-  },
-  streakContainer: {
-    backgroundColor: colors.background.secondary,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 16,
-    padding: 24,
-    alignItems: 'center',
-  },
-  streakContent: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  streakDays: {
-    fontSize: 48,
-    fontWeight: '700',
-    color: colors.semantic.success,
-    marginBottom: 8,
-  },
-  streakLabel: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    marginBottom: 4,
-  },
-  streakMessage: {
-    fontSize: 14,
-    color: colors.text.primary,
-    textAlign: 'center',
-  },
-  celebrateButton: {
-    backgroundColor: colors.semantic.success,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  celebrateButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-    marginLeft: 4,
-  },
-  comparisonContainer: {
-    backgroundColor: colors.background.secondary,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 16,
-    padding: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginBottom: 16,
-  },
-  comparisonGrid: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  comparisonCard: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  comparisonValue: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: 4,
-  },
-  comparisonLabel: {
-    fontSize: 14,
-    color: colors.text.secondary,
-  },
-  comparisonArrow: {
-    marginHorizontal: 20,
-  },
-  reductionContainer: {
-    alignItems: 'center',
-  },
-  reductionPercentage: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  reductionLabel: {
-    fontSize: 14,
-    color: colors.text.secondary,
-  },
-  savingsContainer: {
-    backgroundColor: `${colors.semantic.success}20`,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-  },
-  savingsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  savingsTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.semantic.success,
-    marginLeft: 8,
-  },
-  savingsAmount: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: colors.semantic.success,
-    marginBottom: 8,
-  },
-  savingsDescription: {
-    fontSize: 14,
-    color: colors.semantic.success,
-    textAlign: 'center',
-  },
-  achievementsContainer: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-  },
-  achievementsList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  achievementItem: {
-    backgroundColor: colors.background.secondary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginBottom: 8,
-    marginRight: 8,
-  },
-  achievementText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: colors.text.primary,
-    marginLeft: 6,
-  },
-  insightsContainer: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-  },
-  insightsList: {
-    marginTop: 0,
-  },
-  insightItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: colors.background.secondary,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  insightText: {
-    fontSize: 14,
-    color: colors.text.primary,
-    marginLeft: 12,
-    flex: 1,
-    lineHeight: 20,
-  },
-  lastPurchaseContainer: {
-    backgroundColor: colors.background.secondary,
-    marginHorizontal: 20,
-    marginBottom: 40,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-  },
-  lastPurchaseLabel: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginBottom: 4,
-  },
-  lastPurchaseDate: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.text.primary,
-  },
-});
+    achievementText: {
+      color: colors.text.primary,
+      fontSize: 12,
+      fontWeight: '500',
+      marginLeft: 6,
+    },
+    achievementsContainer: {
+      marginBottom: 20,
+      marginHorizontal: 20,
+    },
+
+    achievementsList: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    },
+    celebrateButton: {
+      alignItems: 'center',
+      backgroundColor: colors.semantic.success,
+      borderRadius: 20,
+      flexDirection: 'row',
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+    },
+    celebrateButtonText: {
+      color: 'white',
+      fontSize: 14,
+      fontWeight: '600',
+      marginLeft: 4,
+    },
+    comparisonArrow: {
+      marginHorizontal: 20,
+    },
+    comparisonCard: {
+      alignItems: 'center',
+      flex: 1,
+    },
+    comparisonContainer: {
+      backgroundColor: colors.background.secondary,
+      borderRadius: 16,
+      marginBottom: 20,
+      marginHorizontal: 20,
+      padding: 20,
+    },
+    comparisonGrid: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+    },
+    comparisonLabel: {
+      color: colors.text.secondary,
+      fontSize: 14,
+    },
+    comparisonValue: {
+      color: colors.text.primary,
+      fontSize: 32,
+      fontWeight: '700',
+      marginBottom: 4,
+    },
+    container: {
+      backgroundColor: colors.background.primary,
+      flex: 1,
+    },
+    errorContainer: {
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+    },
+    errorText: {
+      color: colors.text.secondary,
+      fontSize: 16,
+      lineHeight: 24,
+      marginBottom: 24,
+      marginTop: 16,
+      textAlign: 'center',
+    },
+    header: {
+      alignItems: 'center',
+      padding: 20,
+    },
+    iconContainer: {
+      alignItems: 'center',
+      backgroundColor: `${colors.semantic.success}20`,
+      borderRadius: 24,
+      height: 48,
+      justifyContent: 'center',
+      marginBottom: 12,
+      width: 48,
+    },
+    insightItem: {
+      alignItems: 'flex-start',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      flexDirection: 'row',
+      marginBottom: 12,
+      padding: 16,
+    },
+    insightText: {
+      color: colors.text.primary,
+      flex: 1,
+      fontSize: 14,
+      lineHeight: 20,
+      marginLeft: 12,
+    },
+    insightsContainer: {
+      marginBottom: 20,
+      marginHorizontal: 20,
+    },
+    insightsList: {
+      marginTop: 0,
+    },
+    lastPurchaseContainer: {
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      marginBottom: 40,
+      marginHorizontal: 20,
+      padding: 16,
+    },
+    lastPurchaseDate: {
+      color: colors.text.primary,
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    lastPurchaseLabel: {
+      color: colors.text.secondary,
+      fontSize: 14,
+      marginBottom: 4,
+    },
+    loadingContainer: {
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+    },
+    loadingText: {
+      color: colors.text.secondary,
+      fontSize: 16,
+      textAlign: 'center',
+    },
+    noDataContainer: {
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+    },
+    noDataText: {
+      color: colors.text.secondary,
+      fontSize: 16,
+      lineHeight: 24,
+      textAlign: 'center',
+    },
+    noDataTitle: {
+      color: colors.text.primary,
+      fontSize: 20,
+      fontWeight: '600',
+      marginBottom: 8,
+      marginTop: 16,
+    },
+    reductionContainer: {
+      alignItems: 'center',
+    },
+    reductionLabel: {
+      color: colors.text.secondary,
+      fontSize: 14,
+    },
+    reductionPercentage: {
+      fontSize: 24,
+      fontWeight: '700',
+      marginBottom: 4,
+    },
+    retryButton: {
+      backgroundColor: colors.primary[500],
+      borderRadius: 8,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+    },
+    retryButtonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    savingsAmount: {
+      color: colors.semantic.success,
+      fontSize: 32,
+      fontWeight: '700',
+      marginBottom: 8,
+    },
+    savingsContainer: {
+      alignItems: 'center',
+      backgroundColor: `${colors.semantic.success}20`,
+      borderRadius: 16,
+      marginBottom: 20,
+      marginHorizontal: 20,
+      padding: 20,
+    },
+    savingsDescription: {
+      color: colors.semantic.success,
+      fontSize: 14,
+      textAlign: 'center',
+    },
+    savingsHeader: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      marginBottom: 8,
+    },
+    savingsTitle: {
+      color: colors.semantic.success,
+      fontSize: 16,
+      fontWeight: '600',
+      marginLeft: 8,
+    },
+    sectionTitle: {
+      color: colors.text.primary,
+      fontSize: 18,
+      fontWeight: '600',
+      marginBottom: 16,
+    },
+    streakContainer: {
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 16,
+      marginBottom: 20,
+      marginHorizontal: 20,
+      padding: 24,
+    },
+    streakContent: {
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    streakDays: {
+      color: colors.semantic.success,
+      fontSize: 48,
+      fontWeight: '700',
+      marginBottom: 8,
+    },
+    streakLabel: {
+      color: colors.text.secondary,
+      fontSize: 16,
+      marginBottom: 4,
+    },
+    streakMessage: {
+      color: colors.text.primary,
+      fontSize: 14,
+      textAlign: 'center',
+    },
+    subtitle: {
+      color: colors.text.secondary,
+      fontSize: 16,
+    },
+    title: {
+      color: colors.text.primary,
+      fontSize: 24,
+      fontWeight: '700',
+      marginBottom: 4,
+    },
+  });

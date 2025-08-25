@@ -1,14 +1,15 @@
 // Sign Up Form Component
 import React, { useState } from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
+  View,
 } from 'react-native';
+
 import { useAuth } from '@/hooks/useAuth';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
@@ -25,51 +26,51 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignIn }) => {
     confirmPassword: '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { signUp } = useAuth();
   const { triggerSuccess, triggerError } = useHapticFeedback();
 
   const handleSignUp = async () => {
     const { name, email, password, confirmPassword } = formData;
-    
+
     if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
       Alert.alert('Error', 'Please fill in all fields');
-      triggerError();
+      void triggerError();
       return;
     }
 
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match');
-      triggerError();
+      void triggerError();
       return;
     }
 
     if (password.length < 6) {
       Alert.alert('Error', 'Password must be at least 6 characters');
-      triggerError();
+      void triggerError();
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
       const result = await signUp(email.trim(), password, {
         name: name.trim(),
       });
-      
+
       if (result.success) {
-        triggerSuccess();
+        void triggerSuccess();
         Alert.alert(
           'Success',
           'Account created successfully! Please check your email to verify your account.',
-          [{ text: 'OK', onPress: onSuccess }]
+          [{ text: 'OK', onPress: onSuccess }],
         );
       } else {
-        triggerError();
+        void triggerError();
         Alert.alert('Sign Up Failed', result.error || 'Please try again');
       }
     } catch (error) {
-      triggerError();
+      void triggerError();
       Alert.alert('Error', 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -77,7 +78,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignIn }) => {
   };
 
   const updateFormData = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -85,7 +86,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignIn }) => {
       <View style={styles.form}>
         <Text style={styles.title}>Create Account</Text>
         <Text style={styles.subtitle}>Join AYNA to start your style journey</Text>
-        
+
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Full Name</Text>
           <TextInput
@@ -96,9 +97,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignIn }) => {
             autoCapitalize="words"
             autoCorrect={false}
             editable={!isLoading}
+            accessibilityLabel="Full name"
+            accessibilityHint="Enter your full name for account creation"
           />
         </View>
-        
+
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -110,9 +113,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignIn }) => {
             autoCapitalize="none"
             autoCorrect={false}
             editable={!isLoading}
+            accessibilityLabel="Email address"
+            accessibilityHint="Enter your email address for account creation"
           />
         </View>
-        
+
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Password</Text>
           <TextInput
@@ -124,9 +129,11 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignIn }) => {
             autoCapitalize="none"
             autoCorrect={false}
             editable={!isLoading}
+            accessibilityLabel="Password"
+            accessibilityHint="Create a secure password for your account"
           />
         </View>
-        
+
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Confirm Password</Text>
           <TextInput
@@ -138,12 +145,14 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignIn }) => {
             autoCapitalize="none"
             autoCorrect={false}
             editable={!isLoading}
+            accessibilityLabel="Confirm password"
+            accessibilityHint="Re-enter your password to confirm"
           />
         </View>
-        
+
         <TouchableOpacity
           style={[styles.signUpButton, isLoading && styles.signUpButtonDisabled]}
-          onPress={handleSignUp}
+          onPress={() => void handleSignUp()}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -152,10 +161,17 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess, onSignIn }) => {
             <Text style={styles.signUpButtonText}>Create Account</Text>
           )}
         </TouchableOpacity>
-        
+
         <View style={styles.signInContainer}>
           <Text style={styles.signInText}>Already have an account? </Text>
-          <TouchableOpacity onPress={onSignIn} disabled={isLoading}>
+          <TouchableOpacity
+            onPress={onSignIn}
+            disabled={isLoading}
+            accessibilityRole="button"
+            accessibilityLabel="Sign In"
+            accessibilityHint="Navigate to sign in screen"
+            accessibilityState={{ disabled: isLoading }}
+          >
             <Text style={styles.signInLink}>Sign In</Text>
           </TouchableOpacity>
         </View>
@@ -173,44 +189,45 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 8,
-    color: '#1F2937',
-  },
-  subtitle: {
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    borderWidth: 1,
     fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 32,
-    color: '#6B7280',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   inputContainer: {
     marginBottom: 16,
   },
   label: {
+    color: '#374151',
     fontSize: 14,
     fontWeight: '500',
     marginBottom: 8,
-    color: '#374151',
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
+  signInContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  signInLink: {
+    color: '#3B82F6',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  signInText: {
+    color: '#6B7280',
+    fontSize: 14,
   },
   signUpButton: {
+    alignItems: 'center',
     backgroundColor: '#3B82F6',
     borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: 'center',
     marginBottom: 24,
     marginTop: 8,
+    paddingVertical: 16,
   },
   signUpButtonDisabled: {
     backgroundColor: '#9CA3AF',
@@ -220,19 +237,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  signInContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  signInText: {
-    fontSize: 14,
+  subtitle: {
     color: '#6B7280',
+    fontSize: 16,
+    marginBottom: 32,
+    textAlign: 'center',
   },
-  signInLink: {
-    fontSize: 14,
-    color: '#3B82F6',
-    fontWeight: '500',
+  title: {
+    color: '#1F2937',
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
   },
 });
 

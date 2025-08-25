@@ -1,8 +1,8 @@
 /**
  * AYNAMODA Vision Theme System
  * "Confidence as a Service" - A Serene Styling Sanctuary
- * 
- * Inspired by: Spotify's clarity, Gucci's premium polish, 
+ *
+ * Inspired by: Spotify's clarity, Gucci's premium polish,
  * Poppi's fluid motion, Sonos' confident minimalism
  */
 
@@ -11,28 +11,28 @@ export const AYNAMODA_VISION_THEME = {
   colors: {
     // Primary Palette: Serene Confidence
     primary: {
-      cream: '#FFF8F0',      // Warm sunlit base
-      sage: '#E8F4E6',       // Calming green accent
-      pearl: '#F7F7F7',      // Pure clarity
-      champagne: '#F5F1E8',  // Luxurious warmth
+      cream: '#FFF8F0', // Warm sunlit base
+      sage: '#E8F4E6', // Calming green accent
+      pearl: '#F7F7F7', // Pure clarity
+      champagne: '#F5F1E8', // Luxurious warmth
     },
-    
+
     // Accent Palette: Vibrant Life
     accent: {
-      coral: '#FF6B6B',      // Confident energy
-      lavender: '#B794F6',   // Creative inspiration
-      mint: '#68D391',       // Fresh discovery
-      gold: '#F6E05E',       // Premium highlight
+      coral: '#FF6B6B', // Confident energy
+      lavender: '#B794F6', // Creative inspiration
+      mint: '#68D391', // Fresh discovery
+      gold: '#F6E05E', // Premium highlight
     },
-    
+
     // Neutral Palette: Sophisticated Foundation
     neutral: {
-      charcoal: '#2D3748',   // Deep elegance
-      slate: '#4A5568',      // Refined text
-      mist: '#E2E8F0',       // Gentle boundaries
-      whisper: '#F7FAFC',    // Subtle backgrounds
+      charcoal: '#2D3748', // Deep elegance
+      slate: '#4A5568', // Refined text
+      mist: '#E2E8F0', // Gentle boundaries
+      whisper: '#F7FAFC', // Subtle backgrounds
     },
-    
+
     // Semantic Colors
     success: '#48BB78',
     warning: '#ED8936',
@@ -49,7 +49,7 @@ export const AYNAMODA_VISION_THEME = {
       lineHeight: 40,
       letterSpacing: -0.5,
     },
-    
+
     // Headlines: Clear communication
     h1: {
       fontFamily: 'Inter_600SemiBold',
@@ -57,21 +57,21 @@ export const AYNAMODA_VISION_THEME = {
       lineHeight: 32,
       letterSpacing: -0.3,
     },
-    
+
     h2: {
       fontFamily: 'Inter_600SemiBold',
       fontSize: 20,
       lineHeight: 28,
       letterSpacing: -0.2,
     },
-    
+
     h3: {
       fontFamily: 'Inter_500Medium',
       fontSize: 18,
       lineHeight: 24,
       letterSpacing: -0.1,
     },
-    
+
     // Body: Readable elegance
     body: {
       fontFamily: 'Inter_400Regular',
@@ -79,14 +79,14 @@ export const AYNAMODA_VISION_THEME = {
       lineHeight: 24,
       letterSpacing: 0,
     },
-    
+
     bodySmall: {
       fontFamily: 'Inter_400Regular',
       fontSize: 14,
       lineHeight: 20,
       letterSpacing: 0.1,
     },
-    
+
     // Labels: Precise communication
     label: {
       fontFamily: 'Inter_500Medium',
@@ -112,18 +112,18 @@ export const AYNAMODA_VISION_THEME = {
   layout: {
     // Bento Grid Ratios
     bento: {
-      small: { width: 1, height: 1 },      // 1:1 square
-      medium: { width: 2, height: 1 },     // 2:1 rectangle
-      large: { width: 2, height: 2 },      // 2:2 large square
-      hero: { width: 3, height: 2 },       // 3:2 hero banner
+      small: { width: 1, height: 1 }, // 1:1 square
+      medium: { width: 2, height: 1 }, // 2:1 rectangle
+      large: { width: 2, height: 2 }, // 2:2 large square
+      hero: { width: 3, height: 2 }, // 3:2 hero banner
     },
-    
+
     // Container Sizes
     container: {
       padding: 20,
       maxWidth: 400,
     },
-    
+
     // Card System
     card: {
       borderRadius: 16,
@@ -139,12 +139,12 @@ export const AYNAMODA_VISION_THEME = {
   motion: {
     // Timing Functions: Natural Ease
     easing: {
-      gentle: [0.25, 0.46, 0.45, 0.94],    // Gentle entrance
+      gentle: [0.25, 0.46, 0.45, 0.94], // Gentle entrance
       confident: [0.68, -0.55, 0.265, 1.55], // Confident bounce
-      fluid: [0.4, 0, 0.2, 1],             // Fluid transition
-      instant: [0, 0, 1, 1],               // Immediate response
+      fluid: [0.4, 0, 0.2, 1], // Fluid transition
+      instant: [0, 0, 1, 1], // Immediate response
     },
-    
+
     // Duration Scale
     duration: {
       instant: 150,
@@ -153,7 +153,7 @@ export const AYNAMODA_VISION_THEME = {
       graceful: 600,
       dramatic: 1000,
     },
-    
+
     // Spring Physics
     spring: {
       gentle: { damping: 20, stiffness: 300 },
@@ -170,7 +170,7 @@ export const AYNAMODA_VISION_THEME = {
       borderWidth: 1,
       borderColor: 'rgba(255, 255, 255, 0.18)',
     },
-    
+
     dark: {
       backgroundColor: 'rgba(45, 55, 72, 0.25)',
       backdropFilter: 'blur(20px)',
@@ -184,14 +184,14 @@ export const AYNAMODA_VISION_THEME = {
     // Magnetic Attraction: Cards that subtly pull toward touch
     magneticRadius: 60,
     magneticStrength: 0.3,
-    
+
     // Ripple Physics: Touch creates expanding energy
     rippleScale: 2.5,
     rippleDuration: 800,
-    
+
     // Parallax Depth: Layers that respond to device motion
     parallaxLayers: [0.1, 0.3, 0.5, 0.8],
-    
+
     // Morphing Transitions: Elements that fluidly transform
     morphDuration: 600,
     morphEasing: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
@@ -216,7 +216,7 @@ export const AYNAMODA_VISION_THEME = {
         border: 'transparent',
       },
     },
-    
+
     card: {
       elevated: {
         shadowOffset: { width: 0, height: 8 },
@@ -235,7 +235,7 @@ export const AYNAMODA_VISION_THEME = {
 } as const;
 
 // THEME UTILITIES
-export const getSpacing = (size: keyof typeof AYNAMODA_VISION_THEME.spacing) => 
+export const getSpacing = (size: keyof typeof AYNAMODA_VISION_THEME.spacing) =>
   AYNAMODA_VISION_THEME.spacing[size];
 
 export const getColor = (category: string, shade?: string) => {
@@ -247,10 +247,10 @@ export const getTypography = (variant: keyof typeof AYNAMODA_VISION_THEME.typogr
   AYNAMODA_VISION_THEME.typography[variant];
 
 // MOTION PRESETS
-export const createSpringConfig = (type: keyof typeof AYNAMODA_VISION_THEME.motion.spring) =>
+export const getSpring = (type: keyof typeof AYNAMODA_VISION_THEME.motion.spring) =>
   AYNAMODA_VISION_THEME.motion.spring[type];
 
-export const createTimingConfig = (duration: keyof typeof AYNAMODA_VISION_THEME.motion.duration) => ({
+export const getTransition = (duration: keyof typeof AYNAMODA_VISION_THEME.motion.duration) => ({
   duration: AYNAMODA_VISION_THEME.motion.duration[duration],
   easing: AYNAMODA_VISION_THEME.motion.easing.fluid,
 });

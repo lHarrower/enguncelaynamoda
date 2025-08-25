@@ -1,17 +1,17 @@
 // Living Atmosphere - The Deep, Immersive Canvas
 // Jewel-tone gradients moving like soft light behind heavy silk curtain
 
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
-  withTiming,
+  useSharedValue,
   withRepeat,
   withSequence,
-  interpolate,
+  withTiming,
 } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
@@ -44,35 +44,35 @@ const LivingAtmosphere: React.FC<LivingAtmosphereProps> = ({
           deep: DesignSystem.colors.sage[600],
           medium: DesignSystem.colors.sage[500],
           glow: DesignSystem.colors.sage[400],
-          shimmer: DesignSystem.colors.sage[300]
+          shimmer: DesignSystem.colors.sage[300],
         };
       case 'sapphire':
         return {
           deep: DesignSystem.colors.sage[700],
           medium: DesignSystem.colors.sage[600],
           glow: DesignSystem.colors.sage[500],
-          shimmer: DesignSystem.colors.sage[400]
+          shimmer: DesignSystem.colors.sage[400],
         };
       case 'ruby':
         return {
           deep: DesignSystem.colors.sage[800],
           medium: DesignSystem.colors.sage[700],
           glow: DesignSystem.colors.sage[600],
-          shimmer: DesignSystem.colors.sage[500]
+          shimmer: DesignSystem.colors.sage[500],
         };
       case 'amethyst':
         return {
           deep: DesignSystem.colors.sage[500],
           medium: DesignSystem.colors.sage[400],
           glow: DesignSystem.colors.sage[300],
-          shimmer: DesignSystem.colors.sage[200]
+          shimmer: DesignSystem.colors.sage[200],
         };
       default:
         return {
           deep: DesignSystem.colors.sage[600],
           medium: DesignSystem.colors.sage[500],
           glow: DesignSystem.colors.sage[400],
-          shimmer: DesignSystem.colors.sage[300]
+          shimmer: DesignSystem.colors.sage[300],
         };
     }
   };
@@ -97,75 +97,88 @@ const LivingAtmosphere: React.FC<LivingAtmosphereProps> = ({
 
   useEffect(() => {
     // Start the living atmospheric motion - extremely slow, like breathing
-    
+
     // Gradient 1 - Horizontal drift like wind
     gradient1Position.value = withRepeat(
       withSequence(
         withTiming(intensityValues.movement, { duration: 25000 }),
-        withTiming(-intensityValues.movement, { duration: 25000 })
+        withTiming(-intensityValues.movement, { duration: 25000 }),
       ),
       -1,
-      true
+      true,
     );
 
     // Gradient 2 - Diagonal drift like floating silk
     gradient2Position.value = withRepeat(
       withSequence(
         withTiming(0.7 + intensityValues.movement, { duration: 35000 }),
-        withTiming(0.3 - intensityValues.movement, { duration: 35000 })
+        withTiming(0.3 - intensityValues.movement, { duration: 35000 }),
       ),
       -1,
-      true
+      true,
     );
 
     // Gradient 3 - Vertical drift like rising mist
     gradient3Position.value = withRepeat(
       withSequence(
         withTiming(1 - intensityValues.movement, { duration: 45000 }),
-        withTiming(intensityValues.movement, { duration: 45000 })
+        withTiming(intensityValues.movement, { duration: 45000 }),
       ),
       -1,
-      true
+      true,
     );
 
     // Opacity breathing - like candlelight flickering
     gradient1Opacity.value = withRepeat(
       withSequence(
         withTiming(intensityValues.opacity * 1.5, { duration: 12000 }),
-        withTiming(intensityValues.opacity * 0.5, { duration: 12000 })
+        withTiming(intensityValues.opacity * 0.5, { duration: 12000 }),
       ),
       -1,
-      true
+      true,
     );
 
     gradient2Opacity.value = withRepeat(
       withSequence(
         withTiming(intensityValues.opacity * 1.2, { duration: 18000 }),
-        withTiming(intensityValues.opacity * 0.7, { duration: 18000 })
+        withTiming(intensityValues.opacity * 0.7, { duration: 18000 }),
       ),
       -1,
-      true
+      true,
     );
 
     gradient3Opacity.value = withRepeat(
       withSequence(
         withTiming(intensityValues.opacity, { duration: 15000 }),
-        withTiming(intensityValues.opacity * 0.3, { duration: 15000 })
+        withTiming(intensityValues.opacity * 0.3, { duration: 15000 }),
       ),
       -1,
-      true
+      true,
     );
 
     // Atmospheric pulse - the entire space breathing
     atmosphericPulse.value = withRepeat(
       withSequence(
         withTiming(1 + intensityValues.pulse, { duration: 8000 }),
-        withTiming(1 - intensityValues.pulse, { duration: 8000 })
+        withTiming(1 - intensityValues.pulse, { duration: 8000 }),
       ),
       -1,
-      true
+      true,
     );
-  }, [variant, intensity]);
+  }, [
+    variant,
+    intensity,
+    atmosphericPulse,
+    gradient1Opacity,
+    gradient1Position,
+    gradient2Opacity,
+    gradient2Position,
+    gradient3Opacity,
+    gradient3Position,
+    intensityValues.movement,
+    intensityValues.opacity,
+    intensityValues.pulse,
+  ]);
 
   // Animated styles for each gradient layer
   const gradient1Style = useAnimatedStyle(() => {
@@ -205,17 +218,11 @@ const LivingAtmosphere: React.FC<LivingAtmosphereProps> = ({
     <View style={styles.container}>
       {/* Base Canvas - Deep charcoal void */}
       <View style={styles.voidCanvas} />
-      
+
       {/* Living Gradient Layers - Like light behind silk */}
       <Animated.View style={[styles.gradientLayer, gradient1Style]}>
         <LinearGradient
-          colors={[
-            jewels.glow,
-            'transparent',
-            jewels.shimmer,
-            'transparent',
-            jewels.glow,
-          ]}
+          colors={[jewels.glow, 'transparent', jewels.shimmer, 'transparent', jewels.glow]}
           style={styles.gradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -224,13 +231,7 @@ const LivingAtmosphere: React.FC<LivingAtmosphereProps> = ({
 
       <Animated.View style={[styles.gradientLayer, gradient2Style]}>
         <LinearGradient
-          colors={[
-            'transparent',
-            jewels.shimmer,
-            jewels.glow,
-            jewels.shimmer,
-            'transparent',
-          ]}
+          colors={['transparent', jewels.shimmer, jewels.glow, jewels.shimmer, 'transparent']}
           style={styles.gradient}
           start={{ x: 1, y: 0 }}
           end={{ x: 0, y: 1 }}
@@ -239,13 +240,7 @@ const LivingAtmosphere: React.FC<LivingAtmosphereProps> = ({
 
       <Animated.View style={[styles.gradientLayer, gradient3Style]}>
         <LinearGradient
-          colors={[
-            jewels.shimmer,
-            'transparent',
-            jewels.glow,
-            'transparent',
-            jewels.shimmer,
-          ]}
+          colors={[jewels.shimmer, 'transparent', jewels.glow, 'transparent', jewels.shimmer]}
           style={styles.gradient}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
@@ -253,9 +248,7 @@ const LivingAtmosphere: React.FC<LivingAtmosphereProps> = ({
       </Animated.View>
 
       {/* Content Layer - Floating above the atmosphere */}
-      <View style={styles.contentLayer}>
-        {children}
-      </View>
+      <View style={styles.contentLayer}>{children}</View>
     </View>
   );
 };
@@ -265,28 +258,28 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
   },
-  voidCanvas: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: DesignSystem.colors.background.primary,
-  },
-  gradientLayer: {
-    position: 'absolute',
-    width: width * 3,
-    height: height * 3,
-    top: -height,
-    left: -width,
-  },
-  gradient: {
-    flex: 1,
-    borderRadius: width * 2,
-  },
   contentLayer: {
     flex: 1,
     zIndex: 10,
+  },
+  gradient: {
+    borderRadius: width * 2,
+    flex: 1,
+  },
+  gradientLayer: {
+    height: height * 3,
+    left: -width,
+    position: 'absolute',
+    top: -height,
+    width: width * 3,
+  },
+  voidCanvas: {
+    backgroundColor: DesignSystem.colors.background.primary,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 });
 

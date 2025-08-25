@@ -1,8 +1,9 @@
-import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface ZenButtonProps {
@@ -15,6 +16,8 @@ interface ZenButtonProps {
   icon?: React.ComponentProps<typeof Ionicons>['name'];
   iconPosition?: 'left' | 'right';
   style?: ViewStyle;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 export default function ZenButton({
@@ -27,6 +30,8 @@ export default function ZenButton({
   icon,
   iconPosition = 'left',
   style,
+  accessibilityLabel,
+  accessibilityHint,
 }: ZenButtonProps) {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
@@ -86,8 +91,10 @@ export default function ZenButton({
   };
 
   const getIconColor = () => {
-    if (disabled) return DesignSystem.colors.neutral[300];
-    
+    if (disabled) {
+      return DesignSystem.colors.neutral[300];
+    }
+
     switch (variant) {
       case 'primary':
         return DesignSystem.colors.text.inverse;
@@ -105,20 +112,20 @@ export default function ZenButton({
   const renderContent = () => (
     <>
       {icon && iconPosition === 'left' && (
-        <Ionicons 
-          name={icon} 
-          size={size === 'small' ? 16 : size === 'large' ? 20 : 18} 
-          color={getIconColor()} 
-          style={styles.iconLeft} 
+        <Ionicons
+          name={icon}
+          size={size === 'small' ? 16 : size === 'large' ? 20 : 18}
+          color={getIconColor()}
+          style={styles.iconLeft}
         />
       )}
       <Text style={getTextStyle()}>{title}</Text>
       {icon && iconPosition === 'right' && (
-        <Ionicons 
-          name={icon} 
-          size={size === 'small' ? 16 : size === 'large' ? 20 : 18} 
-          color={getIconColor()} 
-          style={styles.iconRight} 
+        <Ionicons
+          name={icon}
+          size={size === 'small' ? 16 : size === 'large' ? 20 : 18}
+          color={getIconColor()}
+          style={styles.iconRight}
         />
       )}
     </>
@@ -133,6 +140,10 @@ export default function ZenButton({
         onPressOut={handlePressOut}
         disabled={disabled}
         activeOpacity={1}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel || title}
+        accessibilityHint={accessibilityHint}
+        accessibilityState={{ disabled }}
       >
         {variant === 'primary' && !disabled ? (
           <LinearGradient
@@ -153,44 +164,44 @@ export default function ZenButton({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: DesignSystem.borderRadius.lg,
     alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: DesignSystem.borderRadius.lg,
     flexDirection: 'row',
+    justifyContent: 'center',
     overflow: 'hidden',
     ...DesignSystem.elevation.medium,
   },
   gradient: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1,
     flexDirection: 'row',
+    justifyContent: 'center',
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.md,
   },
-  
+
   // Sizes
   small: {
+    minHeight: 36,
     paddingHorizontal: DesignSystem.spacing.md,
     paddingVertical: DesignSystem.spacing.sm,
-    minHeight: 36,
   },
   medium: {
+    minHeight: 44,
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.md,
-    minHeight: 44,
   },
   large: {
+    minHeight: 52,
     paddingHorizontal: DesignSystem.spacing.xl,
     paddingVertical: DesignSystem.spacing.lg,
-    minHeight: 52,
   },
-  
+
   // Variants
   secondary: {
     backgroundColor: DesignSystem.colors.background.secondary,
-    borderWidth: 1,
     borderColor: DesignSystem.colors.sage[200],
+    borderWidth: 1,
   },
   ghost: {
     backgroundColor: 'transparent',
@@ -198,10 +209,10 @@ const styles = StyleSheet.create({
   },
   outline: {
     backgroundColor: 'transparent',
-    borderWidth: 2,
     borderColor: DesignSystem.colors.sage[500],
+    borderWidth: 2,
   },
-  
+
   // States
   disabled: {
     backgroundColor: DesignSystem.colors.sage[100],
@@ -211,12 +222,12 @@ const styles = StyleSheet.create({
   fullWidth: {
     width: '100%',
   },
-  
+
   // Text styles
   text: {
-    textAlign: 'center',
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     letterSpacing: 0.3,
+    textAlign: 'center',
   },
   smallText: {
     ...DesignSystem.typography.caption.medium,
@@ -230,7 +241,7 @@ const styles = StyleSheet.create({
     ...DesignSystem.typography.body.medium,
     fontWeight: '600',
   },
-  
+
   // Text colors
   primaryText: {
     color: DesignSystem.colors.text.inverse,
@@ -244,7 +255,7 @@ const styles = StyleSheet.create({
   outlineText: {
     color: DesignSystem.colors.sage[500],
   },
-  
+
   // Icon spacing
   iconLeft: {
     marginRight: DesignSystem.spacing.sm,

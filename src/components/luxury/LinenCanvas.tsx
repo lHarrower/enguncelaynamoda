@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, StyleSheet, ViewStyle, ColorValue } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { ColorValue, StyleSheet, View, ViewStyle } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface LinenCanvasProps {
@@ -9,11 +10,7 @@ interface LinenCanvasProps {
   variant?: 'default' | 'subtle' | 'warm';
 }
 
-const LinenCanvas: React.FC<LinenCanvasProps> = ({ 
-  children, 
-  style, 
-  variant = 'default' 
-}) => {
+const LinenCanvas: React.FC<LinenCanvasProps> = ({ children, style, variant = 'default' }) => {
   const getGradientColors = (): readonly [ColorValue, ColorValue, ...ColorValue[]] => {
     switch (variant) {
       case 'subtle':
@@ -46,14 +43,12 @@ const LinenCanvas: React.FC<LinenCanvasProps> = ({
         end={{ x: 1, y: 1 }}
         style={styles.gradient}
       />
-      
+
       {/* Subtle Texture Overlay */}
       <View style={styles.textureOverlay} />
-      
+
       {/* Content */}
-      <View style={styles.content}>
-        {children}
-      </View>
+      <View style={styles.content}>{children}</View>
     </View>
   );
 };
@@ -63,12 +58,16 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'relative',
   },
+  content: {
+    flex: 1,
+    zIndex: 1,
+  },
   gradient: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
     bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
   textureOverlay: {
     position: 'absolute',
@@ -81,10 +80,6 @@ const styles = StyleSheet.create({
     opacity: 0.1,
     // Note: In a real implementation, you might use a pattern image here
     // backgroundImage: 'url("data:image/svg+xml,...")', // SVG noise pattern
-  },
-  content: {
-    flex: 1,
-    zIndex: 1,
   },
 });
 

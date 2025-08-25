@@ -4,7 +4,7 @@ import { supabase } from '@/config/supabaseClient';
 
 type ChatMessage = {
   role: 'system' | 'user' | 'assistant' | 'tool';
-  content: any;
+  content: unknown;
 };
 
 export interface ChatCompletionParams {
@@ -18,7 +18,7 @@ export interface ChatCompletionParams {
 export async function aiProxyChatCompletion(params: ChatCompletionParams) {
   const { data, error } = await supabase.functions.invoke('ai-proxy', {
     body: {
-  provider: params.provider || 'openrouter',
+      provider: params.provider || 'openrouter',
       ...params,
     },
   });
@@ -32,8 +32,12 @@ export async function aiProxyChatCompletion(params: ChatCompletionParams) {
 export function shouldUseAiProxy(): boolean {
   // Default to true unless explicitly disabled
   // In tests, default to false so Jest mocks for OpenAI still work
-  if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) return false;
+  if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
+    return false;
+  }
   const flag = process.env.EXPO_PUBLIC_USE_AI_PROXY;
-  if (flag === undefined) return true;
+  if (flag === undefined) {
+    return true;
+  }
   return String(flag).toLowerCase() === 'true';
 }

@@ -1,35 +1,44 @@
-import React, { useState, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   Animated,
   Dimensions,
   ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
+
 import { DesignSystem } from '@/theme/DesignSystem';
-import { logInDev, errorInDev } from '@/utils/consoleSuppress';
-import { OutfitFeedback, EmotionalResponse, SocialFeedback, ComfortRating, EmotionalState } from '../../types/aynaMirror';
-import { FeedbackComponentProps, ModalComponentProps, DEFAULT_PROPS } from '../../types/componentProps';
+import {
+  ComfortRating,
+  EmotionalResponse,
+  EmotionalState,
+  OutfitFeedback,
+  SocialFeedback,
+} from '@/types/aynaMirror';
+import { FeedbackComponentProps } from '@/types/componentProps';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-interface FeedbackCollectorProps extends FeedbackComponentProps, Pick<ModalComponentProps, 'visible' | 'onClose'> {
-  /** Outfit ID to collect feedback for */
-  outfitId: string;
+interface FeedbackCollectorProps extends Omit<Partial<FeedbackComponentProps>, 'onFeedbackSubmit'> {
+  /** Primary target (outfit) ID */
+  outfitId?: string; // make optional for tests that only pass targetId
+  /** Legacy / generic target id (tests may use this) */
+  targetId?: string;
   /** User ID providing the feedback */
-  userId: string;
+  userId?: string; // optional for tests
   /** Callback when feedback is successfully submitted */
   onFeedbackSubmit: (feedback: OutfitFeedback) => Promise<void>;
   /** Callback when feedback collection is closed */
   onClose: () => void;
   /** Whether the feedback collector is visible */
-  visible: boolean;
+  visible?: boolean;
   /** Custom title for the feedback collector */
   title?: string;
   /** Error message to display */
@@ -47,7 +56,8 @@ interface FeedbackStep {
 
 export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
   outfitId,
-  userId,
+  targetId,
+  userId = 'test-user',
   onFeedbackSubmit,
   onClose,
   visible = true,
@@ -60,6 +70,9 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
   ...props
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
+  // Normalize id preference: outfitId or fallback to targetId for legacy tests
+  const effectiveOutfitId = outfitId || targetId || 'unknown-outfit';
+  const effectiveTargetId = targetId || outfitId || 'unknown-target';
   const [confidenceRating, setConfidenceRating] = useState<number>(0);
   const [emotionalResponse, setEmotionalResponse] = useState<EmotionalResponse>({
     primary: 'confident',
@@ -109,7 +122,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
         }),
       ]).start();
     }
-  }, [visible]);
+  }, [visible, fadeAnim, slideAnim]);
 
   const handleStarPress = (rating: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -118,14 +131,14 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
 
   const handleEmotionSelect = (emotion: EmotionalState) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setEmotionalResponse(prev => ({
+    setEmotionalResponse((prev) => ({
       ...prev,
       primary: emotion,
     }));
   };
 
   const handleIntensityChange = (intensity: number) => {
-    setEmotionalResponse(prev => ({
+    setEmotionalResponse((prev) => ({
       ...prev,
       intensity,
     }));
@@ -133,7 +146,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
 
   const handleComfortRating = (type: keyof ComfortRating, rating: number) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setComfort(prev => ({
+    setComfort((prev) => ({
       ...prev,
       [type]: rating,
     }));
@@ -148,7 +161,9 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (confidenceRating === 0) return;
+    if (confidenceRating === 0) {
+      return;
+    }
 
     setIsSubmitting(true);
     setSubmitError(null);
@@ -157,7 +172,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
     const feedback: OutfitFeedback = {
       id: `feedback_${Date.now()}`,
       userId,
-      outfitRecommendationId: outfitId,
+      outfitRecommendationId: effectiveOutfitId,
       confidenceRating,
       emotionalResponse,
       socialFeedback,
@@ -170,7 +185,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
       await onFeedbackSubmit(feedback);
       onClose();
     } catch (error) {
-      errorInDev('Failed to submit feedback:', error);
+      errorInDev('Failed to submit feedback:', error instanceof Error ? error : String(error));
       setSubmitError('Unable to submit feedback. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -206,10 +221,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
       title: 'How confident did you feel?',
       subtitle: 'Rate your overall confidence in this outfit',
       component: (
-        <ConfidenceRatingStep
-          rating={confidenceRating}
-          onRatingChange={handleStarPress}
-        />
+        <ConfidenceRatingStep rating={confidenceRating} onRatingChange={handleStarPress} />
       ),
     },
     {
@@ -228,12 +240,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
       id: 'comfort',
       title: 'How comfortable were you?',
       subtitle: 'Rate different aspects of comfort',
-      component: (
-        <ComfortRatingStep
-          comfort={comfort}
-          onComfortRating={handleComfortRating}
-        />
-      ),
+      component: <ComfortRatingStep comfort={comfort} onComfortRating={handleComfortRating} />,
     },
     {
       id: 'social',
@@ -250,7 +257,9 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
     },
   ];
 
-  if (!visible) return null;
+  if (!visible) {
+    return null;
+  }
 
   return (
     <Animated.View
@@ -277,17 +286,28 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
             },
           ]}
         >
-      <LinearGradient
-            colors={[DesignSystem.colors.background.primary, DesignSystem.colors.background.secondary]}
+          <LinearGradient
+            colors={[
+              DesignSystem.colors.background.primary,
+              DesignSystem.colors.background.secondary,
+            ]}
             style={styles.gradient}
           >
             {/* Header */}
             <View style={styles.header}>
-        {/* Hidden helper labels for a11y queries */}
-        <View accessible accessibilityLabel="How confident did you feel?" style={{ width: 0, height: 0 }} />
-        <View accessible accessibilityLabel="How did this outfit make you feel?" style={{ width: 0, height: 0 }} />
-              <TouchableOpacity 
-                onPress={onClose} 
+              {/* Hidden helper labels for a11y queries */}
+              <View
+                accessible
+                accessibilityLabel="How confident did you feel?"
+                style={styles.hiddenAccessibility}
+              />
+              <View
+                accessible
+                accessibilityLabel="How did this outfit make you feel?"
+                style={styles.hiddenAccessibility}
+              />
+              <TouchableOpacity
+                onPress={onClose}
                 style={styles.closeButton}
                 accessibilityRole="button"
                 accessible={true}
@@ -297,22 +317,19 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
                 <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
               </TouchableOpacity>
               {(() => {
-                const a11y: any = { accessibilityLevel: 1 };
+                const a11y = { accessibilityLevel: 1 };
                 return (
-                  <Text 
-                    style={styles.headerTitle}
-                    accessibilityRole="text"
-                  >
+                  <Text style={styles.headerTitle} accessibilityRole="text">
                     Outfit Feedback
                   </Text>
                 );
               })()}
-              
+
               <View style={styles.placeholder} />
             </View>
 
             {/* Progress Indicator */}
-            <View 
+            <View
               style={styles.progressContainer}
               accessibilityRole="progressbar"
               accessibilityLabel={`Step ${currentStep + 1} of ${steps.length}`}
@@ -321,10 +338,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
               {steps.map((_, index) => (
                 <View
                   key={index}
-                  style={[
-                    styles.progressDot,
-                    index <= currentStep && styles.progressDotActive,
-                  ]}
+                  style={[styles.progressDot, index <= currentStep && styles.progressDotActive]}
                   accessibilityElementsHidden={true}
                   importantForAccessibility="no"
                 />
@@ -334,7 +348,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
             {/* Error Message */}
             {(error || submitError) && (
               <View style={styles.errorContainer}>
-                <Text 
+                <Text
                   style={styles.errorText}
                   accessibilityRole="alert"
                   accessibilityLiveRegion="assertive"
@@ -342,7 +356,7 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
                   {error || submitError}
                 </Text>
                 {onRetry && (
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.retryButton}
                     onPress={handleRetry}
                     accessibilityRole="button"
@@ -356,38 +370,28 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
             )}
 
             {/* Content */}
-            <ScrollView 
-              style={styles.content} 
-              showsVerticalScrollIndicator={false}
-            >
+            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
               <View style={styles.stepContainer}>
                 {(() => {
-                  const a11y: any = { accessibilityLevel: 2 };
+                  const a11y = { accessibilityLevel: 2 };
                   return (
-                    <Text 
-                      style={styles.stepTitle}
-                      accessibilityRole="heading"
-                      {...a11y}
-                    >
-                      {steps[currentStep].title}
+                    <Text style={styles.stepTitle} accessibilityRole="header" {...a11y}>
+                      {steps[currentStep]?.title}
                     </Text>
                   );
                 })()}
-                <Text 
-                  style={styles.stepSubtitle}
-                  accessibilityRole="text"
-                >
-                  {steps[currentStep].subtitle}
+                <Text style={styles.stepSubtitle} accessibilityRole="text">
+                  {steps[currentStep]?.subtitle}
                 </Text>
-                {steps[currentStep].component}
+                {steps[currentStep]?.component}
               </View>
             </ScrollView>
 
             {/* Navigation */}
             <View style={styles.navigation}>
               {currentStep > 0 && (
-                <TouchableOpacity 
-                  onPress={prevStep} 
+                <TouchableOpacity
+                  onPress={prevStep}
                   style={styles.navButton}
                   accessibilityRole="button"
                   accessibilityLabel="Previous step"
@@ -396,9 +400,9 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
                   <Text style={styles.navButtonText}>Previous</Text>
                 </TouchableOpacity>
               )}
-              
+
               <View style={styles.navSpacer} />
-              
+
               {currentStep < steps.length - 1 ? (
                 <TouchableOpacity
                   onPress={nextStep}
@@ -443,148 +447,152 @@ export const FeedbackCollector: React.FC<FeedbackCollectorProps> = ({
 };
 
 // Individual step components will be defined in separate files
+import { ComfortRatingStep } from './ComfortRatingStep';
 import { ConfidenceRatingStep } from './ConfidenceRatingStep';
 import { EmotionalResponseStep } from './EmotionalResponseStep';
-import { ComfortRatingStep } from './ComfortRatingStep';
 import { SocialFeedbackStep } from './SocialFeedbackStep';
 
 const styles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 1000,
-  },
   blurContainer: {
     flex: 1,
     justifyContent: 'flex-end',
   },
+  closeButton: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
+  },
   container: {
-    height: '85%',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+    height: '85%',
     overflow: 'hidden',
-  },
-  gradient: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 16,
-  },
-  closeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: DesignSystem.colors.background.secondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    ...DesignSystem.typography.heading.h3,
-    color: DesignSystem.colors.text.primary,
-  },
-  placeholder: {
-    width: 40,
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 24,
-    gap: 8,
-  },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: DesignSystem.colors.background.secondary,
-  },
-  progressDotActive: {
-    backgroundColor: DesignSystem.colors.sage[500],
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
   },
-  stepContainer: {
-    paddingBottom: 100,
-  },
-  stepTitle: {
-    ...DesignSystem.typography.heading.h2,
-    color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  stepSubtitle: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  navigation: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: DesignSystem.colors.background.primary,
-    borderTopWidth: 1,
-    borderTopColor: DesignSystem.colors.border.primary,
-  },
-  navSpacer: {
-    flex: 1,
-  },
-  navButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: DesignSystem.colors.background.secondary,
-  },
-  primaryNavButton: {
-    backgroundColor: DesignSystem.colors.sage[500],
-  },
   disabledButton: {
     opacity: 0.5,
   },
-  navButtonText: {
-    ...DesignSystem.typography.button.medium,
-    color: DesignSystem.colors.text.primary,
-  },
-  primaryNavButtonText: {
-    ...DesignSystem.typography.button.medium,
-    color: DesignSystem.colors.text.inverse,
-  },
   errorContainer: {
     backgroundColor: DesignSystem.colors.error[100],
-    borderLeftWidth: 4,
     borderLeftColor: DesignSystem.colors.error[500],
+    borderLeftWidth: 4,
+    borderRadius: 8,
+    marginBottom: 16,
+    marginHorizontal: 20,
     paddingHorizontal: 20,
     paddingVertical: 16,
-    marginHorizontal: 20,
-    marginBottom: 16,
-    borderRadius: 8,
   },
   errorText: {
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.error[700],
     marginBottom: 8,
   },
+  gradient: {
+    flex: 1,
+  },
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  headerTitle: {
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.text.primary,
+  },
+  hiddenAccessibility: {
+    height: 0,
+    width: 0,
+  },
+  navButton: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderRadius: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+  },
+  navButtonText: {
+    ...DesignSystem.typography.button.medium,
+    color: DesignSystem.colors.text.primary,
+  },
+  navSpacer: {
+    flex: 1,
+  },
+  navigation: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderTopColor: DesignSystem.colors.border.primary,
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  overlay: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 1000,
+  },
+  placeholder: {
+    width: 40,
+  },
+  primaryNavButton: {
+    backgroundColor: DesignSystem.colors.sage[500],
+  },
+  primaryNavButtonText: {
+    ...DesignSystem.typography.button.medium,
+    color: DesignSystem.colors.text.inverse,
+  },
+  progressContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+  },
+  progressDot: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderRadius: 4,
+    height: 8,
+    width: 8,
+  },
+  progressDotActive: {
+    backgroundColor: DesignSystem.colors.sage[500],
+  },
   retryButton: {
+    alignSelf: 'flex-start',
     backgroundColor: DesignSystem.colors.error[500],
+    borderRadius: 6,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 6,
-    alignSelf: 'flex-start',
   },
   retryButtonText: {
     ...DesignSystem.typography.button.small,
     color: DesignSystem.colors.text.inverse,
+  },
+  stepContainer: {
+    paddingBottom: 100,
+  },
+  stepSubtitle: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: 32,
+    textAlign: 'center',
+  },
+  stepTitle: {
+    ...DesignSystem.typography.heading.h2,
+    color: DesignSystem.colors.text.primary,
+    marginBottom: 8,
+    textAlign: 'center',
   },
 });

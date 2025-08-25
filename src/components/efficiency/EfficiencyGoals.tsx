@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  Alert,
-  Dimensions
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+  Dimensions,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+import { useAuth } from '@/hooks/useAuth';
 import { useEfficiencyScore } from '@/hooks/useEfficiencyScore';
 import { EfficiencyGoal } from '@/services/efficiencyScoreService';
-import { useAuth } from '@/hooks/useAuth';
+import { IoniconsName } from '@/types/icons';
 
 const { width } = Dimensions.get('window');
 
@@ -26,66 +27,94 @@ interface EfficiencyGoalsProps {
 
 export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
   onGoalCreated,
-  onGoalSelected
+  onGoalSelected,
 }) => {
   const { user } = useAuth();
-  const {
-    goals,
-    efficiencyScore,
-    createGoal,
-    refreshGoals,
-    error,
-    clearError,
-    getScoreColor
-  } = useEfficiencyScore();
+  const { goals, efficiencyScore, createGoal, refreshGoals, error, clearError, getScoreColor } =
+    useEfficiencyScore();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newGoal, setNewGoal] = useState({
     type: 'utilization' as EfficiencyGoal['type'],
     target: 80,
     description: '',
-    deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+    deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
   });
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
     refreshGoals();
-  }, []);
+  }, [refreshGoals]);
 
   const goalTypes = [
-    { key: 'utilization', label: 'Utilization', icon: 'shirt-outline', description: 'Wear more of your wardrobe regularly' },
-    { key: 'cost_efficiency', label: 'Cost Efficiency', icon: 'cash-outline', description: 'Optimize cost per wear' },
-    { key: 'sustainability', label: 'Sustainability', icon: 'leaf-outline', description: 'Improve item care and longevity' },
-    { key: 'versatility', label: 'Versatility', icon: 'shuffle-outline', description: 'Create more outfit combinations' },
-    { key: 'curation', label: 'Curation', icon: 'star-outline', description: 'Build a quality, cohesive wardrobe' }
+    {
+      key: 'utilization',
+      label: 'Utilization',
+      icon: 'shirt-outline',
+      description: 'Wear more of your wardrobe regularly',
+    },
+    {
+      key: 'cost_efficiency',
+      label: 'Cost Efficiency',
+      icon: 'cash-outline',
+      description: 'Optimize cost per wear',
+    },
+    {
+      key: 'sustainability',
+      label: 'Sustainability',
+      icon: 'leaf-outline',
+      description: 'Improve item care and longevity',
+    },
+    {
+      key: 'versatility',
+      label: 'Versatility',
+      icon: 'shuffle-outline',
+      description: 'Create more outfit combinations',
+    },
+    {
+      key: 'curation',
+      label: 'Curation',
+      icon: 'star-outline',
+      description: 'Build a quality, cohesive wardrobe',
+    },
   ];
 
   const getCurrentScore = (type: EfficiencyGoal['type']): number => {
-    if (!efficiencyScore) return 0;
-    
+    if (!efficiencyScore) {
+      return 0;
+    }
+
     switch (type) {
-      case 'utilization': return efficiencyScore.breakdown.utilization;
-      case 'cost_efficiency': return efficiencyScore.breakdown.costEfficiency;
-      case 'sustainability': return efficiencyScore.breakdown.sustainability;
-      case 'versatility': return efficiencyScore.breakdown.versatility;
-      case 'curation': return efficiencyScore.breakdown.curation;
-      default: return 0;
+      case 'utilization':
+        return efficiencyScore.breakdown.utilization;
+      case 'cost_efficiency':
+        return efficiencyScore.breakdown.costEfficiency;
+      case 'sustainability':
+        return efficiencyScore.breakdown.sustainability;
+      case 'versatility':
+        return efficiencyScore.breakdown.versatility;
+      case 'curation':
+        return efficiencyScore.breakdown.curation;
+      default:
+        return 0;
     }
   };
 
   const handleCreateGoal = async () => {
-    if (!user?.id) return;
-    
+    if (!user?.id) {
+      return;
+    }
+
     if (!newGoal.description.trim()) {
       Alert.alert('Error', 'Please enter a goal description');
       return;
     }
-    
+
     if (newGoal.target <= getCurrentScore(newGoal.type)) {
       Alert.alert('Error', 'Target score must be higher than your current score');
       return;
     }
-    
+
     try {
       const goalData = {
         userId: user.id,
@@ -95,20 +124,23 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
         deadline: newGoal.deadline,
         description: newGoal.description,
         milestones: [
-          { value: Math.floor((getCurrentScore(newGoal.type) + newGoal.target) / 2), achieved: false },
-          { value: newGoal.target, achieved: false }
-        ]
+          {
+            value: Math.floor((getCurrentScore(newGoal.type) + newGoal.target) / 2),
+            achieved: false,
+          },
+          { value: newGoal.target, achieved: false },
+        ],
       };
-      
+
       await createGoal(goalData);
       setShowCreateModal(false);
       setNewGoal({
         type: 'utilization',
         target: 80,
         description: '',
-        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       });
-      
+
       onGoalCreated?.(goalData as EfficiencyGoal);
     } catch (err) {
       Alert.alert('Error', 'Failed to create goal');
@@ -131,33 +163,38 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
   const getGoalStatusColor = (goal: EfficiencyGoal): string => {
     const daysRemaining = getDaysRemaining(goal.deadline);
     const progress = calculateProgress(goal);
-    
-    if (progress >= 100) return '#4CAF50'; // Completed
-    if (daysRemaining <= 7 && progress < 50) return '#F44336'; // At risk
-    if (progress >= 50) return '#FF9800'; // On track
+
+    if (progress >= 100) {
+      return '#4CAF50';
+    } // Completed
+    if (daysRemaining <= 7 && progress < 50) {
+      return '#F44336';
+    } // At risk
+    if (progress >= 50) {
+      return '#FF9800';
+    } // On track
     return '#9E9E9E'; // Behind
   };
 
   const renderGoalCard = (goal: EfficiencyGoal) => {
-    const goalType = goalTypes.find(t => t.key === goal.type);
+    const goalType = goalTypes.find((t) => t.key === goal.type);
     const progress = calculateProgress(goal);
     const daysRemaining = getDaysRemaining(goal.deadline);
     const statusColor = getGoalStatusColor(goal);
     const currentScore = getCurrentScore(goal.type);
-    
+
     return (
       <TouchableOpacity
         key={goal.id}
         style={styles.goalCard}
         onPress={() => onGoalSelected?.(goal)}
+        accessibilityRole="button"
+        accessibilityLabel={`${goalType?.label} goal: ${goal.description}`}
+        accessibilityHint="Tap to view goal details and progress"
       >
         <View style={styles.goalHeader}>
           <View style={styles.goalTypeContainer}>
-            <Ionicons
-              name={goalType?.icon as any}
-              size={24}
-              color={statusColor}
-            />
+            <Ionicons name={goalType?.icon as IoniconsName} size={24} color={statusColor} />
             <View style={styles.goalTypeText}>
               <Text style={styles.goalTypeLabel}>{goalType?.label}</Text>
               <Text style={styles.goalDescription}>{goal.description}</Text>
@@ -169,7 +206,7 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
             <Text style={styles.targetScore}>{goal.target}</Text>
           </View>
         </View>
-        
+
         <View style={styles.progressContainer}>
           <View style={styles.progressBar}>
             <View
@@ -177,14 +214,14 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
                 styles.progressFill,
                 {
                   width: `${progress}%`,
-                  backgroundColor: statusColor
-                }
+                  backgroundColor: statusColor,
+                },
               ]}
             />
           </View>
           <Text style={styles.progressText}>{Math.round(progress)}%</Text>
         </View>
-        
+
         <View style={styles.goalFooter}>
           <View style={styles.deadlineContainer}>
             <Ionicons name="time-outline" size={16} color="#64748B" />
@@ -194,9 +231,13 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
           </View>
           <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
             <Text style={styles.statusText}>
-              {progress >= 100 ? 'Completed' : 
-               daysRemaining <= 7 && progress < 50 ? 'At Risk' :
-               progress >= 50 ? 'On Track' : 'Behind'}
+              {progress >= 100
+                ? 'Completed'
+                : daysRemaining <= 7 && progress < 50
+                  ? 'At Risk'
+                  : progress >= 50
+                    ? 'On Track'
+                    : 'Behind'}
             </Text>
           </View>
         </View>
@@ -213,15 +254,25 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <TouchableOpacity onPress={() => setShowCreateModal(false)}>
+          <TouchableOpacity
+            onPress={() => setShowCreateModal(false)}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel"
+            accessibilityHint="Tap to cancel creating a new goal"
+          >
             <Text style={styles.modalCancelButton}>Cancel</Text>
           </TouchableOpacity>
           <Text style={styles.modalTitle}>Create Efficiency Goal</Text>
-          <TouchableOpacity onPress={handleCreateGoal}>
+          <TouchableOpacity
+            onPress={handleCreateGoal}
+            accessibilityRole="button"
+            accessibilityLabel="Create goal"
+            accessibilityHint="Tap to create the new efficiency goal"
+          >
             <Text style={styles.modalCreateButton}>Create</Text>
           </TouchableOpacity>
         </View>
-        
+
         <ScrollView style={styles.modalContent}>
           <View style={styles.formSection}>
             <Text style={styles.formLabel}>Goal Type</Text>
@@ -231,75 +282,97 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
                   key={type.key}
                   style={[
                     styles.goalTypeOption,
-                    newGoal.type === type.key && styles.goalTypeOptionSelected
+                    newGoal.type === type.key && styles.goalTypeOptionSelected,
                   ]}
-                  onPress={() => setNewGoal(prev => ({ ...prev, type: type.key as EfficiencyGoal['type'] }))}
+                  onPress={() =>
+                    setNewGoal((prev) => ({ ...prev, type: type.key as EfficiencyGoal['type'] }))
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={`Select ${type.label} goal type`}
+                  accessibilityHint={`Tap to select ${type.label} as your goal type`}
+                  accessibilityState={{ selected: newGoal.type === type.key }}
                 >
                   <Ionicons
-                    name={type.icon as any}
+                    name={type.icon as IoniconsName}
                     size={20}
                     color={newGoal.type === type.key ? '#6366F1' : '#64748B'}
                   />
-                  <Text style={[
-                    styles.goalTypeOptionText,
-                    newGoal.type === type.key && styles.goalTypeOptionTextSelected
-                  ]}>
+                  <Text
+                    style={[
+                      styles.goalTypeOptionText,
+                      newGoal.type === type.key && styles.goalTypeOptionTextSelected,
+                    ]}
+                  >
                     {type.label}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
             <Text style={styles.goalTypeDescription}>
-              {goalTypes.find(t => t.key === newGoal.type)?.description}
+              {goalTypes.find((t) => t.key === newGoal.type)?.description}
             </Text>
           </View>
-          
+
           <View style={styles.formSection}>
             <Text style={styles.formLabel}>Current Score: {getCurrentScore(newGoal.type)}</Text>
             <Text style={styles.formLabel}>Target Score</Text>
             <View style={styles.targetScoreContainer}>
               <TouchableOpacity
                 style={styles.scoreButton}
-                onPress={() => setNewGoal(prev => ({ ...prev, target: Math.max(prev.target - 5, getCurrentScore(newGoal.type) + 1) }))}
+                onPress={() =>
+                  setNewGoal((prev) => ({
+                    ...prev,
+                    target: Math.max(prev.target - 5, getCurrentScore(newGoal.type) + 1),
+                  }))
+                }
+                accessibilityRole="button"
+                accessibilityLabel="Decrease target score"
+                accessibilityHint="Tap to decrease the target score by 5 points"
               >
                 <Ionicons name="remove" size={20} color="#6366F1" />
               </TouchableOpacity>
               <Text style={styles.targetScoreValue}>{newGoal.target}</Text>
               <TouchableOpacity
                 style={styles.scoreButton}
-                onPress={() => setNewGoal(prev => ({ ...prev, target: Math.min(prev.target + 5, 100) }))}
+                onPress={() =>
+                  setNewGoal((prev) => ({ ...prev, target: Math.min(prev.target + 5, 100) }))
+                }
+                accessibilityRole="button"
+                accessibilityLabel="Increase target score"
+                accessibilityHint="Tap to increase the target score by 5 points"
               >
                 <Ionicons name="add" size={20} color="#6366F1" />
               </TouchableOpacity>
             </View>
           </View>
-          
+
           <View style={styles.formSection}>
             <Text style={styles.formLabel}>Description</Text>
             <TextInput
               style={styles.descriptionInput}
               value={newGoal.description}
-              onChangeText={(text) => setNewGoal(prev => ({ ...prev, description: text }))}
+              onChangeText={(text) => setNewGoal((prev) => ({ ...prev, description: text }))}
               placeholder="Describe your goal..."
               multiline
               numberOfLines={3}
             />
           </View>
-          
+
           <View style={styles.formSection}>
             <Text style={styles.formLabel}>Deadline</Text>
             <TouchableOpacity
               style={styles.dateButton}
               onPress={() => setShowDatePicker(true)}
+              accessibilityRole="button"
+              accessibilityLabel="Select deadline date"
+              accessibilityHint="Tap to open date picker and select a deadline for your goal"
             >
               <Ionicons name="calendar-outline" size={20} color="#6366F1" />
-              <Text style={styles.dateButtonText}>
-                {newGoal.deadline.toLocaleDateString()}
-              </Text>
+              <Text style={styles.dateButtonText}>{newGoal.deadline.toLocaleDateString()}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
-        
+
         {showDatePicker && (
           <DateTimePicker
             value={newGoal.deadline}
@@ -309,7 +382,7 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
             onChange={(event, selectedDate) => {
               setShowDatePicker(false);
               if (selectedDate) {
-                setNewGoal(prev => ({ ...prev, deadline: selectedDate }));
+                setNewGoal((prev) => ({ ...prev, deadline: selectedDate }));
               }
             }}
           />
@@ -325,11 +398,14 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
         <TouchableOpacity
           style={styles.createButton}
           onPress={() => setShowCreateModal(true)}
+          accessibilityRole="button"
+          accessibilityLabel="Create new goal"
+          accessibilityHint="Tap to open the create goal modal"
         >
           <Ionicons name="add" size={20} color="white" />
         </TouchableOpacity>
       </View>
-      
+
       {goals.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="flag-outline" size={64} color="#CBD5E1" />
@@ -340,6 +416,9 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
           <TouchableOpacity
             style={styles.emptyStateButton}
             onPress={() => setShowCreateModal(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Create your first goal"
+            accessibilityHint="Tap to create your first efficiency goal"
           >
             <Text style={styles.emptyStateButtonText}>Create Your First Goal</Text>
           </TouchableOpacity>
@@ -349,7 +428,7 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
           {goals.map(renderGoalCard)}
         </ScrollView>
       )}
-      
+
       {renderCreateGoalModal()}
     </View>
   );
@@ -357,279 +436,279 @@ export const EfficiencyGoals: React.FC<EfficiencyGoalsProps> = ({
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: '#F8FAFC',
     flex: 1,
-    backgroundColor: '#F8FAFC'
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    paddingBottom: 10
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1E293B'
   },
   createButton: {
+    alignItems: 'center',
     backgroundColor: '#6366F1',
     borderRadius: 20,
-    width: 40,
     height: 40,
     justifyContent: 'center',
-    alignItems: 'center'
+    width: 40,
+  },
+  currentScore: {
+    color: '#1E293B',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  dateButton: {
+    alignItems: 'center',
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    padding: 12,
+  },
+  dateButtonText: {
+    color: '#1E293B',
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  deadlineContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  deadlineText: {
+    color: '#64748B',
+    fontSize: 12,
+    marginLeft: 4,
+  },
+  descriptionInput: {
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    borderWidth: 1,
+    color: '#1E293B',
+    fontSize: 16,
+    padding: 12,
+    textAlignVertical: 'top',
   },
   emptyState: {
+    alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40
-  },
-  emptyStateTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1E293B',
-    marginTop: 16,
-    marginBottom: 8
-  },
-  emptyStateText: {
-    fontSize: 16,
-    color: '#64748B',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 24
+    padding: 40,
   },
   emptyStateButton: {
     backgroundColor: '#6366F1',
+    borderRadius: 8,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8
   },
   emptyStateButtonText: {
     color: 'white',
     fontSize: 16,
-    fontWeight: '600'
+    fontWeight: '600',
   },
-  goalsList: {
-    flex: 1,
-    paddingHorizontal: 20
+  emptyStateText: {
+    color: '#64748B',
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  emptyStateTitle: {
+    color: '#1E293B',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  formLabel: {
+    color: '#1E293B',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  formSection: {
+    marginBottom: 24,
   },
   goalCard: {
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
     elevation: 2,
+    marginBottom: 16,
+    padding: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 4
-  },
-  goalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 12
-  },
-  goalTypeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1
-  },
-  goalTypeText: {
-    marginLeft: 12,
-    flex: 1
-  },
-  goalTypeLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1E293B'
+    shadowRadius: 4,
   },
   goalDescription: {
-    fontSize: 14,
     color: '#64748B',
-    marginTop: 2
-  },
-  goalScores: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  currentScore: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1E293B'
-  },
-  scoreArrow: {
-    fontSize: 16,
-    color: '#64748B',
-    marginHorizontal: 8
-  },
-  targetScore: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#6366F1'
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12
-  },
-  progressBar: {
-    flex: 1,
-    height: 8,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginRight: 12
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: 4
-  },
-  progressText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#1E293B',
-    minWidth: 40,
-    textAlign: 'right'
+    marginTop: 2,
   },
   goalFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  deadlineContainer: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  deadlineText: {
-    fontSize: 12,
-    color: '#64748B',
-    marginLeft: 4
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12
-  },
-  statusText: {
-    fontSize: 12,
-    color: 'white',
-    fontWeight: '600'
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#F8FAFC'
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0'
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
-  modalCancelButton: {
-    fontSize: 16,
-    color: '#64748B'
+  goalHeader: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1E293B'
+  goalScores: {
+    alignItems: 'center',
+    flexDirection: 'row',
   },
-  modalCreateButton: {
-    fontSize: 16,
-    color: '#6366F1',
-    fontWeight: '600'
-  },
-  modalContent: {
+  goalTypeContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
     flex: 1,
-    padding: 20
   },
-  formSection: {
-    marginBottom: 24
+  goalTypeDescription: {
+    color: '#64748B',
+    fontSize: 14,
+    fontStyle: 'italic',
   },
-  formLabel: {
+  goalTypeLabel: {
+    color: '#1E293B',
     fontSize: 16,
     fontWeight: '600',
-    color: '#1E293B',
-    marginBottom: 8
-  },
-  goalTypeSelector: {
-    marginBottom: 8
   },
   goalTypeOption: {
-    flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    borderColor: '#E2E8F0',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 8
+    flexDirection: 'row',
+    marginBottom: 8,
+    padding: 12,
   },
   goalTypeOptionSelected: {
+    backgroundColor: '#F0F4FF',
     borderColor: '#6366F1',
-    backgroundColor: '#F0F4FF'
   },
   goalTypeOptionText: {
-    fontSize: 16,
     color: '#64748B',
-    marginLeft: 12
+    fontSize: 16,
+    marginLeft: 12,
   },
   goalTypeOptionTextSelected: {
     color: '#6366F1',
-    fontWeight: '600'
+    fontWeight: '600',
   },
-  goalTypeDescription: {
-    fontSize: 14,
-    color: '#64748B',
-    fontStyle: 'italic'
+  goalTypeSelector: {
+    marginBottom: 8,
   },
-  targetScoreContainer: {
-    flexDirection: 'row',
+  goalTypeText: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  goalsList: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  header: {
     alignItems: 'center',
-    justifyContent: 'center'
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
+    paddingBottom: 10,
+  },
+  modalCancelButton: {
+    color: '#64748B',
+    fontSize: 16,
+  },
+  modalContainer: {
+    backgroundColor: '#F8FAFC',
+    flex: 1,
+  },
+  modalContent: {
+    flex: 1,
+    padding: 20,
+  },
+  modalCreateButton: {
+    color: '#6366F1',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalHeader: {
+    alignItems: 'center',
+    borderBottomColor: '#E2E8F0',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 20,
+  },
+  modalTitle: {
+    color: '#1E293B',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  progressBar: {
+    backgroundColor: '#E2E8F0',
+    borderRadius: 4,
+    flex: 1,
+    height: 8,
+    marginRight: 12,
+    overflow: 'hidden',
+  },
+  progressContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  progressFill: {
+    borderRadius: 4,
+    height: '100%',
+  },
+  progressText: {
+    color: '#1E293B',
+    fontSize: 14,
+    fontWeight: '600',
+    minWidth: 40,
+    textAlign: 'right',
+  },
+  scoreArrow: {
+    color: '#64748B',
+    fontSize: 16,
+    marginHorizontal: 8,
   },
   scoreButton: {
+    alignItems: 'center',
     backgroundColor: '#F0F4FF',
     borderRadius: 20,
-    width: 40,
     height: 40,
     justifyContent: 'center',
-    alignItems: 'center'
+    width: 40,
+  },
+  statusBadge: {
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  statusText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  targetScore: {
+    color: '#6366F1',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  targetScoreContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   targetScoreValue: {
+    color: '#1E293B',
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1E293B',
     marginHorizontal: 24,
     minWidth: 60,
-    textAlign: 'center'
+    textAlign: 'center',
   },
-  descriptionInput: {
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
+  title: {
     color: '#1E293B',
-    textAlignVertical: 'top'
+    fontSize: 24,
+    fontWeight: 'bold',
   },
-  dateButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 8
-  },
-  dateButtonText: {
-    fontSize: 16,
-    color: '#1E293B',
-    marginLeft: 8
-  }
 });
 
 export default EfficiencyGoals;

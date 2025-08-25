@@ -3,7 +3,7 @@ import { TextStyle, ViewStyle } from 'react-native';
 /**
  * AYNAMODA Unified Design System
  * Consolidating all theme systems into one coherent foundation
- * 
+ *
  * Sources:
  * - APP_THEME_V2 (primary foundation - most adopted)
  * - AuraTheme (enhanced typography and materials)
@@ -14,33 +14,33 @@ import { TextStyle, ViewStyle } from 'react-native';
 // UNIFIED COLOR PALETTE - Based on APP_THEME_V2's Organic Palette
 export const ORGANIC_PALETTE = {
   // Primary Foundation (from APP_THEME_V2)
-  linen: '#FAF7F2',           // Soft, warm base
-  inkGray: '#2C2C2C',         // Deep, sophisticated text
-  sageGreen: '#A8B5A0',       // Calming, natural accent
-  liquidGold: '#D4AF37',      // Luxury highlight
-  
+  linen: '#FAF7F2', // Soft, warm base
+  inkGray: '#2C2C2C', // Deep, sophisticated text
+  sageGreen: '#A8B5A0', // Calming, natural accent
+  liquidGold: '#D4AF37', // Luxury highlight
+
   // Secondary Palette
-  dustyRose: '#D4A5A5',       // Gentle feminine touch
-  charcoal: '#36454F',        // Strong contrast
-  cream: '#F5F5DC',           // Soft alternative to white
-  pearl: '#E8E8E8',           // Subtle borders and dividers
-  
+  dustyRose: '#D4A5A5', // Gentle feminine touch
+  charcoal: '#36454F', // Strong contrast
+  cream: '#F5F5DC', // Soft alternative to white
+  pearl: '#E8E8E8', // Subtle borders and dividers
+
   // Enhanced from AuraTheme
-  vellum: '#F8F7F4',          // Warm, textured off-white
-  polishedJade: '#7A9E9F',    // Primary accent - moments of serenity
-  whisper: '#F5F4F2',         // Lighter than vellum
-  shadow: '#1A1A1A',          // Deeper than ink
-  
+  vellum: '#F8F7F4', // Warm, textured off-white
+  polishedJade: '#7A9E9F', // Primary accent - moments of serenity
+  whisper: '#F5F4F2', // Lighter than vellum
+  shadow: '#1A1A1A', // Deeper than ink
+
   // Functional Colors
-  success: '#7A9A7A',         // Muted green for success states
-  warning: '#D4A574',         // Warm amber for warnings
-  error: '#C4848C',           // Soft red for errors
-  
+  success: '#7A9A7A', // Muted green for success states
+  warning: '#D4A574', // Warm amber for warnings
+  error: '#C4848C', // Soft red for errors
+
   // Transparency Layers
   linenOpacity: 'rgba(250, 247, 242, 0.95)',
   inkOpacity: 'rgba(44, 44, 44, 0.8)',
   goldOpacity: 'rgba(212, 175, 55, 0.2)',
-  
+
   // Glassmorphism Support (from ArtistryTheme)
   frostedGlass: 'rgba(248, 247, 244, 0.85)',
   deepFrost: 'rgba(248, 247, 244, 0.95)',
@@ -58,7 +58,7 @@ export const EnhancedTypography = {
     letterSpacing: -1,
     color: ORGANIC_PALETTE.inkGray,
   } as TextStyle,
-  
+
   // Headlines (from APP_THEME_V2)
   headline: {
     fontFamily: 'Playfair Display',
@@ -68,7 +68,7 @@ export const EnhancedTypography = {
     letterSpacing: -0.5,
     color: ORGANIC_PALETTE.inkGray,
   } as TextStyle,
-  
+
   title: {
     fontFamily: 'Playfair Display',
     fontSize: 24,
@@ -77,7 +77,7 @@ export const EnhancedTypography = {
     letterSpacing: -0.3,
     color: ORGANIC_PALETTE.inkGray,
   } as TextStyle,
-  
+
   subtitle: {
     fontFamily: 'Playfair Display',
     fontSize: 20,
@@ -86,7 +86,7 @@ export const EnhancedTypography = {
     letterSpacing: 0,
     color: ORGANIC_PALETTE.charcoal,
   } as TextStyle,
-  
+
   // Body Text - Manrope (from APP_THEME_V2)
   body: {
     fontFamily: 'Manrope',
@@ -96,7 +96,7 @@ export const EnhancedTypography = {
     letterSpacing: 0.2,
     color: ORGANIC_PALETTE.inkGray,
   } as TextStyle,
-  
+
   bodyMedium: {
     fontFamily: 'Manrope',
     fontSize: 16,
@@ -105,7 +105,7 @@ export const EnhancedTypography = {
     letterSpacing: 0.2,
     color: ORGANIC_PALETTE.inkGray,
   } as TextStyle,
-  
+
   bodyLight: {
     fontFamily: 'Manrope',
     fontSize: 16,
@@ -114,7 +114,7 @@ export const EnhancedTypography = {
     letterSpacing: 0.3,
     color: ORGANIC_PALETTE.inkGray,
   } as TextStyle,
-  
+
   // Captions and Small Text
   caption: {
     fontFamily: 'Manrope',
@@ -124,7 +124,7 @@ export const EnhancedTypography = {
     letterSpacing: 0.3,
     color: ORGANIC_PALETTE.charcoal,
   } as TextStyle,
-  
+
   captionMedium: {
     fontFamily: 'Manrope',
     fontSize: 14,
@@ -133,7 +133,7 @@ export const EnhancedTypography = {
     letterSpacing: 0.3,
     color: ORGANIC_PALETTE.charcoal,
   } as TextStyle,
-  
+
   small: {
     fontFamily: 'Manrope',
     fontSize: 12,
@@ -142,7 +142,7 @@ export const EnhancedTypography = {
     letterSpacing: 0.4,
     color: ORGANIC_PALETTE.charcoal,
   } as TextStyle,
-  
+
   whisper: {
     fontFamily: 'Manrope',
     fontSize: 12,
@@ -152,7 +152,7 @@ export const EnhancedTypography = {
     color: ORGANIC_PALETTE.inkGray,
     opacity: 0.6,
   } as TextStyle,
-  
+
   // Special Styles
   luxury: {
     fontFamily: 'Playfair Display',
@@ -162,7 +162,7 @@ export const EnhancedTypography = {
     letterSpacing: -0.4,
     color: ORGANIC_PALETTE.liquidGold,
   } as TextStyle,
-  
+
   accent: {
     fontFamily: 'Manrope',
     fontSize: 16,
@@ -172,7 +172,7 @@ export const EnhancedTypography = {
     color: ORGANIC_PALETTE.sageGreen,
     textTransform: 'uppercase' as const,
   } as TextStyle,
-  
+
   button: {
     fontFamily: 'Manrope',
     fontSize: 15,
@@ -194,7 +194,7 @@ export const UnifiedMaterials = {
       borderWidth: 0.5,
       borderColor: 'rgba(255, 255, 255, 0.08)',
     } as ViewStyle,
-    
+
     medium: {
       backgroundColor: 'rgba(248, 247, 244, 0.85)',
       backdropFilter: 'blur(20px)',
@@ -202,7 +202,7 @@ export const UnifiedMaterials = {
       borderWidth: 0.5,
       borderColor: 'rgba(255, 255, 255, 0.1)',
     } as ViewStyle,
-    
+
     heavy: {
       backgroundColor: 'rgba(248, 247, 244, 0.95)',
       backdropFilter: 'blur(30px)',
@@ -210,7 +210,7 @@ export const UnifiedMaterials = {
       borderWidth: 1,
       borderColor: 'rgba(255, 255, 255, 0.12)',
     } as ViewStyle,
-    
+
     goldAura: {
       backgroundColor: 'rgba(212, 175, 55, 0.08)',
       backdropFilter: 'blur(35px)',
@@ -219,7 +219,7 @@ export const UnifiedMaterials = {
       borderColor: 'rgba(212, 175, 55, 0.2)',
     } as ViewStyle,
   },
-  
+
   // Elevation System (from APP_THEME_V2 + AuraTheme)
   elevation: {
     none: {
@@ -229,7 +229,7 @@ export const UnifiedMaterials = {
       shadowRadius: 0,
       elevation: 0,
     } as ViewStyle,
-    
+
     subtle: {
       shadowColor: ORGANIC_PALETTE.inkGray,
       shadowOffset: { width: 0, height: 2 },
@@ -237,7 +237,7 @@ export const UnifiedMaterials = {
       shadowRadius: 4,
       elevation: 2,
     } as ViewStyle,
-    
+
     soft: {
       shadowColor: ORGANIC_PALETTE.inkGray,
       shadowOffset: { width: 0, height: 4 },
@@ -245,7 +245,7 @@ export const UnifiedMaterials = {
       shadowRadius: 8,
       elevation: 4,
     } as ViewStyle,
-    
+
     medium: {
       shadowColor: ORGANIC_PALETTE.inkGray,
       shadowOffset: { width: 0, height: 8 },
@@ -253,7 +253,7 @@ export const UnifiedMaterials = {
       shadowRadius: 12,
       elevation: 8,
     } as ViewStyle,
-    
+
     high: {
       shadowColor: ORGANIC_PALETTE.inkGray,
       shadowOffset: { width: 0, height: 12 },
@@ -261,7 +261,7 @@ export const UnifiedMaterials = {
       shadowRadius: 16,
       elevation: 12,
     } as ViewStyle,
-    
+
     floating: {
       shadowColor: ORGANIC_PALETTE.shadow,
       shadowOffset: { width: 0, height: 16 },
@@ -270,7 +270,7 @@ export const UnifiedMaterials = {
       elevation: 12,
     } as ViewStyle,
   },
-  
+
   // Border Radius (consolidated)
   borderRadius: {
     none: 0,
@@ -308,7 +308,7 @@ export const UnifiedMotion = {
     slow: 500,
     luxury: 800,
   },
-  
+
   // Easing Curves (enhanced)
   curves: {
     // From AuraTheme
@@ -321,7 +321,7 @@ export const UnifiedMotion = {
     easeOut: 'ease-out',
     easeIn: 'ease-in',
   },
-  
+
   // Animation Presets (from ArtistryTheme)
   presets: {
     fadeInUp: {
@@ -355,14 +355,14 @@ export const UnifiedSpacing = {
   xl: 32,
   xxl: 48,
   xxxl: 64,
-  
+
   // From AuraTheme
   atom: 4,
   molecule: 8,
   breathe: 40,
   exhale: 80,
   pause: 120,
-  
+
   // From ArtistryTheme
   breath: 4,
   whisper: 8,
@@ -374,7 +374,7 @@ export const UnifiedSpacing = {
   infinite: 64,
   cosmic: 96,
   universe: 128,
-  
+
   // Semantic spacing (from APP_THEME_V2)
   cardPadding: 20,
   screenPadding: 24,
@@ -389,7 +389,7 @@ export const UnifiedComponents = {
     flex: 1,
     backgroundColor: ORGANIC_PALETTE.linen,
   } as ViewStyle,
-  
+
   // Cards
   card: {
     default: {
@@ -398,14 +398,14 @@ export const UnifiedComponents = {
       padding: UnifiedSpacing.cardPadding,
       ...UnifiedMaterials.elevation.soft,
     } as ViewStyle,
-    
+
     glass: {
       ...UnifiedMaterials.glass.medium,
       borderRadius: UnifiedMaterials.borderRadius.card,
       padding: UnifiedSpacing.cardPadding,
       ...UnifiedMaterials.elevation.soft,
     } as ViewStyle,
-    
+
     luxury: {
       backgroundColor: ORGANIC_PALETTE.whisper,
       borderRadius: UnifiedMaterials.borderRadius.organic,
@@ -415,7 +415,7 @@ export const UnifiedComponents = {
       borderColor: ORGANIC_PALETTE.goldOpacity,
     } as ViewStyle,
   },
-  
+
   // Buttons
   button: {
     primary: {
@@ -425,7 +425,7 @@ export const UnifiedComponents = {
       paddingHorizontal: UnifiedSpacing.lg,
       ...UnifiedMaterials.elevation.soft,
     } as ViewStyle,
-    
+
     secondary: {
       backgroundColor: 'transparent',
       borderWidth: 1,
@@ -434,7 +434,7 @@ export const UnifiedComponents = {
       paddingVertical: UnifiedSpacing.sm,
       paddingHorizontal: UnifiedSpacing.lg,
     } as ViewStyle,
-    
+
     luxury: {
       backgroundColor: ORGANIC_PALETTE.liquidGold,
       borderRadius: UnifiedMaterials.borderRadius.button,
@@ -442,14 +442,14 @@ export const UnifiedComponents = {
       paddingHorizontal: UnifiedSpacing.lg,
       ...UnifiedMaterials.elevation.medium,
     } as ViewStyle,
-    
+
     ghost: {
       backgroundColor: 'transparent',
       paddingVertical: UnifiedSpacing.sm,
       paddingHorizontal: UnifiedSpacing.lg,
     } as ViewStyle,
   },
-  
+
   // Input Fields
   input: {
     default: {
@@ -461,7 +461,7 @@ export const UnifiedComponents = {
       borderColor: ORGANIC_PALETTE.pearl,
       minHeight: 52,
     } as ViewStyle,
-    
+
     focused: {
       borderColor: ORGANIC_PALETTE.sageGreen,
       ...UnifiedMaterials.elevation.subtle,
@@ -478,7 +478,7 @@ export const UnifiedTheme = {
   motion: UnifiedMotion,
   spacing: UnifiedSpacing,
   components: UnifiedComponents,
-  
+
   // Legacy compatibility
   borderRadius: UnifiedMaterials.borderRadius,
   elevation: UnifiedMaterials.elevation,
@@ -493,7 +493,7 @@ export const UnifiedTheme = {
     buttonHeight: 48,
     inputHeight: 52,
   },
-  
+
   // Semantic colors for easy migration
   semantic: {
     background: {

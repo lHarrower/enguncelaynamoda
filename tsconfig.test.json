@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": true,
+    "module": "ESNext",
+    "tsBuildInfoFile": "./node_modules/.cache/tsbuildinfo.test",
+    "types": ["jest", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": [
+    "__tests__/**/*",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "jest.setup.ts",
+    "test-*.ts",
+    "test-*.tsx",
+    "test*.ts",
+    "test*.tsx",
+    "global.d.ts"
+  ],
+  "exclude": ["node_modules", "android", "ios", ".expo", "dist", "build", "coverage"]
+}

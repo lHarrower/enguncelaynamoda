@@ -1,33 +1,108 @@
 // AYNA Mirror Notification Service
 // Precise timing and delivery system for the daily confidence ritual
 
-import * as Device from 'expo-device';
 import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 import { Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { 
-  NotificationPreferences, 
-  EngagementHistory, 
-  UserPreferences 
-} from '@/types/aynaMirror';
-import { errorHandlingService } from '@/services/errorHandlingService';
+
+import { warnInDev } from '@/utils/consoleSuppress';
+
+import { EngagementHistory, NotificationPreferences } from '../types/aynaMirror';
+import { safeParse } from '../utils/safeJSON';
+import { secureStorage } from '../utils/secureStorage';
+import { errorHandlingService } from './errorHandlingService';
+
+// Import jest for test environment
+// Mock notifications for test environment
+let globalMockNotifications: unknown;
+if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
+  try {
+    // Simple mock object without jest dependencies
+    globalMockNotifications = {
+      setNotificationHandler: () => {},
+      getPermissionsAsync: () => Promise.resolve({ status: 'granted' }),
+      requestPermissionsAsync: () => Promise.resolve({ status: 'granted' }),
+      getExpoPushTokenAsync: () => Promise.resolve({ data: 'mock-token' }),
+      setNotificationChannelAsync: () => Promise.resolve(),
+      scheduleNotificationAsync: () => Promise.resolve('mock-notification-id'),
+      cancelScheduledNotificationAsync: () => Promise.resolve(),
+      cancelAllScheduledNotificationsAsync: () => Promise.resolve(),
+      getAllScheduledNotificationsAsync: () => Promise.resolve([]),
+      dismissNotificationAsync: () => Promise.resolve(),
+      dismissAllNotificationsAsync: () => Promise.resolve(),
+      getPresentedNotificationsAsync: () => Promise.resolve([]),
+      setBadgeCountAsync: () => Promise.resolve(),
+      getBadgeCountAsync: () => Promise.resolve(0),
+      addNotificationReceivedListener: () => ({ remove: () => {} }),
+      addNotificationResponseReceivedListener: () => ({ remove: () => {} }),
+      removeNotificationSubscription: () => {},
+      AndroidImportance: {
+        MAX: 5,
+        HIGH: 4,
+        DEFAULT: 3,
+        LOW: 2,
+        MIN: 1,
+      },
+      AndroidNotificationVisibility: {
+        PUBLIC: 1,
+        PRIVATE: 0,
+        SECRET: -1,
+      },
+    };
+  } catch (error) {
+    // Jest not available, continue without mocking
+  }
+}
+
+// Local minimal typed re-export to avoid broad any usage
+type ExpoNotifications = typeof import('expo-notifications');
+
+// Test environment type definitions
+interface MinimalNotificationContent {
+  title: string;
+  body: string;
+  data?: Record<string, unknown>;
+  sound?: string;
+  /** Android only priority; kept optional and narrowed at runtime */
+  priority?: number;
+}
+interface DateTrigger {
+  date: Date;
+}
+interface ScheduleRequest {
+  content: MinimalNotificationContent;
+  trigger: DateTrigger | null;
+}
 
 // Lazy notifications module loader
-let _notifications: any; let _notificationsConfigured = false;
-async function loadNotifications() {
-  if (!_notifications) {
-    if (process.env.NODE_ENV === 'test') {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        _notifications = require('expo-notifications');
-      } catch {
-        _notifications = await import('expo-notifications');
-      }
-    } else {
-      _notifications = await import('expo-notifications');
+let _notifications: ExpoNotifications | null = null;
+let _notificationsConfigured = false;
+export async function loadNotifications(): Promise<ExpoNotifications | null> {
+  // In test environment, prefer returning the Jest-mocked module so tests can spy/override behavior
+  if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
+    try {
+      // Use require to ensure same singleton instance as tests
+
+      const mockedModule = require('expo-notifications');
+      const mocked = mockedModule && mockedModule.default ? mockedModule.default : mockedModule;
+      return mocked as ExpoNotifications;
+    } catch {
+      // Fallback to simple in-file mock when module import fails (rare in tests)
+      return globalMockNotifications as ExpoNotifications;
     }
   }
-  if (!_notificationsConfigured) {
+
+  if (!_notifications) {
+    // Use dynamic import for all environments
+    try {
+      _notifications = (await import('expo-notifications')) as ExpoNotifications;
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      warnInDev('expo-notifications not available:', err);
+      return null; // Return null if notifications are not available
+    }
+  }
+  if (!_notificationsConfigured && _notifications) {
     try {
       _notifications.setNotificationHandler?.({
         handleNotification: async () => ({
@@ -38,7 +113,9 @@ async function loadNotifications() {
           shouldShowList: true,
         }),
       });
-    } catch {}
+    } catch {
+      // silent – handler is best-effort
+    }
     _notificationsConfigured = true;
   }
   return _notifications;
@@ -50,28 +127,41 @@ const isExpoGo = !Application.applicationId || Application.applicationId === 'ho
 export async function getPushTokenSafely(retries = 3): Promise<string | null> {
   // P0 Notifications: add retry/backoff & skip on Expo Go
   try {
-    if (isExpoGo) return null;
+    if (isExpoGo) {
+      return null;
+    }
     const Notifications = await loadNotifications();
+    if (!Notifications) {
+      return null;
+    }
     const settings = await Notifications.getPermissionsAsync();
     let status = settings.status;
     if (status !== 'granted') {
       const req = await Notifications.requestPermissionsAsync();
       status = req.status;
     }
-    if (status !== 'granted') return null;
-    let lastErr: any;
+    if (status !== 'granted') {
+      return null;
+    }
+    let lastErr: unknown;
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
+        if (!Notifications) {
+          throw new Error('Notifications not available');
+        }
         const token = await Notifications.getExpoPushTokenAsync();
         return token.data ?? null;
       } catch (e) {
         lastErr = e;
-        await new Promise(r => setTimeout(r, (attempt + 1) * 400));
+        await new Promise((r) => setTimeout(r, (attempt + 1) * 400));
       }
     }
     if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.warn('[notifications] push token acquisition failed after retries', lastErr?.message);
+      const msg =
+        typeof lastErr === 'object' && lastErr && 'message' in lastErr
+          ? String((lastErr as { message?: unknown }).message)
+          : 'unknown error';
+      warnInDev('[notifications] push token acquisition failed after retries', msg);
     }
     return null;
   } catch {
@@ -84,7 +174,7 @@ export async function getPushTokenSafely(retries = 3): Promise<string | null> {
 export interface NotificationPayload {
   type: 'daily_mirror' | 'feedback_prompt' | 're_engagement';
   userId: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 export interface ScheduledNotification {
@@ -114,28 +204,32 @@ class NotificationService {
    * Initialize notification service and request permissions
    */
   async initialize(): Promise<boolean> {
-    if (this.isInitialized) return true;
+    if (this.isInitialized) {
+      return true;
+    }
 
     try {
       // Request permissions with error handling
-      let finalStatus = 'denied';
       try {
-  const Notifications = await loadNotifications();
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        finalStatus = existingStatus;
+        const Notifications = await loadNotifications();
+        if (!Notifications) {
+          this.isInitialized = true;
+          return false;
+        }
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus; // share same type to avoid unsafe enum comparison
 
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
+        if (finalStatus !== 'granted') {
+          const { status: requestedStatus } = await Notifications.requestPermissionsAsync();
+          finalStatus = requestedStatus;
+        }
+
+        if (finalStatus !== 'granted') {
+          this.isInitialized = true;
+          return false;
         }
       } catch (permissionError) {
         // Silently handle permission errors in development
-        this.isInitialized = true;
-        return false;
-      }
-
-      if (finalStatus !== 'granted') {
-        // Still mark as initialized to prevent repeated attempts
         this.isInitialized = true;
         return false;
       }
@@ -147,21 +241,25 @@ class NotificationService {
 
       // Configure notification channels for Android
       if (Platform.OS === 'android') {
-  const Notifications = await loadNotifications();
-  await Notifications.setNotificationChannelAsync('ayna-mirror', {
+        const Notifications = await loadNotifications();
+        if (!Notifications) {
+          this.isInitialized = true;
+          return false;
+        }
+        await Notifications.setNotificationChannelAsync('ayna-mirror', {
           name: 'AYNA Mirror',
           importance: Notifications.AndroidImportance.HIGH,
           vibrationPattern: [0, 250, 250, 250],
           lightColor: '#FF231F7C',
           sound: 'default',
         });
-  await Notifications.setNotificationChannelAsync('feedback', {
+        await Notifications.setNotificationChannelAsync('feedback', {
           name: 'Outfit Feedback',
           importance: Notifications.AndroidImportance.DEFAULT,
           vibrationPattern: [0, 250],
           sound: 'default',
         });
-  await Notifications.setNotificationChannelAsync('re-engagement', {
+        await Notifications.setNotificationChannelAsync('re-engagement', {
           name: 'Re-engagement',
           importance: Notifications.AndroidImportance.LOW,
           sound: 'default',
@@ -180,88 +278,99 @@ class NotificationService {
    * Schedule daily AYNA Mirror notification at 6 AM (or user's preferred time)
    */
   async scheduleDailyMirrorNotification(
-    userId: string, 
-    preferences: NotificationPreferences
+    userId: string,
+    preferences: NotificationPreferences,
   ): Promise<void> {
     if (!this.isInitialized) {
       await this.initialize();
     }
 
-    return await errorHandlingService.executeWithRetry(
-      async () => {
-        // Cancel existing daily notifications for this user
-        await this.cancelNotificationsByType(userId, 'daily_mirror');
+    return await errorHandlingService
+      .executeWithRetry(
+        async () => {
+          // Cancel existing daily notifications for this user
+          await this.cancelNotificationsByType(userId, 'daily_mirror');
 
-        // Calculate next notification time
-        const nextNotificationTime = this.calculateNextNotificationTime(
-          preferences.preferredTime,
-          preferences.timezone,
-          preferences.enableWeekends
-        );
+          // Calculate next notification time
+          const nextNotificationTime = this.calculateNextNotificationTime(
+            preferences.preferredTime,
+            preferences.timezone,
+            preferences.enableWeekends,
+          );
 
-        // Schedule the notification
-  const Notifications = await loadNotifications();
-  const notificationId = await Notifications.scheduleNotificationAsync({
-          content: {
-            title: "Your AYNA Mirror is ready ✨",
-            body: "3 confidence-building outfits await you. Start your day feeling ready for anything.",
-            data: {
+          // Schedule the notification
+          const Notifications = await loadNotifications();
+          if (!Notifications) {
+            throw new Error('Notifications not available');
+          }
+          const maybePriority = (
+            Notifications as Partial<typeof Notifications> & {
+              AndroidNotificationPriority?: { HIGH?: number };
+            }
+          ).AndroidNotificationPriority?.HIGH;
+          const scheduleReq: ScheduleRequest = {
+            content: {
+              title: 'Your AYNA Mirror is ready ✨',
+              body: '3 confidence-building outfits await you. Start your day feeling ready for anything.',
+              data: {
+                type: 'daily_mirror',
+                userId,
+                timestamp: Date.now(),
+                url: 'aynamoda://ayna-mirror',
+              },
+              sound: 'default',
+              priority: typeof maybePriority === 'number' ? maybePriority : undefined,
+            },
+            trigger: { date: nextNotificationTime },
+          };
+          const notificationId = await Notifications.scheduleNotificationAsync(
+            scheduleReq as import('expo-notifications').NotificationRequestInput,
+          );
+
+          // Store notification info for tracking
+          await this.storeScheduledNotification({
+            id: notificationId,
+            userId,
+            type: 'daily_mirror',
+            scheduledTime: nextNotificationTime,
+            timezone: preferences.timezone,
+            payload: {
               type: 'daily_mirror',
               userId,
-              timestamp: Date.now(),
-              url: 'aynamoda://ayna-mirror', // Deep link to AYNA Mirror
             },
-            sound: 'default',
-            priority: Notifications.AndroidNotificationPriority.HIGH,
-          },
-          trigger: {
-            date: nextNotificationTime,
-          } as any,
-        });
+          });
 
-        // Store notification info for tracking
-        await this.storeScheduledNotification({
-          id: notificationId,
+          // Daily mirror notification scheduled
+        },
+        {
+          service: 'notification',
+          operation: 'scheduleDailyMirrorNotification',
           userId,
+        },
+        {
+          maxRetries: 2,
+          enableOfflineMode: true,
+        },
+      )
+      .catch(async (error) => {
+        // Failed to schedule daily mirror notification after retries
+        // Use error handling service to handle notification failure
+        await errorHandlingService.handleNotificationError(userId, {
           type: 'daily_mirror',
-          scheduledTime: nextNotificationTime,
-          timezone: preferences.timezone,
-          payload: {
-            type: 'daily_mirror',
-            userId,
-          },
+          preferences,
+          scheduledTime: new Date(),
         });
-
-        // Daily mirror notification scheduled
-      },
-      {
-        service: 'notification',
-        operation: 'scheduleDailyMirrorNotification',
-        userId
-      },
-      {
-        maxRetries: 2,
-        enableOfflineMode: true
-      }
-    ).catch(async (error) => {
-      // Failed to schedule daily mirror notification after retries
-      // Use error handling service to handle notification failure
-      await errorHandlingService.handleNotificationError(userId, {
-        type: 'daily_mirror',
-        preferences,
-        scheduledTime: new Date()
+        throw error;
       });
-      throw error;
-    });
   }
 
   /**
    * Schedule feedback prompt 2-4 hours after outfit selection
    */
   async scheduleFeedbackPrompt(
-    userId: string, 
-    outfitId: string, 
-    delayHours: number = 3
+    userId: string,
+    outfitId: string,
+    delayHours: number = 3,
   ): Promise<void> {
     if (!this.isInitialized) {
       await this.initialize();
@@ -271,24 +380,29 @@ class NotificationService {
       const promptTime = new Date();
       promptTime.setHours(promptTime.getHours() + delayHours);
 
-  const Notifications = await loadNotifications();
-  const notificationId = await Notifications.scheduleNotificationAsync({
+      const Notifications = await loadNotifications();
+      if (!Notifications) {
+        throw new Error('Notifications not available');
+      }
+      const req: ScheduleRequest = {
         content: {
-          title: "How did your outfit make you feel? 💫",
-          body: "Your feedback helps AYNA learn your style. It takes just 30 seconds.",
+          title: 'How did your outfit make you feel? 💫',
+          body: 'Your feedback helps AYNA learn your style. It takes just 30 seconds.',
           data: {
             type: 'feedback_prompt',
             userId,
             outfitId,
             timestamp: Date.now(),
-            url: `aynamoda://ayna-mirror?feedback=${outfitId}`, // Deep link to feedback
+            url: `aynamoda://ayna-mirror?feedback=${outfitId}`,
           },
           sound: 'default',
         },
-        trigger: {
-          date: promptTime,
-        } as any,
-      });
+        // schedule API supports date triggers and null for immediate
+        trigger: { date: promptTime },
+      };
+      const notificationId = await Notifications.scheduleNotificationAsync(
+        req as import('expo-notifications').NotificationRequestInput,
+      );
 
       await this.storeScheduledNotification({
         id: notificationId,
@@ -320,9 +434,12 @@ class NotificationService {
 
     try {
       const messages = this.getReEngagementMessage(daysSinceLastUse);
-      
-  const Notifications = await loadNotifications();
-  const notificationId = await Notifications.scheduleNotificationAsync({
+
+      const Notifications = await loadNotifications();
+      if (!Notifications) {
+        throw new Error('Notifications not available');
+      }
+      const req: ScheduleRequest = {
         content: {
           title: messages.title,
           body: messages.body,
@@ -335,7 +452,10 @@ class NotificationService {
           sound: 'default',
         },
         trigger: null, // Send immediately
-      });
+      };
+      await Notifications.scheduleNotificationAsync(
+        req as import('expo-notifications').NotificationRequestInput,
+      );
 
       // Re-engagement message sent
     } catch (error) {
@@ -347,17 +467,14 @@ class NotificationService {
   /**
    * Optimize notification timing based on user engagement patterns
    */
-  async optimizeNotificationTiming(
-    userId: string, 
-    engagementHistory: EngagementHistory
-  ): Promise<Date> {
+  optimizeNotificationTiming(userId: string, engagementHistory: EngagementHistory): Date {
     try {
       // Analyze user's preferred interaction times
       const preferredTimes = engagementHistory.preferredInteractionTimes || [];
 
       // Use averageOpenTime as fallback when no preferredTimes provided
-      if (preferredTimes.length === 0 && (engagementHistory as any).averageOpenTime) {
-        const avgOpen: Date = (engagementHistory as any).averageOpenTime;
+      if (preferredTimes.length === 0 && engagementHistory.averageOpenTime instanceof Date) {
+        const avgOpen: Date = engagementHistory.averageOpenTime;
         // Return a time aligned to the same base date to avoid large diffs in tests
         return new Date(avgOpen);
       }
@@ -398,7 +515,9 @@ class NotificationService {
     try {
       // Get current user preferences
       const preferences = await this.getUserNotificationPreferences(userId);
-      if (!preferences) return;
+      if (!preferences) {
+        return;
+      }
 
       // Update timezone
       preferences.timezone = newTimezone;
@@ -419,15 +538,19 @@ class NotificationService {
   async cancelScheduledNotifications(userId: string): Promise<void> {
     try {
       const scheduledNotifications = await this.getScheduledNotifications(userId);
-      
+
       for (const notification of scheduledNotifications) {
-  const Notifications = await loadNotifications();
-  await Notifications.cancelScheduledNotificationAsync(notification.id);
+        const Notifications = await loadNotifications();
+        if (!Notifications) {
+          continue;
+        }
+        await Notifications.cancelScheduledNotificationAsync(notification.id);
       }
 
       // Clear from storage
-      await AsyncStorage.removeItem(`notifications_${userId}`);
-      
+      await secureStorage.initialize();
+      await secureStorage.removeItem(`notifications_${userId}`);
+
       // Cancelled notifications
     } catch (error) {
       // Failed to cancel scheduled notifications
@@ -441,20 +564,23 @@ class NotificationService {
   private async cancelNotificationsByType(userId: string, type: string): Promise<void> {
     try {
       const scheduledNotifications = await this.getScheduledNotifications(userId);
-      const notificationsToCancel = scheduledNotifications.filter(n => n.type === type);
-      
+      const notificationsToCancel = scheduledNotifications.filter((n) => n.type === type);
+
       for (const notification of notificationsToCancel) {
-  const Notifications = await loadNotifications();
-  await Notifications.cancelScheduledNotificationAsync(notification.id);
+        const Notifications = await loadNotifications();
+        if (!Notifications) {
+          continue;
+        }
+        await Notifications.cancelScheduledNotificationAsync(notification.id);
       }
 
       // Update storage
-      const remainingNotifications = scheduledNotifications.filter(n => n.type !== type);
-      await AsyncStorage.setItem(
-        `notifications_${userId}`, 
-        JSON.stringify(remainingNotifications)
+      const remainingNotifications = scheduledNotifications.filter((n) => n.type !== type);
+      await secureStorage.setItem(
+        `notifications_${userId}`,
+        JSON.stringify(remainingNotifications),
       );
-      
+
       // Cancelled notifications
     } catch (error) {
       // Failed to cancel notifications
@@ -466,20 +592,15 @@ class NotificationService {
    * Calculate next notification time considering timezone and weekend preferences
    */
   private calculateNextNotificationTime(
-    preferredTime: Date, 
-    timezone: string, 
-    enableWeekends: boolean
+    preferredTime: Date,
+    timezone: string,
+    enableWeekends: boolean,
   ): Date {
     const now = new Date();
     const nextNotification = new Date();
-    
+
     // Set to preferred time
-    nextNotification.setHours(
-      preferredTime.getHours(),
-      preferredTime.getMinutes(),
-      0,
-      0
-    );
+    nextNotification.setHours(preferredTime.getHours(), preferredTime.getMinutes(), 0, 0);
 
     // If the time has already passed today, schedule for tomorrow
     if (nextNotification <= now) {
@@ -502,17 +623,17 @@ class NotificationService {
   private getReEngagementMessage(daysSinceLastUse: number): { title: string; body: string } {
     if (daysSinceLastUse <= 3) {
       return {
-        title: "Your AYNA Mirror misses you ✨",
-        body: "Ready to feel confident again? Your personalized outfits are waiting.",
+        title: 'Your AYNA Mirror misses you ✨',
+        body: 'Ready to feel confident again? Your personalized outfits are waiting.',
       };
     } else if (daysSinceLastUse <= 7) {
       return {
-        title: "Time to rediscover your style 🌟",
+        title: 'Time to rediscover your style 🌟',
         body: "AYNA has learned new things about your wardrobe. Come see what's new!",
       };
     } else {
       return {
-        title: "Your confidence ritual awaits 💫",
+        title: 'Your confidence ritual awaits 💫',
         body: "Remember how good it felt to start your day with confidence? Let's bring that back.",
       };
     }
@@ -525,10 +646,11 @@ class NotificationService {
     try {
       const existingNotifications = await this.getScheduledNotifications(notification.userId);
       const updatedNotifications = [...existingNotifications, notification];
-      
-      await AsyncStorage.setItem(
+
+      await secureStorage.initialize();
+      await secureStorage.setItem(
         `notifications_${notification.userId}`,
-        JSON.stringify(updatedNotifications)
+        JSON.stringify(updatedNotifications),
       );
     } catch (error) {
       // Failed to store scheduled notification
@@ -540,8 +662,12 @@ class NotificationService {
    */
   private async getScheduledNotifications(userId: string): Promise<ScheduledNotification[]> {
     try {
-      const stored = await AsyncStorage.getItem(`notifications_${userId}`);
-      return stored ? JSON.parse(stored) : [];
+      await secureStorage.initialize();
+      const stored = await secureStorage.getItem(`notifications_${userId}`);
+      const parsed = safeParse<unknown>(stored, []);
+      return Array.isArray(parsed)
+        ? parsed.filter((n): n is ScheduledNotification => !!n && typeof n === 'object')
+        : [];
     } catch (error) {
       // Failed to get scheduled notifications
       return [];
@@ -551,13 +677,13 @@ class NotificationService {
   /**
    * Get user notification preferences (mock implementation - should integrate with user service)
    */
-  private async getUserNotificationPreferences(userId: string): Promise<NotificationPreferences | null> {
+  private getUserNotificationPreferences(userId: string): NotificationPreferences | null {
     try {
       // This should integrate with your user preferences service
       // For now, return default preferences
       const defaultTime = new Date();
       defaultTime.setHours(6, 0, 0, 0);
-      
+
       return {
         preferredTime: defaultTime,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -582,9 +708,13 @@ class NotificationService {
    * Check if notifications are enabled
    */
   async areNotificationsEnabled(): Promise<boolean> {
+    // kept async: awaits underlying calls
     try {
-  const Notifications = await loadNotifications();
-  const { status } = await Notifications.getPermissionsAsync();
+      const Notifications = await loadNotifications();
+      if (!Notifications) {
+        return false;
+      }
+      const { status } = await Notifications.getPermissionsAsync();
       return status === 'granted';
     } catch (error) {
       // Failed to check notification permissions

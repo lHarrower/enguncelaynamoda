@@ -1,33 +1,31 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  StatusBar,
   Dimensions,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 import Animated, {
-  useSharedValue,
+  Extrapolate,
+  interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
-  interpolate,
-  Extrapolate,
+  useSharedValue,
 } from 'react-native-reanimated';
-import { DesignSystem } from '@/theme/DesignSystem';
-import { FloatingNavBar } from '@/components/editorial/FloatingNavBar';
-import { WeeklyColorCard } from '@/components/editorial/WeeklyColorCard';
-import { StylePickCard } from '@/components/editorial/StylePickCard';
-import { EditorialStoryCard } from '@/components/editorial/EditorialStoryCard';
+
 import { DiscoverScreen } from '@/components/editorial/DiscoverScreen';
-import { WardrobeScreen } from '@/components/editorial/WardrobeScreen';
+import { EditorialStoryCard } from '@/components/editorial/EditorialStoryCard';
+import { FloatingNavBar } from '@/components/editorial/FloatingNavBar';
 import { ProfileScreen } from '@/components/editorial/ProfileScreen';
-import {
-  weeklyColorStories,
-  dailyStylePicks,
-  editorialStories,
-} from '@/data/editorialContent';
+import { StylePickCard } from '@/components/editorial/StylePickCard';
+import { WardrobeScreen } from '@/components/editorial/WardrobeScreen';
+import { WeeklyColorCard } from '@/components/editorial/WeeklyColorCard';
+import { dailyStylePicks, editorialStories, weeklyColorStories } from '@/data/editorialContent';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev } from '@/utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -42,19 +40,9 @@ export const EditorialHomeScreen: React.FC = () => {
   });
 
   const headerAnimatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollY.value,
-      [0, 100],
-      [1, 0.8],
-      Extrapolate.CLAMP
-    );
-    
-    const translateY = interpolate(
-      scrollY.value,
-      [0, 100],
-      [0, -20],
-      Extrapolate.CLAMP
-    );
+    const opacity = interpolate(scrollY.value, [0, 100], [1, 0.8], Extrapolate.CLAMP);
+
+    const translateY = interpolate(scrollY.value, [0, 100], [0, -20], Extrapolate.CLAMP);
 
     return {
       opacity,
@@ -97,7 +85,7 @@ export const EditorialHomeScreen: React.FC = () => {
 
             {/* Weekly Color Section */}
             <View style={styles.section}>
-              {renderSectionHeader('Weekly Color', 'This week\'s color inspiration')}
+              {renderSectionHeader('Weekly Color', "This week's color inspiration")}
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -110,7 +98,7 @@ export const EditorialHomeScreen: React.FC = () => {
                   <View key={story.id} style={styles.cardContainer}>
                     <WeeklyColorCard
                       story={story}
-                      onPress={() => console.log('Color story pressed:', story.id)}
+                      onPress={() => logInDev('Color story pressed:', story.id)}
                     />
                   </View>
                 ))}
@@ -125,7 +113,7 @@ export const EditorialHomeScreen: React.FC = () => {
                   <View key={pick.id} style={styles.cardContainer}>
                     <StylePickCard
                       pick={pick}
-                      onPress={() => console.log('Style pick pressed:', pick.id)}
+                      onPress={() => logInDev('Style pick pressed:', pick.id)}
                     />
                   </View>
                 ))}
@@ -140,7 +128,7 @@ export const EditorialHomeScreen: React.FC = () => {
                   <View key={story.id} style={styles.cardContainer}>
                     <EditorialStoryCard
                       story={story}
-                      onPress={() => console.log('Editorial story pressed:', story.id)}
+                      onPress={() => logInDev('Editorial story pressed:', story.id)}
                     />
                   </View>
                 ))}
@@ -157,84 +145,81 @@ export const EditorialHomeScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
+
       {renderContent()}
 
-      <FloatingNavBar
-        activeTab={activeTab}
-        onTabPress={setActiveTab}
-      />
+      <FloatingNavBar activeTab={activeTab} onTabPress={setActiveTab} />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  bottomSpacing: {
+    height: 100,
+  },
+  cardContainer: {
+    marginRight: DesignSystem.spacing.md,
+  },
   container: {
-    flex: 1,
     backgroundColor: DesignSystem.colors.background.primary,
-  },
-  scrollView: {
     flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 120,
-  },
-  header: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: 20,
-    paddingBottom: DesignSystem.spacing.xl,
   },
   greeting: {
-    fontSize: DesignSystem.typography.body.medium.fontSize,
-    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.body.medium.fontSize,
     marginBottom: 4,
   },
-  headerTitle: {
-    fontSize: DesignSystem.typography.heading.h1.fontSize,
-    fontFamily: DesignSystem.typography.fontFamily.heading,
-    color: DesignSystem.colors.text.primary,
-    marginBottom: 8,
-    lineHeight: 44,
+  header: {
+    paddingBottom: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingTop: 20,
   },
   headerSubtitle: {
-    fontSize: DesignSystem.typography.body.medium.fontSize,
-    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.body.medium.fontSize,
     lineHeight: 24,
     maxWidth: '80%',
   },
-  section: {
-    marginBottom: DesignSystem.spacing.xxl,
-  },
-  sectionHeader: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: DesignSystem.typography.heading.h2.fontSize,
-    fontFamily: DesignSystem.typography.fontFamily.heading,
+  headerTitle: {
     color: DesignSystem.colors.text.primary,
-    marginBottom: 4,
-    lineHeight: 32,
-  },
-  sectionSubtitle: {
-    fontSize: DesignSystem.typography.body.medium.fontSize,
-    fontFamily: DesignSystem.typography.fontFamily.body,
-    color: DesignSystem.colors.text.secondary,
-    lineHeight: 22,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+    fontSize: DesignSystem.typography.heading.h1.fontSize,
+    lineHeight: 44,
+    marginBottom: 8,
   },
   horizontalScroll: {
     paddingLeft: DesignSystem.spacing.lg,
     paddingRight: DesignSystem.spacing.lg,
   },
+  scrollContent: {
+    paddingBottom: 120,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  section: {
+    marginBottom: DesignSystem.spacing.xxl,
+  },
+  sectionHeader: {
+    marginBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
+  },
+  sectionSubtitle: {
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.body.medium.fontSize,
+    lineHeight: 22,
+  },
+  sectionTitle: {
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+    fontSize: DesignSystem.typography.heading.h2.fontSize,
+    lineHeight: 32,
+    marginBottom: 4,
+  },
   verticalCards: {
     alignItems: 'center',
-  },
-  cardContainer: {
-    marginRight: DesignSystem.spacing.md,
-  },
-  bottomSpacing: {
-    height: 100,
   },
 });

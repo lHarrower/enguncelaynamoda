@@ -1,6 +1,7 @@
 # AYNAMODA Design System Migration Guide
 
 ## Overview
+
 This guide helps migrate from the legacy theme systems (`UnifiedTheme.ts`, `AppThemeV2.ts`, `Colors.ts`, etc.) to the new unified `DesignSystem.ts`.
 
 ## Quick Migration Reference
@@ -8,6 +9,7 @@ This guide helps migrate from the legacy theme systems (`UnifiedTheme.ts`, `AppT
 ### Color Migrations
 
 #### From Legacy Systems:
+
 ```typescript
 // OLD - Multiple conflicting systems
 import { ORGANIC_PALETTE } from '../constants/AppThemeV2';
@@ -20,6 +22,7 @@ const colors = useColors();
 ```
 
 #### Color Mapping:
+
 ```typescript
 // Legacy -> New Unified
 ORGANIC_PALETTE.neutral.white -> colors.background.primary
@@ -60,8 +63,8 @@ const spacing = useSpacing();
 const layout = useLayout();
 
 // Usage
-padding: spacing.lg // Instead of SPACING_V2.medium or UnifiedSpacing.medium
-margin: layout.screenPadding // For consistent screen margins
+padding: spacing.lg; // Instead of SPACING_V2.medium or UnifiedSpacing.medium
+margin: layout.screenPadding; // For consistent screen margins
 ```
 
 ### Component Style Migrations
@@ -84,6 +87,7 @@ style={components.card.base} // Instead of UnifiedComponents.cards.elevated
 ## Step-by-Step Migration Process
 
 ### 1. Update Imports
+
 Replace all theme-related imports with the new unified system:
 
 ```typescript
@@ -99,6 +103,7 @@ import { useTheme, useColors, useTypography, useSpacing } from '../theme/ThemePr
 ### 2. Update Component Usage
 
 #### Before:
+
 ```typescript
 const MyComponent = () => {
   return (
@@ -120,10 +125,11 @@ const MyComponent = () => {
 ```
 
 #### After:
+
 ```typescript
 const MyComponent = () => {
   const { colors, typography, spacing, borderRadius } = useTheme();
-  
+
   return (
     <View style={{
       backgroundColor: colors.background.primary,
@@ -162,13 +168,16 @@ export default function App() {
 ## Files to Update
 
 ### Priority 1 - Core Components
+
 - [ ] `src/components/common/` - All shared components
 - [ ] `src/components/studio/` - Studio-specific components
 - [ ] `src/components/wardrobe/` - Wardrobe components
 - [ ] Main screen files
 
 ### Priority 2 - Legacy Theme Files
+
 After migration is complete, these files can be deprecated:
+
 - [ ] `src/theme/UnifiedTheme.ts`
 - [ ] `src/constants/AppThemeV2.ts`
 - [ ] `src/constants/Colors.ts`
@@ -202,6 +211,7 @@ After migration is complete, these files can be deprecated:
 ## Support
 
 If you encounter issues during migration:
+
 1. Check this guide for common patterns
 2. Refer to `DesignSystem.ts` for available tokens
 3. Use TypeScript autocomplete for available options

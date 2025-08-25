@@ -56,14 +56,16 @@ const mockRunOnUI = (fn) => {
   return (...args) => fn(...args);
 };
 
+const React = require('react');
+
 const Animated = {
-  View: 'Animated.View',
-  Text: 'Animated.Text',
-  Pressable: 'Animated.Pressable',
-  ScrollView: 'Animated.ScrollView',
-  FlatList: 'Animated.FlatList',
-  Image: 'Animated.Image',
-  
+  View: React.forwardRef((props, ref) => React.createElement('Animated.View', { ...props, ref })),
+  Text: React.forwardRef((props, ref) => React.createElement('Animated.Text', { ...props, ref })),
+  Pressable: React.forwardRef((props, ref) => React.createElement('Animated.Pressable', { ...props, ref })),
+  ScrollView: React.forwardRef((props, ref) => React.createElement('Animated.ScrollView', { ...props, ref })),
+  FlatList: React.forwardRef((props, ref) => React.createElement('Animated.FlatList', { ...props, ref })),
+  Image: React.forwardRef((props, ref) => React.createElement('Animated.Image', { ...props, ref })),
+
   // Entering animations
   FadeIn: mockAnimatedValue,
   FadeInUp: mockAnimatedValue,
@@ -80,7 +82,7 @@ const Animated = {
   ZoomInRight: mockAnimatedValue,
   ZoomInUp: mockAnimatedValue,
   ZoomInDown: mockAnimatedValue,
-  
+
   // Exiting animations
   FadeOut: mockAnimatedValue,
   FadeOutUp: mockAnimatedValue,
@@ -97,7 +99,7 @@ const Animated = {
   ZoomOutRight: mockAnimatedValue,
   ZoomOutUp: mockAnimatedValue,
   ZoomOutDown: mockAnimatedValue,
-  
+
   // Layout animations
   Layout: mockAnimatedValue,
   LinearTransition: mockAnimatedValue,
@@ -106,7 +108,7 @@ const Animated = {
   JumpingTransition: mockAnimatedValue,
   CurvedTransition: mockAnimatedValue,
   EntryExitTransition: mockAnimatedValue,
-  
+
   // Hooks and utilities
   useSharedValue: jest.fn((initial) => ({ value: initial })),
   useAnimatedStyle: jest.fn((fn) => ({})),
@@ -116,7 +118,7 @@ const Animated = {
   useAnimatedRef: jest.fn(() => ({ current: null })),
   useDerivedValue: jest.fn((fn) => ({ value: fn() })),
   useAnimatedReaction: jest.fn(),
-  
+
   // Animation functions
   withTiming: jest.fn((value, config, callback) => value),
   withSpring: jest.fn((value, config, callback) => value),
@@ -124,7 +126,7 @@ const Animated = {
   withRepeat: jest.fn((animation, numberOfReps, reverse) => animation),
   withSequence: jest.fn((...animations) => animations[0]),
   cancelAnimation: jest.fn(),
-  
+
   // Easing
   Easing: {
     linear: jest.fn(() => (t) => t),
@@ -143,15 +145,15 @@ const Animated = {
     out: jest.fn((fn) => fn),
     inOut: jest.fn((fn) => fn),
   },
-  
+
   // Gesture handler
   runOnJS: jest.fn((fn) => fn),
   runOnUI: jest.fn((fn) => fn),
-  
+
   // Interpolation
   interpolate: jest.fn(),
   interpolateColor: jest.fn(),
-  
+
   // Create animated component
   createAnimatedComponent: jest.fn((component) => component),
 };

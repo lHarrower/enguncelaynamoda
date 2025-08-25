@@ -1,19 +1,20 @@
-import React, { useRef, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useRef } from 'react';
 import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
   Animated,
-  StyleSheet,
   Dimensions,
+  Modal,
   PanResponder,
   ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
-const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
+const { height: screenHeight, width: _screenWidth } = Dimensions.get('window');
 
 interface ActionSheetOption {
   title: string;
@@ -104,22 +105,18 @@ export default function ModernActionSheet({
   };
 
   return (
-    <Modal
-      animationType="none"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
+    <Modal animationType="none" transparent={true} visible={visible} onRequestClose={onClose}>
       <View style={styles.overlay}>
-        <Animated.View
-          style={[styles.backdrop, { opacity: fadeAnim }]}
-        />
+        <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]} />
         <TouchableOpacity
           style={styles.backdropTouchable}
           activeOpacity={1}
           onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel="Close action sheet"
+          accessibilityHint="Tap to close the action sheet"
         />
-        
+
         <Animated.View
           style={[
             styles.container,
@@ -131,7 +128,7 @@ export default function ModernActionSheet({
         >
           {/* Drag Indicator */}
           <View style={styles.handle} />
-          
+
           {/* Header */}
           {(title || subtitle) && (
             <View style={styles.header}>
@@ -139,10 +136,10 @@ export default function ModernActionSheet({
               {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
             </View>
           )}
-          
+
           {/* Options */}
           <ScrollView style={styles.optionsContainer} showsVerticalScrollIndicator={false}>
-            { (options || []).map((option, index) => (
+            {(options || []).map((option, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
@@ -152,30 +149,40 @@ export default function ModernActionSheet({
                 ]}
                 onPress={() => handleOptionPress(option.onPress)}
                 activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel={option.title}
+                accessibilityHint={option.subtitle || `Tap to ${option.title.toLowerCase()}`}
               >
                 <View style={styles.optionContent}>
                   {option.icon && (
-                    <View style={[
-                      styles.optionIcon,
-                      option.style === 'destructive' && styles.destructiveIconContainer,
-                      option.style === 'primary' && styles.primaryIconContainer,
-                    ]}>
+                    <View
+                      style={[
+                        styles.optionIcon,
+                        option.style === 'destructive' && styles.destructiveIconContainer,
+                        option.style === 'primary' && styles.primaryIconContainer,
+                      ]}
+                    >
                       <Ionicons
-                        name={option.icon as any}
+                        name={option.icon}
                         size={20}
                         color={
-                          option.style === 'destructive' ? '#D32F2F' :
-                          option.style === 'primary' ? '#B8918F' : '#7A6B56'
+                          option.style === 'destructive'
+                            ? '#D32F2F'
+                            : option.style === 'primary'
+                              ? '#B8918F'
+                              : '#7A6B56'
                         }
                       />
                     </View>
                   )}
                   <View style={styles.textContainer}>
-                    <Text style={[
-                      styles.optionText,
-                      option.style === 'destructive' && styles.destructiveText,
-                      option.style === 'primary' && styles.primaryText,
-                    ]}>
+                    <Text
+                      style={[
+                        styles.optionText,
+                        option.style === 'destructive' && styles.destructiveText,
+                        option.style === 'primary' && styles.primaryText,
+                      ]}
+                    >
                       {option.title}
                     </Text>
                     {option.subtitle && (
@@ -187,7 +194,7 @@ export default function ModernActionSheet({
               </TouchableOpacity>
             ))}
           </ScrollView>
-          
+
           {/* Cancel Button */}
           {showCancel && (
             <View style={styles.cancelContainer}>
@@ -195,6 +202,9 @@ export default function ModernActionSheet({
                 style={styles.cancelButton}
                 onPress={onClose}
                 activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Cancel"
+                accessibilityHint="Tap to cancel and close the action sheet"
               >
                 <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
@@ -207,152 +217,152 @@ export default function ModernActionSheet({
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(28, 34, 48, 0.85)',
-    justifyContent: 'flex-end',
-  },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(122, 107, 86, 0.6)',
+    backgroundColor: DesignSystem.colors.background.overlay,
   },
   backdropTouchable: {
     ...StyleSheet.absoluteFillObject,
   },
+  cancelButton: {
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderColor: DesignSystem.colors.border.primary,
+    borderRadius: 12,
+    borderWidth: 2,
+    marginHorizontal: 20,
+    marginTop: 16,
+    paddingVertical: 16,
+  },
+  cancelContainer: {
+    borderTopColor: DesignSystem.colors.border.primary,
+    borderTopWidth: 1,
+    padding: 16,
+  },
+  cancelText: {
+    color: DesignSystem.colors.neutral.charcoal,
+    fontFamily: 'Karla_700Bold',
+    fontSize: 16,
+    letterSpacing: 0.3,
+  },
   container: {
     backgroundColor: DesignSystem.colors.surface.elevated,
+    borderTopColor: DesignSystem.colors.border.primary,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    paddingTop: 20,
-    paddingBottom: 34,
-    maxHeight: '80%',
     borderTopWidth: 1,
-  borderTopColor: DesignSystem.colors.border.primary,
+    elevation: 20,
+    maxHeight: '80%',
+    paddingBottom: 34,
+    paddingTop: 20,
     shadowColor: DesignSystem.colors.neutral.charcoal,
     shadowOffset: { width: 0, height: -8 },
     shadowOpacity: 0.3,
     shadowRadius: 16,
-    elevation: 20,
+  },
+  destructiveIconContainer: {
+    backgroundColor: DesignSystem.colors.error[100],
+  },
+  destructiveOption: {
+    backgroundColor: DesignSystem.colors.gold[100],
+    borderColor: DesignSystem.colors.gold[400],
+    elevation: 6,
+    shadowColor: DesignSystem.colors.gold[400],
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  destructiveText: {
+    color: DesignSystem.colors.neutral.charcoal,
   },
   handle: {
-    width: 40,
-    height: 4,
+    alignSelf: 'center',
     backgroundColor: DesignSystem.colors.border.secondary,
     borderRadius: 2,
-    alignSelf: 'center',
+    height: 4,
     marginBottom: 20,
     opacity: 0.6,
+    width: 40,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
     borderBottomColor: DesignSystem.colors.border.primary,
+    borderBottomWidth: 1,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 20,
-    fontFamily: 'PlayfairDisplay_700Bold',
-    color: DesignSystem.colors.neutral.charcoal,
-    textAlign: 'center',
-    marginBottom: 4,
-    letterSpacing: 0.5,
+  option: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.neutral.mist,
+    borderColor: DesignSystem.colors.border.primary,
+    borderRadius: 12,
+    borderWidth: 1,
+    elevation: 2,
+    flexDirection: 'row',
+    marginBottom: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    shadowColor: DesignSystem.colors.neutral.charcoal,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  subtitle: {
-    fontSize: 14,
+  optionContent: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flex: 1,
+  },
+  optionIcon: {
+    alignItems: 'center',
+    marginRight: 12,
+    width: 24,
+  },
+  optionSubtitle: {
+    color: DesignSystem.colors.neutral.slate,
+    fontSize: 13,
+    letterSpacing: -0.1,
+    marginTop: 2,
+  },
+  optionText: {
     color: DesignSystem.colors.neutral.charcoal,
-    textAlign: 'center',
-    opacity: 0.7,
-    fontFamily: 'Karla_400Regular',
+    flex: 1,
+    fontFamily: 'Karla_700Bold',
+    fontSize: 16,
+    letterSpacing: 0.3,
   },
   optionsContainer: {
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    marginBottom: 8,
-    borderRadius: 12,
-  backgroundColor: DesignSystem.colors.neutral.mist,
-    borderWidth: 1,
-  borderColor: DesignSystem.colors.border.primary,
-    shadowColor: DesignSystem.colors.neutral.charcoal,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  destructiveOption: {
-    backgroundColor: DesignSystem.colors.gold[100],
-    borderColor: DesignSystem.colors.gold[400],
-    shadowColor: DesignSystem.colors.gold[400],
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  primaryOption: {
-    backgroundColor: '#F0E6E3',
-  },
-  optionContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  overlay: {
+    backgroundColor: DesignSystem.colors.background.overlay,
     flex: 1,
-  },
-  optionIcon: {
-    marginRight: 12,
-    width: 24,
-    alignItems: 'center',
-  },
-  destructiveIconContainer: {
-    backgroundColor: '#FFE8E8',
+    justifyContent: 'flex-end',
   },
   primaryIconContainer: {
     backgroundColor: DesignSystem.colors.surface.elevated,
   },
-  textContainer: {
-    flex: 1,
-  },
-  optionText: {
-    fontSize: 16,
-    color: DesignSystem.colors.neutral.charcoal,
-    fontFamily: 'Karla_700Bold',
-    flex: 1,
-    letterSpacing: 0.3,
-  },
-  destructiveText: {
-    color: DesignSystem.colors.neutral.charcoal,
+  primaryOption: {
+    backgroundColor: DesignSystem.colors.surface.primary,
   },
   primaryText: {
     color: DesignSystem.colors.sage[500],
   },
-  optionSubtitle: {
-    fontSize: 13,
-    color: DesignSystem.colors.neutral.slate,
-    marginTop: 2,
-    letterSpacing: -0.1,
-  },
-  cancelContainer: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: DesignSystem.colors.border.primary,
-  },
-  cancelButton: {
-    marginTop: 16,
-    marginHorizontal: 20,
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: DesignSystem.colors.border.primary,
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  cancelText: {
-    fontSize: 16,
+  subtitle: {
     color: DesignSystem.colors.neutral.charcoal,
-    fontFamily: 'Karla_700Bold',
-    letterSpacing: 0.3,
+    fontFamily: 'Karla_400Regular',
+    fontSize: 14,
+    opacity: 0.7,
+    textAlign: 'center',
+  },
+  textContainer: {
+    flex: 1,
+  },
+  title: {
+    color: DesignSystem.colors.neutral.charcoal,
+    fontFamily: 'PlayfairDisplay_700Bold',
+    fontSize: 20,
+    letterSpacing: 0.5,
+    marginBottom: 4,
+    textAlign: 'center',
   },
 });

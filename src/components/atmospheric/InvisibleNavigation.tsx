@@ -1,28 +1,21 @@
 // Invisible Navigation - Minimalist, Contextual Navigation System
 // Replaces generic tab bar with elegant, full-screen blurred overlay
 
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-  StatusBar,
-} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSpring,
-  interpolate,
-} from 'react-native-reanimated';
-import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState } from 'react';
+import { Dimensions, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 
@@ -39,13 +32,10 @@ interface InvisibleNavigationProps {
   currentRoute?: string;
 }
 
-const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
-  items,
-  currentRoute,
-}) => {
+const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({ items, currentRoute }) => {
   const insets = useSafeAreaInsets();
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // Animation values
   const overlayOpacity = useSharedValue(0);
   const overlayScale = useSharedValue(0.95);
@@ -56,7 +46,7 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
   const openNavigation = () => {
     setIsOpen(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
+
     overlayOpacity.value = withTiming(1, { duration: 400 });
     overlayScale.value = withSpring(1, { damping: 20, stiffness: 300 });
     triggerRotation.value = withTiming(45, { duration: 300 });
@@ -67,7 +57,7 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
     overlayOpacity.value = withTiming(0, { duration: 300 });
     overlayScale.value = withTiming(0.95, { duration: 300 });
     triggerRotation.value = withTiming(0, { duration: 300 });
-    
+
     setTimeout(() => setIsOpen(false), 300);
   };
 
@@ -83,7 +73,7 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
     triggerScale.value = withSpring(0.9, { damping: 15, stiffness: 400 }, () => {
       triggerScale.value = withSpring(1, { damping: 15, stiffness: 400 });
     });
-    
+
     if (isOpen) {
       closeNavigation();
     } else {
@@ -101,10 +91,7 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
 
   const triggerStyle = useAnimatedStyle(() => {
     return {
-      transform: [
-        { rotate: `${triggerRotation.value}deg` },
-        { scale: triggerScale.value },
-      ],
+      transform: [{ rotate: `${triggerRotation.value}deg` }, { scale: triggerScale.value }],
     };
   });
 
@@ -116,20 +103,16 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
           onPress={handleTriggerPress}
           activeOpacity={0.8}
           style={styles.trigger}
+          accessibilityRole="button"
+          accessibilityLabel="Open navigation menu"
+          accessibilityHint="Double tap to open the navigation overlay"
         >
           <Animated.View style={[styles.triggerContent, triggerStyle]}>
             <LinearGradient
-              colors={[
-                DesignSystem.colors.sage[400],
-                DesignSystem.colors.sage[500],
-              ]}
+              colors={[DesignSystem.colors.sage[400], DesignSystem.colors.sage[500]]}
               style={styles.triggerGradient}
             >
-              <Ionicons 
-                name="add" 
-                size={20} 
-                color={DesignSystem.colors.background.primary} 
-              />
+              <Ionicons name="add" size={20} color={DesignSystem.colors.background.primary} />
             </LinearGradient>
           </Animated.View>
         </TouchableOpacity>
@@ -139,7 +122,7 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
       {isOpen && (
         <Animated.View style={[styles.overlay, overlayStyle]}>
           <StatusBar barStyle="light-content" />
-          
+
           {/* Blurred Background */}
           <BlurView intensity={80} style={styles.blurBackground}>
             <LinearGradient
@@ -167,43 +150,44 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
                   key={item.id}
                   style={[
                     styles.navigationItem,
-                    currentRoute === item.id && styles.activeNavigationItem
+                    currentRoute === item.id && styles.activeNavigationItem,
                   ]}
                   onPress={() => handleItemPress(item)}
                   activeOpacity={0.8}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Navigate to ${item.title}`}
+                  accessibilityHint={item.subtitle}
+                  accessibilityState={{ selected: currentRoute === item.id }}
                 >
                   <View style={styles.navigationItemContent}>
                     <View style={styles.navigationItemIcon}>
-                      <Ionicons 
-                        name={item.icon} 
-                        size={24} 
+                      <Ionicons
+                        name={item.icon}
+                        size={24}
                         color={
-                          currentRoute === item.id 
+                          currentRoute === item.id
                             ? DesignSystem.colors.text.accent
                             : DesignSystem.colors.text.primary
-                        } 
+                        }
                       />
                     </View>
                     <View style={styles.navigationItemText}>
-                      <Text style={[
-                        styles.navigationItemTitle,
-                        currentRoute === item.id && styles.activeNavigationItemTitle
-                      ]}>
+                      <Text
+                        style={[
+                          styles.navigationItemTitle,
+                          currentRoute === item.id && styles.activeNavigationItemTitle,
+                        ]}
+                      >
                         {item.title}
                       </Text>
-                      <Text style={styles.navigationItemSubtitle}>
-                        {item.subtitle}
-                      </Text>
+                      <Text style={styles.navigationItemSubtitle}>{item.subtitle}</Text>
                     </View>
                   </View>
-                  
+
                   {currentRoute === item.id && (
                     <View style={styles.activeIndicator}>
                       <LinearGradient
-                        colors={[
-                          DesignSystem.colors.sage[400],
-                          DesignSystem.colors.sage[500],
-                        ]}
+                        colors={[DesignSystem.colors.sage[400], DesignSystem.colors.sage[500]]}
                         style={styles.activeIndicatorGradient}
                       />
                     </View>
@@ -217,6 +201,9 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({
               style={styles.closeArea}
               onPress={closeNavigation}
               activeOpacity={1}
+              accessibilityRole="button"
+              accessibilityLabel="Close navigation menu"
+              accessibilityHint="Double tap to close the navigation overlay"
             >
               <Text style={styles.closeHint}>Tap anywhere to close</Text>
             </TouchableOpacity>
@@ -235,31 +222,31 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   trigger: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 24,
+    borderWidth: 1,
+    height: 48,
+    width: 48,
   },
   triggerContent: {
-    flex: 1,
     borderRadius: 24,
+    flex: 1,
   },
   triggerGradient: {
-    flex: 1,
-    borderRadius: 24,
     alignItems: 'center',
+    borderRadius: 24,
+    flex: 1,
     justifyContent: 'center',
   },
 
   // Overlay
   overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
     bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
     zIndex: 999,
   },
   blurBackground: {
@@ -281,8 +268,8 @@ const styles = StyleSheet.create({
   navigationTitle: {
     ...DesignSystem.typography.scale.h2,
     color: DesignSystem.colors.text.primary,
-    marginBottom: 8,
     fontSize: 36,
+    marginBottom: 8,
   },
   navigationSubtitle: {
     ...DesignSystem.typography.scale.caption,
@@ -297,35 +284,35 @@ const styles = StyleSheet.create({
   },
   navigationItem: {
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.08)',
-    position: 'relative',
+    borderRadius: 20,
+    borderWidth: 1,
     overflow: 'hidden',
+    padding: 20,
+    position: 'relative',
   },
   activeNavigationItem: {
     backgroundColor: 'rgba(212, 175, 55, 0.08)',
     borderColor: 'rgba(212, 175, 55, 0.2)',
   },
   navigationItemContent: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
   },
   navigationItemIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderRadius: 12,
+    height: 48,
     justifyContent: 'center',
     marginRight: 16,
+    width: 48,
   },
   navigationItemText: {
     flex: 1,
   },
   navigationItemTitle: {
-  ...DesignSystem.typography.body.medium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     fontSize: 18,
     fontWeight: '500',
@@ -340,16 +327,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   activeIndicator: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
     bottom: 0,
+    left: 0,
+    position: 'absolute',
+    top: 0,
     width: 4,
   },
   activeIndicatorGradient: {
-    flex: 1,
-    borderTopRightRadius: 2,
     borderBottomRightRadius: 2,
+    borderTopRightRadius: 2,
+    flex: 1,
   },
 
   // Close Area

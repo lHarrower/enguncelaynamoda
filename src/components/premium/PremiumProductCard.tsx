@@ -1,24 +1,18 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-} from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
   withSpring,
   withTiming,
-  withSequence,
-  interpolate,
 } from 'react-native-reanimated';
+
 import PremiumCard from '@/components/premium/PremiumCard';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width } = Dimensions.get('window');
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
@@ -65,7 +59,7 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
   const handleLike = () => {
     likeScale.value = withSequence(
       withSpring(1.3, DesignSystem.animations.spring.confident),
-      withSpring(1, DesignSystem.animations.spring.gentle)
+      withSpring(1, DesignSystem.animations.spring.gentle),
     );
     onLike?.();
   };
@@ -74,7 +68,7 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
     if (product.confidence) {
       confidenceOpacity.value = withTiming(1, { duration: 800 });
     }
-  }, [product.confidence]);
+  }, [product.confidence, confidenceOpacity]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
@@ -92,9 +86,9 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
     const width = interpolate(
       confidenceOpacity.value,
       [0, 1],
-      [0, (product.confidence || 0) * 0.01 * 100]
+      [0, (product.confidence || 0) * 0.01 * 100],
     );
-    
+
     return {
       width: `${width}%`,
       opacity: confidenceOpacity.value,
@@ -113,7 +107,9 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
   };
 
   const renderConfidenceBar = () => {
-    if (!product.confidence) return null;
+    if (!product.confidence) {
+      return null;
+    }
 
     return (
       <View style={styles.confidenceContainer}>
@@ -127,7 +123,9 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
   };
 
   const renderTags = () => {
-    if (!product.tags || product.tags.length === 0) return null;
+    if (!product.tags || product.tags.length === 0) {
+      return null;
+    }
 
     return (
       <View style={styles.tagsContainer}>
@@ -150,19 +148,11 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
       onPressOut={handlePressOut}
       activeOpacity={0.95}
     >
-      <PremiumCard
-        variant="floating"
-        style={[styles.card, cardDimensions]}
-        padding="sm"
-      >
+      <PremiumCard variant="floating" style={[styles.card, cardDimensions]} padding="sm">
         {/* Product Image */}
         <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: product.image }}
-            style={styles.productImage}
-            resizeMode="cover"
-          />
-          
+          <Image source={{ uri: product.image }} style={styles.productImage} resizeMode="cover" />
+
           {/* Image Overlay */}
           <LinearGradient
             colors={['transparent', 'rgba(0,0,0,0.1)', 'rgba(0,0,0,0.3)']}
@@ -178,7 +168,11 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
               <Ionicons
                 name={product.isLiked ? 'heart' : 'heart-outline'}
                 size={20}
-                color={product.isLiked ? DesignSystem.colors.status.error : DesignSystem.colors.text.primary}
+                color={
+                  product.isLiked
+                    ? DesignSystem.colors.status.error
+                    : DesignSystem.colors.text.primary
+                }
               />
             </View>
           </AnimatedTouchableOpacity>
@@ -198,7 +192,7 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
             {product.name}
           </Text>
           <Text style={styles.productPrice}>{product.price}</Text>
-          
+
           {renderConfidenceBar()}
           {renderTags()}
         </View>
@@ -208,72 +202,33 @@ const PremiumProductCard: React.FC<PremiumProductCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  brandName: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.gold[600],
+    fontWeight: '600',
+    marginBottom: DesignSystem.spacing.xs,
+  },
   card: {
     overflow: 'hidden',
   },
-  imageContainer: {
-    flex: 1,
-    borderRadius: DesignSystem.borderRadius.lg,
-    overflow: 'hidden',
-    position: 'relative',
-    marginBottom: DesignSystem.spacing.md,
-  },
-  productImage: {
-    width: '100%',
-    height: '100%',
-  },
-  imageOverlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  likeButton: {
-    position: 'absolute',
-    top: DesignSystem.spacing.sm,
-    right: DesignSystem.spacing.sm,
-  },
-  likeButtonBackground: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...DesignSystem.elevation.soft,
-  },
   categoryBadge: {
-    position: 'absolute',
-    top: DesignSystem.spacing.sm,
-    left: DesignSystem.spacing.sm,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: DesignSystem.borderRadius.sm,
+    left: DesignSystem.spacing.sm,
     paddingHorizontal: DesignSystem.spacing.sm,
     paddingVertical: DesignSystem.spacing.xs,
-    borderRadius: DesignSystem.borderRadius.sm,
+    position: 'absolute',
+    top: DesignSystem.spacing.sm,
   },
   categoryText: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.inverse,
     fontSize: 10,
   },
-  productInfo: {
-    paddingHorizontal: DesignSystem.spacing.xs,
-  },
-  brandName: {
-    ...DesignSystem.typography.scale.caption,
-  color: DesignSystem.colors.gold[600],
-    marginBottom: DesignSystem.spacing.xs,
-    fontWeight: '600',
-  },
-  productName: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.primary,
-    fontWeight: '500',
-    marginBottom: DesignSystem.spacing.xs,
-    lineHeight: 20,
-  },
-  productPrice: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.primary,
-    fontWeight: '700',
-    marginBottom: DesignSystem.spacing.sm,
+  confidenceBar: {
+    backgroundColor: DesignSystem.colors.gold[500],
+    borderRadius: 1.5,
+    height: '100%',
   },
   confidenceContainer: {
     marginBottom: DesignSystem.spacing.sm,
@@ -281,20 +236,15 @@ const styles = StyleSheet.create({
   confidenceLabel: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
-    marginBottom: DesignSystem.spacing.xs,
     fontSize: 10,
+    marginBottom: DesignSystem.spacing.xs,
   },
   confidenceTrack: {
-    height: 3,
     backgroundColor: DesignSystem.colors.border.secondary,
     borderRadius: 1.5,
-    overflow: 'hidden',
+    height: 3,
     marginBottom: DesignSystem.spacing.xs,
-  },
-  confidenceBar: {
-    height: '100%',
-    backgroundColor: DesignSystem.colors.gold[500],
-    borderRadius: 1.5,
+    overflow: 'hidden',
   },
   confidenceValue: {
     ...DesignSystem.typography.scale.caption,
@@ -302,23 +252,67 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '600',
   },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: DesignSystem.spacing.xs,
+  imageContainer: {
+    borderRadius: DesignSystem.borderRadius.lg,
+    flex: 1,
+    marginBottom: DesignSystem.spacing.md,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  imageOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  likeButton: {
+    position: 'absolute',
+    right: DesignSystem.spacing.sm,
+    top: DesignSystem.spacing.sm,
+  },
+  likeButtonBackground: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 18,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+    ...DesignSystem.elevation.soft,
+  },
+  productImage: {
+    height: '100%',
+    width: '100%',
+  },
+  productInfo: {
+    paddingHorizontal: DesignSystem.spacing.xs,
+  },
+  productName: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
+    fontWeight: '500',
+    lineHeight: 20,
+    marginBottom: DesignSystem.spacing.xs,
+  },
+  productPrice: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.primary,
+    fontWeight: '700',
+    marginBottom: DesignSystem.spacing.sm,
   },
   tag: {
     backgroundColor: DesignSystem.colors.surface.secondary,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: DesignSystem.spacing.xs,
+    borderColor: DesignSystem.colors.border.secondary,
     borderRadius: DesignSystem.borderRadius.sm,
     borderWidth: 0.5,
-    borderColor: DesignSystem.colors.border.secondary,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   tagText: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     fontSize: 9,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: DesignSystem.spacing.xs,
   },
 });
 

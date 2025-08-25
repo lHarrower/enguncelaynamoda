@@ -1,101 +1,132 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, StatusBar } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { DesignSystem } from '@/theme/DesignSystem';
-import StandardButton from '@/components/shared/StandardButton';
-import { useAuth } from '@/context/AuthContext';
-import Animated, { 
-  useSharedValue, 
+import React, { memo, useState } from 'react';
+import {
+  Alert,
+  Image,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+import Animated, {
+  interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
-  interpolate,
+  useSharedValue,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import StandardButton from '@/components/shared/StandardButton';
+import { useAuth } from '@/context/AuthContext';
+import { useI18n } from '@/context/I18nContext';
+import { AynamodaColors } from '@/theme/AynamodaColors';
+import { DesignSystem } from '@/theme/DesignSystem';
+
+import { useOptimizedCallback } from '../../src/utils/performanceUtils';
+import {
+  getResponsivePadding,
+  isTablet,
+  responsiveFontSize,
+  responsiveSpacing,
+} from '../../src/utils/responsiveUtils';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 
-const ProfileOption = ({ 
-  icon, 
-  title, 
-  subtitle, 
-  onPress, 
-  showArrow = true,
-  danger = false
-}: { 
-  icon: React.ComponentProps<typeof Ionicons>['name']; 
-  title: string; 
-  subtitle?: string; 
-  onPress: () => void; 
-  showArrow?: boolean;
-  danger?: boolean;
-}) => {
-  const scale = useSharedValue(1);
-  
-  const handlePressIn = () => {
-    scale.value = 0.98;
-  };
-  
-  const handlePressOut = () => {
-    scale.value = 1;
-  };
-  
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+const ProfileOption = memo(
+  ({
+    icon,
+    title,
+    subtitle,
+    onPress,
+    showArrow = true,
+    danger = false,
+  }: {
+    icon: React.ComponentProps<typeof Ionicons>['name'];
+    title: string;
+    subtitle?: string;
+    onPress: () => void;
+    showArrow?: boolean;
+    danger?: boolean;
+  }) => {
+    const scale = useSharedValue(1);
 
-  return (
-    <Animated.View style={animatedStyle}>
-      <TouchableOpacity 
-        style={styles.optionContainer} 
-        onPress={onPress} 
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        activeOpacity={0.9}
-      >
-        <View style={styles.optionLeft}>
-          <View style={[styles.optionIcon, danger && styles.optionIconDanger]}>
-            <Ionicons 
-              name={icon} 
-              size={18} 
-              color={danger ? DesignSystem.colors.error[500] : DesignSystem.colors.text.secondary} 
-            />
-          </View>
-          <View style={styles.optionText}>
-            <Text style={[styles.optionTitle, danger && styles.optionTitleDanger]}>{title}</Text>
-            {subtitle && <Text style={styles.optionSubtitle}>{subtitle}</Text>}
-          </View>
-        </View>
-        {showArrow && (
-          <Ionicons 
-            name="chevron-forward" 
-            size={16} 
-            color={DesignSystem.colors.text.tertiary} 
-          />
-        )}
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
+    const handlePressIn = () => {
+      scale.value = 0.98;
+    };
 
-const ProfileCard = ({ children, style }: { children: React.ReactNode; style?: any }) => (
-  <View style={[styles.profileCard, style]}>
-    {children}
-  </View>
+    const handlePressOut = () => {
+      scale.value = 1;
+    };
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+    }));
+
+    return (
+      <Animated.View style={animatedStyle}>
+        <TouchableOpacity
+          style={styles.optionContainer}
+          onPress={onPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          activeOpacity={0.9}
+        >
+          <View style={styles.optionLeft}>
+            <LinearGradient
+              colors={
+                danger
+                  ? ['rgba(198, 40, 40, 0.1)', 'rgba(198, 40, 40, 0.05)']
+                  : [AynamodaColors.background.secondary, AynamodaColors.background.card]
+              }
+              style={[styles.optionIcon, danger && styles.optionIconDanger]}
+            >
+              <Ionicons
+                name={icon}
+                size={18}
+                color={danger ? DesignSystem.colors.error[500] : AynamodaColors.text.secondary}
+              />
+            </LinearGradient>
+            <View style={styles.optionText}>
+              <Text style={[styles.optionTitle, danger && styles.optionTitleDanger]}>{title}</Text>
+              {subtitle && <Text style={styles.optionSubtitle}>{subtitle}</Text>}
+            </View>
+          </View>
+          {showArrow && (
+            <Ionicons name="chevron-forward" size={16} color={AynamodaColors.text.tertiary} />
+          )}
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  },
 );
 
-const ProfileSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
+const ProfileCard = memo(
+  ({ children, style }: { children: React.ReactNode; style?: ViewStyle }) => (
+    <LinearGradient
+      colors={[AynamodaColors.background.card, AynamodaColors.background.secondary]}
+      style={[styles.profileCard, style]}
+    >
+      {children}
+    </LinearGradient>
+  ),
+);
+
+const ProfileSection = memo(({ title, children }: { title: string; children: React.ReactNode }) => (
   <View style={styles.section}>
     <Text style={styles.sectionTitle}>{title}</Text>
-    <ProfileCard>
-      {children}
-    </ProfileCard>
+    <ProfileCard>{children}</ProfileCard>
   </View>
-);
+));
 
-export default function ProfileScreen() {
+function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { signOut } = useAuth();
+  const { t } = useI18n();
   const [isEditing, setIsEditing] = useState(false);
   const scrollY = useSharedValue(0);
 
@@ -106,42 +137,57 @@ export default function ProfileScreen() {
   });
 
   const headerAnimatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollY.value,
-      [0, 100],
-      [0, 1],
-      'clamp'
-    );
+    const opacity = interpolate(scrollY.value, [0, 100], [0, 1], 'clamp');
 
     return {
       opacity,
     };
   });
 
-  const handleSignOut = async () => {
+  const handleSignOut = useOptimizedCallback(async () => {
     try {
       await signOut();
     } catch (error) {
       console.error('Error during sign out from profile screen:', error);
     }
-  };
+  }, [signOut]);
 
-  const handleEditProfile = () => {
+  const handleEditProfile = useOptimizedCallback(() => {
     setIsEditing(!isEditing);
-  };
+  }, [isEditing]);
 
   const renderFloatingHeader = () => (
     <Animated.View style={[styles.floatingHeader, headerAnimatedStyle]}>
-      <View style={styles.headerContent}>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <TouchableOpacity style={styles.headerButton} onPress={handleEditProfile}>
-          <Ionicons 
-            name={isEditing ? "checkmark" : "pencil"} 
-            size={18} 
-            color={DesignSystem.colors.text.primary} 
-          />
-        </TouchableOpacity>
-      </View>
+      <LinearGradient
+        colors={[AynamodaColors.background.primary, AynamodaColors.background.secondary]}
+        style={styles.floatingHeaderGradient}
+      >
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>{t('navigation.profile')}</Text>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={handleEditProfile}
+            accessibilityRole="button"
+            accessibilityLabel={isEditing ? 'Save profile changes' : 'Edit profile'}
+            accessibilityHint={
+              isEditing
+                ? 'Saves your profile changes'
+                : 'Allows you to edit your profile information'
+            }
+          >
+            <LinearGradient
+              colors={[AynamodaColors.background.secondary, AynamodaColors.background.card]}
+              style={styles.headerButtonGradient}
+            >
+              <Ionicons
+                name={isEditing ? 'checkmark' : 'pencil'}
+                size={18}
+                color={AynamodaColors.primary.terracotta}
+              />
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
     </Animated.View>
   );
 
@@ -150,7 +196,9 @@ export default function ProfileScreen() {
       <View style={styles.avatarSection}>
         <View style={styles.avatarContainer}>
           <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1494790108755-2616b612b5e5?w=400&h=400&fit=crop&crop=face' }}
+            source={{
+              uri: 'https://images.unsplash.com/photo-1494790108755-2616b612b5e5?w=400&h=400&fit=crop&crop=face',
+            }}
             style={styles.avatar}
           />
           {isEditing && (
@@ -160,42 +208,48 @@ export default function ProfileScreen() {
           )}
         </View>
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>Emma Johnson</Text>
-          <Text style={styles.userTitle}>Fashion Enthusiast</Text>
-          <Text style={styles.userLocation}>New York, NY</Text>
+          <Text style={styles.userName}>Ayşe Yılmaz</Text>
+          <Text style={styles.userTitle}>{t('profile.fashionLover')}</Text>
+          <Text style={styles.userLocation}>İstanbul, TR</Text>
         </View>
       </View>
-      
-      <View style={styles.statsRow}>
+
+      <LinearGradient
+        colors={[AynamodaColors.background.secondary, AynamodaColors.background.card]}
+        style={styles.statsRow}
+      >
         <View style={styles.statItem}>
           <Text style={styles.statValue}>127</Text>
-          <Text style={styles.statLabel}>Items</Text>
+          <Text style={styles.statLabel}>{t('wardrobe.items')}</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
           <Text style={styles.statValue}>43</Text>
-          <Text style={styles.statLabel}>Outfits</Text>
+          <Text style={styles.statLabel}>{t('wardrobe.outfits')}</Text>
         </View>
         <View style={styles.statDivider} />
         <View style={styles.statItem}>
           <Text style={styles.statValue}>8.7</Text>
-          <Text style={styles.statLabel}>Style Score</Text>
+          <Text style={styles.statLabel}>{t('profile.styleScore')}</Text>
         </View>
-      </View>
+      </LinearGradient>
     </View>
   );
 
   return (
-    <View style={styles.container}>
+    <LinearGradient
+      colors={[AynamodaColors.background.primary, AynamodaColors.background.secondary]}
+      style={styles.container}
+    >
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
+
       {renderFloatingHeader()}
-      
+
       <AnimatedScrollView
         style={styles.scrollView}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: insets.bottom + DesignSystem.spacing.xxxl }
+          { paddingBottom: insets.bottom + DesignSystem.spacing.xxxl },
         ]}
         onScroll={scrollHandler}
         scrollEventThrottle={16}
@@ -204,123 +258,112 @@ export default function ProfileScreen() {
         {renderProfileHeader()}
 
         {/* Account Management */}
-        <ProfileSection title="Account">
+        <ProfileSection title={t('profile.account')}>
           <ProfileOption
             icon="person-outline"
-            title="Personal Information"
-            subtitle="Manage your account details"
+            title={t('profile.personalInfo')}
+            subtitle={t('profile.manageAccountDetails')}
             onPress={() => {
-              // Navigate to personal info screen or show modal
-              router.push('/(app)/settings/personal-info' as any);
+              Alert.alert(t('common.comingSoon'), t('common.featureComingSoon'));
             }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="shield-checkmark-outline"
-            title="Privacy & Security"
-            subtitle="Control your data and privacy"
+            title={t('profile.privacySecurity')}
+            subtitle={t('profile.controlDataPrivacy')}
             onPress={() => {
-              // Navigate to privacy settings
-              router.push('/(app)/settings/privacy' as any);
+              Alert.alert(t('common.comingSoon'), t('common.featureComingSoon'));
             }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="notifications-outline"
-            title="Notifications"
-            subtitle="Customize your alerts"
+            title={t('profile.notifications')}
+            subtitle={t('profile.customizeAlerts')}
             onPress={() => {
-              // Navigate to notification settings
-              router.push('/(app)/settings/notifications' as any);
+              router.push('/(app)/notifications');
             }}
           />
         </ProfileSection>
 
         {/* Style Preferences */}
-        <ProfileSection title="Style & Preferences">
+        <ProfileSection title={t('profile.stylePreferences')}>
           <ProfileOption
             icon="color-palette-outline"
-            title="Style Profile"
-            subtitle="Define your fashion preferences"
+            title={t('profile.styleProfile')}
+            subtitle={t('profile.setFashionPreferences')}
             onPress={() => {
-              // Navigate to style preferences
-              router.push('/(app)/settings/style-preferences' as any);
+              Alert.alert(t('common.comingSoon'), t('common.featureComingSoon'));
             }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="resize-outline"
-            title="Size & Measurements"
-            subtitle="Update your sizing information"
+            title={t('profile.sizeMeasurements')}
+            subtitle={t('profile.updateSizeInfo')}
             onPress={() => {
-              // Navigate to size profile
-              router.push('/(app)/settings/size-profile' as any);
+              Alert.alert(t('common.comingSoon'), t('common.featureComingSoon'));
             }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="heart-outline"
-            title="Favorite Brands"
-            subtitle="Manage your preferred brands"
+            title={t('profile.favoriteBrands')}
+            subtitle={t('profile.managePreferredBrands')}
             onPress={() => {
-              // Navigate to favorite brands
-              router.push('/(app)/settings/favorite-brands' as any);
+              Alert.alert(t('common.comingSoon'), t('common.featureComingSoon'));
             }}
           />
         </ProfileSection>
 
         {/* App Settings */}
-        <ProfileSection title="App Settings">
+        <ProfileSection title={t('profile.appSettings')}>
           <ProfileOption
             icon="language-outline"
-            title="Language"
-            subtitle="English"
+            title={t('profile.language')}
+            subtitle={t('profile.currentLanguage')}
             onPress={() => {
-              // Navigate to language settings
-              router.push('/(app)/settings/language' as any);
+              router.push('/(app)/settings');
             }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="moon-outline"
-            title="Appearance"
-            subtitle="Light mode"
+            title={t('profile.theme')}
+            subtitle={t('profile.lightTheme')}
             onPress={() => {
-              // Navigate to appearance settings
-              router.push('/(app)/settings/appearance' as any);
+              Alert.alert(t('common.comingSoon'), t('common.featureComingSoon'));
             }}
           />
         </ProfileSection>
 
         {/* Support & Legal */}
-        <ProfileSection title="Support & Legal">
+        <ProfileSection title={t('profile.supportLegal')}>
           <ProfileOption
             icon="help-circle-outline"
-            title="Help Center"
-            subtitle="Get help and support"
+            title={t('profile.helpCenter')}
+            subtitle={t('profile.getHelpSupport')}
             onPress={() => {
-              // Navigate to help center
-              router.push('/(app)/help/center' as any);
+              Alert.alert(t('common.comingSoon'), t('common.featureComingSoon'));
             }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="chatbubble-outline"
-            title="Contact Support"
-            subtitle="Send us your feedback"
+            title={t('profile.contactSupport')}
+            subtitle={t('profile.sendFeedback')}
             onPress={() => {
-              // Navigate to contact support
-              router.push('/(app)/help/contact' as any);
+              Alert.alert(t('common.comingSoon'), t('common.featureComingSoon'));
             }}
           />
           <View style={styles.divider} />
           <ProfileOption
             icon="document-text-outline"
-            title="Terms & Privacy Policy"
-            subtitle="Read our policies"
+            title={t('profile.termsPrivacy')}
+            subtitle={t('profile.readPolicies')}
             onPress={() => {
-              // Navigate to terms and privacy
-              router.push('/(app)/legal/terms-privacy' as any);
+              Alert.alert(t('common.comingSoon'), t('common.featureComingSoon'));
             }}
           />
         </ProfileSection>
@@ -328,8 +371,8 @@ export default function ProfileScreen() {
         {/* Sign Out */}
         <View style={styles.signOutSection}>
           <StandardButton
-            title="Sign Out"
-            onPress={handleSignOut}
+            title={t('auth.signOut')}
+            onPress={() => void handleSignOut()}
             variant="ghost"
             size="large"
             fullWidth
@@ -337,210 +380,228 @@ export default function ProfileScreen() {
           />
         </View>
       </AnimatedScrollView>
-    </View>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  floatingHeader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-    backgroundColor: DesignSystem.colors.background.primary,
-    borderBottomWidth: 1,
-  borderBottomColor: DesignSystem.colors.border.secondary,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: 60,
-    paddingBottom: DesignSystem.spacing.md,
-  },
-  headerTitle: {
-  ...DesignSystem.typography.scale.h2,
-    color: DesignSystem.colors.text.primary,
-    fontWeight: '400',
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: DesignSystem.radius.round,
-    backgroundColor: DesignSystem.colors.surface.secondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.secondary,
-  },
-  profileHeader: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: 100,
-    paddingBottom: DesignSystem.spacing.xxxl,
-  },
-  avatarSection: {
-    alignItems: 'center',
-    marginBottom: DesignSystem.spacing.xl,
-  },
-  avatarContainer: {
-    position: 'relative',
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: DesignSystem.colors.surface.secondary,
-    borderWidth: 3,
-    borderColor: DesignSystem.colors.border.secondary,
-  },
-  avatarEditButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-  backgroundColor: DesignSystem.colors.sage[600],
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: DesignSystem.colors.background.primary,
-    ...DesignSystem.elevation.soft,
-  },
-  userInfo: {
-    alignItems: 'center',
-  },
-  userName: {
-  ...DesignSystem.typography.scale.h1,
-    color: DesignSystem.colors.text.primary,
-    marginBottom: DesignSystem.spacing.xs,
-    fontWeight: '400',
-  },
-  userTitle: {
-  ...DesignSystem.typography.body1,
-    color: DesignSystem.colors.text.secondary,
-    marginBottom: DesignSystem.spacing.xs,
-  },
-  userLocation: {
-  ...DesignSystem.typography.caption.medium,
-    color: DesignSystem.colors.text.tertiary,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: DesignSystem.colors.surface.secondary,
-    borderRadius: DesignSystem.radius.lg,
-    padding: DesignSystem.spacing.lg,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.secondary,
-  },
-  statItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  statValue: {
-  ...DesignSystem.typography.scale.h2,
-    color: DesignSystem.colors.text.primary,
-    fontWeight: '300',
-    marginBottom: DesignSystem.spacing.xs,
-  },
-  statLabel: {
-  ...DesignSystem.typography.caption.medium,
-    color: DesignSystem.colors.text.tertiary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-  },
-  statDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: DesignSystem.colors.border.secondary,
-    marginHorizontal: DesignSystem.spacing.lg,
-  },
-  section: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.xl,
-  },
-  sectionTitle: {
-    ...DesignSystem.typography.overline,
-    color: DesignSystem.colors.text.tertiary,
-    marginBottom: DesignSystem.spacing.md,
-    paddingLeft: DesignSystem.spacing.xs,
-  },
-  profileCard: {
-    backgroundColor: DesignSystem.colors.surface.primary,
-    borderRadius: DesignSystem.radius.lg,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.secondary,
-    overflow: 'hidden',
-  },
-  optionContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.lg,
-    minHeight: 64,
-  },
-  optionLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  optionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: DesignSystem.radius.lg,
-    backgroundColor: DesignSystem.colors.surface.secondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: DesignSystem.spacing.md,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.secondary,
-  },
-  optionIconDanger: {
-    backgroundColor: 'rgba(198, 40, 40, 0.1)',
-    borderColor: 'rgba(198, 40, 40, 0.2)',
-  },
-  optionText: {
-    flex: 1,
-  },
-  optionTitle: {
-    ...DesignSystem.typography.body1,
-    color: DesignSystem.colors.text.primary,
-    fontWeight: '400',
-    marginBottom: 2,
-  },
-  optionTitleDanger: {
-    color: DesignSystem.colors.error[500],
-  },
-  optionSubtitle: {
-    ...DesignSystem.typography.caption,
-    color: DesignSystem.colors.text.tertiary,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: DesignSystem.colors.border.secondary,
-    marginLeft: DesignSystem.spacing.lg + 44 + DesignSystem.spacing.md,
-  },
-  signOutSection: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    marginTop: DesignSystem.spacing.lg,
-  },
-});
+const createResponsiveStyles = () => {
+  const padding = getResponsivePadding();
+  const isTabletDevice = isTablet();
 
+  return StyleSheet.create({
+    avatar: {
+      backgroundColor: AynamodaColors.background.secondary,
+      borderColor: AynamodaColors.border.primary,
+      borderRadius: 60,
+      borderWidth: 3,
+      height: 120,
+      width: 120,
+    },
+    avatarContainer: {
+      marginBottom: DesignSystem.spacing.lg,
+      position: 'relative',
+    },
+    avatarEditButton: {
+      alignItems: 'center',
+      backgroundColor: AynamodaColors.primary.terracotta,
+      borderColor: AynamodaColors.background.primary,
+      borderRadius: 18,
+      borderWidth: 3,
+      bottom: 0,
+      elevation: 3,
+      height: 36,
+      justifyContent: 'center',
+      position: 'absolute',
+      right: 0,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      width: 36,
+    },
+    avatarSection: {
+      alignItems: 'center',
+      marginBottom: DesignSystem.spacing.xl,
+    },
+    container: {
+      flex: 1,
+    },
+    divider: {
+      backgroundColor: AynamodaColors.border.primary,
+      height: 1,
+      marginLeft: 20 + 44 + 16,
+    },
+    floatingHeader: {
+      borderBottomColor: AynamodaColors.border.primary,
+      borderBottomWidth: 1,
+      left: 0,
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      zIndex: 1000,
+    },
+    floatingHeaderGradient: {
+      width: '100%',
+    },
+    headerButton: {
+      borderColor: AynamodaColors.border.primary,
+      borderRadius: 20,
+      borderWidth: 1,
+      height: 40,
+      overflow: 'hidden',
+      width: 40,
+    },
+    headerButtonGradient: {
+      alignItems: 'center',
+      borderRadius: 20,
+      height: '100%',
+      justifyContent: 'center',
+      width: '100%',
+    },
+    headerContent: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingBottom: responsiveSpacing(DesignSystem.spacing.md),
+      paddingHorizontal: isTabletDevice ? padding.horizontal * 1.5 : DesignSystem.spacing.lg,
+      paddingTop: responsiveSpacing(60),
+    },
+    headerTitle: {
+      color: AynamodaColors.text.primary,
+      fontFamily: DesignSystem.typography.fontFamily.primary,
+      fontSize: responsiveFontSize(DesignSystem.typography.scale.h2.fontSize || 24),
+      fontWeight: '400',
+    },
+    optionContainer: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      minHeight: 64,
+      paddingHorizontal: DesignSystem.spacing.lg,
+      paddingVertical: DesignSystem.spacing.lg,
+    },
+    optionIcon: {
+      alignItems: 'center',
+      borderColor: AynamodaColors.border.primary,
+      borderRadius: 16,
+      borderWidth: 1,
+      height: 44,
+      justifyContent: 'center',
+      marginRight: 16,
+      width: 44,
+    },
+    optionIconDanger: {
+      backgroundColor: 'rgba(198, 40, 40, 0.1)',
+      borderColor: 'rgba(198, 40, 40, 0.2)',
+    },
+    optionLeft: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      flex: 1,
+    },
+    optionSubtitle: {
+      ...DesignSystem.typography.caption,
+      color: AynamodaColors.text.tertiary,
+    },
+    optionText: {
+      flex: 1,
+    },
+    optionTitle: {
+      ...DesignSystem.typography.body1,
+      color: AynamodaColors.text.primary,
+      fontWeight: '400',
+      marginBottom: 2,
+    },
+    optionTitleDanger: {
+      color: DesignSystem.colors.error[500],
+    },
+    profileCard: {
+      borderColor: AynamodaColors.border.primary,
+      borderRadius: 16,
+      borderWidth: 1,
+      overflow: 'hidden',
+    },
+    profileHeader: {
+      paddingBottom: DesignSystem.spacing.xxxl,
+      paddingHorizontal: DesignSystem.spacing.lg,
+      paddingTop: 100,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      paddingHorizontal: isTabletDevice ? padding.horizontal * 1.5 : 0,
+    },
+    scrollView: {
+      flex: 1,
+    },
+    section: {
+      marginBottom: DesignSystem.spacing.xl,
+      paddingHorizontal: DesignSystem.spacing.lg,
+    },
+    sectionTitle: {
+      ...DesignSystem.typography.overline,
+      color: AynamodaColors.text.tertiary,
+      marginBottom: DesignSystem.spacing.md,
+      paddingLeft: DesignSystem.spacing.xs,
+    },
+    signOutSection: {
+      marginTop: responsiveSpacing(DesignSystem.spacing.lg),
+      paddingHorizontal: isTabletDevice ? padding.horizontal * 1.5 : DesignSystem.spacing.lg,
+    },
+    statDivider: {
+      backgroundColor: AynamodaColors.border.primary,
+      height: 40,
+      marginHorizontal: 20,
+      width: 1,
+    },
+    statItem: {
+      alignItems: 'center',
+      flex: 1,
+    },
+    statLabel: {
+      ...DesignSystem.typography.caption.medium,
+      color: AynamodaColors.text.tertiary,
+      letterSpacing: 0.8,
+      textTransform: 'uppercase',
+    },
+    statValue: {
+      ...DesignSystem.typography.scale.h2,
+      color: AynamodaColors.text.primary,
+      fontWeight: '300',
+      marginBottom: DesignSystem.spacing.xs,
+    },
+    statsRow: {
+      alignItems: 'center',
+      borderColor: AynamodaColors.border.primary,
+      borderRadius: 16,
+      borderWidth: 1,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      padding: 20,
+    },
+    userInfo: {
+      alignItems: 'center',
+    },
+    userLocation: {
+      ...DesignSystem.typography.caption.medium,
+      color: AynamodaColors.text.tertiary,
+      letterSpacing: 1,
+      textTransform: 'uppercase',
+    },
+    userName: {
+      ...DesignSystem.typography.scale.h1,
+      color: AynamodaColors.text.primary,
+      fontWeight: '400',
+      marginBottom: DesignSystem.spacing.xs,
+    },
+    userTitle: {
+      ...DesignSystem.typography.body1,
+      color: AynamodaColors.text.secondary,
+      marginBottom: DesignSystem.spacing.xs,
+    },
+  });
+};
+
+// Create responsive styles
+const styles = createResponsiveStyles();
+
+export default memo(ProfileScreen);

@@ -1,11 +1,6 @@
 // Auth Header Component
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 export interface AuthHeaderProps {
   title?: string;
@@ -27,7 +22,7 @@ const AuthHeader: React.FC<AuthHeaderProps> = ({
           </View>
         </View>
       )}
-      
+
       <Text style={styles.title}>{title}</Text>
       {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
     </View>
@@ -43,29 +38,29 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   logoPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#3B82F6',
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#3B82F6',
+    borderRadius: 40,
+    height: 80,
+    justifyContent: 'center',
+    width: 80,
   },
   logoText: {
+    color: '#FFFFFF',
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
     color: '#6B7280',
-    textAlign: 'center',
+    fontSize: 16,
     lineHeight: 24,
+    textAlign: 'center',
+  },
+  title: {
+    color: '#1F2937',
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
 });
 

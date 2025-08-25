@@ -1,12 +1,10 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-} from 'react-native';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+import { IoniconsName } from '@/types/icons';
 
 interface DiscoverStatsProps {
   totalOutfits: number;
@@ -54,11 +52,7 @@ const DiscoverStats: React.FC<DiscoverStatsProps> = ({
         {stats.map((stat, index) => (
           <View key={index} style={styles.statItem}>
             <View style={[styles.iconContainer, { backgroundColor: `${stat.color}20` }]}>
-              <Ionicons 
-                name={stat.icon as any} 
-                size={20} 
-                color={stat.color} 
-              />
+              <Ionicons name={stat.icon as IoniconsName} size={20} color={stat.color} />
             </View>
             <Text style={styles.statValue}>{stat.value}</Text>
             <Text style={styles.statLabel}>{stat.label}</Text>
@@ -72,36 +66,36 @@ const DiscoverStats: React.FC<DiscoverStatsProps> = ({
 const styles = StyleSheet.create({
   container: {
     borderRadius: DesignSystem.borderRadius.lg,
-    overflow: 'hidden',
-    marginHorizontal: DesignSystem.spacing.lg,
     marginBottom: DesignSystem.spacing.lg,
+    marginHorizontal: DesignSystem.spacing.lg,
+    overflow: 'hidden',
     ...DesignSystem.elevation.medium,
   },
-  statsGrid: {
-    flexDirection: 'row',
-    padding: DesignSystem.spacing.lg,
+  iconContainer: {
+    alignItems: 'center',
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    width: 40,
   },
   statItem: {
-    flex: 1,
     alignItems: 'center',
+    flex: 1,
     gap: DesignSystem.spacing.xs,
   },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+  statLabel: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.charcoal[600],
+    textAlign: 'center',
   },
   statValue: {
     ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.charcoal[800],
     fontWeight: '700',
   },
-  statLabel: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.charcoal[600],
-    textAlign: 'center',
+  statsGrid: {
+    flexDirection: 'row',
+    padding: DesignSystem.spacing.lg,
   },
 });
 

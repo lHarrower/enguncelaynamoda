@@ -1,0 +1,178 @@
+{
+  "totalDependencies": 46,
+  "totalDevDependencies": 36,
+  "largestPackages": [
+    {
+      "name": "react-native",
+      "size": 76419436,
+      "formattedSize": "72.88 MB"
+    },
+    {
+      "name": "@sentry/react-native",
+      "size": 17790621,
+      "formattedSize": "16.97 MB"
+    },
+    {
+      "name": "@expo-google-fonts/inter",
+      "size": 8044393,
+      "formattedSize": "7.67 MB"
+    },
+    {
+      "name": "react-dom",
+      "size": 6370687,
+      "formattedSize": "6.08 MB"
+    },
+    {
+      "name": "openai",
+      "size": 5808816,
+      "formattedSize": "5.54 MB"
+    },
+    {
+      "name": "@expo/vector-icons",
+      "size": 5761240,
+      "formattedSize": "5.49 MB"
+    },
+    {
+      "name": "react-native-gesture-handler",
+      "size": 4235617,
+      "formattedSize": "4.04 MB"
+    },
+    {
+      "name": "@expo-google-fonts/playfair-display",
+      "size": 3769943,
+      "formattedSize": "3.6 MB"
+    },
+    {
+      "name": "zod",
+      "size": 3594196,
+      "formattedSize": "3.43 MB"
+    },
+    {
+      "name": "react-native-reanimated",
+      "size": 3457504,
+      "formattedSize": "3.3 MB"
+    },
+    {
+      "name": "expo-updates",
+      "size": 3115240,
+      "formattedSize": "2.97 MB"
+    },
+    {
+      "name": "react-native-web",
+      "size": 3028782,
+      "formattedSize": "2.89 MB"
+    },
+    {
+      "name": "react-native-screens",
+      "size": 2298604,
+      "formattedSize": "2.19 MB"
+    },
+    {
+      "name": "expo-router",
+      "size": 1998767,
+      "formattedSize": "1.91 MB"
+    },
+    {
+      "name": "expo-notifications",
+      "size": 1553027,
+      "formattedSize": "1.48 MB"
+    },
+    {
+      "name": "@sentry/browser",
+      "size": 1260429,
+      "formattedSize": "1.2 MB"
+    },
+    {
+      "name": "expo-camera",
+      "size": 839708,
+      "formattedSize": "820.03 KB"
+    },
+    {
+      "name": "expo-location",
+      "size": 569977,
+      "formattedSize": "556.62 KB"
+    },
+    {
+      "name": "expo",
+      "size": 518741,
+      "formattedSize": "506.58 KB"
+    },
+    {
+      "name": "@sentry/react",
+      "size": 481269,
+      "formattedSize": "469.99 KB"
+    }
+  ],
+  "recommendations": [
+    {
+      "type": "optimization",
+      "package": "react-native",
+      "size": "72.88 MB",
+      "suggestion": "Consider using Hermes engine for better performance and smaller bundle size",
+      "priority": "medium"
+    },
+    {
+      "type": "review",
+      "package": "@sentry/react-native",
+      "size": "16.97 MB",
+      "suggestion": "Review if this large dependency is necessary or can be replaced",
+      "priority": "high"
+    },
+    {
+      "type": "optimization",
+      "package": "@expo-google-fonts/inter",
+      "size": "7.67 MB",
+      "suggestion": "Consider using Expo managed workflow optimizations",
+      "priority": "low"
+    },
+    {
+      "type": "review",
+      "package": "react-dom",
+      "size": "6.08 MB",
+      "suggestion": "Review if this large dependency is necessary or can be replaced",
+      "priority": "high"
+    },
+    {
+      "type": "review",
+      "package": "openai",
+      "size": "5.54 MB",
+      "suggestion": "Review if this large dependency is necessary or can be replaced",
+      "priority": "high"
+    },
+    {
+      "type": "optimization",
+      "package": "@expo/vector-icons",
+      "size": "5.49 MB",
+      "suggestion": "Consider using Expo managed workflow optimizations",
+      "priority": "low"
+    },
+    {
+      "type": "optimization",
+      "package": "@expo-google-fonts/playfair-display",
+      "size": "3.6 MB",
+      "suggestion": "Consider using Expo managed workflow optimizations",
+      "priority": "low"
+    },
+    {
+      "type": "optimization",
+      "package": "expo-updates",
+      "size": "2.97 MB",
+      "suggestion": "Consider using Expo managed workflow optimizations",
+      "priority": "low"
+    },
+    {
+      "type": "optimization",
+      "package": "expo-router",
+      "size": "1.91 MB",
+      "suggestion": "Consider using Expo managed workflow optimizations",
+      "priority": "low"
+    },
+    {
+      "type": "optimization",
+      "package": "expo-notifications",
+      "size": "1.48 MB",
+      "suggestion": "Consider using Expo managed workflow optimizations",
+      "priority": "low"
+    }
+  ]
+}

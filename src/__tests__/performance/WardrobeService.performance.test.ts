@@ -1,59 +1,57 @@
 // Performance tests for WardrobeService
-import { WardrobeService } from '@/services/wardrobeService';
-import { createMockWardrobeItem } from '@/__tests__/utils/testUtils';
-import { WardrobeCategory, WardrobeColor } from '@/types';
-import { mocks } from '@/__tests__/mocks';
+import { WardrobeService } from '../../services/wardrobeService';
+import { createMockWardrobeItem } from '../utils/testUtils';
+import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
+import { createPostgrestBuilder } from '../../test/supabaseMockBuilder';
+import { mocks } from '../mocks';
 
 // Mock dependencies
-jest.mock('@/config/supabaseClient', () => ({ supabase: mocks.supabase }));
+jest.mock('../../config/supabaseClient', () => ({
+  supabase: {
+    from: jest.fn(() => ({
+      select: jest.fn().mockResolvedValue({ data: [], error: null }),
+      insert: jest.fn().mockResolvedValue({ data: [], error: null }),
+      update: jest.fn().mockResolvedValue({ data: [], error: null }),
+      delete: jest.fn().mockResolvedValue({ data: [], error: null }),
+    })),
+  },
+}));
+
 jest.mock('@react-native-async-storage/async-storage', () => mocks.asyncStorage);
 
 describe('WardrobeService Performance', () => {
   let wardrobeService: WardrobeService;
-  const mockSupabase = mocks.supabase;
+  const mockSupabase: any = require('../../config/supabaseClient').supabase;
 
   beforeEach(() => {
     jest.clearAllMocks();
     wardrobeService = new WardrobeService();
-    
+
     // Reset cache
     (wardrobeService as any).cache.clear();
   });
 
   describe('large dataset handling', () => {
     it('should handle loading 1000+ wardrobe items efficiently', async () => {
-      const largeDataset = Array.from({ length: 1000 }, (_, index) => 
+      const largeDataset = Array.from({ length: 1000 }, (_, index) =>
         createMockWardrobeItem({
           id: `item-${index}`,
           name: `Item ${index}`,
           category: Object.values(WardrobeCategory)[index % Object.values(WardrobeCategory).length],
-          colors: [Object.values(WardrobeColor)[index % Object.values(WardrobeColor).length]],
-        })
+          colors: [
+            String(Object.values(WardrobeColor)[index % Object.values(WardrobeColor).length] || ''),
+          ],
+        }),
       );
 
-      mockSupabase.from.mockReturnValue({
-        select: jest.fn().mockReturnThis(),
-        insert: jest.fn().mockReturnThis(),
-        update: jest.fn().mockReturnThis(),
-        delete: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnValue({
-          order: jest.fn().mockResolvedValue({ data: largeDataset, error: null }),
-        }),
-        neq: jest.fn().mockReturnThis(),
-        gt: jest.fn().mockReturnThis(),
-        gte: jest.fn().mockReturnThis(),
-        lt: jest.fn().mockReturnThis(),
-        lte: jest.fn().mockReturnThis(),
-        like: jest.fn().mockReturnThis(),
-        ilike: jest.fn().mockReturnThis(),
-        in: jest.fn().mockReturnThis(),
-        contains: jest.fn().mockReturnThis(),
-        order: jest.fn().mockResolvedValue({ data: largeDataset, error: null }),
-        limit: jest.fn().mockReturnThis(),
-        range: jest.fn().mockReturnThis(),
-        single: jest.fn(),
-        maybeSingle: jest.fn(),
-      } as any);
+      mockSupabase.from.mockImplementation(() => {
+        const b = createPostgrestBuilder();
+        b.eq.mockReturnValue({
+          order: jest.fn().mockReturnValue({ data: largeDataset, error: null }),
+        });
+        b.order.mockReturnValue({ data: largeDataset, error: null });
+        return b;
+      });
 
       const startTime = performance.now();
       const result = await wardrobeService.getAllItems('user-id');
@@ -64,42 +62,26 @@ describe('WardrobeService Performance', () => {
     });
 
     it('should efficiently search through large datasets', async () => {
-      const largeDataset = Array.from({ length: 5000 }, (_, index) => 
+      const largeDataset = Array.from({ length: 5000 }, (_, index) =>
         createMockWardrobeItem({
           id: `item-${index}`,
           name: `${index % 2 === 0 ? 'Summer' : 'Winter'} Item ${index}`,
           category: Object.values(WardrobeCategory)[index % Object.values(WardrobeCategory).length],
-        })
+        }),
       );
 
-      mockSupabase.from.mockReturnValue({
-        select: jest.fn().mockReturnThis(),
-        insert: jest.fn().mockReturnThis(),
-        update: jest.fn().mockReturnThis(),
-        delete: jest.fn().mockReturnThis(),
-        eq: jest.fn().mockReturnValue({
+      mockSupabase.from.mockImplementation(() => {
+        const b = createPostgrestBuilder();
+        b.eq.mockReturnValue({
           or: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({
-              data: largeDataset.filter(item => (item.name || '').includes('Summer')),
+            order: jest.fn().mockReturnValue({
+              data: largeDataset.filter((item) => (item.name || '').includes('Summer')),
               error: null,
             }),
           }),
-        }),
-        neq: jest.fn().mockReturnThis(),
-        gt: jest.fn().mockReturnThis(),
-        gte: jest.fn().mockReturnThis(),
-        lt: jest.fn().mockReturnThis(),
-        lte: jest.fn().mockReturnThis(),
-        like: jest.fn().mockReturnThis(),
-        ilike: jest.fn().mockReturnThis(),
-        in: jest.fn().mockReturnThis(),
-        contains: jest.fn().mockReturnThis(),
-        order: jest.fn(),
-        limit: jest.fn().mockReturnThis(),
-        range: jest.fn().mockReturnThis(),
-        single: jest.fn(),
-        maybeSingle: jest.fn(),
-      } as any);
+        });
+        return b;
+      });
 
       const startTime = performance.now();
       const result = await wardrobeService.searchItems('user-id', 'Summer');
@@ -110,18 +92,17 @@ describe('WardrobeService Performance', () => {
     });
 
     it('should handle bulk operations efficiently', async () => {
-      const bulkItems = Array.from({ length: 100 }, (_, index) => 
+      const bulkItems = Array.from({ length: 100 }, (_, index) =>
         createMockWardrobeItem({
           id: `bulk-item-${index}`,
           name: `Bulk Item ${index}`,
-        })
+        }),
       );
 
-      mockSupabase.from.mockReturnValue({
-        upsert: jest.fn().mockResolvedValue({
-          data: bulkItems,
-          error: null,
-        }),
+      mockSupabase.from.mockImplementation(() => {
+        const b = createPostgrestBuilder();
+        b.upsert.mockResolvedValue({ data: bulkItems, error: null });
+        return b;
       });
 
       const startTime = performance.now();
@@ -134,19 +115,18 @@ describe('WardrobeService Performance', () => {
 
   describe('caching performance', () => {
     it('should significantly improve performance with caching', async () => {
-      const testData = Array.from({ length: 100 }, (_, index) => 
-        createMockWardrobeItem({ id: `cached-item-${index}` })
+      const testData = Array.from({ length: 100 }, (_, index) =>
+        createMockWardrobeItem({ id: `cached-item-${index}` }),
       );
 
-      mockSupabase.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
+      mockSupabase.from.mockImplementation(() => {
+        const b = createPostgrestBuilder();
+        b.select.mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({
-              data: testData,
-              error: null,
-            }),
+            order: jest.fn().mockReturnValue({ data: testData, error: null }),
           }),
-        }),
+        });
+        return b;
       });
 
       // First call (cache miss)
@@ -169,19 +149,18 @@ describe('WardrobeService Performance', () => {
     it('should handle cache invalidation efficiently', async () => {
       const testData = [createMockWardrobeItem()];
 
-      mockSupabase.from.mockReturnValue({
-        select: jest.fn().mockReturnValue({
+      mockSupabase.from.mockImplementation(() => {
+        const b = createPostgrestBuilder();
+        b.select.mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockResolvedValue({
-              data: testData,
-              error: null,
-            }),
+            order: jest.fn().mockReturnValue({ data: testData, error: null }),
           }),
-        }),
-        insert: jest.fn().mockResolvedValue({
+        });
+        b.insert.mockResolvedValue({
           data: [createMockWardrobeItem({ id: 'new-item' })],
           error: null,
-        }),
+        });
+        return b;
       });
 
       // Load initial data
@@ -200,19 +179,18 @@ describe('WardrobeService Performance', () => {
 
       // Load multiple large datasets
       for (let i = 0; i < 10; i++) {
-        const dataset = Array.from({ length: 1000 }, (_, index) => 
-          createMockWardrobeItem({ id: `dataset-${i}-item-${index}` })
+        const dataset = Array.from({ length: 1000 }, (_, index) =>
+          createMockWardrobeItem({ id: `dataset-${i}-item-${index}` }),
         );
 
-        mockSupabase.from.mockReturnValue({
-          select: jest.fn().mockReturnValue({
+        mockSupabase.from.mockImplementation(() => {
+          const b = createPostgrestBuilder();
+          b.select.mockReturnValue({
             eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockResolvedValue({
-                data: dataset,
-                error: null,
-              }),
+              order: jest.fn().mockReturnValue({ data: dataset, error: null }),
             }),
-          }),
+          });
+          return b;
         });
 
         await wardrobeService.getAllItems(`user-${i}`);
@@ -228,8 +206,8 @@ describe('WardrobeService Performance', () => {
 
   describe('concurrent operations', () => {
     it('should handle multiple concurrent reads efficiently', async () => {
-      const testData = Array.from({ length: 100 }, (_, index) => 
-        createMockWardrobeItem({ id: `concurrent-item-${index}` })
+      const testData = Array.from({ length: 100 }, (_, index) =>
+        createMockWardrobeItem({ id: `concurrent-item-${index}` }),
       );
 
       mockSupabase.from.mockReturnValue({
@@ -244,17 +222,15 @@ describe('WardrobeService Performance', () => {
       });
 
       const startTime = performance.now();
-      
+
       // Execute 10 concurrent reads
-      const promises = Array.from({ length: 10 }, () => 
-        wardrobeService.getAllItems('user-id')
-      );
-      
+      const promises = Array.from({ length: 10 }, () => wardrobeService.getAllItems('user-id'));
+
       const results = await Promise.all(promises);
       const endTime = performance.now();
 
       expect(results).toHaveLength(10);
-      expect(results.every(result => result.length === 100)).toBe(true);
+      expect(results.every((result) => result.length === 100)).toBe(true);
       expect(endTime - startTime).toBeLessThan(2000); // Should complete within 2 seconds
     });
 
@@ -284,7 +260,7 @@ describe('WardrobeService Performance', () => {
       });
 
       const startTime = performance.now();
-      
+
       // Execute mixed operations concurrently
       const promises = [
         wardrobeService.getAllItems('user-id'),
@@ -293,7 +269,7 @@ describe('WardrobeService Performance', () => {
         wardrobeService.updateItem('user-id', 'write-item', { name: 'Updated Item' }),
         wardrobeService.getAllItems('user-id'),
       ];
-      
+
       await Promise.all(promises);
       const endTime = performance.now();
 
@@ -335,8 +311,8 @@ describe('WardrobeService Performance', () => {
 
   describe('memory and resource management', () => {
     it('should clean up resources properly', async () => {
-      const testData = Array.from({ length: 1000 }, (_, index) => 
-        createMockWardrobeItem({ id: `cleanup-item-${index}` })
+      const testData = Array.from({ length: 1000 }, (_, index) =>
+        createMockWardrobeItem({ id: `cleanup-item-${index}` }),
       );
 
       mockSupabase.from.mockReturnValue({
@@ -354,7 +330,7 @@ describe('WardrobeService Performance', () => {
 
       // Perform operations
       await wardrobeService.getAllItems('user-id');
-      
+
       // Force garbage collection if available
       if (global.gc) {
         global.gc();
@@ -407,12 +383,12 @@ describe('WardrobeService Performance', () => {
       });
 
       const startTime = performance.now();
-      
+
       // Execute multiple failing operations
-      const promises = Array.from({ length: 10 }, () => 
-        wardrobeService.getAllItems('user-id').catch(() => null)
+      const promises = Array.from({ length: 10 }, () =>
+        wardrobeService.getAllItems('user-id').catch(() => null),
       );
-      
+
       await Promise.all(promises);
       const endTime = performance.now();
 
@@ -440,16 +416,20 @@ describe('WardrobeService Performance', () => {
       });
 
       const startTime = performance.now();
-      
+
       // Should eventually succeed after failures
-      const result = await wardrobeService.getAllItems('user-id').catch(() => 
-        wardrobeService.getAllItems('user-id').catch(() => 
-          wardrobeService.getAllItems('user-id').catch(() => 
-            wardrobeService.getAllItems('user-id')
-          )
-        )
-      );
-      
+      const result = await wardrobeService
+        .getAllItems('user-id')
+        .catch(() =>
+          wardrobeService
+            .getAllItems('user-id')
+            .catch(() =>
+              wardrobeService
+                .getAllItems('user-id')
+                .catch(() => wardrobeService.getAllItems('user-id')),
+            ),
+        );
+
       const endTime = performance.now();
 
       expect(result).toHaveLength(1);
@@ -463,8 +443,8 @@ describe('WardrobeService Performance', () => {
       const times: number[] = [];
 
       for (const size of dataSizes) {
-        const dataset = Array.from({ length: size }, (_, index) => 
-          createMockWardrobeItem({ id: `scale-item-${index}` })
+        const dataset = Array.from({ length: size }, (_, index) =>
+          createMockWardrobeItem({ id: `scale-item-${index}` }),
         );
 
         mockSupabase.from.mockReturnValue({
@@ -481,14 +461,14 @@ describe('WardrobeService Performance', () => {
         const startTime = performance.now();
         await wardrobeService.getAllItems(`user-${size}`);
         const endTime = performance.now();
-        
+
         times.push(endTime - startTime);
       }
 
       // Performance should scale reasonably (not exponentially)
-      const ratio1 = times[1] / times[0]; // 500/100
-      const ratio2 = times[2] / times[1]; // 1000/500
-      const ratio3 = times[3] / times[2]; // 2000/1000
+      const ratio1 = times[1]! / times[0]!; // 500/100
+      const ratio2 = times[2]! / times[1]!; // 1000/500
+      const ratio3 = times[3]! / times[2]!; // 2000/1000
 
       // Ratios should be reasonable (less than 10x)
       expect(ratio1).toBeLessThan(10);
@@ -515,20 +495,20 @@ describe('WardrobeService Performance', () => {
         });
 
         const startTime = performance.now();
-        
+
         // Simulate multiple users
-        const promises = Array.from({ length: userCount }, (_, index) => 
-          wardrobeService.getAllItems(`user-${index}`)
+        const promises = Array.from({ length: userCount }, (_, index) =>
+          wardrobeService.getAllItems(`user-${index}`),
         );
-        
+
         await Promise.all(promises);
         const endTime = performance.now();
-        
+
         times.push(endTime - startTime);
       }
 
       // Should handle increased load reasonably
-      expect(times[2]).toBeLessThan(times[0] * 20); // 100 users shouldn't be 20x slower than 10
+      expect(times[2]!).toBeLessThan(times[0]! * 20); // 100 users shouldn't be 20x slower than 10
     });
   });
 });

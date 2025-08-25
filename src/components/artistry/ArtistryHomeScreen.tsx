@@ -1,34 +1,28 @@
 // Artistry Home Screen - The Living Digital Art Gallery
 // Where style meets sophistication in an interactive masterpiece
 
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
   Dimensions,
+  ScrollView,
   StatusBar,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import { DesignSystem } from '../../theme/DesignSystem';
-import { Ionicons } from '@expo/vector-icons';
-import { logInDev } from '../../utils/consoleSuppress';
 
+import { DesignSystem } from '../../theme/DesignSystem';
+import { logInDev } from '../../utils/consoleSuppress';
 // Import artistry components
 import AtmosphericBackground from './AtmosphericBackground';
-import InteractiveTotem from './InteractiveTotem';
-import BentoGallery from './BentoGallery';
-import KineticTypography, { 
-  PoetryText, 
-  GalleryTitle, 
-  WhisperText,
-  StatementText 
-} from './KineticTypography';
+import BentoGallery, { type BentoItem } from './BentoGallery';
+import InteractiveTotem, { type TotemFacet } from './InteractiveTotem';
+import { GalleryTitle, PoetryText, StatementText, WhisperText } from './KineticTypography';
 
-const { width, height } = Dimensions.get('window');
+const { width: _width, height: _height } = Dimensions.get('window');
 
 interface ArtistryHomeScreenProps {
   onNavigateToWardrobe?: () => void;
@@ -44,7 +38,9 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
   onNavigateToProfile,
 }) => {
   const insets = useSafeAreaInsets();
-  const [currentAtmosphere, setCurrentAtmosphere] = useState<'emerald' | 'sapphire' | 'ruby' | 'gold'>('emerald');
+  const ATMOSPHERE_VARIANTS = useMemo(() => ['emerald', 'sapphire', 'ruby', 'gold'] as const, []);
+  type AtmosphereVariant = (typeof ATMOSPHERE_VARIANTS)[number];
+  const [currentAtmosphere, setCurrentAtmosphere] = useState<AtmosphereVariant>('emerald');
   const [isReady, setIsReady] = useState(false);
 
   // Initialize the component
@@ -58,15 +54,16 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
   // Cycle through atmospheric variants - MUST be before conditional rendering
   useEffect(() => {
     const atmosphereTimer = setInterval(() => {
-      setCurrentAtmosphere(prev => {
-        const variants: Array<'emerald' | 'sapphire' | 'ruby' | 'gold'> = ['emerald', 'sapphire', 'ruby', 'gold'];
-        const currentIndex = variants.indexOf(prev);
-        return variants[(currentIndex + 1) % variants.length];
+      setCurrentAtmosphere((prev: AtmosphereVariant) => {
+        const currentIndex = ATMOSPHERE_VARIANTS.indexOf(prev);
+        const nextIndex = (currentIndex + 1) % ATMOSPHERE_VARIANTS.length;
+        const next = ATMOSPHERE_VARIANTS[nextIndex];
+        return next ?? 'emerald';
       });
     }, 30000); // Change every 30 seconds
 
     return () => clearInterval(atmosphereTimer);
-  }, []);
+  }, [ATMOSPHERE_VARIANTS]);
 
   // Show loading state while initializing
   if (!isReady) {
@@ -80,13 +77,14 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
   }
 
   // Sample totem facets for daily ritual
-  const totemFacets = [
+  const totemFacets: TotemFacet[] = [
     {
       id: 'outfit',
       type: 'outfit' as const,
-      title: 'Today\'s Inspiration',
+      title: "Today's Inspiration",
       content: {
-        image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
+        image:
+          'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
         title: 'Confident Elegance',
         subtitle: 'Sophisticated & Timeless',
         confidence: 94,
@@ -97,7 +95,8 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       type: 'whisper' as const,
       title: 'Style Whisper',
       content: {
-        message: 'Your wardrobe speaks of quiet confidence and timeless elegance. Today, let your inner light shine through carefully chosen pieces.',
+        message:
+          'Your wardrobe speaks of quiet confidence and timeless elegance. Today, let your inner light shine through carefully chosen pieces.',
       },
     },
     {
@@ -106,31 +105,52 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       title: 'Wardrobe Elements',
       content: {
         items: [
-          { image: 'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=100&h=100&fit=crop&q=80', label: 'Blazer' },
-          { image: 'https://images.unsplash.com/photo-1594619336195-39a8f2712533?w=100&h=100&fit=crop&q=80', label: 'Dress' },
-          { image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&h=100&fit=crop&q=80', label: 'Shoes' },
-          { image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=100&h=100&fit=crop&q=80', label: 'Bag' },
+          {
+            image:
+              'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=100&h=100&fit=crop&q=80',
+            label: 'Blazer',
+          },
+          {
+            image:
+              'https://images.unsplash.com/photo-1594619336195-39a8f2712533?w=100&h=100&fit=crop&q=80',
+            label: 'Dress',
+          },
+          {
+            image:
+              'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=100&h=100&fit=crop&q=80',
+            label: 'Shoes',
+          },
+          {
+            image:
+              'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=100&h=100&fit=crop&q=80',
+            label: 'Bag',
+          },
         ],
       },
     },
     {
       id: 'mood',
       type: 'mood' as const,
-      title: 'Today\'s Mood',
+      title: "Today's Mood",
       content: {
         emoji: '✨',
-        mood: 'Radiant Confidence',
+        mood: {
+          color: DesignSystem.colors.sage[500],
+          emotion: 'Radiant Confidence',
+          description: 'Embrace your inner glow',
+        },
         description: 'Embrace your inner glow',
         gradient: [
           DesignSystem.colors.sage[400],
-        DesignSystem.colors.sage[500],
-        ],
+          DesignSystem.colors.sage[500],
+          DesignSystem.colors.sage[600],
+        ] as const,
       },
     },
   ];
 
   // Bento gallery items
-  const bentoItems = [
+  const bentoItems: BentoItem[] = [
     {
       id: 'hero-totem',
       type: 'interactive' as const,
@@ -139,12 +159,12 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       title: 'Daily Ritual',
       subtitle: 'Your personalized style journey',
       content: {
-        icon: 'sparkles',
+        icon: 'sparkles-outline' as keyof typeof Ionicons.glyphMap,
         gradient: [
           DesignSystem.colors.sage[400],
           'transparent',
           DesignSystem.colors.sage[500],
-        ],
+        ] as const,
       },
       onPress: () => {
         // Navigate to daily ritual screen
@@ -178,9 +198,9 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       type: 'text' as const,
       span: 2 as const,
       height: 'small' as const,
-      title: 'Today\'s Whisper',
+      title: "Today's Whisper",
       content: {
-        icon: 'leaf-outline',
+        icon: 'leaf-outline' as keyof typeof Ionicons.glyphMap,
         message: 'Your style is a reflection of your inner confidence. Let it shine.',
       },
     },
@@ -192,7 +212,8 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       title: 'Featured Look',
       subtitle: 'Curated for you',
       content: {
-        image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
+        image:
+          'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop&q=80',
       },
       onPress: onNavigateToDiscover,
     },
@@ -204,11 +225,8 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       title: 'Wardrobe',
       subtitle: 'Your collection',
       content: {
-        icon: 'shirt-outline',
-        gradient: [
-          DesignSystem.colors.sage[600],
-          'transparent',
-        ],
+        icon: 'shirt-outline' as keyof typeof Ionicons.glyphMap,
+        gradient: [DesignSystem.colors.sage[600], 'transparent'],
       },
       onPress: onNavigateToWardrobe,
     },
@@ -220,11 +238,8 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       title: 'Ayna Mirror',
       subtitle: 'Virtual styling',
       content: {
-        icon: 'glasses-outline',
-        gradient: [
-          DesignSystem.colors.sage[700],
-          'transparent',
-        ],
+        icon: 'glasses-outline' as keyof typeof Ionicons.glyphMap,
+        gradient: [DesignSystem.colors.sage[700], 'transparent'],
       },
       onPress: onNavigateToMirror,
     },
@@ -246,17 +261,12 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
       title: 'Profile',
       subtitle: 'Your style DNA',
       content: {
-        icon: 'person-outline',
-        gradient: [
-          DesignSystem.colors.sage[400],
-          'transparent',
-        ],
+        icon: 'person-outline' as keyof typeof Ionicons.glyphMap,
+        gradient: [DesignSystem.colors.sage[400], 'transparent'],
       },
       onPress: onNavigateToProfile,
     },
   ];
-
-
 
   const handleTotemFacetChange = (facetId: string) => {
     logInDev('Totem facet changed:', facetId);
@@ -266,12 +276,12 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
   return (
     <AtmosphericBackground variant={currentAtmosphere} intensity="subtle">
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-      
+
       <ScrollView
         style={styles.container}
         contentContainerStyle={[
           styles.contentContainer,
-          { paddingBottom: insets.bottom + DesignSystem.spacing.xxl }
+          { paddingBottom: insets.bottom + DesignSystem.spacing.xxl },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -280,20 +290,26 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
           <PoetryText animation="glide" delay={0}>
             AYNAMODA
           </PoetryText>
-          
+
           <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.headerButton}>
-              <Ionicons 
-                name="search-outline" 
-                size={20} 
-                color={DesignSystem.colors.text.tertiary} 
-              />
+            <TouchableOpacity
+              style={styles.headerButton}
+              accessibilityRole="button"
+              accessibilityLabel="Search"
+              accessibilityHint="Tap to search your wardrobe and style content"
+            >
+              <Ionicons name="search-outline" size={20} color={DesignSystem.colors.text.tertiary} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.headerButton}>
-              <Ionicons 
-                name="notifications-outline" 
-                size={20} 
-                color={DesignSystem.colors.text.tertiary} 
+            <TouchableOpacity
+              style={styles.headerButton}
+              accessibilityRole="button"
+              accessibilityLabel="Notifications"
+              accessibilityHint="Tap to view your notifications"
+            >
+              <Ionicons
+                name="notifications-outline"
+                size={20}
+                color={DesignSystem.colors.text.tertiary}
               />
             </TouchableOpacity>
           </View>
@@ -301,19 +317,11 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
 
         {/* Hero Section with Interactive Totem */}
         <View style={styles.heroSection}>
-          <GalleryTitle 
-            animation="glide" 
-            delay={300}
-            style={styles.heroTitle}
-          >
+          <GalleryTitle animation="glide" delay={300} style={styles.heroTitle}>
             Your Daily Ritual
           </GalleryTitle>
-          
-          <WhisperText 
-            animation="glide" 
-            delay={600}
-            style={styles.heroSubtitle}
-          >
+
+          <WhisperText animation="glide" delay={600} style={styles.heroSubtitle}>
             Where style meets sophistication
           </WhisperText>
 
@@ -326,18 +334,11 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
 
         {/* Gallery Section Title */}
         <View style={styles.galleryHeader}>
-          <StatementText 
-            animation="glide" 
-            delay={900}
-            shimmerWords={['Gallery']}
-          >
+          <StatementText animation="glide" delay={900} shimmerWords={['Gallery']}>
             Your Style Gallery
           </StatementText>
-          
-          <WhisperText 
-            animation="glide" 
-            delay={1200}
-          >
+
+          <WhisperText animation="glide" delay={1200}>
             Curated experiences for your fashion journey
           </WhisperText>
         </View>
@@ -352,9 +353,7 @@ const ArtistryHomeScreen: React.FC<ArtistryHomeScreenProps> = ({
 
         {/* Atmospheric Indicator */}
         <View style={styles.atmosphereIndicator}>
-          <WhisperText animation="shimmer">
-            {`Atmosphere: ${currentAtmosphere}`}
-          </WhisperText>
+          <WhisperText animation="shimmer">{`Atmosphere: ${currentAtmosphere}`}</WhisperText>
         </View>
       </ScrollView>
     </AtmosphericBackground>
@@ -368,68 +367,68 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexGrow: 1,
   },
-  
+
   // Header Styles
   header: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
     marginBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   headerActions: {
     flexDirection: 'row',
     gap: DesignSystem.spacing.md,
   },
   headerButton: {
-    width: 40,
-    height: 40,
     borderRadius: DesignSystem.radius.md,
+    height: 40,
+    width: 40,
     ...DesignSystem.elevation.soft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
+
   // Hero Section Styles
   heroSection: {
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
     marginBottom: DesignSystem.spacing.xxl,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   heroTitle: {
-    textAlign: 'center',
     marginBottom: DesignSystem.spacing.md,
+    textAlign: 'center',
   },
   heroSubtitle: {
-    textAlign: 'center',
     marginBottom: DesignSystem.spacing.lg,
+    textAlign: 'center',
   },
   totem: {
     marginTop: DesignSystem.spacing.lg,
   },
-  
+
   // Gallery Styles
   galleryHeader: {
     alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
     marginBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.lg,
   },
   gallery: {
     flex: 1,
   },
-  
+
   // Atmosphere Indicator
   atmosphereIndicator: {
     alignItems: 'center',
     paddingVertical: DesignSystem.spacing.lg,
   },
-  
+
   // Loading Styles
   loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: DesignSystem.colors.background.primary,
+    flex: 1,
+    justifyContent: 'center',
   },
   loadingText: {
     ...DesignSystem.typography.body.medium,

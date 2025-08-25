@@ -1,17 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Animated,
-  ScrollView,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 import { SocialFeedback } from '@/types/aynaMirror';
+import { IoniconsName } from '@/types/icons';
 
 interface SocialFeedbackStepProps {
   socialFeedback?: SocialFeedback;
@@ -46,9 +48,11 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
   occasion,
   onOccasionChange,
 }) => {
-  const [complimentsCount, setComplimentsCount] = useState(socialFeedback?.complimentsReceived || 0);
+  const [complimentsCount, setComplimentsCount] = useState(
+    socialFeedback?.complimentsReceived || 0,
+  );
   const [selectedReactions, setSelectedReactions] = useState<string[]>(
-    socialFeedback?.positiveReactions || []
+    socialFeedback?.positiveReactions || [],
   );
   const [socialContext, setSocialContext] = useState(socialFeedback?.socialContext || '');
   const [showCustomOccasion, setShowCustomOccasion] = useState(false);
@@ -59,7 +63,7 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
   useEffect(() => {
     // Update parent component when local state changes
     onSocialFeedback(complimentsCount, selectedReactions, socialContext);
-  }, [complimentsCount, selectedReactions, socialContext]);
+  }, [complimentsCount, selectedReactions, socialContext, onSocialFeedback]);
 
   useEffect(() => {
     // Animate compliment counter changes
@@ -77,7 +81,7 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
         }),
       ]).start();
     }
-  }, [complimentsCount]);
+  }, [complimentsCount, complimentAnimation]);
 
   const handleOccasionSelect = (selectedOccasion: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -87,26 +91,32 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
 
   const handleComplimentChange = (increment: boolean) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const newCount = increment 
-      ? Math.min(complimentsCount + 1, 20) 
+    const newCount = increment
+      ? Math.min(complimentsCount + 1, 20)
       : Math.max(complimentsCount - 1, 0);
     setComplimentsCount(newCount);
   };
 
   const handleReactionToggle = (reaction: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setSelectedReactions(prev => 
-      prev.includes(reaction)
-        ? prev.filter(r => r !== reaction)
-        : [...prev, reaction]
+    setSelectedReactions((prev) =>
+      prev.includes(reaction) ? prev.filter((r) => r !== reaction) : [...prev, reaction],
     );
   };
 
   const getComplimentMessage = () => {
-    if (complimentsCount === 0) return "No compliments yet - that's okay!";
-    if (complimentsCount === 1) return "One compliment - nice!";
-    if (complimentsCount <= 3) return `${complimentsCount} compliments - you're glowing!`;
-    if (complimentsCount <= 5) return `${complimentsCount} compliments - you're on fire! 🔥`;
+    if (complimentsCount === 0) {
+      return "No compliments yet - that's okay!";
+    }
+    if (complimentsCount === 1) {
+      return 'One compliment - nice!';
+    }
+    if (complimentsCount <= 3) {
+      return `${complimentsCount} compliments - you're glowing!`;
+    }
+    if (complimentsCount <= 5) {
+      return `${complimentsCount} compliments - you're on fire! 🔥`;
+    }
     return `${complimentsCount} compliments - absolutely stunning! ✨`;
   };
 
@@ -116,11 +126,11 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>What was the occasion?</Text>
         <Text style={styles.sectionSubtitle}>Optional - helps us learn your style preferences</Text>
-        
+
         <View style={styles.occasionsGrid}>
           {COMMON_OCCASIONS.map((occ) => {
             const isSelected = occasion === occ.label;
-            
+
             return (
               <TouchableOpacity
                 key={occ.label}
@@ -132,7 +142,7 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
                 activeOpacity={0.7}
               >
                 <View style={[styles.occasionIcon, { backgroundColor: occ.color + '20' }]}>
-                  <Ionicons name={occ.icon as any} size={20} color={occ.color} />
+                  <Ionicons name={occ.icon as IoniconsName} size={20} color={occ.color} />
                 </View>
                 <Text style={[styles.occasionLabel, isSelected && { color: occ.color }]}>
                   {occ.label}
@@ -140,17 +150,19 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
               </TouchableOpacity>
             );
           })}
-          
+
           <TouchableOpacity
             onPress={() => setShowCustomOccasion(true)}
-            style={[
-              styles.occasionButton,
-              showCustomOccasion && styles.occasionButtonSelected,
-            ]}
+            style={[styles.occasionButton, showCustomOccasion && styles.occasionButtonSelected]}
             activeOpacity={0.7}
           >
-            <View style={[styles.occasionIcon, { backgroundColor: DesignSystem.colors.sage[500] + '20' }]}>
-          <Ionicons name="add-outline" size={20} color={DesignSystem.colors.sage[500]} />
+            <View
+              style={[
+                styles.occasionIcon,
+                { backgroundColor: DesignSystem.colors.sage[500] + '20' },
+              ]}
+            >
+              <Ionicons name="add-outline" size={20} color={DesignSystem.colors.sage[500]} />
             </View>
             <Text style={styles.occasionLabel}>Other</Text>
           </TouchableOpacity>
@@ -172,7 +184,7 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
       {/* Compliments Counter */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Did you receive any compliments?</Text>
-        
+
         <Animated.View
           style={[
             styles.complimentCounter,
@@ -188,12 +200,12 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
           >
             <Ionicons name="remove" size={24} color={DesignSystem.colors.text.primary} />
           </TouchableOpacity>
-          
+
           <View style={styles.counterDisplay}>
             <Text style={styles.counterNumber}>{complimentsCount}</Text>
             <Text style={styles.counterLabel}>compliments</Text>
           </View>
-          
+
           <TouchableOpacity
             onPress={() => handleComplimentChange(true)}
             style={styles.counterButton}
@@ -209,19 +221,16 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>What kind of positive reactions?</Text>
         <Text style={styles.sectionSubtitle}>Select all that apply</Text>
-        
+
         <View style={styles.reactionsGrid}>
           {POSITIVE_REACTIONS.map((reaction) => {
             const isSelected = selectedReactions.includes(reaction.label);
-            
+
             return (
               <TouchableOpacity
                 key={reaction.label}
                 onPress={() => handleReactionToggle(reaction.label)}
-                style={[
-                  styles.reactionButton,
-                  isSelected && styles.reactionButtonSelected,
-                ]}
+                style={[styles.reactionButton, isSelected && styles.reactionButtonSelected]}
                 activeOpacity={0.7}
               >
                 <Text style={styles.reactionEmoji}>{reaction.emoji}</Text>
@@ -239,7 +248,7 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Any additional details?</Text>
         <Text style={styles.sectionSubtitle}>Optional - share more about your experience</Text>
-        
+
         <TextInput
           style={styles.contextInput}
           placeholder="e.g., 'My colleague loved my jacket' or 'Felt confident all day'"
@@ -256,17 +265,15 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
         <View style={styles.summaryContainer}>
           <Text style={styles.summaryTitle}>Your Social Experience ✨</Text>
           {complimentsCount > 0 && (
-            <Text style={styles.summaryItem}>• {complimentsCount} compliment{complimentsCount > 1 ? 's' : ''}</Text>
+            <Text style={styles.summaryItem}>
+              • {complimentsCount} compliment{complimentsCount > 1 ? 's' : ''}
+            </Text>
           )}
           {selectedReactions.length > 0 && (
             <Text style={styles.summaryItem}>• {selectedReactions.join(', ')}</Text>
           )}
-          {occasion && (
-            <Text style={styles.summaryItem}>• Occasion: {occasion}</Text>
-          )}
-          {socialContext && (
-            <Text style={styles.summaryItem}>• "{socialContext}"</Text>
-          )}
+          {occasion && <Text style={styles.summaryItem}>• Occasion: {occasion}</Text>}
+          {socialContext && <Text style={styles.summaryItem}>• {`"${socialContext}"`}</Text>}
         </View>
       )}
     </ScrollView>
@@ -274,58 +281,58 @@ export const SocialFeedbackStep: React.FC<SocialFeedbackStepProps> = ({
 };
 
 const styles = StyleSheet.create({
+  complimentCounter: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderRadius: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 16,
+    paddingVertical: 20,
+  },
+  complimentMessage: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
+    fontStyle: 'italic',
+    textAlign: 'center',
+  },
   container: {
     flex: 1,
   },
-  section: {
-    marginBottom: 32,
-  },
-  sectionTitle: {
-    ...DesignSystem.typography.heading.h3,
-    color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: 20,
-    fontStyle: 'italic',
-  },
-  occasionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  occasionButton: {
+  contextInput: {
     backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 12,
-    paddingVertical: 12,
     paddingHorizontal: 16,
-    alignItems: 'center',
-    minWidth: 100,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  occasionButtonSelected: {
-    borderWidth: 2,
-    backgroundColor: DesignSystem.colors.background.primary,
-  },
-  occasionIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  occasionLabel: {
-    ...DesignSystem.typography.scale.caption,
+    paddingVertical: 12,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
-    fontWeight: '500',
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  counterButton: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderRadius: 22,
+    height: 44,
+    justifyContent: 'center',
+    width: 44,
+  },
+  counterButtonDisabled: {
+    opacity: 0.3,
+  },
+  counterDisplay: {
+    alignItems: 'center',
+    marginHorizontal: 32,
+  },
+  counterLabel: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    marginTop: -4,
+  },
+  counterNumber: {
+    ...DesignSystem.typography.scale.hero,
+    color: DesignSystem.colors.sage[500],
+    fontWeight: '700',
   },
   customOccasionContainer: {
     marginTop: 16,
@@ -338,66 +345,60 @@ const styles = StyleSheet.create({
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
   },
-  complimentCounter: {
-    flexDirection: 'row',
+  occasionButton: {
     alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: DesignSystem.colors.background.elevated,
-    borderRadius: 16,
-    paddingVertical: 20,
-    marginBottom: 16,
+    borderColor: 'transparent',
+    borderRadius: 12,
+    borderWidth: 2,
+    minWidth: 100,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  counterButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+  occasionButtonSelected: {
     backgroundColor: DesignSystem.colors.background.primary,
+    borderWidth: 2,
+  },
+  occasionIcon: {
     alignItems: 'center',
+    borderRadius: 16,
+    height: 32,
     justifyContent: 'center',
+    marginBottom: 6,
+    width: 32,
   },
-  counterButtonDisabled: {
-    opacity: 0.3,
-  },
-  counterDisplay: {
-    alignItems: 'center',
-    marginHorizontal: 32,
-  },
-  counterNumber: {
-  ...DesignSystem.typography.scale.hero,
-    color: DesignSystem.colors.sage[500],
-    fontWeight: '700',
-  },
-  counterLabel: {
+  occasionLabel: {
     ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.secondary,
-    marginTop: -4,
-  },
-  complimentMessage: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.text.primary,
+    fontWeight: '500',
     textAlign: 'center',
-    fontStyle: 'italic',
   },
-  reactionsGrid: {
+  occasionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
     gap: 12,
+    justifyContent: 'center',
   },
   reactionButton: {
-    backgroundColor: DesignSystem.colors.background.elevated,
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 12,
     alignItems: 'center',
-    width: '45%',
-    minWidth: 140,
-    borderWidth: 2,
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderColor: 'transparent',
+    borderRadius: 12,
+    borderWidth: 2,
+    minWidth: 140,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    width: '45%',
   },
   reactionButtonSelected: {
-    borderColor: DesignSystem.colors.sage[500],
     backgroundColor: DesignSystem.colors.sage[500] + '10',
+    borderColor: DesignSystem.colors.sage[500],
+  },
+  reactionDescription: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
   reactionEmoji: {
     fontSize: 24,
@@ -407,44 +408,50 @@ const styles = StyleSheet.create({
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     fontWeight: '600',
-    textAlign: 'center',
     marginBottom: 2,
+    textAlign: 'center',
   },
   reactionLabelSelected: {
     color: DesignSystem.colors.sage[500],
   },
-  reactionDescription: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.tertiary,
-    textAlign: 'center',
-    fontStyle: 'italic',
+  reactionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    justifyContent: 'center',
   },
-  contextInput: {
-    backgroundColor: DesignSystem.colors.background.elevated,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+  section: {
+    marginBottom: 32,
+  },
+  sectionSubtitle: {
     ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
+    fontStyle: 'italic',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  sectionTitle: {
+    ...DesignSystem.typography.heading.h3,
     color: DesignSystem.colors.text.primary,
-    textAlignVertical: 'top',
-    minHeight: 80,
+    marginBottom: 4,
+    textAlign: 'center',
   },
   summaryContainer: {
     backgroundColor: DesignSystem.colors.sage[500] + '10',
     borderRadius: 16,
-    paddingVertical: 20,
-    paddingHorizontal: 24,
     marginBottom: 20,
-  },
-  summaryTitle: {
-    ...DesignSystem.typography.heading.h3,
-    color: DesignSystem.colors.sage[500],
-    textAlign: 'center',
-    marginBottom: 12,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
   },
   summaryItem: {
     ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     marginBottom: 4,
+  },
+  summaryTitle: {
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.sage[500],
+    marginBottom: 12,
+    textAlign: 'center',
   },
 });

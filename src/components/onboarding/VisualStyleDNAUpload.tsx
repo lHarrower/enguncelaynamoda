@@ -1,22 +1,24 @@
-import React, { useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  ScrollView,
-  Animated,
-  Image,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from 'expo-haptics';
+import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
-import { errorInDev } from '../../utils/consoleSuppress';
+
+import { errorInDev, warnInDev } from '../../utils/consoleSuppress';
 
 const { width, height } = Dimensions.get('window');
 
@@ -32,7 +34,11 @@ interface VisualStyleDNAUploadProps {
   isGenerating?: boolean;
 }
 
-export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating = false }: VisualStyleDNAUploadProps) {
+export default function VisualStyleDNAUpload({
+  onComplete,
+  onSkip,
+  isGenerating = false,
+}: VisualStyleDNAUploadProps) {
   const [uploadedPhotos, setUploadedPhotos] = useState<UploadedPhoto[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -52,17 +58,17 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeAnim, scaleAnim]);
 
   const requestPermissions = async () => {
     const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
     const galleryPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
+
     if (cameraPermission.status !== 'granted' || galleryPermission.status !== 'granted') {
       Alert.alert(
         'Permissions Required',
         'We need access to your camera and photo library to help you upload your favorite outfits.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
       return false;
     }
@@ -71,7 +77,9 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
 
   const handlePhotoUpload = async (useCamera: boolean = false) => {
     const hasPermissions = await requestPermissions();
-    if (!hasPermissions) return;
+    if (!hasPermissions) {
+      return;
+    }
 
     setIsUploading(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -100,11 +108,11 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
           timestamp: Date.now(),
         }));
 
-        setUploadedPhotos(prev => [...prev, ...newPhotos].slice(0, 10));
+        setUploadedPhotos((prev) => [...prev, ...newPhotos].slice(0, 10));
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
     } catch (error) {
-      errorInDev('Error uploading photo:', error);
+      errorInDev('Error uploading photo:', error instanceof Error ? error : String(error));
       Alert.alert('Upload Error', 'Failed to upload photo. Please try again.');
     } finally {
       setIsUploading(false);
@@ -112,7 +120,7 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
   };
 
   const removePhoto = (photoId: string) => {
-    setUploadedPhotos(prev => prev.filter(photo => photo.id !== photoId));
+    setUploadedPhotos((prev) => prev.filter((photo) => photo.id !== photoId));
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
   };
 
@@ -124,7 +132,7 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
       Alert.alert(
         'More Photos Needed',
         'Please upload at least 3 photos of your favorite outfits to generate your Style DNA.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
     }
   };
@@ -140,7 +148,7 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
           <Text style={styles.uploadSubtitle}>
             Upload 5-10 photos of your favorite outfits to help us understand your unique style DNA
           </Text>
-          
+
           <View style={styles.uploadButtons}>
             <TouchableOpacity
               style={styles.primaryUploadButton}
@@ -150,7 +158,7 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
               <Ionicons name="images-outline" size={24} color="#FFFFFF" />
               <Text style={styles.primaryUploadButtonText}>Choose from Gallery</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={styles.secondaryUploadButton}
               onPress={() => handlePhotoUpload(true)}
@@ -172,12 +180,15 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
             <TouchableOpacity
               style={styles.removeButton}
               onPress={() => removePhoto(photo.id)}
+              accessibilityRole="button"
+              accessibilityLabel="Remove photo"
+              accessibilityHint="Remove this photo from your style DNA upload"
             >
               <Ionicons name="close-circle" size={24} color={DesignSystem.colors.error[500]} />
             </TouchableOpacity>
           </View>
         ))}
-        
+
         {uploadedPhotos.length < 10 && (
           <TouchableOpacity
             style={styles.addMoreButton}
@@ -194,7 +205,11 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
 
   return (
     <LinearGradient
-      colors={[DesignSystem.colors.background.secondary, '#FFFFFF', DesignSystem.colors.background.secondary]}
+      colors={[
+        DesignSystem.colors.background.secondary,
+        '#FFFFFF',
+        DesignSystem.colors.background.secondary,
+      ]}
       style={styles.container}
     >
       {/* Progress Indicator */}
@@ -220,7 +235,8 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
         <View style={styles.header}>
           <Text style={styles.title}>Discover Your Style DNA</Text>
           <Text style={styles.subtitle}>
-            Every outfit tells a story. Share yours with us and we'll create a personalized style profile that understands your unique aesthetic.
+            Every outfit tells a story. Share yours with us and we&apos;ll create a personalized style
+            profile that understands your unique aesthetic.
           </Text>
         </View>
 
@@ -237,7 +253,10 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
         {uploadedPhotos.length > 0 && (
           <View style={styles.photoCount}>
             <Text style={styles.photoCountText}>
-              {uploadedPhotos.length} of 10 photos • {uploadedPhotos.length >= 3 ? 'Ready to continue' : `${3 - uploadedPhotos.length} more needed`}
+              {uploadedPhotos.length} of 10 photos •{' '}
+              {uploadedPhotos.length >= 3
+                ? 'Ready to continue'
+                : `${3 - uploadedPhotos.length} more needed`}
             </Text>
           </View>
         )}
@@ -249,9 +268,11 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
             onPress={onSkip}
             disabled={isGenerating}
           >
-            <Text style={[styles.skipButtonText, isGenerating && styles.skipButtonTextDisabled]}>Skip for Now</Text>
+            <Text style={[styles.skipButtonText, isGenerating && styles.skipButtonTextDisabled]}>
+              Skip for Now
+            </Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[
               styles.continueButton,
@@ -263,25 +284,29 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
             {isGenerating ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="small" color="#FFFFFF" />
-                <Text style={[
-                  styles.continueButtonText,
-                  uploadedPhotos.length < 3 && styles.continueButtonTextDisabled,
-                ]}>
+                <Text
+                  style={[
+                    styles.continueButtonText,
+                    uploadedPhotos.length < 3 && styles.continueButtonTextDisabled,
+                  ]}
+                >
                   Analyzing your style...
                 </Text>
               </View>
             ) : (
               <>
-                <Text style={[
-                  styles.continueButtonText,
-                  uploadedPhotos.length < 3 && styles.continueButtonTextDisabled,
-                ]}>
+                <Text
+                  style={[
+                    styles.continueButtonText,
+                    uploadedPhotos.length < 3 && styles.continueButtonTextDisabled,
+                  ]}
+                >
                   Generate Style DNA
                 </Text>
-                <Ionicons 
-                  name="arrow-forward" 
-                  size={20} 
-                  color={uploadedPhotos.length >= 3 ? '#FFFFFF' : DesignSystem.colors.sage[200]} 
+                <Ionicons
+                  name="arrow-forward"
+                  size={20}
+                  color={uploadedPhotos.length >= 3 ? '#FFFFFF' : DesignSystem.colors.sage[200]}
                 />
               </>
             )}
@@ -298,7 +323,23 @@ export default function VisualStyleDNAUpload({ onComplete, onSkip, isGenerating 
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (styleObj: Record<string, any>) => {
+  try {
+    return StyleSheet.create(styleObj);
+  } catch (error) {
+    warnInDev('StyleSheet.create failed, using fallback styles:', error);
+    // Return a safe fallback with basic styles
+    return {
+      container: { flex: 1 },
+      gradient: { flex: 1 },
+      scrollView: { flex: 1 },
+      content: { padding: 20 },
+      ...styleObj,
+    };
+  }
+};
+
+const styles = createStyles({
   container: {
     flex: 1,
     paddingTop: 60,
@@ -325,7 +366,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 14,
     color: DesignSystem.colors.sage[700],
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
   },
   content: {
     flex: 1,
@@ -337,7 +378,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-  fontFamily: DesignSystem.typography.fontFamily.headline,
+    fontFamily: DesignSystem.typography.fontFamily.headline,
     color: DesignSystem.colors.sage[700],
     textAlign: 'center',
     marginBottom: 16,
@@ -345,7 +386,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.sage[500],
     textAlign: 'center',
     lineHeight: 24,
@@ -375,14 +416,14 @@ const styles = StyleSheet.create({
   },
   uploadTitle: {
     fontSize: 24,
-  fontFamily: DesignSystem.typography.fontFamily.headline,
+    fontFamily: DesignSystem.typography.fontFamily.headline,
     color: DesignSystem.colors.sage[700],
     textAlign: 'center',
     marginBottom: 12,
   },
   uploadSubtitle: {
     fontSize: 16,
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.sage[500],
     textAlign: 'center',
     lineHeight: 24,
@@ -405,7 +446,7 @@ const styles = StyleSheet.create({
   },
   primaryUploadButtonText: {
     fontSize: 16,
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
     color: '#FFFFFF',
   },
@@ -423,7 +464,7 @@ const styles = StyleSheet.create({
   },
   secondaryUploadButtonText: {
     fontSize: 16,
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
     color: DesignSystem.colors.sage[500],
   },
@@ -436,7 +477,7 @@ const styles = StyleSheet.create({
   photoContainer: {
     position: 'relative',
     width: (width - 72) / 3,
-    height: (width - 72) / 3 * 1.33,
+    height: ((width - 72) / 3) * 1.33,
   },
   uploadedPhoto: {
     width: '100%',
@@ -450,11 +491,11 @@ const styles = StyleSheet.create({
     right: -8,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-  ...DesignSystem.shadows.soft,
+    ...DesignSystem.shadows.soft,
   },
   addMoreButton: {
     width: (width - 72) / 3,
-    height: (width - 72) / 3 * 1.33,
+    height: ((width - 72) / 3) * 1.33,
     borderRadius: 12,
     borderWidth: 2,
     borderColor: DesignSystem.colors.sage[200],
@@ -465,7 +506,7 @@ const styles = StyleSheet.create({
   },
   addMoreText: {
     fontSize: 12,
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.sage[500],
     marginTop: 4,
   },
@@ -475,7 +516,7 @@ const styles = StyleSheet.create({
   },
   photoCountText: {
     fontSize: 14,
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     color: DesignSystem.colors.sage[500],
   },
   actionButtons: {
@@ -495,7 +536,7 @@ const styles = StyleSheet.create({
   },
   skipButtonText: {
     fontSize: 16,
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
     color: DesignSystem.colors.sage[500],
   },
@@ -527,7 +568,7 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     fontSize: 16,
-  fontFamily: DesignSystem.typography.fontFamily.body,
+    fontFamily: DesignSystem.typography.fontFamily.body,
     fontWeight: '600',
     color: '#FFFFFF',
   },

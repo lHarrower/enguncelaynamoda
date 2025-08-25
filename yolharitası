@@ -1,0 +1,137 @@
+PROJE: NIGHTINGALE - AYNAMODA Stabilizasyon ve Lansman Yol Haritası
+CTO Direktifi:
+Tüm mühendislik ekibine,
+
+Önümüzdeki 5-8 hafta boyunca tek bir görevimiz var: "OPERATION: CONSTITUTION" raporunda teşhisi konan kritik sorunları, belirlenen sıra ve metodoloji ile ortadan kaldırmak. Bu süreçte yeni özellik geliştirme çalışmaları tamamen durdurulmuştur. Tüm odak noktamız, stabilite, kalite ve güvenliği yeniden tesis etmektir.
+
+Temel Prensiplerimiz:
+
+Sırayı Takip Et: Fazlar ve maddeler atlanamaz. Bir sonraki adıma geçmek için bir öncekini tamamlamak zorunludur.
+
+"Yara Bandı" Yok: Geçici çözümlere, kodu // @ts-ignore ile susturmaya veya kuralları devre dışı bırakmaya izin verilmeyecektir. Sorunları kökünden çözeceğiz.
+
+Kalite, Hızdan Önce Gelir: Amacımız, bu sorunları bir daha asla yaşamayacağımız şekilde çözmektir.
+
+Ölçülebilir İlerleme: Her maddenin sonunda, başarının ne anlama geldiğini tanımlayan net bir "Başarı Kriteri" bulunmaktadır.
+
+FAZ 1: TRİYAJ VE STABİLİZASYON (Tahmini Süre: 1-2 Hafta)
+Amaç: Uygulamanın kanamasını durdurmak. Derlenebilen, test edilebilen ve bir geliştirme ortamında çalışabilen bir temel oluşturmak.
+
+Madde 1: TypeScript Derleme Hatalarının Giderilmesi (229 Hata)
+
+Neden: Bu, tüm blokerlerin anasıdır. Kod derlenmeden hiçbir test çalışmaz, hiçbir build alınamaz ve uygulamanın gerçek durumu anlaşılamaz.
+
+Ne Yapılacak:
+
+Hata Analizi: tsc --noEmit komutunu çalıştırarak 229 hatanın tamamını listeleyin. Hataları kategorize edin: Tema/Design System uyuşmazlıkları, eksik property'ler, yanlış tipte parametreler vb.
+
+Tema Hatalarının Çözümü: Hataların büyük çoğunluğu tema uyuşmazlıklarından kaynaklanıyor. DesignSystem.ts dosyasını tek doğruluk kaynağı olarak kabul edin. Hata veren tüm component'lerdeki tema property'lerini bu sistemle %100 uyumlu hale getirin.
+
+Tip Tanımlamaları: API cevapları, fonksiyon parametreleri ve karmaşık nesneler için eksik olan tüm interface ve type tanımlamalarını oluşturun. any tipini geçici bir çözüm olarak kullanmak kesinlikle yasaktır.
+
+Başarı Kriteri: tsc --noEmit komutu çalıştırıldığında terminalde 0 hata göstermesi.
+
+Madde 2: Üretim Ortamının (Production Environment) Kurulumu (23 Eksik Değişken)
+
+Neden: Ortam değişkenleri olmadan üretim (production) ve önizleme (preview) ortamlarını simüle edemeyiz. Bu, CI/CD pipeline'ımızın anlamsız olduğu anlamına gelir.
+
+Ne Yapılacak:
+
+Envanter Çıkarma: Projenin kök dizininde bir .env.example dosyası oluşturun. Gerekli 23 değişkenin tamamını buraya VARIABLE_NAME= şeklinde listeleyin.
+
+Güvenli Yönetim: Gerekli tüm anahtar ve gizli bilgileri (Supabase, Sentry, Google/Apple OAuth) güvenli bir parola yöneticisine (örneğin: 1Password, Vault) veya projenin kullandığı platformun (örneğin: Vercel, Netlify, EAS Secrets) gizli değişken yönetimi sistemine ekleyin.
+
+Başarı Kriteri: eas build --profile production komutunun, ortam değişkeni eksikliği nedeniyle hata vermeden başarıyla tetiklenebilmesi.
+
+Madde 3: Yüksek Öncelikli Güvenlik Açıklarının Kapatılması (3 HIGH)
+
+Neden: Yüksek öncelikli güvenlik açıkları, kullanıcı verilerini ve sistem bütünlüğünü doğrudan tehdit eder. Bu, yasal ve etik bir zorunluluktur.
+
+Ne Yapılacak:
+
+npm audit --audit-level=high komutunu çalıştırarak ilgili paketleri tespit edin.
+
+npm update veya package.json içindeki "resolutions" özelliğini kullanarak bu paketlerin güvenli versiyonlarına geçin.
+
+Güncelleme sonrası, uygulamanın ana fonksiyonlarının bozulmadığını manuel olarak hızla test edin.
+
+Başarı Kriteri: npm audit komutunun 0 high severity vulnerability raporlaması.
+
+Madde 4: Kritik ESLint Hatalarının Giderilmesi (89 Hata)
+
+Neden: Bu hatalar, potansiyel bug'ların ve kötü kodlama pratiklerinin habercisidir. Kod kalitesinin temelini oluştururlar.
+
+Ne Yapılacak:
+
+eslint . --quiet komutu ile sadece hataları listeleyin.
+
+Bu hataları, kural bazında gruplayarak (örneğin, önce tüm "react-hooks/exhaustive-deps" hataları) sistematik olarak çözün.
+
+Başarı Kriteri: eslint . komutunun 0 error vermesi. (Uyarılar (warnings) Faz 2'de ele alınacaktır).
+
+Madde 5: E2E Test Altyapısının Onarımı (8 Başarısız Test Suite)
+
+Neden: Yaptığımız düzeltmelerin, uygulamanın başka yerlerini bozmadığından emin olmamızı sağlayacak bir güvenlik ağına ihtiyacımız var.
+
+Ne Yapılacak:
+
+Rapor, sorunun "eksik UI elemanları" olduğunu belirtiyor. Bu, büyük ihtimalle TypeScript hataları nedeniyle bazı ekranların hiç render olmamasından kaynaklanmaktadır. Madde 1 tamamlandığında bu testleri tekrar çalıştırın.
+
+Hala başarısız olan testlerde, test ID'lerinin veya seçicilerin (selectors) doğru olduğundan emin olun. Test ortamının kendisinin (Maestro, Detox, Appium vb.) stabil çalıştığını doğrulayın.
+
+Başarı Kriteri: Tüm test suite'lerinin, içindeki testler başarısız olsa bile, çökmeden veya hata vermeden baştan sona çalışabilmesi.
+
+FAZ 2: KOD KALİTESİNİ YENİDEN TESİS ETME (Tahmini Süre: 2-3 Hafta)
+Amaç: Teknik borcu ödemek ve projeyi uzun vadede sürdürülebilir hale getirmek.
+
+Madde 6: any Tipinin Tamamen Ortadan Kaldırılması (150+ Kullanım)
+
+Ne Yapılacak: Projedeki her bir any kullanımı için, doğru ve spesifik tipleri tanımlayın. Bu, projenin en zahmetli ama en değerli yatırımlarından biri olacaktır.
+
+Başarı Kriteri: Proje genelinde grep -r " any" . aramasının 0 sonuç vermesi.
+
+Madde 7: ESLint Uyarılarının Çözümlenmesi (2581 Uyarı)
+
+Ne Yapılacak: Tüm uyarıları kural bazında gruplayarak çözün. Bu, kod tutarlılığını ve okunabilirliğini en üst seviyeye çıkaracaktır.
+
+Başarı Kriteri: eslint . komutunun 0 error ve 0 warning vermesi.
+
+Madde 8: Test Kapsam Raporlamasının Geri Getirilmesi
+
+Ne Yapılacak: Test altyapısını, jest --coverage gibi komutlarla test kapsam raporu üretebilecek şekilde düzeltin.
+
+Başarı Kriteri: Test kapsam raporunun başarıyla oluşturulması ve minimum %60 birim (unit) test kapsam oranına ulaşılması.
+
+Madde 9: Servis Entegrasyonlarının Tamamlanması
+
+Ne Yapılacak: Faz 1'de sağlanan kimlik bilgileri ile Supabase, Sentry, Google/Apple OAuth istemcilerini (clients) yapılandırın ve uygulamanın bu servislerle doğru bir şekilde iletişim kurduğunu doğrulayın.
+
+Başarı Kriteri: Login, veri çekme/yazma ve hata raporlama gibi temel akışların entegre edilen servisler üzerinden sorunsuz çalışması.
+
+FAZ 3: ÜRETİME HAZIRLIK VE SERTLEŞTİRME (Tahmini Süre: 1-2 Hafta)
+Amaç: Projeyi denetlemek, optimize etmek ve App Store / Google Play'e göndermeye hazır hale getirmek.
+
+Madde 10: Nihai Güvenlik Denetimi (13 Orta/Düşük Açık)
+
+Ne Yapılacak: Kalan tüm güvenlik açıklarını kapatın.
+
+Başarı Kriteri: npm audit komutunun 0 vulnerability raporlaması.
+
+Madde 11: Performans Optimizasyonu
+
+Ne Yapılacak: react-native-bundle-visualizer ile bundle boyutunu analiz edin. Gereksiz kütüphaneleri kaldırın. Uygulama başlangıç süresini (Treadmill, Perfetto) ve ana ekranların render performansını (React Profiler) ölçüp iyileştirin.
+
+Başarı Kriteri: Uygulama başlangıç süresinin modern cihazlarda 2 saniyenin altında olması.
+
+Madde 12: Uçtan Uca (E2E) Testlerin Tamamlanması
+
+Ne Yapılacak: Tüm kritik kullanıcı akışlarını (kayıt olma, giriş yapma, kıyafet ekleme, kombin önermesi) kapsayan E2E testlerinin %100 başarılı olmasını sağlayın.
+
+Başarı Kriteri: E2E test suite'inin %100 başarılı (PASS) olması.
+
+Madde 13 & 14: Üretim Dağıtımının Doğrulanması ve Mağaza Kurulumu
+
+Ne Yapılacak: EAS üzerinden başarılı bir üretim build'i alıp TestFlight ve Google Play Internal Testing kanallarına gönderin. Mağaza girişleri, ekran görüntüleri ve yasal metinlerin hazır olduğundan emin olun.
+
+Başarı Kriteri: Uygulamanın her iki mağazanın da test kanallarına başarıyla yüklenmesi ve test ekibi tarafından indirilebilmesi.
+

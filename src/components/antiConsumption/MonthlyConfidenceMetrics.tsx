@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { useSafeTheme } from '@/hooks/useSafeTheme';
-import { antiConsumptionService, MonthlyConfidenceMetrics as MonthlyConfidenceMetricsType } from '../../services/antiConsumptionService';
+import { errorInDev } from '@/utils/consoleSuppress';
+
+import {
+  antiConsumptionService,
+  MonthlyConfidenceMetrics as MonthlyConfidenceMetricsType,
+} from '../../services/antiConsumptionService';
 import { DesignSystem } from '../../theme/DesignSystem';
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: _screenWidth } = Dimensions.get('window');
 
 interface MonthlyConfidenceMetricsProps {
   userId: string;
@@ -33,12 +32,8 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
   const [metrics, setMetrics] = useState<MonthlyConfidenceMetricsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState(month || new Date().getMonth() + 1);
-  const [selectedYear, setSelectedYear] = useState(year || new Date().getFullYear());
-
-  useEffect(() => {
-    loadMetrics();
-  }, [userId, selectedMonth, selectedYear]);
+  const [selectedMonth, _setSelectedMonth] = useState(month || new Date().getMonth() + 1);
+  const [selectedYear, _setSelectedYear] = useState(year || new Date().getFullYear());
 
   const loadMetrics = async () => {
     try {
@@ -47,41 +42,70 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
       const metricsData = await antiConsumptionService.generateMonthlyConfidenceMetrics(
         userId,
         selectedMonth,
-        selectedYear
+        selectedYear,
       );
       setMetrics(metricsData);
-      onMetricsLoaded?.(metricsData);
-    } catch (err) {
-      setError('Failed to load confidence metrics');
-      console.error('Error loading monthly confidence metrics:', err);
+    } catch (err: unknown) {
+      setError('Failed to load metrics');
+      errorInDev(
+        'Error loading monthly confidence metrics:',
+        err instanceof Error ? err : String(err),
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    void loadMetrics();
+  }, [userId, selectedMonth, selectedYear]);
+
   const getMonthName = (monthNum: number): string => {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
-    return months[monthNum - 1];
+    const idx = monthNum - 1;
+    return months[idx] || 'Unknown';
   };
 
   const getConfidenceColor = (rating: number): string => {
-    if (rating >= 4.5) return DesignSystem.colors.success[500];
-    if (rating >= 3.5) return DesignSystem.colors.warning[500];
+    if (rating >= 4.5) {
+      return DesignSystem.colors.success[500];
+    }
+    if (rating >= 3.5) {
+      return DesignSystem.colors.warning[500];
+    }
     return DesignSystem.colors.error[500];
   };
 
   const getImprovementIcon = (improvement: number): string => {
-    if (improvement > 0.2) return 'trending-up';
-    if (improvement < -0.2) return 'trending-down';
+    if (improvement > 0.2) {
+      return 'trending-up';
+    }
+    if (improvement < -0.2) {
+      return 'trending-down';
+    }
     return 'remove';
   };
 
   const getImprovementColor = (improvement: number): string => {
-    if (improvement > 0.1) return DesignSystem.colors.success[500];
-    if (improvement < -0.1) return DesignSystem.colors.error[500];
+    if (improvement > 0.1) {
+      return DesignSystem.colors.success[500];
+    }
+    if (improvement < -0.1) {
+      return DesignSystem.colors.error[500];
+    }
     return DesignSystem.colors.neutral[600];
   };
 
@@ -114,7 +138,13 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle-outline" size={48} color={DesignSystem.colors.error[500]} />
           <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadMetrics}>
+          <TouchableOpacity
+            style={styles.retryButton}
+            onPress={() => void loadMetrics()}
+            accessibilityRole="button"
+            accessibilityLabel="Try again"
+            accessibilityHint="Tap to reload confidence metrics"
+          >
             <Text style={styles.retryButtonText}>Try Again</Text>
           </TouchableOpacity>
         </View>
@@ -169,7 +199,11 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
         </View>
 
         <View style={styles.improvementContainer}>
-          <Ionicons name={improvementIcon as keyof typeof Ionicons.glyphMap} size={20} color={improvementColor} />
+          <Ionicons
+            name={improvementIcon as keyof typeof Ionicons.glyphMap}
+            size={20}
+            color={improvementColor}
+          />
           <Text style={[styles.improvementText, { color: improvementColor }]}>
             {metrics.confidenceImprovement > 0 ? '+' : ''}
             {metrics.confidenceImprovement.toFixed(1)} from last month
@@ -193,7 +227,9 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
 
         <View style={styles.metricCard}>
           <Ionicons name="leaf-outline" size={24} color={DesignSystem.colors.success[500]} />
-          <Text style={styles.metricValue}>{formatPercentage(metrics.shoppingReductionPercentage)}</Text>
+          <Text style={styles.metricValue}>
+            {formatPercentage(metrics.shoppingReductionPercentage)}
+          </Text>
           <Text style={styles.metricLabel}>Shopping Reduced</Text>
         </View>
 
@@ -213,14 +249,26 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
             {metrics.mostConfidentItems.map((item) => (
               <View key={item.id} style={styles.itemCard}>
                 <View style={styles.itemImagePlaceholder}>
-                  <Ionicons name="shirt-outline" size={24} color={DesignSystem.colors.neutral[600]} />
+                  <Ionicons
+                    name="shirt-outline"
+                    size={24}
+                    color={DesignSystem.colors.neutral[600]}
+                  />
                 </View>
                 <Text style={styles.itemCategory}>{item.category}</Text>
                 <View style={styles.itemColors}>
                   {item.colors.slice(0, 3).map((color, index) => (
                     <View
                       key={index}
-                      style={[styles.colorDot, { backgroundColor: color.toLowerCase() }]}
+                      style={[
+                        styles.colorDot,
+                        {
+                          backgroundColor:
+                            typeof color === 'string'
+                              ? color.toLowerCase()
+                              : DesignSystem.colors.neutral[300],
+                        },
+                      ]}
                     />
                   ))}
                 </View>
@@ -239,14 +287,26 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
             {metrics.leastConfidentItems.map((item) => (
               <View key={item.id} style={styles.itemCard}>
                 <View style={styles.itemImagePlaceholder}>
-                  <Ionicons name="shirt-outline" size={24} color={DesignSystem.colors.neutral[600]} />
+                  <Ionicons
+                    name="shirt-outline"
+                    size={24}
+                    color={DesignSystem.colors.neutral[600]}
+                  />
                 </View>
                 <Text style={styles.itemCategory}>{item.category}</Text>
                 <View style={styles.itemColors}>
                   {item.colors.slice(0, 3).map((color, index) => (
                     <View
                       key={index}
-                      style={[styles.colorDot, { backgroundColor: color.toLowerCase() }]}
+                      style={[
+                        styles.colorDot,
+                        {
+                          backgroundColor:
+                            typeof color === 'string'
+                              ? color.toLowerCase()
+                              : DesignSystem.colors.neutral[300],
+                        },
+                      ]}
                     />
                   ))}
                 </View>
@@ -264,32 +324,37 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
             <View style={styles.insightItem}>
               <Ionicons name="trending-up" size={16} color={DesignSystem.colors.success[500]} />
               <Text style={styles.insightText}>
-                Your confidence is trending up! You're getting better at choosing outfits that make you feel great.
+                Your confidence is trending up! You&apos;re getting better at choosing outfits that make
+                you feel great.
               </Text>
             </View>
           )}
-          
+
           {metrics.wardrobeUtilization > 80 && (
             <View style={styles.insightItem}>
               <Ionicons name="star" size={16} color={DesignSystem.colors.warning[500]} />
               <Text style={styles.insightText}>
-                Excellent wardrobe utilization! You're making great use of what you own.
+                Excellent wardrobe utilization! You&apos;re making great use of what you own.
               </Text>
             </View>
           )}
-          
+
           {metrics.shoppingReductionPercentage > 20 && (
             <View style={styles.insightItem}>
               <Ionicons name="leaf" size={16} color={DesignSystem.colors.success[500]} />
               <Text style={styles.insightText}>
-                Amazing! You've significantly reduced shopping by loving what you already have.
+                Amazing! You&apos;ve significantly reduced shopping by loving what you already have.
               </Text>
             </View>
           )}
-          
+
           {metrics.totalOutfitsRated < 10 && (
             <View style={styles.insightItem}>
-              <Ionicons name="information-circle" size={16} color={DesignSystem.colors.primary[500]} />
+              <Ionicons
+                name="information-circle"
+                size={16}
+                color={DesignSystem.colors.primary[500]}
+              />
               <Text style={styles.insightText}>
                 Rate more outfits to get better insights and recommendations!
               </Text>
@@ -301,212 +366,213 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
   );
 };
 
-const createStyles = (colors: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    fontSize: 16,
-    color: colors.semantic.error,
-    textAlign: 'center',
-    marginTop: 16,
-    marginBottom: 20,
-  },
-  retryButton: {
-    backgroundColor: DesignSystem.colors.primary[500],
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  noDataContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  noDataTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  noDataText: {
-    fontSize: 16,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  header: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.text.secondary,
-  },
-  mainMetricContainer: {
-    backgroundColor: colors.background.secondary,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    borderRadius: 16,
-    padding: 24,
-    alignItems: 'center',
-  },
-  scoreContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  mainScore: {
-    fontSize: 48,
-    fontWeight: '700',
-    marginBottom: 8,
-  },
-  starsContainer: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  scoreLabel: {
-    fontSize: 16,
-    color: colors.text.secondary,
-  },
-  improvementContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  improvementText: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginLeft: 4,
-  },
-  metricsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginHorizontal: 20,
-    marginBottom: 20,
-  },
-  metricCard: {
-    width: '48%',
-    backgroundColor: colors.background.secondary,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  metricValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  metricLabel: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    textAlign: 'center',
-  },
-  itemsSection: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text.primary,
-    marginHorizontal: 20,
-    marginBottom: 4,
-  },
-  sectionSubtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginHorizontal: 20,
-    marginBottom: 16,
-  },
-  itemsScroll: {
-    paddingLeft: 20,
-  },
-  itemCard: {
-    width: 80,
-    marginRight: 12,
-    alignItems: 'center',
-  },
-  itemImagePlaceholder: {
-    width: 80,
-    height: 80,
-    backgroundColor: colors.border.primary,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  itemCategory: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: colors.text.primary,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  itemColors: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  colorDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 1,
-    borderWidth: 1,
-    borderColor: colors.border.primary,
-  },
-  insightsContainer: {
-    marginHorizontal: 20,
-    marginBottom: 40,
-  },
-  insightsList: {
-    marginTop: 16,
-  },
-  insightItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: colors.background.secondary,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  insightText: {
-    fontSize: 14,
-    color: colors.text.primary,
-    marginLeft: 12,
-    flex: 1,
-    lineHeight: 20,
-  },
-});
+const createStyles = (colors: typeof DesignSystem.colors) =>
+  StyleSheet.create({
+    colorDot: {
+      borderRadius: 4,
+      height: 8,
+      marginRight: 2,
+      width: 8,
+    },
+    container: {
+      backgroundColor: colors.background.primary,
+      flex: 1,
+    },
+    errorContainer: {
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+    },
+    errorText: {
+      color: colors.text.secondary,
+      fontSize: 16,
+      lineHeight: 24,
+      marginBottom: 24,
+      marginTop: 16,
+      textAlign: 'center',
+    },
+    header: {
+      alignItems: 'center',
+      padding: 20,
+    },
+    improvementContainer: {
+      alignItems: 'center',
+      flexDirection: 'row',
+    },
+    improvementText: {
+      fontSize: 14,
+      fontWeight: '500',
+      marginLeft: 4,
+    },
+    insightItem: {
+      alignItems: 'flex-start',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 8,
+      flexDirection: 'row',
+      marginBottom: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+    },
+    insightText: {
+      color: colors.text.primary,
+      flex: 1,
+      fontSize: 14,
+      lineHeight: 20,
+      marginLeft: 8,
+    },
+    insightsContainer: {
+      marginBottom: 24,
+      marginHorizontal: 20,
+    },
+    insightsList: {
+      marginTop: 16,
+    },
+    itemCard: {
+      alignItems: 'center',
+      marginRight: 12,
+      width: 80,
+    },
+    itemCategory: {
+      color: colors.text.secondary,
+      fontSize: 12,
+      marginBottom: 4,
+      textAlign: 'center',
+    },
+    itemColors: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+    },
+    itemImagePlaceholder: {
+      alignItems: 'center',
+      backgroundColor: colors.border.primary,
+      borderRadius: 8,
+      height: 80,
+      justifyContent: 'center',
+      marginBottom: 8,
+      width: 80,
+    },
+    itemsScroll: {
+      paddingLeft: 20,
+    },
+    itemsSection: {
+      marginBottom: 24,
+    },
+    loadingContainer: {
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+    },
+    loadingText: {
+      color: colors.text.secondary,
+      fontSize: 16,
+      textAlign: 'center',
+    },
+    mainMetricContainer: {
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 16,
+      marginBottom: 20,
+      marginHorizontal: 20,
+      padding: 24,
+    },
+    mainScore: {
+      fontSize: 48,
+      fontWeight: '700',
+      marginBottom: 8,
+    },
+    metricCard: {
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      marginBottom: 12,
+      padding: 16,
+      width: '48%',
+    },
+    metricLabel: {
+      color: colors.text.secondary,
+      fontSize: 12,
+      textAlign: 'center',
+    },
+    metricValue: {
+      color: colors.text.primary,
+      fontSize: 24,
+      fontWeight: '700',
+      marginBottom: 4,
+      marginTop: 8,
+    },
+    metricsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      marginBottom: 20,
+      marginHorizontal: 20,
+    },
+    noDataContainer: {
+      alignItems: 'center',
+      flex: 1,
+      justifyContent: 'center',
+      padding: 20,
+    },
+    noDataText: {
+      color: colors.text.secondary,
+      fontSize: 16,
+      lineHeight: 24,
+      textAlign: 'center',
+    },
+    noDataTitle: {
+      color: colors.text.primary,
+      fontSize: 20,
+      fontWeight: '600',
+      marginBottom: 8,
+      marginTop: 16,
+    },
+    retryButton: {
+      backgroundColor: DesignSystem.colors.primary[500],
+      borderRadius: 8,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+    },
+    retryButtonText: {
+      color: colors.background.primary,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    scoreContainer: {
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    scoreLabel: {
+      color: colors.text.secondary,
+      fontSize: 16,
+    },
+    sectionSubtitle: {
+      color: colors.text.secondary,
+      fontSize: 14,
+      marginBottom: 16,
+      marginHorizontal: 20,
+    },
+    sectionTitle: {
+      color: colors.text.primary,
+      fontSize: 20,
+      fontWeight: '600',
+      marginBottom: 4,
+      marginHorizontal: 20,
+    },
+    starsContainer: {
+      flexDirection: 'row',
+      marginBottom: 8,
+    },
+    subtitle: {
+      color: colors.text.secondary,
+      fontSize: 16,
+    },
+    title: {
+      color: colors.text.primary,
+      fontSize: 28,
+      fontWeight: '700',
+      marginBottom: 4,
+    },
+  });

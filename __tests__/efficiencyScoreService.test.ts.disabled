@@ -1,0 +1,52 @@
+import { efficiencyScoreService } from '@/services/efficiencyScoreService';
+import { enhancedWardrobeService } from '@/services/enhancedWardrobeService';
+import { supabase } from '@/config/supabaseClient';
+
+// Mock the dependencies
+jest.mock('@/services/enhancedWardrobeService');
+jest.mock('@/config/supabaseClient', () => ({
+  supabase: {
+    from: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    eq: jest.fn().mockReturnThis(),
+    gte: jest.fn().mockReturnThis(),
+    order: jest.fn().mockReturnThis(),
+    limit: jest.fn().mockReturnThis(),
+    rpc: jest.fn().mockResolvedValue({ data: [], error: null })
+  }
+}));
+
+describe('EfficiencyScoreService', () => {
+  const mockWardrobeService = enhancedWardrobeService as jest.Mocked<typeof enhancedWardrobeService>;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    
+    // Setup simple mocks
+    (supabase.from as jest.Mock).mockImplementation(() => ({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      gte: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockResolvedValue({ data: [], error: null })
+    }));
+    
+    mockWardrobeService.getWardrobeUtilizationStats = jest.fn().mockResolvedValue({
+      totalItems: 5,
+      activeItems: 4,
+      neglectedItems: 1,
+      utilizationPercentage: 80
+    });
+    
+    mockWardrobeService.getUserWardrobe = jest.fn().mockResolvedValue([]);
+    mockWardrobeService.calculateCostPerWear = jest.fn().mockResolvedValue(10);
+  });
+
+  test('should calculate basic efficiency score', async () => {
+    const result = await efficiencyScoreService.calculateEfficiencyScore('test-user');
+    
+    expect(result).toBeDefined();
+    expect(typeof result.overall).toBe('number');
+    expect(result.breakdown).toBeDefined();
+  }, 5000);
+});

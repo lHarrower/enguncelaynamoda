@@ -1,29 +1,29 @@
 /**
  * Editorial "Weekly Color" Section
- * 
+ *
  * A premium editorial section inspired by Gucci's editorial grid and Poppi's color play.
  * Features weekly evolving visual themes with staggered grid layout and serif typography.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Dimensions,
-  StyleSheet,
-  Animated,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  ORIGINAL_COLORS,
-  ORIGINAL_TYPOGRAPHY,
-  ORIGINAL_SPACING,
+  Animated,
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+import {
   ORIGINAL_BORDER_RADIUS,
+  ORIGINAL_COLORS,
+  ORIGINAL_SPACING,
+  ORIGINAL_TYPOGRAPHY,
 } from '../auth/originalLoginStyles';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -54,13 +54,13 @@ export interface EditorialImage {
 export interface EditorialColorSectionProps {
   /** Current weekly color theme */
   colorTheme: ColorTheme;
-  
+
   /** Callback when explore color is pressed */
   onExploreColor?: (theme: ColorTheme) => void;
-  
+
   /** Callback when editorial image is pressed */
   onImagePress?: (image: EditorialImage, theme: ColorTheme) => void;
-  
+
   /** Whether to show animations */
   enableAnimations?: boolean;
 }
@@ -85,29 +85,33 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
         scaleAnims[image.id] = new Animated.Value(0.95);
       }
     });
-  }, [colorTheme.editorialImages]);
+  }, [colorTheme.editorialImages, fadeAnims, scaleAnims]);
 
   const handleImageLoad = (imageId: string) => {
-    setImagesLoaded(prev => new Set([...prev, imageId]));
-    
+    setImagesLoaded((prev) => new Set([...prev, imageId]));
+
     if (enableAnimations && fadeAnims[imageId]) {
       // Staggered fade-in animation
       const delay = Math.random() * 300; // Random delay for organic feel
-      
+
       setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(fadeAnims[imageId], {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-          Animated.spring(scaleAnims[imageId], {
-            toValue: 1,
-            tension: 100,
-            friction: 8,
-            useNativeDriver: true,
-          }),
-        ]).start();
+        const fade = fadeAnims[imageId];
+        const scale = scaleAnims[imageId];
+        if (fade && scale) {
+          Animated.parallel([
+            Animated.timing(fade, {
+              toValue: 1,
+              duration: 600,
+              useNativeDriver: true,
+            }),
+            Animated.spring(scale, {
+              toValue: 1,
+              tension: 100,
+              friction: 8,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        }
       }, delay);
     }
   };
@@ -115,18 +119,21 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
   const handleImagePress = (image: EditorialImage) => {
     // Micro-interaction: scale down on press
     if (enableAnimations && scaleAnims[image.id]) {
-      Animated.sequence([
-        Animated.timing(scaleAnims[image.id], {
-          toValue: 0.95,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnims[image.id], {
-          toValue: 1,
-          duration: 100,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      const scale = scaleAnims[image.id];
+      if (scale) {
+        Animated.sequence([
+          Animated.timing(scale, {
+            toValue: 0.95,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scale, {
+            toValue: 1,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }
     }
 
     onImagePress?.(image, colorTheme);
@@ -143,7 +150,7 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
 
     // Calculate image dimensions based on size and aspect ratio
     const getImageStyle = () => {
-      const baseWidth = screenWidth - (ORIGINAL_SPACING.containerHorizontal * 2);
+      const baseWidth = screenWidth - ORIGINAL_SPACING.containerHorizontal * 2;
       const columnWidth = (baseWidth - 12) / 2; // 12px gap between columns
 
       let width = columnWidth;
@@ -194,23 +201,16 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
             onLoad={() => handleImageLoad(image.id)}
             resizeMode="cover"
           />
-          
+
           {/* Image Loading Placeholder */}
           {!isLoaded && (
             <View style={styles.imagePlaceholder}>
-              <Ionicons 
-                name="image-outline" 
-                size={32} 
-                color={ORIGINAL_COLORS.placeholderText} 
-              />
+              <Ionicons name="image-outline" size={32} color={ORIGINAL_COLORS.placeholderText} />
             </View>
           )}
 
           {/* Image Overlay */}
-          <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.4)']}
-            style={styles.imageOverlay}
-          >
+          <LinearGradient colors={['transparent', 'rgba(0,0,0,0.4)']} style={styles.imageOverlay}>
             <View style={styles.imageContent}>
               <Text style={styles.imageTitle} numberOfLines={2}>
                 {image.title}
@@ -240,7 +240,7 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
             style={styles.heroImage}
             resizeMode="cover"
           />
-          
+
           {/* Hero Content Overlay */}
           <LinearGradient
             colors={['rgba(0,0,0,0.3)', 'transparent', 'rgba(0,0,0,0.6)'] as const}
@@ -251,21 +251,17 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
               <View style={styles.weekBadge}>
                 <Text style={styles.weekText}>{colorTheme.week}</Text>
               </View>
-              
+
               {/* Main Title */}
               <Text style={[styles.heroTitle, { color: colorTheme.accentColor }]}>
                 {colorTheme.name}
               </Text>
-              
+
               {/* Subtitle */}
-              <Text style={styles.heroSubtitle}>
-                {colorTheme.subtitle}
-              </Text>
-              
+              <Text style={styles.heroSubtitle}>{colorTheme.subtitle}</Text>
+
               {/* Description */}
-              <Text style={styles.heroDescription}>
-                {colorTheme.description}
-              </Text>
+              <Text style={styles.heroDescription}>{colorTheme.description}</Text>
             </View>
           </LinearGradient>
         </LinearGradient>
@@ -274,9 +270,7 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
       {/* Editorial Grid */}
       <View style={styles.editorialSection}>
         <Text style={styles.sectionTitle}>Rengin Hikayesi</Text>
-        <Text style={styles.sectionSubtitle}>
-          Bu haftanın rengini keşfet ve stiline yansıt
-        </Text>
+        <Text style={styles.sectionSubtitle}>Bu haftanın rengini keşfet ve stiline yansıt</Text>
 
         {/* Staggered Grid Layout */}
         <View style={styles.editorialGrid}>
@@ -285,7 +279,7 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
               .filter((_, index) => index % 2 === 0)
               .map((image, index) => renderEditorialImage(image, index * 2))}
           </View>
-          
+
           <View style={[styles.gridColumn, styles.rightColumn]}>
             {colorTheme.editorialImages
               .filter((_, index) => index % 2 === 1)
@@ -309,11 +303,7 @@ export const EditorialColorSection: React.FC<EditorialColorSectionProps> = ({
               <Text style={[styles.exploreButtonText, { color: colorTheme.accentColor }]}>
                 Bu Rengi Keşfet
               </Text>
-              <Ionicons 
-                name="arrow-forward" 
-                size={20} 
-                color={colorTheme.accentColor} 
-              />
+              <Ionicons name="arrow-forward" size={20} color={colorTheme.accentColor} />
             </LinearGradient>
           </BlurView>
         </TouchableOpacity>
@@ -339,9 +329,9 @@ const styles = StyleSheet.create({
   },
 
   heroImage: {
-    width: '100%',
     height: '100%',
     position: 'absolute',
+    width: '100%',
   },
 
   heroOverlay: {
@@ -357,10 +347,10 @@ const styles = StyleSheet.create({
   weekBadge: {
     alignSelf: 'flex-start',
     backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
     borderRadius: 20,
     marginBottom: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
 
   weekText: {
@@ -380,30 +370,30 @@ const styles = StyleSheet.create({
   },
 
   heroSubtitle: {
-    fontSize: 18,
     color: 'rgba(255,255,255,0.9)',
-    marginBottom: 12,
+    fontSize: 18,
     fontWeight: '500',
+    marginBottom: 12,
   },
 
   heroDescription: {
-    fontSize: 16,
     color: 'rgba(255,255,255,0.8)',
+    fontSize: 16,
     lineHeight: 24,
     maxWidth: '90%',
   },
 
   // Editorial Section
   editorialSection: {
-    paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
     marginBottom: 40,
+    paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
   },
 
   sectionTitle: {
     ...ORIGINAL_TYPOGRAPHY.title,
+    fontFamily: 'serif',
     fontSize: 28,
     marginBottom: 8,
-    fontFamily: 'serif',
   },
 
   sectionSubtitle: {
@@ -427,14 +417,14 @@ const styles = StyleSheet.create({
   },
 
   editorialImageContainer: {
-    borderRadius: ORIGINAL_BORDER_RADIUS.input,
-    overflow: 'hidden',
     backgroundColor: ORIGINAL_COLORS.inputBackground,
+    borderRadius: ORIGINAL_BORDER_RADIUS.input,
+    elevation: 4,
+    overflow: 'hidden',
     shadowColor: ORIGINAL_COLORS.shadowColor,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 4,
   },
 
   editorialImageTouchable: {
@@ -443,28 +433,28 @@ const styles = StyleSheet.create({
   },
 
   editorialImage: {
-    width: '100%',
     height: '100%',
+    width: '100%',
   },
 
   imagePlaceholder: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: ORIGINAL_COLORS.background,
     alignItems: 'center',
+    backgroundColor: ORIGINAL_COLORS.background,
+    bottom: 0,
     justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 
   imageOverlay: {
-    position: 'absolute',
     bottom: 0,
-    left: 0,
-    right: 0,
     height: '40%',
     justifyContent: 'flex-end',
+    left: 0,
+    position: 'absolute',
+    right: 0,
   },
 
   imageContent: {
@@ -472,30 +462,30 @@ const styles = StyleSheet.create({
   },
 
   imageTitle: {
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
     marginBottom: 4,
   },
 
   imageSubtitle: {
-    fontSize: 14,
     color: 'rgba(255,255,255,0.8)',
+    fontSize: 14,
   },
 
   // CTA Section
   ctaSection: {
-    paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
-    paddingBottom: 40,
     alignItems: 'center',
+    paddingBottom: 40,
+    paddingHorizontal: ORIGINAL_SPACING.containerHorizontal,
   },
 
   exploreButton: {
-    width: '100%',
-    maxWidth: 280,
-    height: 56,
     borderRadius: 28,
+    height: 56,
+    maxWidth: 280,
     overflow: 'hidden',
+    width: '100%',
   },
 
   exploreButtonBlur: {
@@ -503,19 +493,19 @@ const styles = StyleSheet.create({
   },
 
   exploreButtonGradient: {
+    alignItems: 'center',
+    borderColor: 'rgba(255,255,255,0.3)',
+    borderWidth: 1,
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     gap: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    justifyContent: 'center',
   },
 
   exploreButtonText: {
+    fontFamily: ORIGINAL_TYPOGRAPHY.button.fontFamily,
     fontSize: 18,
     fontWeight: '600',
-    fontFamily: ORIGINAL_TYPOGRAPHY.button.fontFamily,
   },
 });
 

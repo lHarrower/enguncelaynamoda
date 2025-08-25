@@ -1,21 +1,31 @@
 /**
  * Text Atom
- * 
+ *
  * The fundamental text element that ensures consistent typography
  * across the entire application following the unified design system.
  */
 
 import React from 'react';
-import { Text as RNText, StyleSheet, TextStyle } from 'react-native';
-import { BaseComponentProps } from '@/types/componentProps';
+import { StyleSheet, Text as RNText, TextStyle } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+import { BaseComponentProps } from '@/types/componentProps';
 
 export interface TextProps extends Omit<BaseComponentProps, 'style'> {
   children: React.ReactNode;
   variant?: 'display' | 'headline' | 'title' | 'body' | 'label' | 'caption';
   weight?: 'light' | 'regular' | 'medium' | 'semibold' | 'bold';
   size?: 'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
-  color?: 'charcoal' | 'slate' | 'light' | 'primary' | 'secondary' | 'error' | 'warning' | 'success' | 'luxury';
+  color?:
+    | 'charcoal'
+    | 'slate'
+    | 'light'
+    | 'primary'
+    | 'secondary'
+    | 'error'
+    | 'warning'
+    | 'success'
+    | 'luxury';
   align?: 'left' | 'center' | 'right' | 'justify';
   transform?: 'none' | 'uppercase' | 'lowercase' | 'capitalize';
   decoration?: 'none' | 'underline' | 'line-through';
@@ -92,7 +102,7 @@ const getColorStyle = (color: TextProps['color']): TextStyle => {
     case 'slate':
       return { color: DesignSystem.colors.neutral.slate };
     case 'light':
-  return { color: DesignSystem.colors.neutral[100] };
+      return { color: DesignSystem.colors.neutral[100] };
     default:
       return { color: DesignSystem.colors.neutral.charcoal };
   }
@@ -111,89 +121,89 @@ const getDecorationStyle = (decoration: TextProps['decoration']): TextStyle => {
 
 const styles = StyleSheet.create({
   base: {
-    fontFamily: DesignSystem.typography.fontFamily.primary,
     color: DesignSystem.colors.neutral.charcoal,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
   },
-  
+
   // Variants
   display: {
     ...DesignSystem.typography.heading.h1,
   },
-  
+
   headline: {
     ...DesignSystem.typography.heading.h1,
   },
-  
+
   title: {
     ...DesignSystem.typography.heading.h2,
   },
-  
+
   body: {
     ...DesignSystem.typography.body.medium,
   },
-  
+
   label: {
     ...DesignSystem.typography.caption.medium,
   },
-  
+
   caption: {
     ...DesignSystem.typography.scale.caption,
   },
-  
+
   // Weights
   light: {
     fontWeight: '300',
   },
-  
+
   regular: {
     fontWeight: '400',
   },
-  
+
   medium: {
     fontWeight: '500',
   },
-  
+
   semibold: {
     fontWeight: '600',
   },
-  
+
   bold: {
     fontWeight: '700',
   },
-  
+
   // Sizes
   xs: {
     fontSize: 12,
   },
-  
+
   sm: {
     fontSize: 14,
   },
-  
+
   baseSize: {
     fontSize: 16,
   },
-  
+
   lg: {
     fontSize: 18,
   },
-  
+
   xl: {
     fontSize: 20,
   },
-  
+
   '2xl': {
     fontSize: 24,
   },
-  
+
   '3xl': {
     fontSize: 30,
   },
-  
+
   '4xl': {
     fontSize: 36,
   },
-  
+
   italic: {
     fontStyle: 'italic',
   },

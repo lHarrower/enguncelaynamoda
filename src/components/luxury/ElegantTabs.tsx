@@ -1,14 +1,22 @@
 import React, { useEffect, useRef } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import {
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+import type { SharedValue } from 'react-native-reanimated';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  useAnimatedScrollHandler,
-  withSpring,
-  interpolate,
   Extrapolate,
+  interpolate,
   runOnJS,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
 } from 'react-native-reanimated';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface Tab {
@@ -21,12 +29,40 @@ interface ElegantTabsProps {
   tabs: Tab[];
   activeTab: string;
   onTabPress: (tabId: string) => void;
-  style?: any;
-  contentStyle?: any;
+  style?: ViewStyle;
+  contentStyle?: ViewStyle;
   showContent?: boolean;
 }
 
 const { width: screenWidth } = Dimensions.get('window');
+
+type TabLabelProps = {
+  index: number;
+  isActive: boolean;
+  label: string;
+  scrollX: SharedValue<number>;
+  tabWidth: number;
+};
+
+const TabLabel: React.FC<TabLabelProps> = ({ index, isActive, label, scrollX, tabWidth }) => {
+  const animatedStyle = useAnimatedStyle(() => {
+    const progress = scrollX.value / tabWidth;
+    const distance = Math.abs(progress - index);
+    const opacity = interpolate(distance, [0, 1], [1, 0.6], Extrapolate.CLAMP);
+    const scale = interpolate(distance, [0, 1], [1, 0.95], Extrapolate.CLAMP);
+
+    return {
+      opacity,
+      transform: [{ scale }],
+    };
+  });
+
+  return (
+    <Animated.Text style={[styles.tabLabel, animatedStyle, isActive && styles.activeTabLabel]}>
+      {label}
+    </Animated.Text>
+  );
+};
 
 export const ElegantTabs: React.FC<ElegantTabsProps> = ({
   tabs,
@@ -39,9 +75,9 @@ export const ElegantTabs: React.FC<ElegantTabsProps> = ({
   // Single source of truth for scroll position
   const scrollX = useSharedValue(0);
   const scrollViewRef = useRef<ScrollView>(null);
-  
+
   const tabWidth = screenWidth;
-  const activeIndex = tabs.findIndex(tab => tab.id === activeTab);
+  const activeIndex = tabs.findIndex((tab) => tab.id === activeTab);
 
   // Synchronized spring configuration for perfect harmony
   const SPRING_CONFIG = {
@@ -64,7 +100,7 @@ export const ElegantTabs: React.FC<ElegantTabsProps> = ({
       x: index * tabWidth,
       animated: true,
     });
-    
+
     // Update active tab
     runOnJS(onTabPress)(tabId);
   };
@@ -86,7 +122,7 @@ export const ElegantTabs: React.FC<ElegantTabsProps> = ({
       scrollX.value,
       tabs.map((_, index) => index * tabWidth),
       tabs.map((_, index) => (index * screenWidth) / tabs.length),
-      Extrapolate.CLAMP
+      Extrapolate.CLAMP,
     );
 
     // Dynamic width based on active tab label
@@ -105,31 +141,6 @@ export const ElegantTabs: React.FC<ElegantTabsProps> = ({
     };
   });
 
-  // Tab label animations
-  const getTabLabelStyle = (index: number) => {
-    return useAnimatedStyle(() => {
-      const progress = scrollX.value / tabWidth;
-      const opacity = interpolate(
-        Math.abs(progress - index),
-        [0, 1],
-        [1, 0.6],
-        Extrapolate.CLAMP
-      );
-
-      const scale = interpolate(
-        Math.abs(progress - index),
-        [0, 1],
-        [1, 0.95],
-        Extrapolate.CLAMP
-      );
-
-      return {
-        opacity,
-        transform: [{ scale }],
-      };
-    });
-  };
-
   return (
     <View style={[styles.container, style]}>
       {/* Tab buttons */}
@@ -141,15 +152,13 @@ export const ElegantTabs: React.FC<ElegantTabsProps> = ({
             onPress={() => handleTabPress(tab.id, index)}
             activeOpacity={0.8}
           >
-            <Animated.Text
-              style={[
-                styles.tabLabel,
-                getTabLabelStyle(index),
-                activeTab === tab.id && styles.activeTabLabel,
-              ]}
-            >
-              {tab.label}
-            </Animated.Text>
+            <TabLabel
+              index={index}
+              isActive={activeTab === tab.id}
+              label={tab.label}
+              scrollX={scrollX}
+              tabWidth={tabWidth}
+            />
           </TouchableOpacity>
         ))}
       </View>
@@ -180,36 +189,27 @@ export const ElegantTabs: React.FC<ElegantTabsProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    backgroundColor: 'transparent',
-  },
-  
-  tabsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: DesignSystem.spacing.md,
-  },
-  
-  tab: {
-    paddingVertical: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  
-  tabLabel: {
-  ...DesignSystem.typography.scale.h5,
-    color: DesignSystem.colors.neutral.charcoal,
-    opacity: 0.6,
-    textAlign: 'center',
-  },
-  
   activeTabLabel: {
     color: DesignSystem.colors.neutral.slate,
-    opacity: 1,
     fontWeight: '600' as const,
+    opacity: 1,
   },
-  
+
+  container: {
+    backgroundColor: 'transparent',
+    position: 'relative',
+  },
+
+  contentContainer: {
+    flex: 1,
+    marginTop: DesignSystem.spacing.md,
+  },
+
+  contentPage: {
+    flex: 1,
+    paddingHorizontal: DesignSystem.spacing.md,
+  },
+
   indicator: {
     position: 'absolute',
     bottom: 0,
@@ -223,14 +223,23 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 2,
   },
-  
-  contentContainer: {
-    flex: 1,
-    marginTop: DesignSystem.spacing.md,
+
+  tab: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.md,
   },
-  
-  contentPage: {
-    flex: 1,
+
+  tabLabel: {
+    ...DesignSystem.typography.scale.h5,
+    color: DesignSystem.colors.neutral.charcoal,
+    opacity: 0.6,
+    textAlign: 'center',
+  },
+
+  tabsContainer: {
+    flexDirection: 'row',
     paddingHorizontal: DesignSystem.spacing.md,
   },
 });

@@ -1,21 +1,17 @@
 // src/components/shared/StudioHeader.tsx
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface StudioHeaderProps {
   userName?: string;
   messageOfTheDay?: string;
   onProfilePress?: () => void;
-  style?: any;
+  style?: ViewStyle;
 }
 
 export const StudioHeader: React.FC<StudioHeaderProps> = ({
@@ -25,11 +21,15 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
   style,
 }) => {
   const insets = useSafeAreaInsets();
-  
+
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
+    if (hour < 12) {
+      return 'Good morning';
+    }
+    if (hour < 17) {
+      return 'Good afternoon';
+    }
     return 'Good evening';
   };
 
@@ -40,11 +40,14 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           <Text style={styles.greeting}>{getGreeting()}</Text>
           <Text style={styles.userName}>{userName}</Text>
         </View>
-        
+
         <TouchableOpacity
           style={styles.profileButton}
           onPress={onProfilePress}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          accessibilityRole="button"
+          accessibilityLabel="Profile"
+          accessibilityHint="Tap to open your profile"
         >
           <Ionicons
             name="person-circle-outline"
@@ -53,7 +56,7 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
           />
         </TouchableOpacity>
       </View>
-      
+
       {messageOfTheDay && (
         <View style={styles.messageOfTheDay}>
           <Text style={styles.messageText}>{messageOfTheDay}</Text>
@@ -65,44 +68,44 @@ export const StudioHeader: React.FC<StudioHeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: DesignSystem.spacing.xl,
     marginBottom: DesignSystem.spacing.xxxl,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  headerContent: {
-    flex: 1,
+    paddingHorizontal: DesignSystem.spacing.xl,
   },
   greeting: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.secondary,
     marginBottom: 4,
   },
-  userName: {
-    ...DesignSystem.typography.scale.hero,
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  headerContent: {
+    flex: 1,
+  },
+  messageOfTheDay: {
+    backgroundColor: DesignSystem.colors.sage[50],
+    borderLeftColor: DesignSystem.colors.sage[500],
+    borderLeftWidth: 3,
+    borderRadius: DesignSystem.radius.md,
+    marginTop: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.md,
+  },
+  messageText: {
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
-    fontSize: 32,
+    lineHeight: 24,
+    textAlign: 'center',
   },
   profileButton: {
     padding: 4,
   },
-  messageOfTheDay: {
-    marginTop: DesignSystem.spacing.lg,
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.sage[50],
-    borderRadius: DesignSystem.radius.md,
-    borderLeftWidth: 3,
-    borderLeftColor: DesignSystem.colors.sage[500],
-  },
-  messageText: {
-  ...DesignSystem.typography.body.medium,
+  userName: {
+    ...DesignSystem.typography.scale.hero,
     color: DesignSystem.colors.text.primary,
-    textAlign: 'center',
-    lineHeight: 24,
+    fontSize: 32,
   },
 });
 

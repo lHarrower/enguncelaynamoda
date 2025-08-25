@@ -1,17 +1,17 @@
 // Atmospheric Background - The Living Canvas
 // Deep, immersive space with slow-moving gradients like light behind silk
 
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
-  withTiming,
+  useSharedValue,
   withRepeat,
   withSequence,
-  interpolate,
+  withTiming,
 } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
@@ -100,10 +100,10 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
           }),
           withTiming(-intensityValues.movement, {
             duration: 15000,
-          })
+          }),
         ),
         -1,
-        true
+        true,
       );
 
       // Gradient 2 - Diagonal drift
@@ -114,10 +114,10 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
           }),
           withTiming(0.3 - intensityValues.movement, {
             duration: 20000,
-          })
+          }),
         ),
         -1,
-        true
+        true,
       );
 
       // Gradient 3 - Vertical drift
@@ -128,10 +128,10 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
           }),
           withTiming(intensityValues.movement, {
             duration: 25000,
-          })
+          }),
         ),
         -1,
-        true
+        true,
       );
 
       // Opacity breathing
@@ -142,10 +142,10 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
           }),
           withTiming(intensityValues.opacity * 0.5, {
             duration: 8000,
-          })
+          }),
         ),
         -1,
-        true
+        true,
       );
 
       opacity2.value = withRepeat(
@@ -155,10 +155,10 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
           }),
           withTiming(intensityValues.opacity * 0.7, {
             duration: 12000,
-          })
+          }),
         ),
         -1,
-        true
+        true,
       );
 
       opacity3.value = withRepeat(
@@ -168,15 +168,26 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
           }),
           withTiming(intensityValues.opacity * 0.3, {
             duration: 10000,
-          })
+          }),
         ),
         -1,
-        true
+        true,
       );
     };
 
     startAtmosphericMotion();
-  }, [variant, intensity]);
+  }, [
+    variant,
+    intensity,
+    gradientPosition1,
+    gradientPosition2,
+    gradientPosition3,
+    intensityValues.movement,
+    intensityValues.opacity,
+    opacity1,
+    opacity2,
+    opacity3,
+  ]);
 
   // Animated styles for each gradient layer
   const gradient1Style = useAnimatedStyle(() => {
@@ -213,7 +224,7 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
     <View style={styles.container}>
       {/* Base Canvas - Deep charcoal */}
       <View style={styles.baseCanvas} />
-      
+
       {/* Atmospheric Gradient Layers */}
       <Animated.View style={[styles.gradientLayer, gradient1Style]}>
         <LinearGradient
@@ -243,40 +254,38 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
       </Animated.View>
 
       {/* Content Layer */}
-      <View style={styles.contentLayer}>
-        {children}
-      </View>
+      <View style={styles.contentLayer}>{children}</View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  baseCanvas: {
+    backgroundColor: DesignSystem.colors.background.primary,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   container: {
     flex: 1,
     position: 'relative',
   },
-  baseCanvas: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: DesignSystem.colors.background.primary,
-  },
-  gradientLayer: {
-    position: 'absolute',
-    width: width * 2,
-    height: height * 2,
-    top: -height * 0.5,
-    left: -width * 0.5,
-  },
-  gradient: {
-    flex: 1,
-    borderRadius: width,
-  },
   contentLayer: {
     flex: 1,
     zIndex: 10,
+  },
+  gradient: {
+    borderRadius: width,
+    flex: 1,
+  },
+  gradientLayer: {
+    height: height * 2,
+    left: -width * 0.5,
+    position: 'absolute',
+    top: -height * 0.5,
+    width: width * 2,
   },
 });
 

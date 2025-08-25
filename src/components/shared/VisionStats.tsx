@@ -1,21 +1,14 @@
 // src/components/shared/VisionStats.tsx
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  useAnimatedProps,
-} from 'react-native-reanimated';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+import { IoniconsName } from '@/types/icons';
 
 interface VisionStatsProps {
   totalSeen: number;
@@ -26,7 +19,7 @@ interface VisionStatsProps {
 }
 
 interface StatItemProps {
-  icon: string;
+  icon: IoniconsName;
   label: string;
   value: number;
   color: string;
@@ -42,7 +35,7 @@ const StatItem: React.FC<StatItemProps> = ({ icon, label, value, color, delay = 
       scale.value = withSpring(1, { damping: 15, stiffness: 150 });
       opacity.value = withSpring(1);
     }, delay);
-  }, [delay]);
+  }, [delay, opacity, scale]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -53,14 +46,11 @@ const StatItem: React.FC<StatItemProps> = ({ icon, label, value, color, delay = 
     <Animated.View style={[styles.statItem, animatedStyle]}>
       <BlurView intensity={20} style={styles.statBlur}>
         <LinearGradient
-          colors={[
-            'rgba(255, 255, 255, 0.9)',
-            'rgba(255, 255, 255, 0.7)',
-          ]}
+          colors={['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.7)']}
           style={styles.statGradient}
         >
           <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
-            <Ionicons name={icon as any} size={24} color={color} />
+            <Ionicons name={icon} size={24} color={color} />
           </View>
           <Text style={styles.statValue}>{value.toLocaleString()}</Text>
           <Text style={styles.statLabel}>{label}</Text>
@@ -81,28 +71,28 @@ export const VisionStats: React.FC<VisionStatsProps> = ({
 
   const stats = [
     {
-      icon: 'eye',
+      icon: 'eye' as IoniconsName,
       label: 'Outfits Seen',
       value: totalSeen,
       color: DesignSystem.colors.sage[600],
       delay: 0,
     },
     {
-      icon: 'heart',
+      icon: 'heart' as IoniconsName,
       label: 'Loved',
       value: totalLiked,
       color: DesignSystem.colors.coral[500],
       delay: 100,
     },
     {
-      icon: 'close',
+      icon: 'close' as IoniconsName,
       label: 'Passed',
       value: totalPassed,
       color: DesignSystem.colors.text.tertiary,
       delay: 200,
     },
     {
-      icon: 'flame',
+      icon: 'flame' as IoniconsName,
       label: 'Day Streak',
       value: streakDays,
       color: DesignSystem.colors.amber[500],
@@ -119,7 +109,7 @@ export const VisionStats: React.FC<VisionStatsProps> = ({
           <Text style={styles.likeRateLabel}>Love Rate</Text>
         </View>
       </View>
-      
+
       <View style={styles.statsGrid}>
         {stats.map((stat, index) => (
           <StatItem
@@ -141,57 +131,53 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.lg,
   },
   header: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: DesignSystem.spacing.lg,
   },
-  title: {
-    ...DesignSystem.typography.scale.h3,
-    color: DesignSystem.colors.text.primary,
-    fontWeight: '600',
+  iconContainer: {
+    alignItems: 'center',
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    marginBottom: DesignSystem.spacing.xs,
+    width: 40,
   },
   likeRateContainer: {
     alignItems: 'flex-end',
+  },
+  likeRateLabel: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
   },
   likeRateValue: {
     ...DesignSystem.typography.scale.h2,
     color: DesignSystem.colors.sage[600],
     fontWeight: '700',
   },
-  likeRateLabel: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.secondary,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: DesignSystem.spacing.md,
-  },
-  statItem: {
-    flex: 1,
-    minWidth: '45%',
-    height: 100,
-  },
   statBlur: {
-    flex: 1,
     borderRadius: DesignSystem.radius.lg,
+    flex: 1,
     overflow: 'hidden',
     ...DesignSystem.elevation.medium,
   },
   statGradient: {
+    alignItems: 'center',
     flex: 1,
+    justifyContent: 'center',
     padding: DesignSystem.spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: DesignSystem.spacing.xs,
+  statItem: {
+    flex: 1,
+    height: 100,
+    minWidth: '45%',
+  },
+  statLabel: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    fontSize: 11,
+    textAlign: 'center',
   },
   statValue: {
     ...DesignSystem.typography.scale.h3,
@@ -199,11 +185,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 2,
   },
-  statLabel: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-    fontSize: 11,
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: DesignSystem.spacing.md,
+  },
+  title: {
+    ...DesignSystem.typography.scale.h3,
+    color: DesignSystem.colors.text.primary,
+    fontWeight: '600',
   },
 });
 

@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-  ActivityIndicator
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { efficiencyScoreService, EfficiencyScore } from '@/services/efficiencyScoreService';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
 import { useAuth } from '@/hooks/useAuth';
+import { EfficiencyScore, efficiencyScoreService } from '@/services/efficiencyScoreService';
+import { IoniconsName } from '@/types/icons';
 import { logInDev } from '@/utils/consoleSuppress';
 
 const { width } = Dimensions.get('window');
@@ -23,7 +25,7 @@ interface EfficiencyScoreDashboardProps {
 
 export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> = ({
   onGoalPress,
-  onInsightPress
+  onInsightPress,
 }) => {
   const { user } = useAuth();
   const [efficiencyScore, setEfficiencyScore] = useState<EfficiencyScore | null>(null);
@@ -31,59 +33,77 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user?.id) {
-      loadEfficiencyScore();
+  const loadEfficiencyScore = useCallback(async () => {
+    if (!user?.id) {
+      return;
     }
-  }, [user?.id]);
 
-  const loadEfficiencyScore = async () => {
     try {
       setLoading(true);
       setError(null);
-      const score = await efficiencyScoreService.calculateEfficiencyScore(user!.id);
+      const score = await efficiencyScoreService.calculateEfficiencyScore(user.id);
       setEfficiencyScore(score);
-      
+
       // Store the score for historical tracking
-      await efficiencyScoreService.storeEfficiencyScore(user!.id, score);
+      await efficiencyScoreService.storeEfficiencyScore(user.id, score);
     } catch (err) {
-      logInDev('Failed to load efficiency score:', err);
+      logInDev('Failed to load efficiency score:', err instanceof Error ? err : String(err));
       setError('Failed to load efficiency score');
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    loadEfficiencyScore();
+  }, [loadEfficiencyScore]);
 
   const getScoreColor = (score: number): string => {
-    if (score >= 80) return '#4CAF50'; // Green
-    if (score >= 60) return '#FF9800'; // Orange
+    if (score >= 80) {
+      return '#4CAF50';
+    } // Green
+    if (score >= 60) {
+      return '#FF9800';
+    } // Orange
     return '#F44336'; // Red
   };
 
   const getScoreGradient = (score: number): readonly [string, string] => {
-    if (score >= 80) return ['#4CAF50', '#66BB6A'] as const;
-    if (score >= 60) return ['#FF9800', '#FFB74D'] as const;
+    if (score >= 80) {
+      return ['#4CAF50', '#66BB6A'] as const;
+    }
+    if (score >= 60) {
+      return ['#FF9800', '#FFB74D'] as const;
+    }
     return ['#F44336', '#EF5350'] as const;
   };
 
-  const getTrendIcon = (trajectory: string): string => {
+  const getTrendIcon = (trajectory: string): IoniconsName => {
     switch (trajectory) {
-      case 'improving': return 'trending-up';
-      case 'declining': return 'trending-down';
-      default: return 'remove';
+      case 'improving':
+        return 'trending-up';
+      case 'declining':
+        return 'trending-down';
+      default:
+        return 'remove';
     }
   };
 
   const getTrendColor = (trajectory: string): string => {
     switch (trajectory) {
-      case 'improving': return '#4CAF50';
-      case 'declining': return '#F44336';
-      default: return '#9E9E9E';
+      case 'improving':
+        return '#4CAF50';
+      case 'declining':
+        return '#F44336';
+      default:
+        return '#9E9E9E';
     }
   };
 
   const renderOverallScore = () => {
-    if (!efficiencyScore) return null;
+    if (!efficiencyScore) {
+      return null;
+    }
 
     const { overall, trends } = efficiencyScore;
     const scoreColor = getScoreColor(overall);
@@ -101,13 +121,10 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
             <Text style={styles.overallScoreLabel}>Efficiency Score</Text>
             <Text style={styles.overallScoreValue}>{overall}</Text>
             <View style={styles.trendContainer}>
-              <Ionicons
-                name={getTrendIcon(trends.trajectory) as any}
-                size={16}
-                color="white"
-              />
+              <Ionicons name={getTrendIcon(trends.trajectory)} size={16} color="white" />
               <Text style={styles.trendText}>
-                {trends.monthlyChange > 0 ? '+' : ''}{trends.monthlyChange} this month
+                {trends.monthlyChange > 0 ? '+' : ''}
+                {trends.monthlyChange} this month
               </Text>
             </View>
           </View>
@@ -117,14 +134,16 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
   };
 
   const renderCategoryScores = () => {
-    if (!efficiencyScore) return null;
+    if (!efficiencyScore) {
+      return null;
+    }
 
     const categories = [
       { key: 'utilization', label: 'Utilization', icon: 'shirt-outline' },
       { key: 'costEfficiency', label: 'Cost Efficiency', icon: 'cash-outline' },
       { key: 'sustainability', label: 'Sustainability', icon: 'leaf-outline' },
       { key: 'versatility', label: 'Versatility', icon: 'shuffle-outline' },
-      { key: 'curation', label: 'Curation', icon: 'star-outline' }
+      { key: 'curation', label: 'Curation', icon: 'star-outline' },
     ];
 
     return (
@@ -132,21 +151,23 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
         <Text style={styles.sectionTitle}>Category Breakdown</Text>
         <View style={styles.categoriesGrid}>
           {categories.map((category) => {
-            const score = efficiencyScore.breakdown[category.key as keyof typeof efficiencyScore.breakdown];
+            const score =
+              efficiencyScore.breakdown[category.key as keyof typeof efficiencyScore.breakdown];
             const isSelected = selectedCategory === category.key;
-            
+
             return (
               <TouchableOpacity
                 key={category.key}
-                style={[
-                  styles.categoryCard,
-                  isSelected && styles.categoryCardSelected
-                ]}
+                style={[styles.categoryCard, isSelected && styles.categoryCardSelected]}
                 onPress={() => setSelectedCategory(isSelected ? null : category.key)}
+                accessibilityRole="button"
+                accessibilityLabel={`${category.label} category with score ${score}`}
+                accessibilityHint={`Tap to ${isSelected ? 'deselect' : 'select'} ${category.label} category`}
+                accessibilityState={{ selected: isSelected }}
               >
                 <View style={styles.categoryHeader}>
                   <Ionicons
-                    name={category.icon as any}
+                    name={category.icon as IoniconsName}
                     size={20}
                     color={getScoreColor(score)}
                   />
@@ -159,8 +180,8 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
                       styles.categoryProgress,
                       {
                         width: `${score}%`,
-                        backgroundColor: getScoreColor(score)
-                      }
+                        backgroundColor: getScoreColor(score),
+                      },
                     ]}
                   />
                 </View>
@@ -173,14 +194,16 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
   };
 
   const renderInsights = () => {
-    if (!efficiencyScore) return null;
+    if (!efficiencyScore) {
+      return null;
+    }
 
     const { insights } = efficiencyScore;
 
     return (
       <View style={styles.insightsContainer}>
         <Text style={styles.sectionTitle}>Insights & Recommendations</Text>
-        
+
         {insights.strengths.length > 0 && (
           <View style={styles.insightSection}>
             <View style={styles.insightHeader}>
@@ -192,6 +215,9 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
                 key={index}
                 style={styles.insightItem}
                 onPress={() => onInsightPress?.(strength)}
+                accessibilityRole="button"
+                accessibilityLabel={`Strength insight: ${strength}`}
+                accessibilityHint="Tap to view more details about this strength"
               >
                 <Text style={styles.insightText}>{strength}</Text>
               </TouchableOpacity>
@@ -210,6 +236,9 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
                 key={index}
                 style={styles.insightItem}
                 onPress={() => onInsightPress?.(improvement)}
+                accessibilityRole="button"
+                accessibilityLabel={`Improvement area: ${improvement}`}
+                accessibilityHint="Tap to view more details about this improvement area"
               >
                 <Text style={styles.insightText}>{improvement}</Text>
               </TouchableOpacity>
@@ -228,6 +257,9 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
                 key={index}
                 style={styles.insightItem}
                 onPress={() => onInsightPress?.(recommendation)}
+                accessibilityRole="button"
+                accessibilityLabel={`Recommendation: ${recommendation}`}
+                accessibilityHint="Tap to view more details about this recommendation"
               >
                 <Text style={styles.insightText}>{recommendation}</Text>
               </TouchableOpacity>
@@ -239,7 +271,9 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
   };
 
   const renderBenchmarks = () => {
-    if (!efficiencyScore) return null;
+    if (!efficiencyScore) {
+      return null;
+    }
 
     const { benchmarks } = efficiencyScore;
 
@@ -260,7 +294,13 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
   };
 
   const renderGoalsButton = () => (
-    <TouchableOpacity style={styles.goalsButton} onPress={onGoalPress}>
+    <TouchableOpacity
+      style={styles.goalsButton}
+      onPress={onGoalPress}
+      accessibilityRole="button"
+      accessibilityLabel="Set efficiency goals"
+      accessibilityHint="Tap to create and manage your efficiency goals"
+    >
       <LinearGradient
         colors={['#6366F1', '#8B5CF6']}
         style={styles.goalsButtonGradient}
@@ -288,7 +328,13 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
       <View style={styles.errorContainer}>
         <Ionicons name="alert-circle" size={48} color="#F44336" />
         <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={loadEfficiencyScore}>
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={loadEfficiencyScore}
+          accessibilityRole="button"
+          accessibilityLabel="Try again"
+          accessibilityHint="Tap to retry loading your efficiency score"
+        >
           <Text style={styles.retryButtonText}>Try Again</Text>
         </TouchableOpacity>
       </View>
@@ -307,231 +353,231 @@ export const EfficiencyScoreDashboard: React.FC<EfficiencyScoreDashboardProps> =
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8FAFC'
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#64748B',
-    textAlign: 'center'
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20
-  },
-  errorText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#64748B',
-    textAlign: 'center'
-  },
-  retryButton: {
-    marginTop: 16,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    backgroundColor: '#6366F1',
-    borderRadius: 8
-  },
-  retryButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600'
-  },
-  overallScoreContainer: {
-    margin: 20,
-    borderRadius: 16,
-    overflow: 'hidden',
-    elevation: 4,
+  benchmarkCard: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    elevation: 2,
+    padding: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
   },
-  overallScoreGradient: {
-    padding: 24
-  },
-  overallScoreContent: {
-    alignItems: 'center'
-  },
-  overallScoreLabel: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '500',
-    opacity: 0.9
-  },
-  overallScoreValue: {
-    color: 'white',
-    fontSize: 48,
-    fontWeight: 'bold',
-    marginVertical: 8
-  },
-  trendContainer: {
-    flexDirection: 'row',
+  benchmarkItem: {
     alignItems: 'center',
-    marginTop: 8
   },
-  trendText: {
-    color: 'white',
+  benchmarkLabel: {
+    color: '#64748B',
     fontSize: 14,
-    marginLeft: 4,
-    opacity: 0.9
+    marginBottom: 4,
   },
-  sectionTitle: {
-    fontSize: 20,
+  benchmarkSubtext: {
+    color: '#94A3B8',
+    fontSize: 12,
+  },
+  benchmarkValue: {
+    color: '#6366F1',
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#1E293B',
-    marginBottom: 16
+    marginBottom: 4,
+  },
+  benchmarksContainer: {
+    margin: 20,
+    marginTop: 0,
   },
   categoriesContainer: {
     margin: 20,
-    marginTop: 0
+    marginTop: 0,
   },
   categoriesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   categoryCard: {
-    width: (width - 60) / 2,
     backgroundColor: 'white',
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
     elevation: 2,
+    marginBottom: 12,
+    padding: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 4
+    shadowRadius: 4,
+    width: (width - 60) / 2,
   },
   categoryCardSelected: {
+    borderColor: '#6366F1',
     borderWidth: 2,
-    borderColor: '#6366F1'
   },
   categoryHeader: {
+    alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8
-  },
-  categoryScore: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1E293B'
+    marginBottom: 8,
   },
   categoryLabel: {
-    fontSize: 14,
     color: '#64748B',
-    marginBottom: 8
-  },
-  categoryProgressBar: {
-    height: 4,
-    backgroundColor: '#E2E8F0',
-    borderRadius: 2,
-    overflow: 'hidden'
+    fontSize: 14,
+    marginBottom: 8,
   },
   categoryProgress: {
+    borderRadius: 2,
     height: '100%',
-    borderRadius: 2
   },
-  insightsContainer: {
-    margin: 20,
-    marginTop: 0
+  categoryProgressBar: {
+    backgroundColor: '#E2E8F0',
+    borderRadius: 2,
+    height: 4,
+    overflow: 'hidden',
   },
-  insightSection: {
-    marginBottom: 20
-  },
-  insightHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12
-  },
-  insightSectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+  categoryScore: {
     color: '#1E293B',
-    marginLeft: 8
-  },
-  insightItem: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2
-  },
-  insightText: {
-    fontSize: 14,
-    color: '#475569',
-    lineHeight: 20
-  },
-  benchmarksContainer: {
-    margin: 20,
-    marginTop: 0
-  },
-  benchmarkCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4
-  },
-  benchmarkItem: {
-    alignItems: 'center'
-  },
-  benchmarkLabel: {
-    fontSize: 14,
-    color: '#64748B',
-    marginBottom: 4
-  },
-  benchmarkValue: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#6366F1',
-    marginBottom: 4
   },
-  benchmarkSubtext: {
-    fontSize: 12,
-    color: '#94A3B8'
+  container: {
+    backgroundColor: '#F8FAFC',
+    flex: 1,
+  },
+  errorContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  errorText: {
+    color: '#64748B',
+    fontSize: 16,
+    marginTop: 16,
+    textAlign: 'center',
   },
   goalsButton: {
+    borderRadius: 12,
+    elevation: 3,
     margin: 20,
     marginTop: 0,
-    borderRadius: 12,
     overflow: 'hidden',
-    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 6
+    shadowRadius: 6,
   },
   goalsButtonGradient: {
-    flexDirection: 'row',
     alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'center',
-    padding: 16
+    padding: 16,
   },
   goalsButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
-    marginHorizontal: 8
-  }
+    marginHorizontal: 8,
+  },
+  insightHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  insightItem: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    elevation: 1,
+    marginBottom: 8,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  insightSection: {
+    marginBottom: 20,
+  },
+  insightSectionTitle: {
+    color: '#1E293B',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  insightText: {
+    color: '#475569',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  insightsContainer: {
+    margin: 20,
+    marginTop: 0,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    color: '#64748B',
+    fontSize: 16,
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  overallScoreContainer: {
+    borderRadius: 16,
+    elevation: 4,
+    margin: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  overallScoreContent: {
+    alignItems: 'center',
+  },
+  overallScoreGradient: {
+    padding: 24,
+  },
+  overallScoreLabel: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
+    opacity: 0.9,
+  },
+  overallScoreValue: {
+    color: 'white',
+    fontSize: 48,
+    fontWeight: 'bold',
+    marginVertical: 8,
+  },
+  retryButton: {
+    backgroundColor: '#6366F1',
+    borderRadius: 8,
+    marginTop: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+  },
+  retryButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  sectionTitle: {
+    color: '#1E293B',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  trendContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginTop: 8,
+  },
+  trendText: {
+    color: 'white',
+    fontSize: 14,
+    marginLeft: 4,
+    opacity: 0.9,
+  },
 });
 
 export default EfficiencyScoreDashboard;

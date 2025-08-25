@@ -1,20 +1,22 @@
 // AYNA Mirror Main Screen - Integrated with expo-router
-import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@shopify/restyle';
-import { DesignSystemType } from '@/theme/DesignSystem';
-import { AynaMirrorScreen } from '@/screens/AynaMirrorScreen';
 import { Redirect, useLocalSearchParams } from 'expo-router';
+import React, { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
+
+import { useAuth } from '@/context/AuthContext';
+import { AynaMirrorScreen } from '@/screens/AynaMirrorScreen';
 import deepLinkService, {
   processDeepLinkParams as _processDeepLinkParams,
 } from '@/services/deepLinkService';
+import { DesignSystemType } from '@/theme/DesignSystem';
+import { logger } from '@/utils/logger';
 
 // Safe resolver for backward compatibility (default or named export)
-const processParams =
+const processDeepLinkParams =
   (deepLinkService && deepLinkService.processDeepLinkParams) ||
   _processDeepLinkParams ||
-  ((p: any) => (p ?? {}));
+  ((p: unknown) => p ?? {});
 
 export default function AynaMirrorPage() {
   const { user, session, loading } = useAuth();
@@ -33,7 +35,7 @@ export default function AynaMirrorPage() {
         });
       }
     } catch (err) {
-      console.log('deep link params processing error', err);
+      logger.error('deep link params processing error', { err, context: 'AynaMirrorPage' });
     }
   }, [params]);
 

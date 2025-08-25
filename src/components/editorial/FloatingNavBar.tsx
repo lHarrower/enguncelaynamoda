@@ -1,18 +1,9 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
+import { BlurView } from 'expo-blur';
+import React, { useEffect } from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -35,21 +26,18 @@ const navItems: NavItem[] = [
   { id: 'profile', label: 'Profile', icon: 'person-outline' },
 ];
 
-export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({
-  activeTab,
-  onTabPress,
-}) => {
+export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({ activeTab, onTabPress }) => {
   const indicatorPosition = useSharedValue(0);
   const navContentWidth = screenWidth * 0.8 - 32; // Account for padding
   const itemWidth = navContentWidth / navItems.length;
 
   useEffect(() => {
-    const activeIndex = navItems.findIndex(item => item.id === activeTab);
+    const activeIndex = navItems.findIndex((item) => item.id === activeTab);
     indicatorPosition.value = withSpring(activeIndex * itemWidth + itemWidth / 2 - 20, {
       damping: 20,
       stiffness: 300,
     });
-  }, [activeTab, itemWidth]);
+  }, [activeTab, itemWidth, indicatorPosition]);
 
   const indicatorStyle = useAnimatedStyle(() => {
     return {
@@ -63,7 +51,7 @@ export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({
         <View style={styles.navContent}>
           {/* Animated indicator */}
           <Animated.View style={[styles.indicator, indicatorStyle]} />
-          
+
           {navItems.map((item) => (
             <TouchableOpacity
               key={item.id}
@@ -80,12 +68,7 @@ export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({
                     : DesignSystem.colors.text.tertiary
                 }
               />
-              <Text
-                style={[
-                  styles.navLabel,
-                  activeTab === item.id && styles.activeNavLabel,
-                ]}
-              >
+              <Text style={[styles.navLabel, activeTab === item.id && styles.activeNavLabel]}>
                 {item.label}
               </Text>
             </TouchableOpacity>
@@ -97,54 +80,54 @@ export const FloatingNavBar: React.FC<FloatingNavBarProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    bottom: 34,
-    left: 20,
-    right: 20,
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  blurContainer: {
-    borderRadius: DesignSystem.borderRadius.full,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    ...DesignSystem.elevation.medium,
-  },
-  navContent: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    minWidth: screenWidth * 0.8,
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: DesignSystem.borderRadius.lg,
-    minWidth: 60,
-  },
   activeNavItem: {
     backgroundColor: DesignSystem.colors.sage[50],
-  },
-  navLabel: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.tertiary,
-    marginTop: 2,
   },
   activeNavLabel: {
     color: DesignSystem.colors.sage[600],
     fontFamily: 'Inter_400Regular',
   },
-  indicator: {
+  blurContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: DesignSystem.borderRadius.full,
+    overflow: 'hidden',
+    ...DesignSystem.elevation.medium,
+  },
+  container: {
+    alignItems: 'center',
+    bottom: 34,
+    left: 20,
     position: 'absolute',
-    bottom: 4,
-    width: 40,
-    height: 3,
+    right: 20,
+    zIndex: 1000,
+  },
+  indicator: {
     backgroundColor: DesignSystem.colors.sage[500],
     borderRadius: DesignSystem.borderRadius.full,
+    bottom: 4,
+    height: 3,
+    position: 'absolute',
+    width: 40,
+  },
+  navContent: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    minWidth: screenWidth * 0.8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  navItem: {
+    alignItems: 'center',
+    borderRadius: DesignSystem.borderRadius.lg,
+    justifyContent: 'center',
+    minWidth: 60,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  navLabel: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.tertiary,
+    marginTop: 2,
   },
 });

@@ -37,10 +37,11 @@ export const weeklyColorStories: WeeklyColorStory[] = [
   {
     id: '1',
     title: 'Lavender Dreams',
-    subtitle: 'This Week\'s Color Story',
+    subtitle: "This Week's Color Story",
     color: '#B794FF',
     colorName: 'Soft Lavender',
-    description: 'Embrace the ethereal beauty of lavender - a color that whispers confidence and speaks to the soul.',
+    description:
+      'Embrace the ethereal beauty of lavender - a color that whispers confidence and speaks to the soul.',
     image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=600&fit=crop',
     mood: 'Dreamy & Confident',
     styling: ['Pair with cream neutrals', 'Add gold jewelry', 'Mix with soft textures'],
@@ -48,10 +49,11 @@ export const weeklyColorStories: WeeklyColorStory[] = [
   {
     id: '2',
     title: 'Golden Hour',
-    subtitle: 'Next Week\'s Inspiration',
+    subtitle: "Next Week's Inspiration",
     color: '#FCD34D',
     colorName: 'Warm Gold',
-    description: 'Capture the magic of golden hour with warm, luminous tones that radiate inner light.',
+    description:
+      'Capture the magic of golden hour with warm, luminous tones that radiate inner light.',
     image: 'https://images.unsplash.com/photo-1594736797933-d0401ba2fe65?w=400&h=600&fit=crop',
     mood: 'Radiant & Warm',
     styling: ['Layer with earth tones', 'Complement with bronze', 'Perfect for evening wear'],
@@ -101,7 +103,8 @@ export const editorialStories: EditorialStory[] = [
     author: 'Sarah Chen',
     readTime: '5 min read',
     image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=300&fit=crop',
-    excerpt: 'Discover how to curate a wardrobe that reflects your values and stands the test of time.',
+    excerpt:
+      'Discover how to curate a wardrobe that reflects your values and stands the test of time.',
     category: 'guide',
   },
   {
@@ -121,7 +124,8 @@ export const editorialStories: EditorialStory[] = [
     author: 'Emma Thompson',
     readTime: '7 min read',
     image: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=400&h=300&fit=crop',
-    excerpt: 'How luxury brands are reimagining their approach to sustainability without compromising on quality.',
+    excerpt:
+      'How luxury brands are reimagining their approach to sustainability without compromising on quality.',
     category: 'trend',
   },
 ];

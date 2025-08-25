@@ -1,25 +1,31 @@
 /**
  * Vertical Swipeable Product Card
- * 
+ *
  * A premium vertical product card inspired by The Row, Poppi, and Gucci designs.
  * Features edge-to-edge imagery, minimal chrome, and elegant overlays.
  * This component defines the first impression on the homepage.
  */
 
-import React, { useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Dimensions,
-  StyleSheet,
-  Animated,
-} from 'react-native';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useRef, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+import {
+  PanGestureHandler,
+  PanGestureHandlerStateChangeEvent,
+  State,
+} from 'react-native-gesture-handler';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -41,30 +47,30 @@ export interface ProductCardData {
 export interface VerticalProductCardProps {
   /** Product data to display */
   product: ProductCardData;
-  
+
   /** Card width as percentage of screen width (default: 0.8) */
   widthPercentage?: number;
-  
+
   /** Card height as percentage of screen height (default: 0.6) */
   heightPercentage?: number;
-  
+
   /** Whether to show the like button */
   showLikeButton?: boolean;
-  
+
   /** Whether to show price information */
   showPrice?: boolean;
-  
+
   /** Callback when card is pressed */
   onPress?: (product: ProductCardData) => void;
-  
+
   /** Callback when like button is pressed */
   onLike?: (product: ProductCardData) => void;
-  
+
   /** Callback when card is swiped */
   onSwipe?: (direction: 'left' | 'right', product: ProductCardData) => void;
-  
+
   /** Custom style for the card container */
-  style?: any;
+  style?: ViewStyle;
 }
 
 export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
@@ -80,7 +86,7 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
 }) => {
   const [isLiked, setIsLiked] = useState(product.isLiked || false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  
+
   // Animation values
   const translateX = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(1)).current;
@@ -129,12 +135,11 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
     onLike?.({ ...product, isLiked: newLikedState });
   };
 
-  const onGestureEvent = Animated.event(
-    [{ nativeEvent: { translationX: translateX } }],
-    { useNativeDriver: true }
-  );
+  const onGestureEvent = Animated.event([{ nativeEvent: { translationX: translateX } }], {
+    useNativeDriver: true,
+  });
 
-  const onHandlerStateChange = (event: any) => {
+  const onHandlerStateChange = (event: PanGestureHandlerStateChangeEvent) => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       const { translationX: tx } = event.nativeEvent;
       const swipeThreshold = cardWidth * 0.3;
@@ -142,7 +147,7 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
       if (Math.abs(tx) > swipeThreshold) {
         // Swipe detected
         const direction = tx > 0 ? 'right' : 'left';
-        
+
         // Animate card out
         Animated.parallel([
           Animated.timing(translateX, {
@@ -172,20 +177,14 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
   };
 
   return (
-    <PanGestureHandler
-      onGestureEvent={onGestureEvent}
-      onHandlerStateChange={onHandlerStateChange}
-    >
+    <PanGestureHandler onGestureEvent={onGestureEvent} onHandlerStateChange={onHandlerStateChange}>
       <Animated.View
         style={[
           styles.cardContainer,
           {
             width: cardWidth,
             height: cardHeight,
-            transform: [
-              { translateX },
-              { scale },
-            ],
+            transform: [{ translateX }, { scale }],
             opacity,
           },
           style,
@@ -195,6 +194,9 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
           style={styles.cardTouchable}
           onPress={handlePress}
           activeOpacity={0.95}
+          accessibilityRole="button"
+          accessibilityLabel={`${product.brand ? product.brand + ' ' : ''}${product.title}${product.price ? ', ' + product.price : ''}`}
+          accessibilityHint="Tap to view product details"
         >
           {/* Background Image */}
           <View style={styles.imageContainer}>
@@ -204,14 +206,14 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
               onLoad={() => setImageLoaded(true)}
               resizeMode="cover"
             />
-            
+
             {/* Image Loading Placeholder */}
             {!imageLoaded && (
               <View style={styles.imagePlaceholder}>
-                <Ionicons 
-                  name="image-outline" 
-                  size={48} 
-                  color={DesignSystem.colors.text.secondary} 
+                <Ionicons
+                  name="image-outline"
+                  size={48}
+                  color={DesignSystem.colors.text.secondary}
                 />
               </View>
             )}
@@ -223,13 +225,21 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
               style={styles.likeButton}
               onPress={handleLike}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel={isLiked ? 'Unlike product' : 'Like product'}
+              accessibilityHint={`Tap to ${isLiked ? 'remove from' : 'add to'} favorites`}
+              accessibilityState={{ selected: isLiked }}
             >
               <BlurView intensity={20} style={styles.likeButtonBlur}>
                 <Animated.View style={{ transform: [{ scale: likeScale }] }}>
                   <Ionicons
                     name={isLiked ? 'heart' : 'heart-outline'}
                     size={24}
-                    color={isLiked ? DesignSystem.colors.semantic.error : DesignSystem.colors.text.primary}
+                    color={
+                      isLiked
+                        ? DesignSystem.colors.semantic.error
+                        : DesignSystem.colors.text.primary
+                    }
                   />
                 </Animated.View>
               </BlurView>
@@ -243,22 +253,20 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
           >
             <View style={styles.contentContainer}>
               {/* Brand */}
-              {product.brand && (
-                <Text style={styles.brandText}>{product.brand.toUpperCase()}</Text>
-              )}
-              
+              {product.brand && <Text style={styles.brandText}>{product.brand.toUpperCase()}</Text>}
+
               {/* Title */}
               <Text style={styles.titleText} numberOfLines={2}>
                 {product.title}
               </Text>
-              
+
               {/* Subtitle */}
               {product.subtitle && (
                 <Text style={styles.subtitleText} numberOfLines={1}>
                   {product.subtitle}
                 </Text>
               )}
-              
+
               {/* Price Section */}
               {showPrice && product.price && (
                 <View style={styles.priceContainer}>
@@ -268,7 +276,7 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
                   )}
                 </View>
               )}
-              
+
               {/* Tags */}
               {product.tags && product.tags.length > 0 && (
                 <View style={styles.tagsContainer}>
@@ -283,13 +291,9 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
           </LinearGradient>
 
           {/* Frosted Glass CTA */}
-      <BlurView intensity={30} style={styles.ctaContainer}>
+          <BlurView intensity={30} style={styles.ctaContainer}>
             <Text style={styles.ctaText}>Keşfet</Text>
-            <Ionicons 
-              name="arrow-forward" 
-              size={16} 
-        color={DesignSystem.colors.text.primary} 
-            />
+            <Ionicons name="arrow-forward" size={16} color={DesignSystem.colors.text.primary} />
           </BlurView>
         </TouchableOpacity>
       </Animated.View>
@@ -298,157 +302,157 @@ export const VerticalProductCard: React.FC<VerticalProductCardProps> = ({
 };
 
 const styles = StyleSheet.create({
+  brandText: {
+    // fontSize comes from typography body.medium
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+
   cardContainer: {
-    borderRadius: DesignSystem.borderRadius.large,
-    overflow: 'hidden',
     backgroundColor: DesignSystem.colors.background.elevated,
+    borderRadius: DesignSystem.borderRadius.large,
+    elevation: 8,
+    overflow: 'hidden',
     shadowColor: DesignSystem.colors.shadow.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 16,
-    elevation: 8,
   },
-  
+
   cardTouchable: {
     flex: 1,
     position: 'relative',
   },
-  
-  imageContainer: {
-    flex: 1,
-    position: 'relative',
-  },
-  
-  image: {
-    width: '100%',
-    height: '100%',
-  },
-  
-  imagePlaceholder: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: DesignSystem.colors.background.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  
-  likeButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    overflow: 'hidden',
-  },
-  
-  likeButtonBlur: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  
-  contentOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '50%',
-    justifyContent: 'flex-end',
-  },
-  
+
   contentContainer: {
     padding: DesignSystem.spacing.large,
     paddingBottom: 80, // Space for CTA
   },
-  
-  brandText: {
-  // fontSize comes from typography body.medium
-    fontFamily: DesignSystem.typography.fontFamily.body,
-    color: 'rgba(255,255,255,0.8)',
-  fontSize: 12,
-    letterSpacing: 1,
-    marginBottom: 4,
+
+  contentOverlay: {
+    bottom: 0,
+    height: '50%',
+    justifyContent: 'flex-end',
+    left: 0,
+    position: 'absolute',
+    right: 0,
   },
-  
-  titleText: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    lineHeight: 28,
-    marginBottom: 4,
-    fontFamily: DesignSystem.typography.fontFamily.heading,
-  },
-  
-  subtitleText: {
-  // fontSize comes from typography body.medium
-    fontFamily: DesignSystem.typography.fontFamily.body,
-    color: 'rgba(255,255,255,0.9)',
-  fontSize: 16,
-    marginBottom: 12,
-  },
-  
-  priceContainer: {
-    flexDirection: 'row',
+
+  ctaContainer: {
     alignItems: 'center',
+    borderRadius: 24,
+    bottom: 16,
+    flexDirection: 'row',
+    gap: 8,
+    height: 48,
+    justifyContent: 'center',
+    left: DesignSystem.spacing.large,
+    position: 'absolute',
+    right: DesignSystem.spacing.large,
+  },
+
+  ctaText: {
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.button,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+  image: {
+    height: '100%',
+    width: '100%',
+  },
+
+  imageContainer: {
+    flex: 1,
+    position: 'relative',
+  },
+
+  imagePlaceholder: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.primary,
+    bottom: 0,
+    justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+
+  likeButton: {
+    borderRadius: 22,
+    height: 44,
+    overflow: 'hidden',
+    position: 'absolute',
+    right: 16,
+    top: 16,
+    width: 44,
+  },
+
+  likeButtonBlur: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+
+  originalPriceText: {
+    color: 'rgba(255,255,255,0.6)',
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 16,
+    textDecorationLine: 'line-through',
+  },
+
+  priceContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
     marginBottom: 12,
   },
-  
+
   priceText: {
+    color: '#FFFFFF',
+    fontFamily: DesignSystem.typography.fontFamily.heading,
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
     marginRight: 8,
-    fontFamily: DesignSystem.typography.fontFamily.heading,
   },
-  
-  originalPriceText: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.6)',
-    textDecorationLine: 'line-through',
+
+  subtitleText: {
+    // fontSize comes from typography body.medium
     fontFamily: DesignSystem.typography.fontFamily.body,
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 16,
+    marginBottom: 12,
   },
-  
+
+  tag: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+
+  tagText: {
+    color: '#FFFFFF',
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: 12,
+    fontWeight: '500',
+  },
+
   tagsContainer: {
     flexDirection: 'row',
     gap: 8,
   },
-  
-  tag: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  
-  tagText: {
-    fontSize: 12,
+
+  titleText: {
     color: '#FFFFFF',
-    fontWeight: '500',
-    fontFamily: DesignSystem.typography.fontFamily.body,
-  },
-  
-  ctaContainer: {
-    position: 'absolute',
-    bottom: 16,
-    left: DesignSystem.spacing.large,
-    right: DesignSystem.spacing.large,
-    height: 48,
-    borderRadius: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  
-  ctaText: {
-    fontSize: 16,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+    fontSize: 24,
     fontWeight: '600',
-    color: DesignSystem.colors.text.primary,
-    fontFamily: DesignSystem.typography.fontFamily.button,
+    lineHeight: 28,
+    marginBottom: 4,
   },
 });
 

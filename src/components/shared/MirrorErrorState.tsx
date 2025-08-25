@@ -1,8 +1,19 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '@/theme/DesignSystem';
+import { BlurView } from 'expo-blur';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+// AYNAMODA Color Palette
+const COLORS = {
+  primary: '#8B6F47',
+  secondary: '#B8A082',
+  background: '#F5F1E8',
+  surface: '#FFFFFF',
+  text: '#2C2C2C',
+  textLight: '#B8A082',
+  border: '#E8DCC6',
+  accent: '#D4AF37',
+  error: '#E74C3C',
+};
 
 interface MirrorErrorStateProps {
   errorMessage: string;
@@ -13,28 +24,23 @@ interface MirrorErrorStateProps {
 export const MirrorErrorState: React.FC<MirrorErrorStateProps> = ({
   errorMessage,
   onRetry,
-  retryButtonText = "Try Again",
+  retryButtonText = 'Try Again',
 }) => {
   return (
     <View style={styles.errorContainer}>
       <BlurView intensity={20} style={styles.errorBlur}>
         <View style={styles.errorContent}>
-          <Ionicons
-            name="alert-circle-outline"
-            size={48}
-            color={DesignSystem.colors.coral[500]}
-          />
-          <Text style={styles.errorText}>
-            {errorMessage}
-          </Text>
+          <Ionicons name="alert-circle-outline" size={48} color={COLORS.error} />
+          <Text style={styles.errorText}>{errorMessage}</Text>
           <TouchableOpacity
             style={styles.retryButton}
             onPress={onRetry}
             activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel={retryButtonText}
+            accessibilityHint="Retry the failed operation"
           >
-            <Text style={styles.retryButtonText}>
-              {retryButtonText}
-            </Text>
+            <Text style={styles.retryButtonText}>{retryButtonText}</Text>
           </TouchableOpacity>
         </View>
       </BlurView>
@@ -43,35 +49,39 @@ export const MirrorErrorState: React.FC<MirrorErrorStateProps> = ({
 };
 
 const styles = StyleSheet.create({
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: DesignSystem.spacing.xl,
-  },
   errorBlur: {
-    borderRadius: DesignSystem.radius.lg,
+    borderRadius: 16,
     overflow: 'hidden',
   },
+  errorContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
   errorContent: {
-    padding: DesignSystem.spacing.xxl,
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 32,
   },
   errorText: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.inkGray[700],
+    color: COLORS.text,
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '500',
+    marginVertical: 20,
     textAlign: 'center',
-    marginVertical: DesignSystem.spacing.lg,
   },
   retryButton: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingVertical: DesignSystem.spacing.md,
-    backgroundColor: DesignSystem.colors.sageGreen[500],
-    borderRadius: DesignSystem.radius.lg,
+    backgroundColor: COLORS.primary,
+    borderRadius: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
   },
   retryButtonText: {
-    ...DesignSystem.typography.button,
-    color: DesignSystem.colors.background.elevated,
+    color: COLORS.surface,
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

@@ -1,6 +1,7 @@
 // Google Vision API Configuration
 // Note: This is a mock implementation for React Native compatibility
 // In production, you would use Google Cloud Vision API through a backend service
+import { logInDev } from '@/utils/consoleSuppress';
 
 export interface VisionResponse {
   labelAnnotations?: Array<{
@@ -34,23 +35,23 @@ export interface VisionRequest {
 class MockVisionClient {
   async labelDetection(request: VisionRequest): Promise<VisionResponse> {
     // Mock implementation - in production this would call Google Vision API
-    console.log('Mock Vision API - Label Detection:', request.image.source.filename);
+    logInDev('Mock Vision API - Label Detection:', request.image.source.filename);
     return {
       labelAnnotations: [
         { description: 'Clothing', score: 0.95 },
-        { description: 'Fashion', score: 0.90 },
+        { description: 'Fashion', score: 0.9 },
       ],
     };
   }
 
   async objectLocalization(request: VisionRequest): Promise<VisionResponse> {
     // Mock implementation - in production this would call Google Vision API
-    console.log('Mock Vision API - Object Localization:', request.image.source.filename);
+    logInDev('Mock Vision API - Object Localization:', request.image.source.filename);
     return {
       localizedObjectAnnotations: [
         {
           name: 'Clothing',
-          score: 0.90,
+          score: 0.9,
           boundingPoly: {
             normalizedVertices: [
               { x: 0.1, y: 0.1 },
@@ -66,11 +67,9 @@ class MockVisionClient {
 
   async textDetection(request: VisionRequest): Promise<VisionResponse> {
     // Mock implementation - in production this would call Google Vision API
-    console.log('Mock Vision API - Text Detection:', request.image.source.filename);
+    logInDev('Mock Vision API - Text Detection:', request.image.source.filename);
     return {
-      textAnnotations: [
-        { description: 'Brand Name', score: 0.85 },
-      ],
+      textAnnotations: [{ description: 'Brand Name', score: 0.85 }],
     };
   }
 }

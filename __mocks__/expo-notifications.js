@@ -1,14 +1,18 @@
-export const getPermissionsAsync = jest.fn(() => Promise.resolve({
-  status: 'granted',
-  canAskAgain: true,
-  granted: true,
-}));
+export const getPermissionsAsync = jest.fn(() =>
+  Promise.resolve({
+    status: 'granted',
+    canAskAgain: true,
+    granted: true,
+  }),
+);
 
-export const requestPermissionsAsync = jest.fn(() => Promise.resolve({
-  status: 'granted',
-  canAskAgain: true,
-  granted: true,
-}));
+export const requestPermissionsAsync = jest.fn(() =>
+  Promise.resolve({
+    status: 'granted',
+    canAskAgain: true,
+    granted: true,
+  }),
+);
 
 export const scheduleNotificationAsync = jest.fn(() => Promise.resolve('notification-id'));
 

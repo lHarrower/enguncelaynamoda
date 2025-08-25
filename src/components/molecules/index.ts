@@ -1,6 +1,6 @@
 /**
  * Molecules Index
- * 
+ *
  * Exports all molecular components - functional UI components that combine
  * multiple atoms to create more complex, reusable interface elements.
  */
@@ -43,8 +43,8 @@ export { default as Card } from '@/components/molecules/Card';
 // export { default as EfficiencyScore } from './EfficiencyScore';
 
 // Export types (Implemented)
-export type { FormFieldProps } from '@/components/molecules/FormField';
 export type { CardProps } from '@/components/molecules/Card';
+export type { FormFieldProps } from '@/components/molecules/FormField';
 
 // Export types (To be implemented)
 // export type { SearchBarProps } from './SearchBar';

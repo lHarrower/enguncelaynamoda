@@ -1,4 +1,4 @@
-import { Share, Alert, Platform } from 'react-native';
+import { Alert, Platform, Share } from 'react-native';
 
 interface ShareOptions {
   message: string;
@@ -13,11 +13,7 @@ interface ShareOptions {
  * @param title - Optional title for the share dialog (Android only)
  * @returns Promise<boolean> - true if shared successfully, false if cancelled/failed
  */
-export const onShare = async (
-  message: string,
-  url?: string,
-  title?: string
-): Promise<boolean> => {
+export const onShare = async (message: string, url?: string, title?: string): Promise<boolean> => {
   try {
     // Construct the share content
     const shareOptions: ShareOptions = {
@@ -62,14 +58,10 @@ export const onShare = async (
     return false;
   } catch (error) {
     // Error sharing content
-    
+
     // Show user-friendly error message
-    Alert.alert(
-      'Share Error',
-      'Unable to open share options. Please try again.',
-      [{ text: 'OK' }]
-    );
-    
+    Alert.alert('Share Error', 'Unable to open share options. Please try again.', [{ text: 'OK' }]);
+
     return false;
   }
 };
@@ -83,11 +75,11 @@ export const onShare = async (
 export const shareOutfit = async (
   outfitName: string,
   items: string[],
-  occasion?: string
+  occasion?: string,
 ): Promise<boolean> => {
   const itemsList = items.join(', ');
   const occasionText = occasion ? ` for ${occasion}` : '';
-  
+
   const message = `Check out this amazing outfit${occasionText}! 👗✨
 
 ${outfitName}
@@ -107,11 +99,11 @@ Created with AYNAMODA - Your AI Style Assistant 💖`;
 export const shareWardrobeItem = async (
   itemName: string,
   brand?: string,
-  category?: string
+  category?: string,
 ): Promise<boolean> => {
   const brandText = brand ? ` by ${brand}` : '';
   const categoryText = category ? ` (${category})` : '';
-  
+
   const message = `Love this piece from my wardrobe! 😍
 
 ${itemName}${brandText}${categoryText}
@@ -143,12 +135,9 @@ You should definitely try it! Download AYNAMODA and let AI transform your style 
  * @param achievement - Description of the achievement
  * @param details - Additional details about the achievement
  */
-export const shareAchievement = async (
-  achievement: string,
-  details?: string
-): Promise<boolean> => {
+export const shareAchievement = async (achievement: string, details?: string): Promise<boolean> => {
   const detailsText = details ? `\n\n${details}` : '';
-  
+
   const message = `🎉 Style Achievement Unlocked! 
 
 ${achievement}${detailsText}
@@ -160,19 +149,19 @@ Powered by AYNAMODA - Your AI Style Assistant ✨`;
 
 /**
  * EXAMPLE USAGE:
- * 
+ *
  * import { onShare, shareOutfit, shareWardrobeItem } from '../utils/sharing';
- * 
+ *
  * // Basic share
  * const handleBasicShare = async () => {
  *   await onShare('Check out this amazing style tip!', 'https://aynamoda.com', 'Style Tip');
  * };
- * 
+ *
  * // Share outfit
  * const handleOutfitShare = async () => {
  *   await shareOutfit('Casual Friday Look', ['Blue Jacket', 'White T-Shirt'], 'Work');
  * };
- * 
+ *
  * // Share wardrobe item
  * const handleItemShare = async () => {
  *   await shareWardrobeItem('Vintage Denim Jacket', 'Levis', 'Outerwear');

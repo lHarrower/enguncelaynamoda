@@ -2,11 +2,11 @@
 import { UserPreferencesService } from '@/services/userPreferencesService';
 import { supabase } from '@/config/supabaseClient';
 import * as Location from 'expo-location';
-import { 
-  UserPreferences, 
-  NotificationPreferences, 
+import {
+  UserPreferences,
+  NotificationPreferences,
   PrivacySettings,
-  ConfidenceNoteStyle 
+  ConfidenceNoteStyle,
 } from '@/types/aynaMirror';
 
 // Mock dependencies
@@ -15,8 +15,8 @@ jest.mock('expo-location', () => ({
   getForegroundPermissionsAsync: jest.fn(),
   getCurrentPositionAsync: jest.fn(),
   Accuracy: {
-    Low: 1
-  }
+    Low: 1,
+  },
 }));
 
 const mockSupabase = supabase as jest.Mocked<typeof supabase>;
@@ -48,31 +48,31 @@ describe('UserPreferencesService', () => {
           bodyTypePreferences: [],
           occasionPreferences: {},
           confidencePatterns: [],
-          confidenceNoteStyle: 'encouraging'
+          confidenceNoteStyle: 'encouraging',
         },
         privacy_settings: {
           shareUsageData: false,
           allowLocationTracking: true,
           enableSocialFeatures: true,
-          dataRetentionDays: 365
+          dataRetentionDays: 365,
         },
         engagement_history: {
           totalDaysActive: 5,
           streakDays: 3,
           averageRating: 4.2,
           lastActiveDate: '2024-01-15',
-          preferredInteractionTimes: []
+          preferredInteractionTimes: [],
         },
         created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-15T00:00:00Z'
+        updated_at: '2024-01-15T00:00:00Z',
       };
 
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: mockRecord, error: null })
-          })
-        })
+            single: jest.fn().mockResolvedValue({ data: mockRecord, error: null }),
+          }),
+        }),
       } as any);
 
       const result = await UserPreferencesService.getUserPreferences(mockUserId);
@@ -88,27 +88,27 @@ describe('UserPreferencesService', () => {
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ 
-              data: null, 
-              error: { code: 'PGRST116' } // No rows returned
-            })
-          })
-        })
+            single: jest.fn().mockResolvedValue({
+              data: null,
+              error: { code: 'PGRST116' }, // No rows returned
+            }),
+          }),
+        }),
       } as any);
 
       // Mock timezone detection
       Object.defineProperty(Intl, 'DateTimeFormat', {
         value: jest.fn(() => ({
-          resolvedOptions: () => ({ timeZone: 'America/Los_Angeles' })
+          resolvedOptions: () => ({ timeZone: 'America/Los_Angeles' }),
         })),
-        writable: true
+        writable: true,
       });
 
-      mockLocation.getForegroundPermissionsAsync.mockResolvedValue({ 
+      mockLocation.getForegroundPermissionsAsync.mockResolvedValue({
         status: 'denied' as any,
         expires: 'never',
         granted: false,
-        canAskAgain: true
+        canAskAgain: true,
       });
 
       // Mock insert for creating default preferences
@@ -124,12 +124,12 @@ describe('UserPreferencesService', () => {
                 privacy_settings: {},
                 engagement_history: {},
                 created_at: mockDate.toISOString(),
-                updated_at: mockDate.toISOString()
+                updated_at: mockDate.toISOString(),
               },
-              error: null
-            })
-          })
-        })
+              error: null,
+            }),
+          }),
+        }),
       } as any);
 
       const result = await UserPreferencesService.getUserPreferences(mockUserId);
@@ -143,12 +143,12 @@ describe('UserPreferencesService', () => {
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ 
-              data: null, 
-              error: { message: 'Database error' } 
-            })
-          })
-        })
+            single: jest.fn().mockResolvedValue({
+              data: null,
+              error: { message: 'Database error' },
+            }),
+          }),
+        }),
       } as any);
 
       const result = await UserPreferencesService.getUserPreferences(mockUserId);
@@ -173,32 +173,33 @@ describe('UserPreferencesService', () => {
           bodyTypePreferences: [],
           occasionPreferences: {},
           confidencePatterns: [],
-          lastUpdated: mockDate
+          lastUpdated: mockDate,
         },
         privacySettings: {
           shareUsageData: false,
           allowLocationTracking: true,
           enableSocialFeatures: true,
-          dataRetentionDays: 365
+          dataRetentionDays: 365,
         },
         engagementHistory: {
           totalDaysActive: 0,
           streakDays: 0,
           averageRating: 0,
           lastActiveDate: mockDate,
-          preferredInteractionTimes: []
+          preferredInteractionTimes: [],
         },
         createdAt: mockDate,
-        updatedAt: mockDate
+        updatedAt: mockDate,
       };
 
       // Mock getting current preferences
-      jest.spyOn(UserPreferencesService, 'getUserPreferences')
+      jest
+        .spyOn(UserPreferencesService, 'getUserPreferences')
         .mockResolvedValue(mockCurrentPreferences);
 
       const updates = {
         timezone: 'America/New_York',
-        notificationTime: new Date('2024-01-01T07:00:00')
+        notificationTime: new Date('2024-01-01T07:00:00'),
       };
 
       const mockUpdatedRecord = {
@@ -209,18 +210,18 @@ describe('UserPreferencesService', () => {
         privacy_settings: mockCurrentPreferences.privacySettings,
         engagement_history: mockCurrentPreferences.engagementHistory,
         created_at: mockDate.toISOString(),
-        updated_at: mockDate.toISOString()
+        updated_at: mockDate.toISOString(),
       };
 
       mockSupabase.from.mockReturnValue({
         upsert: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ 
-              data: mockUpdatedRecord, 
-              error: null 
-            })
-          })
-        })
+            single: jest.fn().mockResolvedValue({
+              data: mockUpdatedRecord,
+              error: null,
+            }),
+          }),
+        }),
       } as any);
 
       const result = await UserPreferencesService.updateUserPreferences(mockUserId, updates);
@@ -230,22 +231,23 @@ describe('UserPreferencesService', () => {
     });
 
     it('should handle update errors', async () => {
-      jest.spyOn(UserPreferencesService, 'getUserPreferences')
+      jest
+        .spyOn(UserPreferencesService, 'getUserPreferences')
         .mockResolvedValue({} as UserPreferences);
 
       mockSupabase.from.mockReturnValue({
         upsert: jest.fn().mockReturnValue({
           select: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ 
-              data: null, 
-              error: { message: 'Update failed' } 
-            })
-          })
-        })
+            single: jest.fn().mockResolvedValue({
+              data: null,
+              error: { message: 'Update failed' },
+            }),
+          }),
+        }),
       } as any);
 
       await expect(
-        UserPreferencesService.updateUserPreferences(mockUserId, { timezone: 'UTC' })
+        UserPreferencesService.updateUserPreferences(mockUserId, { timezone: 'UTC' }),
       ).rejects.toThrow();
     });
   });
@@ -264,35 +266,37 @@ describe('UserPreferencesService', () => {
           occasionPreferences: {},
           confidencePatterns: [],
           confidenceNoteStyle: 'encouraging',
-          lastUpdated: mockDate
+          lastUpdated: mockDate,
         },
         privacySettings: {
           shareUsageData: false,
           allowLocationTracking: true,
           enableSocialFeatures: true,
-          dataRetentionDays: 365
+          dataRetentionDays: 365,
         },
         engagementHistory: {
           totalDaysActive: 0,
           streakDays: 0,
           averageRating: 0,
           lastActiveDate: mockDate,
-          preferredInteractionTimes: []
+          preferredInteractionTimes: [],
         },
         createdAt: mockDate,
-        updatedAt: mockDate
+        updatedAt: mockDate,
       };
 
-      jest.spyOn(UserPreferencesService, 'getUserPreferences')
+      jest
+        .spyOn(UserPreferencesService, 'getUserPreferences')
         .mockResolvedValue(mockCurrentPreferences);
-      
-      jest.spyOn(UserPreferencesService, 'updateUserPreferences')
+
+      jest
+        .spyOn(UserPreferencesService, 'updateUserPreferences')
         .mockResolvedValue(mockCurrentPreferences);
 
       const notificationPrefs: Partial<NotificationPreferences> = {
         preferredTime: new Date('2024-01-01T07:30:00'),
         timezone: 'America/New_York',
-        confidenceNoteStyle: 'witty'
+        confidenceNoteStyle: 'witty',
       };
 
       await UserPreferencesService.updateNotificationPreferences(mockUserId, notificationPrefs);
@@ -303,9 +307,9 @@ describe('UserPreferencesService', () => {
           notificationTime: notificationPrefs.preferredTime,
           timezone: notificationPrefs.timezone,
           stylePreferences: expect.objectContaining({
-            confidenceNoteStyle: 'witty'
-          })
-        })
+            confidenceNoteStyle: 'witty',
+          }),
+        }),
       );
     });
   });
@@ -316,18 +320,20 @@ describe('UserPreferencesService', () => {
         shareUsageData: false,
         allowLocationTracking: true,
         enableSocialFeatures: true,
-        dataRetentionDays: 365
+        dataRetentionDays: 365,
       };
 
-      jest.spyOn(UserPreferencesService, 'getPrivacySettings')
+      jest
+        .spyOn(UserPreferencesService, 'getPrivacySettings')
         .mockResolvedValue(mockPrivacySettings);
-      
-      jest.spyOn(UserPreferencesService, 'updateUserPreferences')
+
+      jest
+        .spyOn(UserPreferencesService, 'updateUserPreferences')
         .mockResolvedValue({} as UserPreferences);
 
       const updates: Partial<PrivacySettings> = {
         shareUsageData: true,
-        dataRetentionDays: 180
+        dataRetentionDays: 180,
       };
 
       await UserPreferencesService.updatePrivacySettings(mockUserId, updates);
@@ -339,9 +345,9 @@ describe('UserPreferencesService', () => {
             shareUsageData: true,
             dataRetentionDays: 180,
             allowLocationTracking: true,
-            enableSocialFeatures: true
-          })
-        })
+            enableSocialFeatures: true,
+          }),
+        }),
       );
     });
   });
@@ -350,59 +356,60 @@ describe('UserPreferencesService', () => {
     it('should detect timezone from device', async () => {
       Object.defineProperty(Intl, 'DateTimeFormat', {
         value: jest.fn(() => ({
-          resolvedOptions: () => ({ timeZone: 'Europe/London' })
+          resolvedOptions: () => ({ timeZone: 'Europe/London' }),
         })),
-        writable: true
+        writable: true,
       });
 
-      mockLocation.getForegroundPermissionsAsync.mockResolvedValue({ 
+      mockLocation.getForegroundPermissionsAsync.mockResolvedValue({
         status: 'denied' as any,
         expires: 'never',
         granted: false,
-        canAskAgain: true
+        canAskAgain: true,
       });
 
-      jest.spyOn(UserPreferencesService, 'updateUserPreferences')
+      jest
+        .spyOn(UserPreferencesService, 'updateUserPreferences')
         .mockResolvedValue({} as UserPreferences);
 
       const result = await UserPreferencesService.detectAndUpdateTimezone(mockUserId);
 
       expect(result).toBe('Europe/London');
-      expect(UserPreferencesService.updateUserPreferences).toHaveBeenCalledWith(
-        mockUserId,
-        { timezone: 'Europe/London' }
-      );
+      expect(UserPreferencesService.updateUserPreferences).toHaveBeenCalledWith(mockUserId, {
+        timezone: 'Europe/London',
+      });
     });
 
     it('should use location-based timezone when available', async () => {
       Object.defineProperty(Intl, 'DateTimeFormat', {
         value: jest.fn(() => ({
-          resolvedOptions: () => ({ timeZone: 'America/New_York' })
+          resolvedOptions: () => ({ timeZone: 'America/New_York' }),
         })),
-        writable: true
+        writable: true,
       });
 
-      mockLocation.getForegroundPermissionsAsync.mockResolvedValue({ 
+      mockLocation.getForegroundPermissionsAsync.mockResolvedValue({
         status: 'granted' as any,
         expires: 'never',
         granted: true,
-        canAskAgain: false
+        canAskAgain: false,
       });
 
       mockLocation.getCurrentPositionAsync.mockResolvedValue({
         coords: {
           latitude: 40.7128,
-          longitude: -74.0060,
+          longitude: -74.006,
           altitude: null,
           accuracy: 10,
           altitudeAccuracy: null,
           heading: null,
-          speed: null
+          speed: null,
         },
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
-      jest.spyOn(UserPreferencesService, 'updateUserPreferences')
+      jest
+        .spyOn(UserPreferencesService, 'updateUserPreferences')
         .mockResolvedValue({} as UserPreferences);
 
       const result = await UserPreferencesService.detectAndUpdateTimezone(mockUserId);
@@ -415,7 +422,7 @@ describe('UserPreferencesService', () => {
         value: jest.fn(() => {
           throw new Error('Timezone detection failed');
         }),
-        writable: true
+        writable: true,
       });
 
       const result = await UserPreferencesService.detectAndUpdateTimezone(mockUserId);
@@ -437,30 +444,28 @@ describe('UserPreferencesService', () => {
           bodyTypePreferences: [],
           occasionPreferences: {},
           confidencePatterns: [],
-          lastUpdated: mockDate
+          lastUpdated: mockDate,
         },
         privacySettings: {
           shareUsageData: false,
           allowLocationTracking: true,
           enableSocialFeatures: true,
-          dataRetentionDays: 365
+          dataRetentionDays: 365,
         },
         engagementHistory: {
           totalDaysActive: 5,
           streakDays: 3,
           averageRating: 4.0,
           lastActiveDate: new Date('2024-01-01'), // Different day to trigger update
-          preferredInteractionTimes: []
+          preferredInteractionTimes: [],
         },
         createdAt: mockDate,
-        updatedAt: mockDate
+        updatedAt: mockDate,
       };
 
-      jest.spyOn(UserPreferencesService, 'getUserPreferences')
-        .mockResolvedValue(mockPreferences);
-      
-      jest.spyOn(UserPreferencesService, 'updateEngagementHistory')
-        .mockResolvedValue();
+      jest.spyOn(UserPreferencesService, 'getUserPreferences').mockResolvedValue(mockPreferences);
+
+      jest.spyOn(UserPreferencesService, 'updateEngagementHistory').mockResolvedValue();
 
       await UserPreferencesService.trackDailyEngagement(mockUserId);
 
@@ -468,19 +473,18 @@ describe('UserPreferencesService', () => {
         mockUserId,
         expect.objectContaining({
           totalDaysActive: expect.any(Number),
-          streakDays: expect.any(Number)
-        })
+          streakDays: expect.any(Number),
+        }),
       );
     });
 
     it('should handle engagement tracking errors gracefully', async () => {
-      jest.spyOn(UserPreferencesService, 'getUserPreferences')
+      jest
+        .spyOn(UserPreferencesService, 'getUserPreferences')
         .mockRejectedValue(new Error('Database error'));
 
       // Should not throw error
-      await expect(
-        UserPreferencesService.trackDailyEngagement(mockUserId)
-      ).resolves.not.toThrow();
+      await expect(UserPreferencesService.trackDailyEngagement(mockUserId)).resolves.not.toThrow();
     });
   });
 
@@ -494,15 +498,15 @@ describe('UserPreferencesService', () => {
         privacy_settings: {},
         engagement_history: {},
         created_at: mockDate.toISOString(),
-        updated_at: mockDate.toISOString()
+        updated_at: mockDate.toISOString(),
       };
 
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ data: mockRecord, error: null })
-          })
-        })
+            single: jest.fn().mockResolvedValue({ data: mockRecord, error: null }),
+          }),
+        }),
       } as any);
 
       const result = await UserPreferencesService.syncPreferences(mockUserId);
@@ -515,19 +519,18 @@ describe('UserPreferencesService', () => {
       mockSupabase.from.mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
-            single: jest.fn().mockResolvedValue({ 
-              data: null, 
-              error: { code: 'PGRST116' } 
-            })
-          })
-        })
+            single: jest.fn().mockResolvedValue({
+              data: null,
+              error: { code: 'PGRST116' },
+            }),
+          }),
+        }),
       } as any);
 
-      jest.spyOn(UserPreferencesService, 'createDefaultPreferences' as any)
-        .mockResolvedValue({
-          userId: mockUserId,
-          timezone: 'UTC'
-        } as UserPreferences);
+      jest.spyOn(UserPreferencesService, 'createDefaultPreferences' as any).mockResolvedValue({
+        userId: mockUserId,
+        timezone: 'UTC',
+      } as UserPreferences);
 
       const result = await UserPreferencesService.syncPreferences(mockUserId);
 

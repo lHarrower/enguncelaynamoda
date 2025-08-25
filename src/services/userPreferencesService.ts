@@ -1,20 +1,23 @@
 // User Preferences Service - AYNA Mirror Settings Management
-import { supabase } from '@/config/supabaseClient';
 import * as Location from 'expo-location';
-import { 
-  UserPreferences,
+
+import { supabase } from '../config/supabaseClient';
+import {
+  EngagementHistory,
+  isConfidenceNoteStyle,
   NotificationPreferences,
   PrivacySettings,
-  EngagementHistory,
   StyleProfile,
-  ConfidenceNoteStyle,
-  UserPreferencesRecord
-} from '@/types/aynaMirror';
-import { logInDev, errorInDev } from '@/utils/consoleSuppress';
+  UserPreferences,
+  UserPreferencesRecord,
+} from '../types/aynaMirror';
+import { errorInDev, logInDev } from '../utils/consoleSuppress';
+import { ensureSupabaseOk } from '../utils/supabaseErrorMapping';
+import { isSupabaseOk, wrap } from '../utils/supabaseResult';
 
 /**
  * UserPreferencesService - Manages user settings and preferences for AYNA Mirror
- * 
+ *
  * This service handles:
  * - Notification timing and style preferences
  * - Privacy settings and data control
@@ -23,7 +26,6 @@ import { logInDev, errorInDev } from '@/utils/consoleSuppress';
  * - User engagement tracking and adaptation
  */
 export class UserPreferencesService {
-  
   // ============================================================================
   // CORE PREFERENCE MANAGEMENT
   // ============================================================================
@@ -35,27 +37,37 @@ export class UserPreferencesService {
     try {
       logInDev('[UserPreferencesService] Getting preferences for user:', userId);
 
-      const { data, error } = await supabase
-        .from('user_preferences')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+      const res = await wrap(
+        async () =>
+          await (supabase as any)
+            .from('user_preferences')
+            .select('*')
+            .eq('user_id', userId)
+            .single(),
+      );
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        throw error;
+      if (!isSupabaseOk(res) && (res.error as { code?: string })?.code !== 'PGRST116') {
+        // Use ensureSupabaseOk for non-PGRST116 errors (record not found handled below)
+        ensureSupabaseOk(res, { action: 'getUserPreferences' });
       }
 
-      if (!data) {
+      if (!isSupabaseOk(res)) {
+        // PGRST116 -> create defaults
         // Create default preferences for new user
         logInDev('[UserPreferencesService] Creating default preferences for new user');
         return await this.createDefaultPreferences(userId);
       }
 
       // Convert database record to UserPreferences interface
+      const data = ensureSupabaseOk(res, {
+        action: 'createDefaultPreferences',
+      }) as UserPreferencesRecord;
       return this.convertRecordToPreferences(data);
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to get user preferences:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to get user preferences:',
+        error instanceof Error ? error : String(error),
+      );
       // Return default preferences on error
       return this.getDefaultPreferences(userId);
     }
@@ -65,40 +77,46 @@ export class UserPreferencesService {
    * Update user preferences
    */
   static async updateUserPreferences(
-    userId: string, 
-    updates: Partial<UserPreferences>
+    userId: string,
+    updates: Partial<UserPreferences>,
   ): Promise<UserPreferences> {
     try {
       logInDev('[UserPreferencesService] Updating preferences for user:', userId);
 
       // Get current preferences
       const currentPreferences = await this.getUserPreferences(userId);
-      
+
       // Merge updates with current preferences
       const updatedPreferences: UserPreferences = {
         ...currentPreferences,
         ...updates,
         userId,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       // Convert to database record format
       const record = this.convertPreferencesToRecord(updatedPreferences);
 
       // Upsert to database
-      const { data, error } = await supabase
-        .from('user_preferences')
-        .upsert(record, { onConflict: 'user_id' })
-        .select()
-        .single();
-
-      if (error) throw error;
+      const res = await wrap(
+        async () =>
+          await (supabase as any)
+            .from('user_preferences')
+            .upsert(record, { onConflict: 'user_id' })
+            .select()
+            .single(),
+      );
+      const data = ensureSupabaseOk(res, {
+        action: 'updateUserPreferences',
+      }) as UserPreferencesRecord;
 
       logInDev('[UserPreferencesService] Successfully updated preferences');
       return this.convertRecordToPreferences(data);
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to update preferences:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to update preferences:',
+        error instanceof Error ? error : String(error),
+      );
       throw error;
     }
   }
@@ -112,20 +130,20 @@ export class UserPreferencesService {
    */
   static async updateNotificationPreferences(
     userId: string,
-    notificationPrefs: Partial<NotificationPreferences>
+    notificationPrefs: Partial<NotificationPreferences>,
   ): Promise<void> {
     try {
       logInDev('[UserPreferencesService] Updating notification preferences');
 
       const currentPreferences = await this.getUserPreferences(userId);
-      
+
       // Update notification-related fields
       const updates: Partial<UserPreferences> = {};
-      
+
       if (notificationPrefs.preferredTime) {
         updates.notificationTime = notificationPrefs.preferredTime;
       }
-      
+
       if (notificationPrefs.timezone) {
         updates.timezone = notificationPrefs.timezone;
       }
@@ -134,14 +152,16 @@ export class UserPreferencesService {
       if (notificationPrefs.confidenceNoteStyle) {
         updates.stylePreferences = {
           ...currentPreferences.stylePreferences,
-          confidenceNoteStyle: notificationPrefs.confidenceNoteStyle
+          confidenceNoteStyle: notificationPrefs.confidenceNoteStyle,
         };
       }
 
       await this.updateUserPreferences(userId, updates);
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to update notification preferences:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to update notification preferences:',
+        error instanceof Error ? error : String(error),
+      );
       throw error;
     }
   }
@@ -152,24 +172,26 @@ export class UserPreferencesService {
   static async getNotificationPreferences(userId: string): Promise<NotificationPreferences> {
     try {
       const preferences = await this.getUserPreferences(userId);
-      
+
       return {
         preferredTime: preferences.notificationTime,
         timezone: preferences.timezone,
         enableWeekends: true, // Default to true, can be made configurable
         enableQuickOptions: true, // Default to true, can be made configurable
-        confidenceNoteStyle: preferences.stylePreferences.confidenceNoteStyle || 'encouraging'
+        confidenceNoteStyle: preferences.stylePreferences.confidenceNoteStyle || 'encouraging',
       };
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to get notification preferences:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to get notification preferences:',
+        error instanceof Error ? error : String(error),
+      );
       // Return default notification preferences
       return {
         preferredTime: new Date('2024-01-01T06:00:00'),
         timezone: 'UTC',
         enableWeekends: true,
         enableQuickOptions: true,
-        confidenceNoteStyle: 'encouraging'
+        confidenceNoteStyle: 'encouraging',
       };
     }
   }
@@ -183,22 +205,24 @@ export class UserPreferencesService {
    */
   static async updatePrivacySettings(
     userId: string,
-    privacySettings: Partial<PrivacySettings>
+    privacySettings: Partial<PrivacySettings>,
   ): Promise<void> {
     try {
       logInDev('[UserPreferencesService] Updating privacy settings');
 
       const updates: Partial<UserPreferences> = {
         privacySettings: {
-          ...await this.getPrivacySettings(userId),
-          ...privacySettings
-        }
+          ...(await this.getPrivacySettings(userId)),
+          ...privacySettings,
+        },
       };
 
       await this.updateUserPreferences(userId, updates);
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to update privacy settings:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to update privacy settings:',
+        error instanceof Error ? error : String(error),
+      );
       throw error;
     }
   }
@@ -210,15 +234,17 @@ export class UserPreferencesService {
     try {
       const preferences = await this.getUserPreferences(userId);
       return preferences.privacySettings;
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to get privacy settings:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to get privacy settings:',
+        error instanceof Error ? error : String(error),
+      );
       // Return default privacy settings
       return {
         shareUsageData: false,
         allowLocationTracking: true,
         enableSocialFeatures: true,
-        dataRetentionDays: 365
+        dataRetentionDays: 365,
       };
     }
   }
@@ -236,18 +262,18 @@ export class UserPreferencesService {
 
       // Get device timezone
       const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      
+
       // Try to get location-based timezone if location permission is granted
       let locationTimezone: string | null = null;
-      
+
       try {
         const { status } = await Location.getForegroundPermissionsAsync();
-        
-        if (status === 'granted') {
-          const location = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Low
+
+        if (status === Location.PermissionStatus.GRANTED) {
+          const _location = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Low,
           });
-          
+
           // Use a timezone lookup service or library to get timezone from coordinates
           // For now, we'll use the device timezone as fallback
           locationTimezone = deviceTimezone;
@@ -257,17 +283,19 @@ export class UserPreferencesService {
       }
 
       const detectedTimezone = locationTimezone || deviceTimezone;
-      
+
       // Update user preferences with detected timezone
       await this.updateUserPreferences(userId, {
-        timezone: detectedTimezone
+        timezone: detectedTimezone,
       });
 
       logInDev('[UserPreferencesService] Updated timezone to:', detectedTimezone);
       return detectedTimezone;
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to detect timezone:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to detect timezone:',
+        error instanceof Error ? error : String(error),
+      );
       return 'UTC'; // Fallback to UTC
     }
   }
@@ -280,21 +308,28 @@ export class UserPreferencesService {
       logInDev('[UserPreferencesService] Handling timezone change to:', newTimezone);
 
       await this.updateUserPreferences(userId, {
-        timezone: newTimezone
+        timezone: newTimezone,
       });
 
       // Notify notification service to reschedule notifications
       try {
         const { notificationService } = await import('./notificationService');
         await notificationService.handleTimezoneChange(userId, newTimezone);
-        logInDev('[UserPreferencesService] Successfully rescheduled notifications for new timezone');
+        logInDev(
+          '[UserPreferencesService] Successfully rescheduled notifications for new timezone',
+        );
       } catch (notificationError) {
-        errorInDev('[UserPreferencesService] Failed to reschedule notifications:', notificationError);
+        errorInDev(
+          '[UserPreferencesService] Failed to reschedule notifications:',
+          notificationError instanceof Error ? notificationError : String(notificationError),
+        );
         // Don't throw - timezone update should succeed even if notification rescheduling fails
       }
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to handle timezone change:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to handle timezone change:',
+        error instanceof Error ? error : String(error),
+      );
       throw error;
     }
   }
@@ -308,7 +343,7 @@ export class UserPreferencesService {
    */
   static async updateEngagementHistory(
     userId: string,
-    engagementData: Partial<EngagementHistory>
+    engagementData: Partial<EngagementHistory>,
   ): Promise<void> {
     try {
       const currentPreferences = await this.getUserPreferences(userId);
@@ -317,15 +352,17 @@ export class UserPreferencesService {
       const updatedEngagement: EngagementHistory = {
         ...currentEngagement,
         ...engagementData,
-        lastActiveDate: new Date()
+        lastActiveDate: new Date(),
       };
 
       await this.updateUserPreferences(userId, {
-        engagementHistory: updatedEngagement
+        engagementHistory: updatedEngagement,
       });
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to update engagement history:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to update engagement history:',
+        error instanceof Error ? error : String(error),
+      );
       throw error;
     }
   }
@@ -337,33 +374,34 @@ export class UserPreferencesService {
     try {
       const preferences = await this.getUserPreferences(userId);
       const engagement = preferences.engagementHistory;
-      
+
       const today = new Date();
       const lastActive = engagement.lastActiveDate;
-      
+
       // Check if this is a new day of engagement
-      const isNewDay = !lastActive || 
-        today.toDateString() !== lastActive.toDateString();
+      const isNewDay = !lastActive || today.toDateString() !== lastActive.toDateString();
 
       if (isNewDay) {
         // Check if streak continues (yesterday was active)
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
-        
-        const streakContinues = lastActive && 
-          lastActive.toDateString() === yesterday.toDateString();
+
+        const streakContinues =
+          lastActive && lastActive.toDateString() === yesterday.toDateString();
 
         const newStreakDays = streakContinues ? engagement.streakDays + 1 : 1;
 
         await this.updateEngagementHistory(userId, {
           totalDaysActive: engagement.totalDaysActive + 1,
           streakDays: newStreakDays,
-          lastActiveDate: today
+          lastActiveDate: today,
         });
       }
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to track daily engagement:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to track daily engagement:',
+        error instanceof Error ? error : String(error),
+      );
     }
   }
 
@@ -376,24 +414,26 @@ export class UserPreferencesService {
    */
   static async updateStylePreferences(
     userId: string,
-    styleUpdates: Partial<StyleProfile>
+    styleUpdates: Partial<StyleProfile>,
   ): Promise<void> {
     try {
       const currentPreferences = await this.getUserPreferences(userId);
-      
+
       const updatedStyleProfile: StyleProfile = {
         ...currentPreferences.stylePreferences,
         ...styleUpdates,
         userId,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
 
       await this.updateUserPreferences(userId, {
-        stylePreferences: updatedStyleProfile
+        stylePreferences: updatedStyleProfile,
       });
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to update style preferences:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to update style preferences:',
+        error instanceof Error ? error : String(error),
+      );
       throw error;
     }
   }
@@ -410,25 +450,30 @@ export class UserPreferencesService {
       logInDev('[UserPreferencesService] Syncing preferences with backend');
 
       // Force fetch from database (bypass any caching)
-      const { data, error } = await supabase
-        .from('user_preferences')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+      const res = await wrap(
+        async () =>
+          await (supabase as any)
+            .from('user_preferences')
+            .select('*')
+            .eq('user_id', userId)
+            .single(),
+      );
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
+      if (!isSupabaseOk(res) && (res.error as { code?: string })?.code !== 'PGRST116') {
+        ensureSupabaseOk(res, { action: 'syncPreferences' });
       }
 
-      if (!data) {
+      if (!isSupabaseOk(res)) {
+        // PGRST116 -> create defaults
         // Create default preferences if none exist
         return await this.createDefaultPreferences(userId);
       }
-
-      return this.convertRecordToPreferences(data);
-
+      return this.convertRecordToPreferences(res.data as UserPreferencesRecord);
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to sync preferences:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to sync preferences:',
+        error instanceof Error ? error : String(error),
+      );
       throw error;
     }
   }
@@ -443,26 +488,28 @@ export class UserPreferencesService {
   private static async createDefaultPreferences(userId: string): Promise<UserPreferences> {
     try {
       const defaultPreferences = this.getDefaultPreferences(userId);
-      
-      // Detect timezone for new user
-      const detectedTimezone = await this.detectAndUpdateTimezone(userId);
+
+      // Detect timezone WITHOUT writing to DB yet to avoid recursive create -> update loop
+      // (Previously detectAndUpdateTimezone called updateUserPreferences which could re-enter createDefaultPreferences)
+      const detectedTimezone = await this.detectTimezone();
       defaultPreferences.timezone = detectedTimezone;
 
-      // Save to database
+      // Persist the freshly prepared default preferences
       const record = this.convertPreferencesToRecord(defaultPreferences);
-      
-      const { data, error } = await supabase
-        .from('user_preferences')
-        .insert(record)
-        .select()
-        .single();
 
-      if (error) throw error;
-
+      const res = await wrap(
+        async () =>
+          await (supabase as any).from('user_preferences').insert(record).select().single(),
+      );
+      const data = ensureSupabaseOk(res, {
+        action: 'createDefaultPreferences',
+      }) as UserPreferencesRecord;
       return this.convertRecordToPreferences(data);
-
     } catch (error) {
-      errorInDev('[UserPreferencesService] Failed to create default preferences:', error);
+      errorInDev(
+        '[UserPreferencesService] Failed to create default preferences:',
+        error instanceof Error ? error : String(error),
+      );
       return this.getDefaultPreferences(userId);
     }
   }
@@ -487,23 +534,23 @@ export class UserPreferencesService {
         occasionPreferences: {},
         confidencePatterns: [],
         confidenceNoteStyle: 'encouraging',
-        lastUpdated: now
+        lastUpdated: now,
       },
       privacySettings: {
         shareUsageData: false,
         allowLocationTracking: true,
         enableSocialFeatures: true,
-        dataRetentionDays: 365
+        dataRetentionDays: 365,
       },
       engagementHistory: {
         totalDaysActive: 0,
         streakDays: 0,
         averageRating: 0,
         lastActiveDate: now,
-        preferredInteractionTimes: [sixAM]
+        preferredInteractionTimes: [sixAM],
       },
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
     };
   }
 
@@ -511,45 +558,127 @@ export class UserPreferencesService {
    * Convert database record to UserPreferences interface
    */
   private static convertRecordToPreferences(record: UserPreferencesRecord): UserPreferences {
+    const safeObj = (val: unknown): Record<string, unknown> =>
+      val && typeof val === 'object' ? (val as Record<string, unknown>) : {};
+
+    const styleRaw = safeObj(record.style_preferences);
+    const privacyRaw = safeObj(record.privacy_settings);
+    const engagementRaw = safeObj(record.engagement_history);
+
+    const preferredInteractionTimes = Array.isArray(engagementRaw.preferredInteractionTimes)
+      ? (engagementRaw.preferredInteractionTimes as unknown[])
+          .filter((t): t is string => typeof t === 'string')
+          .map((t) => new Date(t))
+      : [];
+
     return {
       userId: record.user_id,
       notificationTime: this.parseTimeString(record.notification_time),
-      timezone: record.timezone,
+      timezone: typeof record.timezone === 'string' && record.timezone ? record.timezone : 'UTC',
       stylePreferences: {
         userId: record.user_id,
-        preferredColors: record.style_preferences?.preferredColors || [],
-        preferredStyles: record.style_preferences?.preferredStyles || [],
-        bodyTypePreferences: record.style_preferences?.bodyTypePreferences || [],
-        occasionPreferences: record.style_preferences?.occasionPreferences || {},
-        confidencePatterns: record.style_preferences?.confidencePatterns || [],
-        confidenceNoteStyle: record.style_preferences?.confidenceNoteStyle || 'encouraging',
-        lastUpdated: new Date(record.updated_at)
+        preferredColors: Array.isArray(styleRaw.preferredColors)
+          ? (styleRaw.preferredColors as unknown[]).filter(
+              (c): c is string => typeof c === 'string',
+            )
+          : [],
+        preferredStyles: Array.isArray(styleRaw.preferredStyles)
+          ? (styleRaw.preferredStyles as unknown[]).filter(
+              (c): c is string => typeof c === 'string',
+            )
+          : [],
+        bodyTypePreferences: Array.isArray(styleRaw.bodyTypePreferences)
+          ? (styleRaw.bodyTypePreferences as unknown[]).filter(
+              (c): c is string => typeof c === 'string',
+            )
+          : [],
+        occasionPreferences:
+          typeof styleRaw.occasionPreferences === 'object' && styleRaw.occasionPreferences
+            ? (styleRaw.occasionPreferences as Record<string, number>)
+            : {},
+        // Legacy JSON may have stored confidencePatterns as string[]; normalise to ConfidencePattern[] with defaults
+        confidencePatterns: Array.isArray(styleRaw.confidencePatterns)
+          ? (styleRaw.confidencePatterns as unknown[])
+              .filter(
+                (c): c is string | Record<string, unknown> =>
+                  typeof c === 'string' || (c !== null && typeof c === 'object'),
+              )
+              .map((c) => {
+                if (typeof c === 'string') {
+                  return {
+                    itemCombination: [],
+                    averageRating: 0,
+                    contextFactors: [],
+                    emotionalResponse: [c],
+                  };
+                }
+                const obj = c;
+                return {
+                  itemCombination: Array.isArray(obj.itemCombination)
+                    ? (obj.itemCombination as unknown[]).filter(
+                        (v): v is string => typeof v === 'string',
+                      )
+                    : [],
+                  averageRating: typeof obj.averageRating === 'number' ? obj.averageRating : 0,
+                  contextFactors: Array.isArray(obj.contextFactors)
+                    ? (obj.contextFactors as unknown[]).filter(
+                        (v): v is string => typeof v === 'string',
+                      )
+                    : [],
+                  emotionalResponse: Array.isArray(obj.emotionalResponse)
+                    ? (obj.emotionalResponse as unknown[]).filter(
+                        (v): v is string => typeof v === 'string',
+                      )
+                    : [],
+                };
+              })
+          : [],
+        confidenceNoteStyle: isConfidenceNoteStyle(styleRaw.confidenceNoteStyle)
+          ? styleRaw.confidenceNoteStyle
+          : 'encouraging',
+        lastUpdated: new Date(record.updated_at),
       },
       privacySettings: {
-        shareUsageData: record.privacy_settings?.shareUsageData ?? false,
-        allowLocationTracking: record.privacy_settings?.allowLocationTracking ?? true,
-        enableSocialFeatures: record.privacy_settings?.enableSocialFeatures ?? true,
-        dataRetentionDays: record.privacy_settings?.dataRetentionDays ?? 365
+        shareUsageData:
+          typeof privacyRaw.shareUsageData === 'boolean' ? privacyRaw.shareUsageData : false,
+        allowLocationTracking:
+          typeof privacyRaw.allowLocationTracking === 'boolean'
+            ? privacyRaw.allowLocationTracking
+            : true,
+        enableSocialFeatures:
+          typeof privacyRaw.enableSocialFeatures === 'boolean'
+            ? privacyRaw.enableSocialFeatures
+            : true,
+        dataRetentionDays:
+          typeof privacyRaw.dataRetentionDays === 'number' ? privacyRaw.dataRetentionDays : 365,
       },
       engagementHistory: {
-        totalDaysActive: record.engagement_history?.totalDaysActive || 0,
-        streakDays: record.engagement_history?.streakDays || 0,
-        averageRating: record.engagement_history?.averageRating || 0,
-        lastActiveDate: record.engagement_history?.lastActiveDate ? 
-          new Date(record.engagement_history.lastActiveDate) : new Date(),
-        preferredInteractionTimes: record.engagement_history?.preferredInteractionTimes?.map(
-          (time: string) => new Date(time)
-        ) || []
+        totalDaysActive:
+          typeof engagementRaw.totalDaysActive === 'number' ? engagementRaw.totalDaysActive : 0,
+        streakDays: typeof engagementRaw.streakDays === 'number' ? engagementRaw.streakDays : 0,
+        averageRating:
+          typeof engagementRaw.averageRating === 'number' ? engagementRaw.averageRating : 0,
+        lastActiveDate:
+          typeof engagementRaw.lastActiveDate === 'string'
+            ? new Date(engagementRaw.lastActiveDate)
+            : new Date(),
+        preferredInteractionTimes,
       },
       createdAt: new Date(record.created_at),
-      updatedAt: new Date(record.updated_at)
+      updatedAt: new Date(record.updated_at),
     };
   }
 
   /**
    * Convert UserPreferences to database record format
    */
-  private static convertPreferencesToRecord(preferences: UserPreferences): Omit<UserPreferencesRecord, 'created_at' | 'updated_at'> & { created_at?: string; updated_at?: string } {
+  private static convertPreferencesToRecord(preferences: UserPreferences): Omit<
+    UserPreferencesRecord,
+    'created_at' | 'updated_at'
+  > & {
+    created_at?: string;
+    updated_at?: string;
+  } {
     return {
       user_id: preferences.userId,
       notification_time: this.formatTimeString(preferences.notificationTime),
@@ -559,19 +688,27 @@ export class UserPreferencesService {
         preferredStyles: preferences.stylePreferences.preferredStyles,
         bodyTypePreferences: preferences.stylePreferences.bodyTypePreferences,
         occasionPreferences: preferences.stylePreferences.occasionPreferences,
-        confidencePatterns: preferences.stylePreferences.confidencePatterns,
-        confidenceNoteStyle: preferences.stylePreferences.confidenceNoteStyle
+        // Persist only minimal string representation for patterns (emotionalResponse tags) to keep JSON lean
+        confidencePatterns: preferences.stylePreferences.confidencePatterns.map(
+          (p) => p.emotionalResponse[0] || 'pattern',
+        ),
+        confidenceNoteStyle: preferences.stylePreferences.confidenceNoteStyle,
       },
       privacy_settings: preferences.privacySettings,
       engagement_history: {
-        ...preferences.engagementHistory,
+        totalDaysActive: preferences.engagementHistory.totalDaysActive,
+        streakDays: preferences.engagementHistory.streakDays,
+        averageRating: preferences.engagementHistory.averageRating,
         lastActiveDate: preferences.engagementHistory.lastActiveDate.toISOString(),
         preferredInteractionTimes: preferences.engagementHistory.preferredInteractionTimes.map(
-          time => time.toISOString()
-        )
+          (time) => time.toISOString(),
+        ),
+        averageOpenTime: preferences.engagementHistory.averageOpenTime
+          ? preferences.engagementHistory.averageOpenTime.toISOString()
+          : undefined,
       },
       created_at: preferences.createdAt.toISOString(),
-      updated_at: preferences.updatedAt.toISOString()
+      updated_at: preferences.updatedAt.toISOString(),
     };
   }
 
@@ -579,17 +716,69 @@ export class UserPreferencesService {
    * Parse time string (HH:MM:SS) to Date object
    */
   private static parseTimeString(timeString: string): Date {
-    const [hours, minutes, seconds] = timeString.split(':').map(Number);
     const date = new Date();
-    date.setHours(hours, minutes, seconds || 0, 0);
+    if (typeof timeString === 'string') {
+      const parts = timeString.split(':');
+      if (parts.length >= 2) {
+        const hours = Number(parts[0]);
+        const minutes = Number(parts[1]);
+        const seconds = parts[2] ? Number(parts[2]) : 0;
+        if (
+          Number.isFinite(hours) &&
+          Number.isFinite(minutes) &&
+          hours >= 0 &&
+          hours < 24 &&
+          minutes >= 0 &&
+          minutes < 60 &&
+          Number.isFinite(seconds) &&
+          seconds >= 0 &&
+          seconds < 60
+        ) {
+          date.setHours(hours, minutes, seconds, 0);
+          return date;
+        }
+      }
+    }
+    // Fallback: 06:00:00
+    date.setHours(6, 0, 0, 0);
     return date;
+  }
+
+  /**
+   * Lightweight timezone detection without persisting changes (used during initial creation)
+   */
+  private static async detectTimezone(): Promise<string> {
+    try {
+      const deviceTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+      let locationTimezone: string | null = null;
+      try {
+        const { status } = await Location.getForegroundPermissionsAsync();
+        if (status === Location.PermissionStatus.GRANTED) {
+          await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Low });
+          // Use device timezone as location-based timezone (future: derive from coordinates)
+          locationTimezone = deviceTimezone;
+        }
+      } catch {
+        // Ignore detection errors, fallback below
+      }
+      return locationTimezone || deviceTimezone || 'UTC';
+    } catch {
+      return 'UTC';
+    }
   }
 
   /**
    * Format Date object to time string (HH:MM:SS)
    */
   private static formatTimeString(date: Date): string {
-    return date.toTimeString().split(' ')[0]; // Gets HH:MM:SS part
+    const str = date.toTimeString();
+    if (typeof str === 'string') {
+      const first = str.split(' ')[0];
+      if (first && first.includes(':')) {
+        return first;
+      }
+    }
+    return '06:00:00';
   }
 }
 

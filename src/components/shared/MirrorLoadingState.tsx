@@ -1,9 +1,24 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { useAnimatedStyle, withRepeat, withTiming, useSharedValue } from 'react-native-reanimated';
-import { DesignSystem } from '@/theme/DesignSystem';
+import { BlurView } from 'expo-blur';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
+// AYNAMODA Color Palette
+const COLORS = {
+  primary: '#8B6F47',
+  secondary: '#B8A082',
+  background: '#F5F1E8',
+  surface: '#FFFFFF',
+  text: '#2C2C2C',
+  textLight: '#B8A082',
+  border: '#E8DCC6',
+  accent: '#D4AF37',
+};
 
 interface MirrorLoadingStateProps {
   message?: string;
@@ -11,18 +26,14 @@ interface MirrorLoadingStateProps {
 }
 
 export const MirrorLoadingState: React.FC<MirrorLoadingStateProps> = ({
-  message = "Curating your perfect look...",
+  message = 'Curating your perfect look...',
   subMessage = "Analyzing your style preferences and today's weather",
 }) => {
   const rotation = useSharedValue(0);
 
   useEffect(() => {
-    rotation.value = withRepeat(
-      withTiming(360, { duration: 2000 }),
-      -1,
-      false
-    );
-  }, []);
+    rotation.value = withRepeat(withTiming(360, { duration: 2000 }), -1, false);
+  }, [rotation]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
@@ -33,18 +44,10 @@ export const MirrorLoadingState: React.FC<MirrorLoadingStateProps> = ({
       <BlurView intensity={20} style={styles.loadingBlur}>
         <View style={styles.loadingContent}>
           <Animated.View style={animatedStyle}>
-            <Ionicons
-              name="sparkles"
-              size={48}
-              color={DesignSystem.colors.sageGreen[500]}
-            />
+            <Ionicons name="sparkles" size={48} color={COLORS.primary} />
           </Animated.View>
-          <Text style={styles.loadingText}>
-            {message}
-          </Text>
-          <Text style={styles.loadingSubtext}>
-            {subMessage}
-          </Text>
+          <Text style={styles.loadingText}>{message}</Text>
+          <Text style={styles.loadingSubtext}>{subMessage}</Text>
           {/* Provide at least one accessible action for keyboard/accessibility tests */}
           <TouchableOpacity
             accessibilityRole="button"
@@ -63,43 +66,48 @@ export const MirrorLoadingState: React.FC<MirrorLoadingStateProps> = ({
 };
 
 const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: DesignSystem.spacing.xl,
-  },
-  loadingBlur: {
-    borderRadius: DesignSystem.radius.lg,
-    overflow: 'hidden',
-  },
-  loadingContent: {
-    padding: DesignSystem.spacing.xxl,
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  loadingText: {
-    ...DesignSystem.typography.heading.h3,
-    color: DesignSystem.colors.inkGray[700],
-    marginTop: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.sm,
-    textAlign: 'center',
-  },
-  loadingSubtext: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.inkGray[600],
-    textAlign: 'center',
-  },
   accessibleButton: {
-    marginTop: DesignSystem.spacing.lg,
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.sm,
-    backgroundColor: DesignSystem.colors.sageGreen[500],
-    borderRadius: DesignSystem.radius.lg,
     alignSelf: 'center',
+    backgroundColor: COLORS.primary,
+    borderRadius: 16,
+    marginTop: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
   },
   accessibleButtonText: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.inverse,
-  }
+    color: COLORS.surface,
+    fontFamily: 'Inter',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  loadingBlur: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  loadingContent: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 32,
+  },
+  loadingSubtext: {
+    color: COLORS.textLight,
+    fontFamily: 'Inter',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  loadingText: {
+    color: COLORS.text,
+    fontFamily: 'Inter',
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 8,
+    marginTop: 20,
+    textAlign: 'center',
+  },
 });

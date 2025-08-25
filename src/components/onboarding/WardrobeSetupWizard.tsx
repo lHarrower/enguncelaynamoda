@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, ScrollView, Pressable } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as ImagePicker from 'expo-image-picker';
-import * as Camera from 'expo-camera';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useState } from 'react';
+import {
+  Alert,
+  ImageStyle,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { DesignSystem } from '@/theme/DesignSystem';
-import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
-import { Ionicons } from '@expo/vector-icons';
 
 interface WardrobeSetupWizardProps {
   onNext: () => void;
@@ -20,8 +30,10 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
 
   const requestPermissions = async () => {
     // Be resilient in tests/mocks: default to granted when mocks are missing
-  const cameraResp = (await (ImagePicker.requestCameraPermissionsAsync?.() || Promise.resolve({ status: 'granted' as const }))) as any;
-    const mediaResp = (await (ImagePicker.requestMediaLibraryPermissionsAsync?.() || Promise.resolve({ status: 'granted' as const }))) as any;
+    const cameraResp = await (ImagePicker.requestCameraPermissionsAsync?.() ||
+      Promise.resolve({ status: 'granted' as const }));
+    const mediaResp = await (ImagePicker.requestMediaLibraryPermissionsAsync?.() ||
+      Promise.resolve({ status: 'granted' as const }));
     const cameraStatus = cameraResp?.status ?? 'granted';
     const mediaStatus = mediaResp?.status ?? 'granted';
 
@@ -29,7 +41,7 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
       Alert.alert(
         'Permissions Required',
         'We need camera and photo library access to help you build your digital wardrobe.',
-        [{ text: 'OK' }]
+        [{ text: 'OK' }],
       );
       return false;
     }
@@ -38,10 +50,12 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
 
   const handleCameraCapture = async () => {
     const hasPermissions = await requestPermissions();
-    if (!hasPermissions) return;
+    if (!hasPermissions) {
+      return;
+    }
 
     setIsCapturing(true);
-    
+
     try {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -52,7 +66,7 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
 
       if (!result.canceled && result.assets[0]) {
         // In a real implementation, this would save to wardrobe service
-        setItemsAdded(prev => prev + 1);
+        setItemsAdded((prev) => prev + 1);
         Alert.alert('Success!', 'Item added to your wardrobe');
       }
     } catch (error) {
@@ -64,7 +78,9 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
 
   const handleGallerySelect = async () => {
     const hasPermissions = await requestPermissions();
-    if (!hasPermissions) return;
+    if (!hasPermissions) {
+      return;
+    }
 
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -78,7 +94,7 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
 
       if (!result.canceled && result.assets.length > 0) {
         // In a real implementation, this would save to wardrobe service
-        setItemsAdded(prev => prev + result.assets.length);
+        setItemsAdded((prev) => prev + result.assets.length);
         Alert.alert('Success!', `${result.assets.length} items added to your wardrobe`);
       }
     } catch (error) {
@@ -94,17 +110,14 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
       >
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
-            <Animated.View 
-              entering={FadeInUp.delay(200).duration(600)}
-              style={styles.header}
-            >
+            <Animated.View entering={FadeInUp.delay(200).duration(600)} style={styles.header}>
               <Text style={styles.title}>Build Your Digital Wardrobe</Text>
               <Text style={styles.subtitle}>
                 Add your favorite pieces so AYNA can create perfect outfit combinations
               </Text>
             </Animated.View>
 
-            <Animated.View 
+            <Animated.View
               entering={FadeInUp.delay(400).duration(600)}
               style={styles.progressSection}
             >
@@ -114,11 +127,11 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
                   Add at least 5-10 items to get personalized recommendations
                 </Text>
                 <View style={styles.progressBar}>
-                  <View 
+                  <View
                     style={[
-                      styles.progressFill, 
-                      { width: `${Math.min((itemsAdded / 5) * 100, 100)}%` }
-                    ]} 
+                      styles.progressFill,
+                      { width: `${Math.min((itemsAdded / 5) * 100, 100)}%` },
+                    ]}
                   />
                 </View>
                 <Text style={styles.progressCount}>
@@ -127,51 +140,39 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
               </BlurView>
             </Animated.View>
 
-            <Animated.View 
+            <Animated.View
               entering={FadeInUp.delay(600).duration(600)}
               style={styles.actionsSection}
             >
               <Text style={styles.actionsTitle}>Add Your Clothing Items</Text>
-              
+
               <View style={styles.actionButtons}>
                 <Pressable
                   style={({ pressed }: { pressed: boolean }) => [
                     styles.actionButton,
-                    pressed && styles.actionButtonPressed
+                    pressed && styles.actionButtonPressed,
                   ]}
                   onPress={handleCameraCapture}
                   disabled={isCapturing}
                 >
                   <BlurView intensity={20} style={styles.actionButtonContent}>
-                    <Ionicons 
-                      name="camera" 
-                      size={32} 
-                      color={DesignSystem.colors.sageGreen[600]} 
-                    />
+                    <Ionicons name="camera" size={32} color={DesignSystem.colors.sageGreen[600]} />
                     <Text style={styles.actionButtonTitle}>Take Photo</Text>
-                    <Text style={styles.actionButtonSubtitle}>
-                      Capture items with your camera
-                    </Text>
+                    <Text style={styles.actionButtonSubtitle}>Capture items with your camera</Text>
                   </BlurView>
                 </Pressable>
 
                 <Pressable
                   style={({ pressed }: { pressed: boolean }) => [
                     styles.actionButton,
-                    pressed && styles.actionButtonPressed
+                    pressed && styles.actionButtonPressed,
                   ]}
                   onPress={handleGallerySelect}
                 >
                   <BlurView intensity={20} style={styles.actionButtonContent}>
-                    <Ionicons 
-                      name="images" 
-                      size={32} 
-                      color={DesignSystem.colors.liquidGold[600]} 
-                    />
+                    <Ionicons name="images" size={32} color={DesignSystem.colors.liquidGold[600]} />
                     <Text style={styles.actionButtonTitle}>Choose from Gallery</Text>
-                    <Text style={styles.actionButtonSubtitle}>
-                      Select multiple photos at once
-                    </Text>
+                    <Text style={styles.actionButtonSubtitle}>Select multiple photos at once</Text>
                   </BlurView>
                 </Pressable>
               </View>
@@ -182,12 +183,14 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
                   <Text style={styles.tipItem}>• Use good lighting for best results</Text>
                   <Text style={styles.tipItem}>• Lay items flat or hang them up</Text>
                   <Text style={styles.tipItem}>• Include shoes, accessories, and outerwear</Text>
-                  <Text style={styles.tipItem}>• AYNA will automatically categorize everything</Text>
+                  <Text style={styles.tipItem}>
+                    • AYNA will automatically categorize everything
+                  </Text>
                 </View>
               </View>
             </Animated.View>
 
-            <Animated.View 
+            <Animated.View
               entering={FadeInDown.delay(800).duration(600)}
               style={styles.navigationSection}
             >
@@ -195,7 +198,7 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
                 <Pressable
                   style={({ pressed }: { pressed: boolean }) => [
                     styles.skipButton,
-                    pressed && styles.skipButtonPressed
+                    pressed && styles.skipButtonPressed,
                   ]}
                   onPress={onSkip}
                 >
@@ -206,23 +209,25 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
                   style={({ pressed }: { pressed: boolean }) => [
                     styles.continueButton,
                     itemsAdded < 3 && styles.continueButtonDisabled,
-                    pressed && styles.continueButtonPressed
+                    pressed && styles.continueButtonPressed,
                   ]}
                   onPress={onNext}
                   disabled={itemsAdded < 3}
                 >
                   <LinearGradient
                     colors={
-                      itemsAdded >= 3 
+                      itemsAdded >= 3
                         ? [DesignSystem.colors.sage[400], DesignSystem.colors.sage[600]]
                         : [DesignSystem.colors.neutral[300], DesignSystem.colors.neutral[400]]
                     }
                     style={styles.continueButtonGradient}
                   >
-                    <Text style={[
-                      styles.continueButtonText,
-                      itemsAdded < 3 && styles.continueButtonTextDisabled
-                    ]}>
+                    <Text
+                      style={[
+                        styles.continueButtonText,
+                        itemsAdded < 3 && styles.continueButtonTextDisabled,
+                      ]}
+                    >
                       Continue
                     </Text>
                   </LinearGradient>
@@ -236,7 +241,16 @@ export default function WardrobeSetupWizard({ onNext, onSkip }: WardrobeSetupWiz
   );
 }
 
-const styles = StyleSheet.create({
+// Safe StyleSheet create for testing
+const createStyles = (styles: Record<string, ViewStyle | TextStyle | ImageStyle>) => {
+  try {
+    return StyleSheet.create(styles);
+  } catch {
+    return styles;
+  }
+};
+
+const styles = createStyles({
   container: {
     flex: 1,
   },

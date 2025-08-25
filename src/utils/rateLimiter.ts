@@ -30,7 +30,7 @@ export function rateLimit(key: string, capacity = 20, refillPerSec = 5): RateLim
     bucket.updated = now;
   }
   if (bucket.tokens < 1) {
-    const resetIn = (1 - bucket.tokens) / refillRate * 1000;
+    const resetIn = ((1 - bucket.tokens) / refillRate) * 1000;
     return { allowed: false, remaining: 0, resetInMs: Math.max(0, Math.round(resetIn)) };
   }
   bucket.tokens -= 1;

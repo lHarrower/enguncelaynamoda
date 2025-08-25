@@ -10,4 +10,4 @@ export const TAB_ICON_SIZE = 30;
 export const TAB_ICON_VERTICAL_PADDING = 16;
 
 // This will now automatically calculate to the same content height as before.
-export const TAB_BAR_CONTENT_HEIGHT = TAB_ICON_SIZE + (TAB_ICON_VERTICAL_PADDING * 2); 
+export const TAB_BAR_CONTENT_HEIGHT = TAB_ICON_SIZE + TAB_ICON_VERTICAL_PADDING * 2;

@@ -1,8 +1,9 @@
 // Page Transitions - Screen-to-screen animation system
 import React, { useEffect, useRef } from 'react';
-import { Animated, Dimensions, ViewStyle } from 'react-native';
-import { useFadeAnimation, useSlideAnimation, useSpringAnimation } from '@/hooks/useAnimation';
-import { AnimationSystem, TIMING, EASING } from '@/theme/foundations/Animation';
+import { Animated, Dimensions, StyleSheet, ViewStyle } from 'react-native';
+
+import { useFadeAnimation, useSpringAnimation } from '@/hooks/useAnimation';
+import { AnimationSystem, EASING, TIMING } from '@/theme/foundations/Animation';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -26,85 +27,96 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
   direction = 'right',
   duration = TIMING.standard,
   style,
-  onTransitionComplete
+  onTransitionComplete,
 }) => {
   const { opacity, fadeIn, fadeOut, isReducedMotionEnabled } = useFadeAnimation();
-  const slideAnim = useRef(new Animated.Value(isActive ? 0 : getInitialSlideValue(direction))).current;
+  const slideAnim = useRef(
+    new Animated.Value(isActive ? 0 : getInitialSlideValue(direction)),
+  ).current;
   const scaleAnim = useRef(new Animated.Value(isActive ? 1 : 0.8)).current;
-  
+
   function getInitialSlideValue(dir: string): number {
     switch (dir) {
-      case 'left': return -SCREEN_WIDTH;
-      case 'right': return SCREEN_WIDTH;
-      case 'up': return -SCREEN_HEIGHT;
-      case 'down': return SCREEN_HEIGHT;
-      default: return SCREEN_WIDTH;
+      case 'left':
+        return -SCREEN_WIDTH;
+      case 'right':
+        return SCREEN_WIDTH;
+      case 'up':
+        return -SCREEN_HEIGHT;
+      case 'down':
+        return SCREEN_HEIGHT;
+      default:
+        return SCREEN_WIDTH;
     }
   }
-  
-  function getSlideTransform() {
+
+  function getSlideTransform():
+    | { translateX: Animated.AnimatedAddition<number> }
+    | { translateY: Animated.AnimatedAddition<number> } {
     if (direction === 'left' || direction === 'right') {
       return { translateX: slideAnim };
     }
     return { translateY: slideAnim };
   }
-  
+
   useEffect(() => {
     if (isReducedMotionEnabled) {
       // Skip animations for accessibility
-      if (onTransitionComplete) onTransitionComplete();
+      if (onTransitionComplete) {
+        onTransitionComplete();
+      }
       return;
     }
-    
+
     const animations: Animated.CompositeAnimation[] = [];
-    
+
     if (isActive) {
       // Entering animations
       switch (transitionType) {
         case 'fade':
           fadeIn(onTransitionComplete);
           break;
-          
+
         case 'slide':
           animations.push(
             Animated.timing(slideAnim, {
               toValue: 0,
               duration,
               easing: EASING.organic.gentle,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           break;
-          
+
         case 'scale':
           animations.push(
             Animated.spring(scaleAnim, {
               toValue: 1,
               ...AnimationSystem.spring.gentle,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           fadeIn();
           break;
-          
+
         case 'push':
           animations.push(
             Animated.timing(slideAnim, {
               toValue: 0,
               duration,
               easing: EASING.enter,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           break;
-          
+
         case 'modal':
           animations.push(
             Animated.spring(slideAnim, {
               toValue: 0,
               ...AnimationSystem.spring.bouncy,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           fadeIn();
           break;
@@ -115,54 +127,54 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
         case 'fade':
           fadeOut(onTransitionComplete);
           break;
-          
+
         case 'slide':
           animations.push(
             Animated.timing(slideAnim, {
               toValue: getInitialSlideValue(direction),
               duration,
               easing: EASING.organic.gentle,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           break;
-          
+
         case 'scale':
           animations.push(
             Animated.spring(scaleAnim, {
               toValue: 0.8,
               ...AnimationSystem.spring.gentle,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           fadeOut();
           break;
-          
+
         case 'push':
           animations.push(
             Animated.timing(slideAnim, {
               toValue: -getInitialSlideValue(direction),
               duration,
               easing: EASING.exit,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           break;
-          
+
         case 'modal':
           animations.push(
             Animated.timing(slideAnim, {
               toValue: SCREEN_HEIGHT,
               duration: TIMING.quick,
               easing: EASING.exit,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           fadeOut();
           break;
       }
     }
-    
+
     if (animations.length > 0) {
       Animated.parallel(animations).start((finished) => {
         if (finished && onTransitionComplete) {
@@ -170,59 +182,60 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
         }
       });
     }
-  }, [isActive, transitionType, direction, duration, isReducedMotionEnabled]);
-  
+  }, [
+    isActive,
+    transitionType,
+    direction,
+    duration,
+    isReducedMotionEnabled,
+    fadeIn,
+    fadeOut,
+    onTransitionComplete,
+    scaleAnim,
+    slideAnim,
+  ]);
+
   const getAnimatedStyle = (): ViewStyle => {
     if (isReducedMotionEnabled) {
-      return { opacity: isActive ? 1 : 0 };
+      return { ...styles.reducedMotionStyle, opacity: isActive ? 1 : 0 };
     }
-    
-    const baseStyle: ViewStyle = {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0
-    };
-    
+
+    const baseStyle = styles.baseStyle;
+
     switch (transitionType) {
       case 'fade':
         return {
           ...baseStyle,
-          opacity
+          opacity,
         };
-        
+
       case 'slide':
       case 'push':
         return {
           ...baseStyle,
-          transform: [getSlideTransform()]
+          transform: [getSlideTransform()],
         };
-        
+
       case 'scale':
         return {
           ...baseStyle,
           opacity,
-          transform: [{ scale: scaleAnim }]
+          transform: [{ scale: scaleAnim }],
         };
-        
+
       case 'modal':
         return {
           ...baseStyle,
           opacity,
-          transform: [{ translateY: slideAnim }]
+          transform: [{ translateY: slideAnim }],
         };
-        
+
       default:
         return baseStyle;
     }
   };
-  
-  return (
-    <Animated.View style={[getAnimatedStyle(), style]}>
-      {children}
-    </Animated.View>
-  );
+
+  return <Animated.View style={[getAnimatedStyle(), style]}>{children}</Animated.View>;
 };
 
 /**
@@ -241,26 +254,27 @@ export const StackTransition: React.FC<StackTransitionProps> = ({
   isActive,
   index,
   direction = 'horizontal',
-  style
+  style,
 }) => {
   const translateAnim = useRef(new Animated.Value(isActive ? 0 : SCREEN_WIDTH)).current;
   const { isReducedMotionEnabled } = useFadeAnimation();
-  
+
   useEffect(() => {
-    if (isReducedMotionEnabled) return;
-    
+    if (isReducedMotionEnabled) {
+      return;
+    }
+
     Animated.timing(translateAnim, {
-      toValue: isActive ? 0 : (direction === 'horizontal' ? SCREEN_WIDTH : SCREEN_HEIGHT),
+      toValue: isActive ? 0 : direction === 'horizontal' ? SCREEN_WIDTH : SCREEN_HEIGHT,
       duration: TIMING.standard,
       easing: EASING.organic.gentle,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start();
-  }, [isActive, direction, isReducedMotionEnabled]);
-  
-  const transform = direction === 'horizontal'
-    ? { translateX: translateAnim }
-    : { translateY: translateAnim };
-  
+  }, [isActive, direction, isReducedMotionEnabled, translateAnim]);
+
+  const transform =
+    direction === 'horizontal' ? { translateX: translateAnim } : { translateY: translateAnim };
+
   return (
     <Animated.View
       style={[
@@ -270,9 +284,9 @@ export const StackTransition: React.FC<StackTransitionProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          transform: isReducedMotionEnabled ? [] : [transform]
-        },
-        style
+          transform: isReducedMotionEnabled ? [] : [transform],
+        } as any,
+        style,
       ]}
     >
       {children}
@@ -294,31 +308,33 @@ export const TabTransition: React.FC<TabTransitionProps> = ({
   children,
   isActive,
   tabIndex,
-  style
+  style,
 }) => {
   const { opacity, fadeIn, fadeOut, isReducedMotionEnabled } = useFadeAnimation();
   const scaleAnim = useRef(new Animated.Value(isActive ? 1 : 0.95)).current;
-  
+
   useEffect(() => {
-    if (isReducedMotionEnabled) return;
-    
+    if (isReducedMotionEnabled) {
+      return;
+    }
+
     if (isActive) {
       fadeIn();
       Animated.spring(scaleAnim, {
         toValue: 1,
         ...AnimationSystem.spring.gentle,
-        useNativeDriver: true
+        useNativeDriver: true,
       }).start();
     } else {
       fadeOut();
       Animated.spring(scaleAnim, {
         toValue: 0.95,
         ...AnimationSystem.spring.gentle,
-        useNativeDriver: true
+        useNativeDriver: true,
       }).start();
     }
-  }, [isActive, isReducedMotionEnabled]);
-  
+  }, [isActive, isReducedMotionEnabled, fadeIn, fadeOut, scaleAnim]);
+
   return (
     <Animated.View
       style={[
@@ -329,9 +345,9 @@ export const TabTransition: React.FC<TabTransitionProps> = ({
           right: 0,
           bottom: 0,
           opacity: isReducedMotionEnabled ? (isActive ? 1 : 0) : opacity,
-          transform: isReducedMotionEnabled ? [] : [{ scale: scaleAnim }]
+          transform: isReducedMotionEnabled ? [] : [{ scale: scaleAnim }],
         },
-        style
+        style,
       ]}
     >
       {children}
@@ -355,44 +371,46 @@ export const ModalTransition: React.FC<ModalTransitionProps> = ({
   visible,
   animationType = 'slide',
   onAnimationComplete,
-  style
+  style,
 }) => {
   const { opacity, fadeIn, fadeOut, isReducedMotionEnabled } = useFadeAnimation();
   const slideAnim = useRef(new Animated.Value(visible ? 0 : SCREEN_HEIGHT)).current;
   const scaleAnim = useRef(new Animated.Value(visible ? 1 : 0.8)).current;
-  
+
   useEffect(() => {
     if (isReducedMotionEnabled) {
-      if (onAnimationComplete) onAnimationComplete();
+      if (onAnimationComplete) {
+        onAnimationComplete();
+      }
       return;
     }
-    
+
     const animations: Animated.CompositeAnimation[] = [];
-    
+
     if (visible) {
       switch (animationType) {
         case 'fade':
           fadeIn(onAnimationComplete);
           break;
-          
+
         case 'slide':
           animations.push(
             Animated.spring(slideAnim, {
               toValue: 0,
               ...AnimationSystem.spring.bouncy,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           fadeIn();
           break;
-          
+
         case 'scale':
           animations.push(
             Animated.spring(scaleAnim, {
               toValue: 1,
               ...AnimationSystem.spring.gentle,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           fadeIn();
           break;
@@ -402,33 +420,33 @@ export const ModalTransition: React.FC<ModalTransitionProps> = ({
         case 'fade':
           fadeOut(onAnimationComplete);
           break;
-          
+
         case 'slide':
           animations.push(
             Animated.timing(slideAnim, {
               toValue: SCREEN_HEIGHT,
               duration: TIMING.quick,
               easing: EASING.exit,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           fadeOut();
           break;
-          
+
         case 'scale':
           animations.push(
             Animated.timing(scaleAnim, {
               toValue: 0.8,
               duration: TIMING.quick,
               easing: EASING.exit,
-              useNativeDriver: true
-            })
+              useNativeDriver: true,
+            }),
           );
           fadeOut();
           break;
       }
     }
-    
+
     if (animations.length > 0) {
       Animated.parallel(animations).start((finished) => {
         if (finished && onAnimationComplete) {
@@ -436,56 +454,55 @@ export const ModalTransition: React.FC<ModalTransitionProps> = ({
         }
       });
     }
-  }, [visible, animationType, isReducedMotionEnabled]);
-  
+  }, [
+    visible,
+    animationType,
+    isReducedMotionEnabled,
+    fadeIn,
+    fadeOut,
+    onAnimationComplete,
+    scaleAnim,
+    slideAnim,
+  ]);
+
   const getAnimatedStyle = (): ViewStyle => {
     if (isReducedMotionEnabled) {
-      return { opacity: visible ? 1 : 0 };
+      return { ...styles.reducedMotionStyle, opacity: visible ? 1 : 0 };
     }
-    
-    const baseStyle: ViewStyle = {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0
-    };
-    
+
+    const baseStyle = styles.baseStyle;
+
     switch (animationType) {
       case 'fade':
         return {
           ...baseStyle,
-          opacity
+          opacity,
         };
-        
+
       case 'slide':
         return {
           ...baseStyle,
           opacity,
-          transform: [{ translateY: slideAnim }]
+          transform: [{ translateY: slideAnim }],
         };
-        
+
       case 'scale':
         return {
           ...baseStyle,
           opacity,
-          transform: [{ scale: scaleAnim }]
+          transform: [{ scale: scaleAnim }],
         };
-        
+
       default:
         return baseStyle;
     }
   };
-  
+
   if (!visible && isReducedMotionEnabled) {
     return null;
   }
-  
-  return (
-    <Animated.View style={[getAnimatedStyle(), style]}>
-      {children}
-    </Animated.View>
-  );
+
+  return <Animated.View style={[getAnimatedStyle(), style]}>{children}</Animated.View>;
 };
 
 /**
@@ -502,14 +519,16 @@ export const SharedElementTransition: React.FC<SharedElementTransitionProps> = (
   children,
   sharedElementId,
   isSource,
-  style
+  style,
 }) => {
   const { animatedValue, springTo, isReducedMotionEnabled } = useSpringAnimation(isSource ? 1 : 0);
   const { opacity, fadeIn, fadeOut } = useFadeAnimation();
-  
+
   useEffect(() => {
-    if (isReducedMotionEnabled) return;
-    
+    if (isReducedMotionEnabled) {
+      return;
+    }
+
     if (isSource) {
       fadeIn();
       springTo(1, AnimationSystem.spring.gentle);
@@ -517,16 +536,16 @@ export const SharedElementTransition: React.FC<SharedElementTransitionProps> = (
       fadeOut();
       springTo(0, AnimationSystem.spring.gentle);
     }
-  }, [isSource, isReducedMotionEnabled]);
-  
+  }, [isSource, isReducedMotionEnabled, fadeIn, fadeOut, springTo]);
+
   return (
     <Animated.View
       style={[
         {
           opacity: isReducedMotionEnabled ? (isSource ? 1 : 0) : opacity,
-          transform: isReducedMotionEnabled ? [] : [{ scale: animatedValue }]
+          transform: isReducedMotionEnabled ? [] : [{ scale: animatedValue }],
         },
-        style
+        style,
       ]}
     >
       {children}
@@ -550,7 +569,7 @@ export const PageTransitionManager: React.FC<PageTransitionManagerProps> = ({
   activeIndex,
   transitionType = 'slide',
   direction = 'right',
-  style
+  style,
 }) => {
   return (
     <Animated.View style={[{ flex: 1 }, style]}>
@@ -586,48 +605,58 @@ export const GesturePageTransition: React.FC<GesturePageTransitionProps> = ({
   onSwipeRight,
   onSwipeUp,
   onSwipeDown,
-  style
+  style,
 }) => {
   const translateX = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const { isReducedMotionEnabled } = useFadeAnimation();
-  
+
   // Note: In a real implementation, you would use react-native-gesture-handler
   // for proper gesture recognition. This is a simplified version.
-  
-  const resetPosition = () => {
-    if (isReducedMotionEnabled) return;
-    
+
+  const _resetPosition = () => {
+    if (isReducedMotionEnabled) {
+      return;
+    }
+
     Animated.parallel([
       Animated.spring(translateX, {
         toValue: 0,
         ...AnimationSystem.spring.gentle,
-        useNativeDriver: true
+        useNativeDriver: true,
       }),
       Animated.spring(translateY, {
         toValue: 0,
         ...AnimationSystem.spring.gentle,
-        useNativeDriver: true
-      })
+        useNativeDriver: true,
+      }),
     ]).start();
   };
-  
+
   return (
     <Animated.View
       style={[
         {
           flex: 1,
-          transform: isReducedMotionEnabled ? [] : [
-            { translateX },
-            { translateY }
-          ]
+          transform: isReducedMotionEnabled ? [] : [{ translateX }, { translateY }],
         },
-        style
+        style,
       ]}
     >
       {children}
     </Animated.View>
   );
 };
+
+const styles = StyleSheet.create({
+  baseStyle: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  reducedMotionStyle: {},
+});
 
 export default PageTransition;

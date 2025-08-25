@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { TouchableOpacity, Text, StyleSheet, Animated, ViewStyle, TextStyle } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface UndoNotificationProps {
@@ -11,6 +12,7 @@ interface UndoNotificationProps {
 
 const UndoNotification: React.FC<UndoNotificationProps> = ({ isVisible, onUndo, onTimeout }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const styles = createStyles(fadeAnim);
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -27,7 +29,6 @@ const UndoNotification: React.FC<UndoNotificationProps> = ({ isVisible, onUndo, 
       timeoutId = setTimeout(() => {
         onTimeout();
       }, 3000);
-
     } else {
       // Fade out
       Animated.timing(fadeAnim, {
@@ -41,45 +42,54 @@ const UndoNotification: React.FC<UndoNotificationProps> = ({ isVisible, onUndo, 
   }, [isVisible, onTimeout, fadeAnim]);
 
   const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onUndo();
   };
 
-  // Using a private property, which is safe here but not officially supported.
-  // A better solution would involve state management to track animation completion.
-  if (!isVisible && (fadeAnim as any)._value === 0) {
+  // Check visibility state instead of accessing private properties
+  if (!isVisible) {
     return null;
   }
 
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      <TouchableOpacity onPress={handlePress} style={styles.button}>
+    <Animated.View style={[styles.container, styles.fadeOpacity]}>
+      <TouchableOpacity
+        onPress={handlePress}
+        style={styles.button}
+        accessibilityRole="button"
+        accessibilityLabel="Undo"
+        accessibilityHint="Undo the last action"
+      >
         <Text style={styles.text}>Undo</Text>
       </TouchableOpacity>
     </Animated.View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    bottom: 100, // Positioned above the tab bar
-    alignSelf: 'center',
-    backgroundColor: 'rgba(44, 44, 46, 0.95)',
-    borderRadius: DesignSystem.borderRadius.xl,
-    paddingVertical: DesignSystem.spacing.md,
-    paddingHorizontal: DesignSystem.spacing.xl,
-    ...DesignSystem.elevation.high,
-  } as ViewStyle,
-  button: {
-    // No additional styles needed for the button
-  },
-  text: {
-    ...DesignSystem.typography.button,
-    fontSize: 14,
-    color: DesignSystem.colors.text.inverse,
-    fontFamily: DesignSystem.typography.fontFamily.body,
-  } as TextStyle,
-});
+const createStyles = (fadeAnim: Animated.Value) =>
+  StyleSheet.create({
+    button: {
+      // Add button styles if needed
+    },
+    container: {
+      position: 'absolute',
+      bottom: 100, // Positioned above the tab bar
+      alignSelf: 'center',
+      backgroundColor: 'rgba(44, 44, 46, 0.95)',
+      borderRadius: DesignSystem.borderRadius.xl,
+      paddingVertical: DesignSystem.spacing.md,
+      paddingHorizontal: DesignSystem.spacing.xl,
+      ...DesignSystem.elevation.high,
+    } as ViewStyle,
+    fadeOpacity: {
+      opacity: fadeAnim,
+    },
+    text: {
+      ...DesignSystem.typography.button,
+      fontSize: 14,
+      color: DesignSystem.colors.text.inverse,
+      fontFamily: DesignSystem.typography.fontFamily.body,
+    } as TextStyle,
+  });
 
 export default UndoNotification;

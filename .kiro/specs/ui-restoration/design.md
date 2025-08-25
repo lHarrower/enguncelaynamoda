@@ -9,6 +9,7 @@ This design document outlines the complete restoration of AynaModa's original lo
 ### Design Philosophy Restoration
 
 **Original Design Principles:**
+
 - Clean minimalism with ample white space
 - Subtle gradients and soft backgrounds
 - Clear typography hierarchy
@@ -17,6 +18,7 @@ This design document outlines the complete restoration of AynaModa's original lo
 - Turkish language as primary interface language
 
 **Visual Hierarchy:**
+
 1. **Brand Identity**: Large, bold "AYNAMODA" title
 2. **Welcome Message**: Turkish greeting with subtitle
 3. **Form Elements**: Clean input fields with icons
@@ -56,6 +58,7 @@ Original Login Screen
 ### 1. Background and Layout
 
 **Background Styling:**
+
 ```typescript
 const backgroundStyle = {
   flex: 1,
@@ -63,11 +66,12 @@ const backgroundStyle = {
   background: 'linear-gradient(180deg, #FAFAFA 0%, #F5F5F5 100%)', // Subtle gradient
   paddingHorizontal: 24,
   paddingVertical: 60,
-  justifyContent: 'center'
-}
+  justifyContent: 'center',
+};
 ```
 
 **Container Layout:**
+
 ```typescript
 const containerStyle = {
   flex: 1,
@@ -75,13 +79,14 @@ const containerStyle = {
   justifyContent: 'center',
   maxWidth: 400,
   alignSelf: 'center',
-  width: '100%'
-}
+  width: '100%',
+};
 ```
 
 ### 2. Brand Section
 
 **AYNAMODA Title:**
+
 ```typescript
 const titleStyle = {
   fontSize: 32,
@@ -90,11 +95,12 @@ const titleStyle = {
   letterSpacing: 2,
   textAlign: 'center',
   marginBottom: 24,
-  fontFamily: 'System' // Clean system font
-}
+  fontFamily: 'System', // Clean system font
+};
 ```
 
 **Welcome Message:**
+
 ```typescript
 const welcomeStyle = {
   fontSize: 18,
@@ -102,11 +108,12 @@ const welcomeStyle = {
   color: '#1A1A1A',
   textAlign: 'center',
   marginBottom: 8,
-  fontFamily: 'System'
-}
+  fontFamily: 'System',
+};
 ```
 
 **Subtitle:**
+
 ```typescript
 const subtitleStyle = {
   fontSize: 14,
@@ -114,22 +121,24 @@ const subtitleStyle = {
   color: '#666666',
   textAlign: 'center',
   marginBottom: 48,
-  fontFamily: 'System'
-}
+  fontFamily: 'System',
+};
 ```
 
 ### 3. Form Elements
 
 **Input Container:**
+
 ```typescript
 const inputContainerStyle = {
   width: '100%',
   marginBottom: 16,
-  position: 'relative'
-}
+  position: 'relative',
+};
 ```
 
 **Input Field Styling:**
+
 ```typescript
 const inputStyle = {
   width: '100%',
@@ -142,11 +151,12 @@ const inputStyle = {
   paddingVertical: 16,
   fontSize: 16,
   color: '#1A1A1A',
-  fontFamily: 'System'
-}
+  fontFamily: 'System',
+};
 ```
 
 **Input Icons:**
+
 ```typescript
 const iconStyle = {
   position: 'absolute',
@@ -154,11 +164,12 @@ const iconStyle = {
   top: 18,
   width: 20,
   height: 20,
-  color: '#999999'
-}
+  color: '#999999',
+};
 ```
 
 **Password Toggle:**
+
 ```typescript
 const toggleStyle = {
   position: 'absolute',
@@ -166,13 +177,14 @@ const toggleStyle = {
   top: 18,
   width: 20,
   height: 20,
-  color: '#999999'
-}
+  color: '#999999',
+};
 ```
 
 ### 4. Action Elements
 
 **Login Button:**
+
 ```typescript
 const loginButtonStyle = {
   width: '100%',
@@ -182,53 +194,57 @@ const loginButtonStyle = {
   alignItems: 'center',
   justifyContent: 'center',
   marginTop: 8,
-  marginBottom: 16
-}
+  marginBottom: 16,
+};
 
 const loginButtonTextStyle = {
   color: '#FFFFFF',
   fontSize: 16,
   fontWeight: '600',
   letterSpacing: 1,
-  fontFamily: 'System'
-}
+  fontFamily: 'System',
+};
 ```
 
 **Forgot Password Link:**
+
 ```typescript
 const forgotPasswordStyle = {
   fontSize: 14,
   color: '#666666',
   textAlign: 'center',
   marginBottom: 32,
-  fontFamily: 'System'
-}
+  fontFamily: 'System',
+};
 ```
 
 ### 5. Social Login Section
 
 **Divider Text:**
+
 ```typescript
 const dividerTextStyle = {
   fontSize: 14,
   color: '#999999',
   textAlign: 'center',
   marginBottom: 24,
-  fontFamily: 'System'
-}
+  fontFamily: 'System',
+};
 ```
 
 **Social Buttons Container:**
+
 ```typescript
 const socialContainerStyle = {
   flexDirection: 'row',
   justifyContent: 'center',
   gap: 16,
-  marginBottom: 32
-}
+  marginBottom: 32,
+};
 ```
 
 **Social Button Styling:**
+
 ```typescript
 const socialButtonStyle = {
   width: 56,
@@ -243,32 +259,34 @@ const socialButtonStyle = {
   shadowOffset: { width: 0, height: 2 },
   shadowOpacity: 0.1,
   shadowRadius: 4,
-  elevation: 2
-}
+  elevation: 2,
+};
 ```
 
 ### 6. Registration Section
 
 **Signup Prompt:**
+
 ```typescript
 const signupPromptStyle = {
   fontSize: 14,
   color: '#666666',
   textAlign: 'center',
-  fontFamily: 'System'
-}
+  fontFamily: 'System',
+};
 
 const signupLinkStyle = {
   fontSize: 14,
   color: '#1A1A1A',
   fontWeight: '600',
-  fontFamily: 'System'
-}
+  fontFamily: 'System',
+};
 ```
 
 ## Data Models
 
 ### Login Screen Props
+
 ```typescript
 interface OriginalLoginScreenProps {
   onLogin: (email: string, password: string) => void;
@@ -282,6 +300,7 @@ interface OriginalLoginScreenProps {
 ```
 
 ### Form State
+
 ```typescript
 interface LoginFormState {
   email: string;
@@ -293,6 +312,7 @@ interface LoginFormState {
 ```
 
 ### Turkish Text Constants
+
 ```typescript
 const TURKISH_TEXT = {
   title: 'AYNAMODA',
@@ -304,13 +324,14 @@ const TURKISH_TEXT = {
   forgotPassword: 'Şifrenizi mi unuttunuz?',
   continueWith: 'veya şununla devam et',
   noAccount: 'Hesabın yok mu?',
-  signup: 'Kayıt Ol'
+  signup: 'Kayıt Ol',
 } as const;
 ```
 
 ## Error Handling
 
 ### Form Validation
+
 ```typescript
 const validateEmail = (email: string): string | undefined => {
   if (!email) return 'E-posta adresi gerekli';
@@ -326,27 +347,30 @@ const validatePassword = (password: string): string | undefined => {
 ```
 
 ### Error Display
+
 ```typescript
 const errorStyle = {
   fontSize: 12,
   color: '#FF4444',
   marginTop: 4,
   marginLeft: 4,
-  fontFamily: 'System'
+  fontFamily: 'System',
 };
 ```
 
 ### Loading States
+
 ```typescript
 const loadingButtonStyle = {
   ...loginButtonStyle,
-  backgroundColor: '#999999' // Disabled state
+  backgroundColor: '#999999', // Disabled state
 };
 ```
 
 ## Testing Strategy
 
 ### Visual Accuracy Testing
+
 1. **Screenshot Comparison**
    - Pixel-perfect comparison with original screenshot
    - Cross-device rendering validation
@@ -358,6 +382,7 @@ const loadingButtonStyle = {
    - Safe area compliance
 
 ### Functional Testing
+
 1. **Form Validation**
    - Email format validation
    - Password requirements
@@ -370,6 +395,7 @@ const loadingButtonStyle = {
    - Signup navigation
 
 ### Accessibility Testing
+
 1. **Screen Reader Support**
    - Proper labeling for form fields
    - Button accessibility
@@ -383,6 +409,7 @@ const loadingButtonStyle = {
 ## Implementation Details
 
 ### File Structure
+
 ```
 components/
 ├── auth/
@@ -399,30 +426,35 @@ components/
 ### Key Components
 
 #### OriginalLoginScreen
+
 - Main container component
 - Handles authentication logic
 - Manages form state
 - Integrates with existing auth system
 
 #### OriginalLoginForm
+
 - Form input handling
 - Validation logic
 - Error display
 - Turkish text integration
 
 #### OriginalSocialButtons
+
 - Google and Apple authentication
 - Circular button styling
 - Icon integration
 - Touch feedback
 
 #### OriginalInput
+
 - Reusable input component
 - Icon support
 - Password visibility toggle
 - Validation error display
 
 #### OriginalButton
+
 - Clean button styling
 - Loading states
 - Accessibility support
@@ -431,18 +463,21 @@ components/
 ### Integration Points
 
 **Authentication Service:**
+
 ```typescript
 // Integrate with existing auth context
 const { login, googleLogin, appleLogin } = useAuth();
 ```
 
 **Navigation:**
+
 ```typescript
 // Integrate with expo-router
 import { router } from 'expo-router';
 ```
 
 **Styling:**
+
 ```typescript
 // Use original styling, not APP_THEME_V2
 // Maintain independence from current theme system
@@ -451,24 +486,28 @@ import { router } from 'expo-router';
 ## Success Criteria
 
 ### Visual Fidelity
+
 - 100% match with provided screenshot
 - Consistent typography and spacing
 - Proper color reproduction
 - Accurate icon placement
 
 ### Functional Completeness
+
 - All authentication methods working
 - Form validation functioning
 - Navigation flows intact
 - Error handling operational
 
 ### User Experience
+
 - Familiar interface for returning users
 - Smooth interactions
 - Proper feedback mechanisms
 - Accessibility compliance
 
 ### Code Quality
+
 - Clean, maintainable implementation
 - Proper TypeScript typing
 - Consistent code patterns

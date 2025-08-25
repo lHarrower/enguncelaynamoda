@@ -1,5 +1,11 @@
 // Unit tests for ErrorHandler
-import { ErrorHandler, AppError, ErrorSeverity, ErrorCategory, RecoveryStrategy } from '../../utils/ErrorHandler';
+import {
+  ErrorHandler,
+  AppError,
+  ErrorSeverity,
+  ErrorCategory,
+  RecoveryStrategy,
+} from '../../utils/ErrorHandler';
 import { createMockError } from '../utils/testUtils';
 import { mocks } from '../mocks';
 
@@ -14,8 +20,18 @@ jest.mock('../../services/ErrorReporting', () => ({
     })),
   },
 }));
+jest.mock('c:/AYNAMODA/src/config/supabaseClient', () => ({
+  supabaseClient: {
+    from: jest.fn(() => ({
+      select: jest.fn().mockResolvedValue({ data: [], error: null }),
+      insert: jest.fn().mockResolvedValue({ data: [], error: null }),
+      update: jest.fn().mockResolvedValue({ data: [], error: null }),
+      delete: jest.fn().mockResolvedValue({ data: [], error: null }),
+    })),
+  },
+}));
 
-describe('ErrorHandler', () => {
+describe('Hata İşleyici', () => {
   let errorHandler: ErrorHandler;
   let mockConsoleError: jest.SpyInstance;
   let mockConsoleWarn: jest.SpyInstance;
@@ -33,22 +49,22 @@ describe('ErrorHandler', () => {
   });
 
   describe('getInstance', () => {
-    it('should return singleton instance', () => {
+    it('singleton örneği döndürmeli', () => {
       const instance1 = ErrorHandler.getInstance();
       const instance2 = ErrorHandler.getInstance();
-      
+
       expect(instance1).toBe(instance2);
     });
   });
 
   describe('createError', () => {
-    it('should create error with all required fields', () => {
+    it('gerekli tüm alanlarla hata oluşturmalı', () => {
       const error = errorHandler.createError(
         'TEST_ERROR',
         'Test error message',
         ErrorSeverity.MEDIUM,
         ErrorCategory.NETWORK,
-        { userId: '123' }
+        { userId: '123' },
       );
 
       expect(error).toMatchObject({
@@ -63,38 +79,38 @@ describe('ErrorHandler', () => {
       });
     });
 
-    it('should generate appropriate user messages', () => {
+    it('uygun kullanıcı mesajları oluşturmalı', () => {
       const networkError = errorHandler.createError(
         'NETWORK_ERROR',
         'Failed to connect',
         ErrorSeverity.HIGH,
-        ErrorCategory.NETWORK
+        ErrorCategory.NETWORK,
       );
 
       const authError = errorHandler.createError(
         'AUTH_ERROR',
         'Invalid credentials',
         ErrorSeverity.HIGH,
-        ErrorCategory.AUTHENTICATION
+        ErrorCategory.AUTHENTICATION,
       );
 
       expect(networkError.userMessage).toContain('connection');
       expect(authError.userMessage).toContain('sign in');
     });
 
-    it('should assign recovery strategies based on category', () => {
+    it('kategoriye göre kurtarma stratejileri atamalı', () => {
       const networkError = errorHandler.createError(
         'NETWORK_ERROR',
         'Connection failed',
         ErrorSeverity.HIGH,
-        ErrorCategory.NETWORK
+        ErrorCategory.NETWORK,
       );
 
       const uiError = errorHandler.createError(
         'UI_ERROR',
         'Component crashed',
         ErrorSeverity.MEDIUM,
-        ErrorCategory.UI
+        ErrorCategory.UI,
       );
 
       expect(networkError.recoveryStrategies).toContain(RecoveryStrategy.RETRY);
@@ -103,7 +119,7 @@ describe('ErrorHandler', () => {
   });
 
   describe('handleError', () => {
-    it('should handle critical errors appropriately', async () => {
+    it('kritik hataları uygun şekilde işlemeli', async () => {
       const criticalError = createMockError({
         severity: ErrorSeverity.CRITICAL,
         category: ErrorCategory.SYSTEM,
@@ -116,11 +132,11 @@ describe('ErrorHandler', () => {
         expect.objectContaining({
           code: criticalError.code,
           message: criticalError.message,
-        })
+        }),
       );
     });
 
-    it('should handle medium severity errors with warnings', async () => {
+    it('orta önem dereceli hataları uyarılarla işlemeli', async () => {
       const mediumError = createMockError({
         severity: ErrorSeverity.MEDIUM,
         category: ErrorCategory.UI,
@@ -133,11 +149,11 @@ describe('ErrorHandler', () => {
         expect.objectContaining({
           code: mediumError.code,
           message: mediumError.message,
-        })
+        }),
       );
     });
 
-    it('should queue errors for batch reporting', async () => {
+    it('toplu raporlama için hataları kuyruğa almalı', async () => {
       const errors = [
         createMockError({ code: 'ERROR_1' }),
         createMockError({ code: 'ERROR_2' }),
@@ -153,7 +169,7 @@ describe('ErrorHandler', () => {
       expect(queuedErrors).toHaveLength(3);
     });
 
-    it('should respect error throttling', async () => {
+    it('hata kısıtlamasına uymalı', async () => {
       const duplicateError = createMockError({ code: 'DUPLICATE_ERROR' });
 
       // Handle the same error multiple times quickly
@@ -165,20 +181,20 @@ describe('ErrorHandler', () => {
       expect(mockConsoleWarn).toHaveBeenCalledTimes(1);
     });
 
-    it('should store errors in AsyncStorage', async () => {
+    it("hataları AsyncStorage'da saklamalı", async () => {
       const error = createMockError();
-      
+
       await errorHandler.handleError(error);
 
       expect(mocks.asyncStorage.setItem).toHaveBeenCalledWith(
         'error_logs',
-        expect.stringContaining(error.code)
+        expect.stringContaining(String(error.code)),
       );
     });
   });
 
-  describe('retry mechanism', () => {
-    it('should retry operations with exponential backoff', async () => {
+  describe('yeniden deneme mekanizması', () => {
+    it('üstel geri çekilme ile işlemleri yeniden denemeli', async () => {
       let attemptCount = 0;
       const failingOperation = jest.fn().mockImplementation(() => {
         attemptCount++;
@@ -188,27 +204,28 @@ describe('ErrorHandler', () => {
         return 'success';
       });
 
-      const result = await errorHandler.retryOperation(
-        failingOperation,
-        { maxAttempts: 3, baseDelay: 100 }
-      );
+      const result = await errorHandler.retryOperation(failingOperation, {
+        maxAttempts: 3,
+        baseDelay: 100,
+      });
 
       expect(result).toBe('success');
       expect(failingOperation).toHaveBeenCalledTimes(3);
     });
 
-    it('should give up after max attempts', async () => {
+    it('maksimum denemeden sonra vazgeçmeli', async () => {
       const alwaysFailingOperation = jest.fn().mockRejectedValue(new Error('Always fails'));
 
       await expect(
-        errorHandler.retryOperation(alwaysFailingOperation, { maxAttempts: 2 })
+        errorHandler.retryOperation(alwaysFailingOperation, { maxAttempts: 2 }),
       ).rejects.toThrow('Always fails');
 
       expect(alwaysFailingOperation).toHaveBeenCalledTimes(2);
     });
 
-    it('should apply jitter to prevent thundering herd', async () => {
-      const operation = jest.fn()
+    it('sürü etkisini önlemek için jitter uygulamalı', async () => {
+      const operation = jest
+        .fn()
         .mockRejectedValueOnce(new Error('Fail 1'))
         .mockRejectedValueOnce(new Error('Fail 2'))
         .mockResolvedValueOnce('success');
@@ -226,56 +243,50 @@ describe('ErrorHandler', () => {
     });
   });
 
-  describe('recovery actions', () => {
-    it('should execute refresh component recovery', async () => {
+  describe('kurtarma eylemleri', () => {
+    it('bileşen yenileme kurtarmasını yürütmeli', async () => {
       const mockComponent = {
         forceUpdate: jest.fn(),
         setState: jest.fn(),
       };
 
-      await errorHandler.executeRecoveryAction(
-        RecoveryStrategy.REFRESH_COMPONENT,
-        { component: mockComponent }
-      );
+      await errorHandler.executeRecoveryAction(RecoveryStrategy.REFRESH_COMPONENT, {
+        component: mockComponent,
+      });
 
       expect(mockComponent.forceUpdate).toHaveBeenCalled();
     });
 
-    it('should execute clear cache recovery', async () => {
-      await errorHandler.executeRecoveryAction(
-        RecoveryStrategy.CLEAR_CACHE,
-        { cacheKeys: ['wardrobe_cache', 'user_cache'] }
-      );
+    it('önbellek temizleme kurtarmasını yürütmeli', async () => {
+      await errorHandler.executeRecoveryAction(RecoveryStrategy.CLEAR_CACHE, {
+        cacheKeys: ['wardrobe_cache', 'user_cache'],
+      });
 
       expect(mocks.asyncStorage.removeItem).toHaveBeenCalledWith('wardrobe_cache');
       expect(mocks.asyncStorage.removeItem).toHaveBeenCalledWith('user_cache');
     });
 
-    it('should execute logout recovery', async () => {
+    it('çıkış kurtarmasını yürütmeli', async () => {
       const mockAuthService = {
         logout: jest.fn().mockResolvedValue(undefined),
       };
 
-      await errorHandler.executeRecoveryAction(
-        RecoveryStrategy.LOGOUT,
-        { authService: mockAuthService }
-      );
+      await errorHandler.executeRecoveryAction(RecoveryStrategy.LOGOUT, {
+        authService: mockAuthService,
+      });
 
       expect(mockAuthService.logout).toHaveBeenCalled();
     });
 
-    it('should handle unknown recovery strategies gracefully', async () => {
+    it('bilinmeyen kurtarma stratejilerini zarif bir şekilde işlemeli', async () => {
       await expect(
-        errorHandler.executeRecoveryAction(
-          'UNKNOWN_STRATEGY' as RecoveryStrategy,
-          {}
-        )
+        errorHandler.executeRecoveryAction('UNKNOWN_STRATEGY' as RecoveryStrategy, {}),
       ).resolves.not.toThrow();
     });
   });
 
-  describe('error categorization', () => {
-    it('should categorize network errors correctly', () => {
+  describe('hata kategorilendirme', () => {
+    it('ağ hatalarını doğru kategorilendirmeli', () => {
       const networkErrors = [
         new Error('Network request failed'),
         new Error('Connection timeout'),
@@ -283,13 +294,13 @@ describe('ErrorHandler', () => {
         new Error('ERR_NETWORK'),
       ];
 
-      networkErrors.forEach(error => {
+      networkErrors.forEach((error) => {
         const appError = errorHandler.categorizeError(error);
         expect(appError.category).toBe(ErrorCategory.NETWORK);
       });
     });
 
-    it('should categorize authentication errors correctly', () => {
+    it('kimlik doğrulama hatalarını doğru kategorilendirmeli', () => {
       const authErrors = [
         new Error('Invalid credentials'),
         new Error('Token expired'),
@@ -297,13 +308,13 @@ describe('ErrorHandler', () => {
         new Error('Authentication failed'),
       ];
 
-      authErrors.forEach(error => {
+      authErrors.forEach((error) => {
         const appError = errorHandler.categorizeError(error);
         expect(appError.category).toBe(ErrorCategory.AUTHENTICATION);
       });
     });
 
-    it('should categorize validation errors correctly', () => {
+    it('doğrulama hatalarını doğru kategorilendirmeli', () => {
       const validationErrors = [
         new Error('Required field missing'),
         new Error('Invalid email format'),
@@ -311,13 +322,13 @@ describe('ErrorHandler', () => {
         new Error('Validation failed'),
       ];
 
-      validationErrors.forEach(error => {
+      validationErrors.forEach((error) => {
         const appError = errorHandler.categorizeError(error);
         expect(appError.category).toBe(ErrorCategory.VALIDATION);
       });
     });
 
-    it('should assign appropriate severity levels', () => {
+    it('uygun önem derecesi seviyeleri atamalı', () => {
       const criticalError = new Error('Database connection lost');
       const mediumError = new Error('Image upload failed');
       const lowError = new Error('Cache miss');
@@ -328,13 +339,13 @@ describe('ErrorHandler', () => {
     });
   });
 
-  describe('error filtering and sanitization', () => {
-    it('should filter sensitive information from error context', () => {
+  describe('hata filtreleme ve temizleme', () => {
+    it('hata bağlamından hassas bilgileri filtrelemeli', () => {
       const sensitiveContext = {
         password: 'secret123',
         token: 'bearer-token',
         apiKey: 'api-key-123',
-        email: 'user@example.com',
+        email: 'user@aynamoda.app',
         userId: '12345',
       };
 
@@ -343,24 +354,24 @@ describe('ErrorHandler', () => {
         'Test message',
         ErrorSeverity.MEDIUM,
         ErrorCategory.AUTHENTICATION,
-        sensitiveContext
+        sensitiveContext,
       );
 
       expect(error.context.password).toBe('[REDACTED]');
       expect(error.context.token).toBe('[REDACTED]');
       expect(error.context.apiKey).toBe('[REDACTED]');
-      expect(error.context.email).toBe('user@example.com'); // Email should be preserved
+      expect(error.context.email).toBe('user@aynamoda.app'); // Email should be preserved
       expect(error.context.userId).toBe('12345'); // User ID should be preserved
     });
 
-    it('should sanitize error messages', () => {
+    it('hata mesajlarını temizlemeli', () => {
       const sensitiveMessage = 'Authentication failed for user secret123 with token bearer-xyz';
-      
+
       const error = errorHandler.createError(
         'AUTH_ERROR',
         sensitiveMessage,
         ErrorSeverity.HIGH,
-        ErrorCategory.AUTHENTICATION
+        ErrorCategory.AUTHENTICATION,
       );
 
       expect(error.message).not.toContain('secret123');
@@ -368,8 +379,8 @@ describe('ErrorHandler', () => {
     });
   });
 
-  describe('error statistics and monitoring', () => {
-    it('should track error frequency', async () => {
+  describe('hata istatistikleri ve izleme', () => {
+    it('hata sıklığını takip etmeli', async () => {
       const errors = [
         createMockError({ code: 'NETWORK_ERROR' }),
         createMockError({ code: 'NETWORK_ERROR' }),
@@ -385,21 +396,21 @@ describe('ErrorHandler', () => {
       expect(stats.errorCounts.AUTH_ERROR).toBe(1);
     });
 
-    it('should track error trends over time', async () => {
+    it('zaman içindeki hata eğilimlerini takip etmeli', async () => {
       const error = createMockError();
-      
+
       await errorHandler.handleError(error);
-      
+
       const stats = errorHandler.getErrorStatistics();
       expect(stats.totalErrors).toBe(1);
       expect(stats.recentErrors).toContain(error.code);
     });
 
-    it('should identify error patterns', async () => {
+    it('hata kalıplarını tanımlamalı', async () => {
       // Simulate rapid succession of same error
-      const rapidErrors = Array(5).fill(null).map(() => 
-        createMockError({ code: 'RAPID_ERROR' })
-      );
+      const rapidErrors = Array(5)
+        .fill(null)
+        .map(() => createMockError({ code: 'RAPID_ERROR' }));
 
       for (const error of rapidErrors) {
         await errorHandler.handleError(error);
@@ -410,19 +421,19 @@ describe('ErrorHandler', () => {
     });
   });
 
-  describe('configuration and customization', () => {
-    it('should allow custom error handlers', () => {
+  describe('yapılandırma ve özelleştirme', () => {
+    it('özel hata işleyicilerine izin vermeli', () => {
       const customHandler = jest.fn();
-      
+
       errorHandler.setCustomHandler(ErrorCategory.AI_SERVICE, customHandler);
-      
+
       const aiError = createMockError({ category: ErrorCategory.AI_SERVICE });
       errorHandler.handleError(aiError);
 
       expect(customHandler).toHaveBeenCalledWith(aiError);
     });
 
-    it('should allow configuration updates', () => {
+    it('yapılandırma güncellemelerine izin vermeli', () => {
       const newConfig = {
         enableReporting: false,
         maxQueueSize: 200,
@@ -430,54 +441,54 @@ describe('ErrorHandler', () => {
       };
 
       errorHandler.updateConfig(newConfig);
-      
+
       const config = errorHandler.getConfig();
       expect(config.enableReporting).toBe(false);
       expect(config.maxQueueSize).toBe(200);
       expect(config.throttleWindow).toBe(10000);
     });
 
-    it('should support custom recovery strategies', async () => {
+    it('özel kurtarma stratejilerini desteklemeli', async () => {
       const customRecovery = jest.fn().mockResolvedValue(undefined);
-      
+
       errorHandler.registerRecoveryStrategy('CUSTOM_RECOVERY', customRecovery);
-      
+
       await errorHandler.executeRecoveryAction('CUSTOM_RECOVERY' as RecoveryStrategy, {});
-      
+
       expect(customRecovery).toHaveBeenCalled();
     });
   });
 
-  describe('wellness and accessibility', () => {
-    it('should provide calming error messages for wellness mode', () => {
+  describe('sağlık ve erişilebilirlik', () => {
+    it('sağlık modu için sakinleştirici hata mesajları sağlamalı', () => {
       errorHandler.updateConfig({ wellnessMode: true });
-      
+
       const error = errorHandler.createError(
         'NETWORK_ERROR',
         'Connection failed',
         ErrorSeverity.HIGH,
-        ErrorCategory.NETWORK
+        ErrorCategory.NETWORK,
       );
 
       expect(error.userMessage).toMatch(/gentle|moment|breathe|okay/);
     });
 
-    it('should support accessibility-friendly error reporting', () => {
+    it('erişilebilirlik dostu hata raporlamasını desteklemeli', () => {
       errorHandler.updateConfig({ accessibilityMode: true });
-      
+
       const error = createMockError();
-      
+
       expect(error.userMessage).toBeDefined();
       expect(error.userMessage.length).toBeGreaterThan(10); // Descriptive message
     });
 
-    it('should provide error context for screen readers', () => {
+    it('ekran okuyucular için hata bağlamı sağlamalı', () => {
       const error = errorHandler.createError(
         'FORM_ERROR',
         'Validation failed',
         ErrorSeverity.MEDIUM,
         ErrorCategory.VALIDATION,
-        { fieldName: 'email' }
+        { fieldName: 'email' },
       );
 
       expect(error.accessibilityLabel).toContain('email');

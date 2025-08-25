@@ -1,25 +1,27 @@
 /**
  * Standardized Button Component
- * 
+ *
  * A reusable button component that follows AYNAMODA's design system
  * and implements the standardized ButtonComponentProps interface.
  */
 
-import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  ViewStyle,
-  TextStyle,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ButtonComponentProps, DEFAULT_PROPS, validateRequiredProps } from '@/types/componentProps';
+import React from 'react';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+import { ButtonComponentProps, DEFAULT_PROPS } from '@/types/componentProps';
+import { warnInDev } from '@/utils/consoleSuppress';
 
 export interface StandardButtonProps extends ButtonComponentProps {
   /** Button gradient colors for luxury variants */
@@ -51,13 +53,15 @@ const StandardButton: React.FC<StandardButtonProps> = ({
   // Validate required props
   React.useEffect(() => {
     if (!title && !children) {
-      console.warn('StandardButton: Either title or children prop is required');
+      warnInDev('StandardButton: Either title or children prop is required');
     }
   }, [title, children]);
 
   const handlePress = () => {
-    if (disabled || loading) return;
-    
+    if (disabled || loading) {
+      return;
+    }
+
     // Provide haptic feedback
     if (hapticFeedback !== 'none') {
       switch (hapticFeedback) {
@@ -72,7 +76,7 @@ const StandardButton: React.FC<StandardButtonProps> = ({
           break;
       }
     }
-    
+
     onPress?.();
   };
 
@@ -131,15 +135,11 @@ const StandardButton: React.FC<StandardButtonProps> = ({
     if (loading) {
       return (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator 
-            size={size === 'small' ? 'small' : 'large'} 
-            color={variant === 'primary' ? '#FFFFFF' : DesignSystem.colors.sage[500]} 
+          <ActivityIndicator
+            size={size === 'small' ? 'small' : 'large'}
+            color={variant === 'primary' ? '#FFFFFF' : DesignSystem.colors.sage[500]}
           />
-          {title && (
-            <Text style={[getTextStyles(), textStyle, styles.loadingText]}>
-              {title}
-            </Text>
-          )}
+          {title && <Text style={[getTextStyles(), textStyle, styles.loadingText]}>{title}</Text>}
         </View>
       );
     }
@@ -154,13 +154,9 @@ const StandardButton: React.FC<StandardButtonProps> = ({
             style={styles.iconLeft}
           />
         )}
-        
-        {children || (
-          <Text style={[getTextStyles(), textStyle]}>
-            {title}
-          </Text>
-        )}
-        
+
+        {children || <Text style={[getTextStyles(), textStyle]}>{title}</Text>}
+
         {icon && iconPosition === 'right' && (
           <Ionicons
             name={icon}
@@ -175,10 +171,10 @@ const StandardButton: React.FC<StandardButtonProps> = ({
 
   const buttonStyle = [getButtonStyles(), style];
   const shouldUseGradient = variant === 'luxury' || gradientColors;
-  const finalGradientColors = (gradientColors ?? [
+  const finalGradientColors = gradientColors ?? [
     DesignSystem.colors.sage[500],
     DesignSystem.colors.sage[600],
-  ]) as readonly [string, string, ...string[]];
+  ];
 
   if (shouldUseGradient) {
     return (
@@ -192,10 +188,7 @@ const StandardButton: React.FC<StandardButtonProps> = ({
         accessibilityState={{ disabled: disabled || loading }}
         {...props}
       >
-        <LinearGradient
-          colors={finalGradientColors}
-          style={styles.gradientContainer}
-        >
+        <LinearGradient colors={finalGradientColors} style={styles.gradientContainer}>
           {renderContent()}
         </LinearGradient>
       </TouchableOpacity>
@@ -220,55 +213,80 @@ const StandardButton: React.FC<StandardButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: DesignSystem.radius.md,
     alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: DesignSystem.radius.md,
     flexDirection: 'row',
-  },
-  button_small: {
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
-    minHeight: 36,
-  },
-  button_medium: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    minHeight: 44,
+    justifyContent: 'center',
   },
   button_large: {
+    minHeight: 52,
     paddingHorizontal: DesignSystem.spacing.xl,
     paddingVertical: DesignSystem.spacing.lg,
-    minHeight: 52,
   },
-  fullWidth: {
-    width: '100%',
+  button_medium: {
+    minHeight: 44,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
+  },
+  button_small: {
+    minHeight: 36,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.sm,
+  },
+  contentContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   disabled: {
     opacity: 0.5,
   },
-  primary: {
-    backgroundColor: DesignSystem.colors.sage[500],
-  },
-  secondary: {
-    backgroundColor: DesignSystem.colors.background.secondary,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.primary,
+  fullWidth: {
+    width: '100%',
   },
   ghost: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
     borderColor: DesignSystem.colors.sage[500],
+    borderWidth: 1,
   },
   glass: {
     backgroundColor: DesignSystem.colors.background.glass,
-    borderWidth: 1,
     borderColor: DesignSystem.colors.border.glass,
+    borderWidth: 1,
+  },
+  gradientContainer: {
+    alignItems: 'center',
+    borderRadius: DesignSystem.radius.md,
+    flex: 1,
+    justifyContent: 'center',
+  },
+  iconLeft: {
+    marginRight: DesignSystem.spacing.sm,
+  },
+  iconRight: {
+    marginLeft: DesignSystem.spacing.sm,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginLeft: DesignSystem.spacing.sm,
   },
   luxury: {
     backgroundColor: 'transparent',
   },
   minimal: {
     backgroundColor: 'transparent',
+  },
+  primary: {
+    backgroundColor: DesignSystem.colors.sage[500],
+  },
+  secondary: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderColor: DesignSystem.colors.border.primary,
+    borderWidth: 1,
   },
   shadow: {
     ...DesignSystem.elevation.soft,
@@ -277,23 +295,8 @@ const styles = StyleSheet.create({
     ...DesignSystem.typography.button.medium,
     textAlign: 'center',
   },
-  text_small: {
-    ...DesignSystem.typography.button.small,
-  },
-  text_medium: {
-    ...DesignSystem.typography.button.medium,
-  },
-  text_large: {
-    ...DesignSystem.typography.button.large,
-  },
   textDisabled: {
     opacity: 0.6,
-  },
-  textPrimary: {
-    color: DesignSystem.colors.text.inverse,
-  },
-  textSecondary: {
-    color: DesignSystem.colors.text.primary,
   },
   textGhost: {
     color: DesignSystem.colors.sage[500],
@@ -307,30 +310,20 @@ const styles = StyleSheet.create({
   textMinimal: {
     color: DesignSystem.colors.text.primary,
   },
-  contentContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  textPrimary: {
+    color: DesignSystem.colors.text.inverse,
   },
-  loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  textSecondary: {
+    color: DesignSystem.colors.text.primary,
   },
-  loadingText: {
-    marginLeft: DesignSystem.spacing.sm,
+  text_large: {
+    ...DesignSystem.typography.button.large,
   },
-  iconLeft: {
-    marginRight: DesignSystem.spacing.sm,
+  text_medium: {
+    ...DesignSystem.typography.button.medium,
   },
-  iconRight: {
-    marginLeft: DesignSystem.spacing.sm,
-  },
-  gradientContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: DesignSystem.radius.md,
+  text_small: {
+    ...DesignSystem.typography.button.small,
   },
 });
 

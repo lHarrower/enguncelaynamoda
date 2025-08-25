@@ -1,12 +1,12 @@
 // Auth Container Component
 import React from 'react';
 import {
-  View,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  View,
 } from 'react-native';
 
 export interface AuthContainerProps {
@@ -14,10 +14,7 @@ export interface AuthContainerProps {
   showHeader?: boolean;
 }
 
-const AuthContainer: React.FC<AuthContainerProps> = ({
-  children,
-  showHeader = true,
-}) => {
+const AuthContainer: React.FC<AuthContainerProps> = ({ children, showHeader = true }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
@@ -30,9 +27,7 @@ const AuthContainer: React.FC<AuthContainerProps> = ({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.content}>
-            {children}
-          </View>
+          <View style={styles.content}>{children}</View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -40,23 +35,23 @@ const AuthContainer: React.FC<AuthContainerProps> = ({
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
   container: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    minHeight: '100%',
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 32,
+  },
+  safeArea: {
+    backgroundColor: '#F9FAFB',
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    minHeight: '100%',
   },
 });
 

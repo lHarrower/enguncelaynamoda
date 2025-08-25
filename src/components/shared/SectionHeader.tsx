@@ -1,13 +1,9 @@
 // src/components/shared/SectionHeader.tsx
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 interface SectionHeaderProps {
@@ -32,20 +28,16 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       <View style={styles.content}>
         <View style={styles.textContainer}>
           <Text style={styles.title}>{title}</Text>
-          {subtitle && (
-            <Text style={styles.subtitle}>{subtitle}</Text>
-          )}
+          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
         </View>
-        
+
         {(actionText || onActionPress) && (
           <TouchableOpacity
             style={styles.actionButton}
             onPress={onActionPress}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            {actionText && (
-              <Text style={styles.actionText}>{actionText}</Text>
-            )}
+            {actionText && <Text style={styles.actionText}>{actionText}</Text>}
             {showArrow && (
               <Ionicons
                 name="chevron-forward"
@@ -62,14 +54,33 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
 };
 
 const styles = StyleSheet.create({
+  actionButton: {
+    alignItems: 'center',
+    borderRadius: DesignSystem.radius.sm,
+    flexDirection: 'row',
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
+  },
+  actionIcon: {
+    marginLeft: DesignSystem.spacing.xs,
+  },
+  actionText: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.sage[600],
+    fontWeight: '500',
+  },
   container: {
-    paddingHorizontal: DesignSystem.spacing.xl,
     marginBottom: DesignSystem.spacing.lg,
+    paddingHorizontal: DesignSystem.spacing.xl,
   },
   content: {
+    alignItems: 'flex-start',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+  },
+  subtitle: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
   },
   textContainer: {
     flex: 1,
@@ -79,25 +90,6 @@ const styles = StyleSheet.create({
     ...DesignSystem.typography.scale.h2,
     color: DesignSystem.colors.text.primary,
     marginBottom: 4,
-  },
-  subtitle: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.secondary,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: DesignSystem.spacing.xs,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    borderRadius: DesignSystem.radius.sm,
-  },
-  actionText: {
-  ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.sage[600],
-    fontWeight: '500',
-  },
-  actionIcon: {
-    marginLeft: DesignSystem.spacing.xs,
   },
 });
 

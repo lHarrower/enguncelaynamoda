@@ -1,30 +1,30 @@
 // Discovery Engine - The New Paradigm for Interaction
 // Tinder-style swipe mechanism with intelligent learning algorithm
 
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  ScrollView,
-  Modal,
-  Image,
-} from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
-  runOnJS,
-} from 'react-native-reanimated';
-import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import React, { useRef, useState } from 'react';
+import {
+  Dimensions,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 import SwipeableCard from '@/components/discovery/SwipeableCard';
 import PremiumOutfitCard from '@/components/studio/PremiumOutfitCard';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 
@@ -46,7 +46,7 @@ interface DiscoveryEngineProps {
   onLike: (item: ProductItem) => void;
   onDislike: (item: ProductItem) => void;
   onBoutiqueFavorite?: (boutique: string) => void;
-  style?: any;
+  style?: Record<string, unknown>;
 }
 
 const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
@@ -85,11 +85,11 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
   const handleSwipeRight = (item: ProductItem) => {
     const actionData = { type: 'like' as const, item, index: currentIndex };
     setLastAction(actionData);
-    setRecentlyLiked(prev => [item, ...prev.slice(0, 9)]); // Keep last 10
-    
+    setRecentlyLiked((prev) => [item, ...prev.slice(0, 9)]); // Keep last 10
+
     // Check for boutique favorite logic
     checkBoutiqueFavorite(item.boutique);
-    
+
     onLike(item);
     showUndoButton();
     nextCard();
@@ -99,7 +99,7 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
   const handleSwipeLeft = (item: ProductItem) => {
     const actionData = { type: 'dislike' as const, item, index: currentIndex };
     setLastAction(actionData);
-    
+
     onDislike(item);
     showUndoButton();
     nextCard();
@@ -119,10 +119,12 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
     setShowUndo(true);
     undoOpacity.value = withTiming(1, { duration: 300 });
     undoTranslateY.value = withSpring(0);
-    
+
     // Auto-hide after 3 seconds
-    if (undoTimer.current) clearTimeout(undoTimer.current);
-  undoTimer.current = setTimeout(() => {
+    if (undoTimer.current) {
+      clearTimeout(undoTimer.current);
+    }
+    undoTimer.current = setTimeout(() => {
       hideUndoButton();
     }, 3000);
   };
@@ -137,18 +139,20 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
 
   // Handle undo action
   const handleUndo = () => {
-    if (!lastAction) return;
-    
+    if (!lastAction) {
+      return;
+    }
+
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
+
     // Restore previous state
     setCurrentIndex(lastAction.index);
-    
+
     // Remove from recently liked if it was a like
     if (lastAction.type === 'like') {
-      setRecentlyLiked(prev => prev.filter(item => item.id !== lastAction.item.id));
+      setRecentlyLiked((prev) => prev.filter((item) => item.id !== lastAction.item.id));
     }
-    
+
     setLastAction(null);
     hideUndoButton();
   };
@@ -156,14 +160,14 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
   // Move to next card
   const nextCard = () => {
     if (currentIndex < items.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
     }
   };
 
   // Check if user should be prompted to favorite a boutique
   const checkBoutiqueFavorite = (boutique: string) => {
-    const boutiqueCount = recentlyLiked.filter(item => item.boutique === boutique).length + 1;
-    
+    const boutiqueCount = recentlyLiked.filter((item) => item.boutique === boutique).length + 1;
+
     if (boutiqueCount === 5) {
       setBoutiqueNotification({ boutique, count: boutiqueCount });
       setTimeout(() => setBoutiqueNotification(null), 5000);
@@ -173,19 +177,28 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
   // Generate similar items (mock function)
   const generateSimilarItems = (item: ProductItem): ProductItem[] => {
     // In real app, this would use ML/AI to find similar items
-    return items.filter(i => 
-      i.id !== item.id && 
-      (i.category === item.category || 
-       i.brand === item.brand ||
-       i.colors.some(color => item.colors.includes(color)))
-    ).slice(0, 6);
+    return items
+      .filter(
+        (i) =>
+          i.id !== item.id &&
+          (i.category === item.category ||
+            i.brand === item.brand ||
+            i.colors.some((color) => item.colors.includes(color))),
+      )
+      .slice(0, 6);
   };
 
   // Handle scroll to bottom - show favorites bar
-  const handleScrollEnd = (event: any) => {
+  const handleScrollEnd = (event: {
+    nativeEvent: {
+      contentOffset: { y: number };
+      contentSize: { height: number };
+      layoutMeasurement: { height: number };
+    };
+  }) => {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
     const isAtBottom = contentOffset.y >= contentSize.height - layoutMeasurement.height - 50;
-    
+
     if (isAtBottom && recentlyLiked.length > 0) {
       setShowFavoritesBar(true);
       favoritesBarTranslateY.value = withSpring(0);
@@ -211,11 +224,16 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
   });
 
   const currentItem = items[currentIndex];
+  const nextItem = items.length > currentIndex + 1 ? items[currentIndex + 1] : undefined;
 
   if (!currentItem) {
     return (
       <View style={[styles.container, styles.emptyContainer]}>
-        <Ionicons name="checkmark-circle" size={64} color={DesignSystem.colors.sage[500]} />
+        <Ionicons
+          name="checkmark-circle"
+          size={64}
+          color={DesignSystem.colors.sage?.[500] || '#2ECC71'}
+        />
         <Text style={styles.emptyTitle}>All caught up!</Text>
         <Text style={styles.emptySubtitle}>Check back later for new discoveries</Text>
       </View>
@@ -241,10 +259,10 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
         </View>
 
         {/* Next Card Preview */}
-        {items[currentIndex + 1] && (
+        {nextItem && (
           <View style={styles.nextCardPreview}>
             <SwipeableCard
-              item={items[currentIndex + 1]}
+              item={nextItem}
               onSwipeLeft={() => {}}
               onSwipeRight={() => {}}
               onLongPress={() => {}}
@@ -257,7 +275,13 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
       {/* Undo Button */}
       {showUndo && (
         <Animated.View style={[styles.undoContainer, undoStyle]}>
-          <TouchableOpacity style={styles.undoButton} onPress={handleUndo}>
+          <TouchableOpacity
+            style={styles.undoButton}
+            onPress={handleUndo}
+            accessibilityRole="button"
+            accessibilityLabel="Undo last action"
+            accessibilityHint="Undo the last swipe action and restore the previous item"
+          >
             <Ionicons name="arrow-undo" size={20} color={DesignSystem.colors.text.inverse} />
             <Text style={styles.undoText}>Undo</Text>
           </TouchableOpacity>
@@ -283,7 +307,7 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
         <View style={styles.notificationContainer}>
           <View style={styles.notification}>
             <Text style={styles.notificationText}>
-              You've loved {boutiqueNotification.count} pieces from {boutiqueNotification.boutique}
+              You&apos;ve loved {boutiqueNotification.count} pieces from {boutiqueNotification.boutique}
             </Text>
             <View style={styles.notificationActions}>
               <TouchableOpacity
@@ -323,7 +347,7 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
               <Ionicons name="close" size={24} color={DesignSystem.colors.text.primary} />
             </TouchableOpacity>
           </View>
-          
+
           {selectedItem && (
             <View style={styles.selectedItemContainer}>
               <Image source={{ uri: selectedItem.image }} style={styles.selectedItemImage} />
@@ -333,7 +357,7 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
               </View>
             </View>
           )}
-          
+
           <ScrollView style={styles.similarItemsContainer}>
             <View style={styles.similarItemsGrid}>
               {similarItems.map((item) => (
@@ -360,8 +384,8 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: DesignSystem.colors.background.primary,
+    flex: 1,
   },
   scrollView: {
     flex: 1,
@@ -382,60 +406,60 @@ const styles = StyleSheet.create({
     opacity: 0.5,
     transform: [{ scale: 0.95 }],
   },
-  
+
   // Empty State
   emptyContainer: {
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   emptyTitle: {
     ...DesignSystem.typography.scale.h2,
     color: DesignSystem.colors.text.primary,
-    marginTop: 16,
     marginBottom: 8,
+    marginTop: 16,
   },
   emptySubtitle: {
-  ...DesignSystem.typography.body.medium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
   },
-  
+
   // Undo Button
   undoContainer: {
-    position: 'absolute',
+    alignItems: 'center',
     bottom: 100,
     left: 0,
+    position: 'absolute',
     right: 0,
-    alignItems: 'center',
   },
   undoButton: {
-    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: DesignSystem.colors.text.primary,
+    borderRadius: 25,
+    flexDirection: 'row',
     paddingHorizontal: 20,
     paddingVertical: 12,
-    borderRadius: 25,
     ...DesignSystem.elevation.medium,
   },
   undoText: {
-  ...DesignSystem.typography.body.medium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.inverse,
     marginLeft: 8,
   },
-  
+
   // Favorites Bar
   favoritesBar: {
-    position: 'absolute',
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderTopColor: DesignSystem.colors.border.secondary,
+    borderTopWidth: 1,
     bottom: 0,
     left: 0,
-    right: 0,
-    backgroundColor: DesignSystem.colors.background.elevated,
     padding: 16,
-    borderTopWidth: 1,
-  borderTopColor: DesignSystem.colors.border.secondary,
+    position: 'absolute',
+    right: 0,
   },
   favoritesTitle: {
-  ...DesignSystem.typography.body.medium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     marginBottom: 12,
   },
@@ -443,27 +467,27 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   favoriteImage: {
-    width: 60,
-    height: 60,
     borderRadius: 8,
+    height: 60,
+    width: 60,
   },
-  
+
   // Notification
   notificationContainer: {
-    position: 'absolute',
-    top: 60,
     left: 20,
+    position: 'absolute',
     right: 20,
+    top: 60,
     zIndex: 1000,
   },
   notification: {
     backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 16,
     padding: 16,
-  ...DesignSystem.elevation.high,
+    ...DesignSystem.elevation.high,
   },
   notificationText: {
-  ...DesignSystem.typography.body.medium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
     marginBottom: 12,
   },
@@ -472,17 +496,17 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   notificationButton: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.sage[500],
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
     alignItems: 'center',
+    backgroundColor: DesignSystem.colors.sage[500],
+    borderRadius: 8,
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   notificationButtonSecondary: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
     borderColor: DesignSystem.colors.sage[500],
+    borderWidth: 1,
   },
   notificationButtonText: {
     ...DesignSystem.typography.scale.caption,
@@ -494,19 +518,19 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.sage[500],
     fontWeight: '600',
   },
-  
+
   // Similar Items Modal
   modalContainer: {
-    flex: 1,
     backgroundColor: DesignSystem.colors.background.primary,
+    flex: 1,
   },
   modalHeader: {
+    alignItems: 'center',
+    borderBottomColor: DesignSystem.colors.border.secondary,
+    borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 20,
-    borderBottomWidth: 1,
-  borderBottomColor: DesignSystem.colors.border.secondary,
   },
   modalTitle: {
     ...DesignSystem.typography.scale.h2,
@@ -516,15 +540,15 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   selectedItemContainer: {
+    backgroundColor: DesignSystem.colors.background.secondary,
     flexDirection: 'row',
     padding: 20,
-    backgroundColor: DesignSystem.colors.background.secondary,
   },
   selectedItemImage: {
-    width: 80,
-    height: 80,
     borderRadius: 8,
+    height: 80,
     marginRight: 16,
+    width: 80,
   },
   selectedItemInfo: {
     flex: 1,
@@ -536,7 +560,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   selectedItemTitle: {
-  ...DesignSystem.typography.body.medium,
+    ...DesignSystem.typography.body.medium,
     color: DesignSystem.colors.text.primary,
   },
   similarItemsContainer: {

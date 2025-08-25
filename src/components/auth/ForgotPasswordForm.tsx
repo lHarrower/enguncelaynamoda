@@ -1,14 +1,15 @@
 // Forgot Password Form Component
 import React, { useState } from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
+  View,
 } from 'react-native';
+
 import { supabase } from '@/config/supabaseClient';
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 
@@ -17,42 +18,37 @@ export interface ForgotPasswordFormProps {
   onSuccess?: () => void;
 }
 
-const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
-  onBack,
-  onSuccess,
-}) => {
+const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBack, onSuccess }) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { triggerSuccess, triggerError } = useHapticFeedback();
 
   const handleResetPassword = async () => {
     if (!email.trim()) {
       Alert.alert('Error', 'Please enter your email address');
-      triggerError();
+      void triggerError();
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: 'ayna://reset-password',
       });
-      
+
       if (error) {
-        triggerError();
+        void triggerError();
         Alert.alert('Error', error.message);
       } else {
-        triggerSuccess();
-        Alert.alert(
-          'Reset Link Sent',
-          'Please check your email for password reset instructions.',
-          [{ text: 'OK', onPress: onSuccess }]
-        );
+        void triggerSuccess();
+        Alert.alert('Reset Link Sent', 'Please check your email for password reset instructions.', [
+          { text: 'OK', onPress: onSuccess },
+        ]);
       }
     } catch (error) {
-      triggerError();
+      void triggerError();
       Alert.alert('Error', 'An unexpected error occurred');
     } finally {
       setIsLoading(false);
@@ -64,9 +60,9 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
       <View style={styles.form}>
         <Text style={styles.title}>Reset Password</Text>
         <Text style={styles.subtitle}>
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email address and we&apos;ll send you a link to reset your password.
         </Text>
-        
+
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Email</Text>
           <TextInput
@@ -78,13 +74,19 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
             autoCapitalize="none"
             autoCorrect={false}
             editable={!isLoading}
+            accessibilityLabel="Email address"
+            accessibilityHint="Enter your email address to reset password"
           />
         </View>
-        
+
         <TouchableOpacity
           style={[styles.resetButton, isLoading && styles.resetButtonDisabled]}
-          onPress={handleResetPassword}
+          onPress={() => void handleResetPassword()}
           disabled={isLoading}
+          accessibilityRole="button"
+          accessibilityLabel="Send reset link"
+          accessibilityHint="Tap to send a password reset link to your email"
+          accessibilityState={{ disabled: isLoading }}
         >
           {isLoading ? (
             <ActivityIndicator color="#FFFFFF" />
@@ -92,11 +94,15 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
             <Text style={styles.resetButtonText}>Send Reset Link</Text>
           )}
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={styles.backButton}
           onPress={onBack}
           disabled={isLoading}
+          accessibilityRole="button"
+          accessibilityLabel="Back to sign in"
+          accessibilityHint="Tap to return to the sign in screen"
+          accessibilityState={{ disabled: isLoading }}
         >
           <Text style={styles.backButtonText}>Back to Sign In</Text>
         </TouchableOpacity>
@@ -106,6 +112,15 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
 };
 
 const styles = StyleSheet.create({
+  backButton: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  backButtonText: {
+    color: '#3B82F6',
+    fontSize: 14,
+    fontWeight: '500',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -114,44 +129,30 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 8,
-    color: '#1F2937',
-  },
-  subtitle: {
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    borderWidth: 1,
     fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 32,
-    color: '#6B7280',
-    lineHeight: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   inputContainer: {
     marginBottom: 24,
   },
   label: {
+    color: '#374151',
     fontSize: 14,
     fontWeight: '500',
     marginBottom: 8,
-    color: '#374151',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: '#FFFFFF',
   },
   resetButton: {
+    alignItems: 'center',
     backgroundColor: '#3B82F6',
     borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: 'center',
     marginBottom: 16,
+    paddingVertical: 16,
   },
   resetButtonDisabled: {
     backgroundColor: '#9CA3AF',
@@ -161,14 +162,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  backButton: {
-    alignItems: 'center',
-    paddingVertical: 12,
+  subtitle: {
+    color: '#6B7280',
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 32,
+    textAlign: 'center',
   },
-  backButtonText: {
-    fontSize: 14,
-    color: '#3B82F6',
-    fontWeight: '500',
+  title: {
+    color: '#1F2937',
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
   },
 });
 

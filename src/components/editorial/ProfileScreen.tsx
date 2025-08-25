@@ -1,18 +1,27 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   SafeAreaView,
-  StatusBar,
   ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+
 import { DesignSystem } from '../../theme/DesignSystem';
 
+type IoniconsName = keyof typeof Ionicons.glyphMap;
+
+interface ProfileOption {
+  id: string;
+  label: string;
+  icon: IoniconsName;
+}
+
 export const ProfileScreen: React.FC = () => {
-  const profileOptions = [
+  const profileOptions: ProfileOption[] = [
     { id: 'preferences', label: 'Style Preferences', icon: 'heart-outline' },
     { id: 'saved', label: 'Saved Items', icon: 'bookmark-outline' },
     { id: 'orders', label: 'Order History', icon: 'bag-outline' },
@@ -23,7 +32,7 @@ export const ProfileScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
+
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <View style={styles.avatar}>
@@ -35,14 +44,16 @@ export const ProfileScreen: React.FC = () => {
 
         <View style={styles.optionsContainer}>
           {profileOptions.map((option) => (
-            <TouchableOpacity key={option.id} style={styles.optionItem}>
+            <TouchableOpacity
+              key={option.id}
+              style={styles.optionItem}
+              accessibilityRole="button"
+              accessibilityLabel={option.label}
+              accessibilityHint={`Navigate to ${option.label} section`}
+            >
               <View style={styles.optionLeft}>
                 <View style={styles.optionIcon}>
-                  <Ionicons
-                    name={option.icon as any}
-                    size={20}
-                    color={DesignSystem.colors.lilac[600]}
-                  />
+                  <Ionicons name={option.icon} size={20} color={DesignSystem.colors.lilac[600]} />
                 </View>
                 <Text style={styles.optionLabel}>{option.label}</Text>
               </View>
@@ -60,77 +71,77 @@ export const ProfileScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
+  avatar: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.lilac[100],
+    borderRadius: 40,
+    height: 80,
+    justifyContent: 'center',
+    marginBottom: 16,
+    width: 80,
   },
-  scrollView: {
+  avatarText: {
+    color: DesignSystem.colors.lilac[600],
+    fontFamily: DesignSystem.typography.fontFamily.serif,
+    fontSize: DesignSystem.typography.scale.h2.fontSize,
+  },
+  container: {
+    backgroundColor: DesignSystem.colors.background.primary,
     flex: 1,
   },
   content: {
     flexGrow: 1,
   },
   header: {
+    alignItems: 'center',
+    paddingBottom: 40,
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingTop: 20,
-    paddingBottom: 40,
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: DesignSystem.colors.lilac[100],
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  avatarText: {
-    fontSize: DesignSystem.typography.scale.h2.fontSize,
-  fontFamily: DesignSystem.typography.fontFamily.serif,
-    color: DesignSystem.colors.lilac[600],
   },
   name: {
-    fontSize: DesignSystem.typography.scale.h1.fontSize,
-  fontFamily: DesignSystem.typography.fontFamily.serif,
     color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.serif,
+    fontSize: DesignSystem.typography.scale.h1.fontSize,
     marginBottom: 4,
   },
-  subtitle: {
+  optionIcon: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.lilac[50],
+    borderRadius: 20,
+    height: 40,
+    justifyContent: 'center',
+    marginRight: 16,
+    width: 40,
+  },
+  optionItem: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderRadius: DesignSystem.radius.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    ...DesignSystem.elevation.soft,
+  },
+  optionLabel: {
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.sans,
     fontSize: DesignSystem.typography.scale.body1.fontSize,
-  fontFamily: DesignSystem.typography.fontFamily.sans,
-    color: DesignSystem.colors.text.secondary,
+  },
+  optionLeft: {
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   optionsContainer: {
     paddingHorizontal: DesignSystem.spacing.lg,
   },
-  optionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    backgroundColor: DesignSystem.colors.background.secondary,
-    borderRadius: DesignSystem.radius.lg,
-    marginBottom: 12,
-  ...DesignSystem.elevation.soft,
+  scrollView: {
+    flex: 1,
   },
-  optionLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  optionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: DesignSystem.colors.lilac[50],
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  optionLabel: {
+  subtitle: {
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.sans,
     fontSize: DesignSystem.typography.scale.body1.fontSize,
-  fontFamily: DesignSystem.typography.fontFamily.sans,
-    color: DesignSystem.colors.text.primary,
   },
 });

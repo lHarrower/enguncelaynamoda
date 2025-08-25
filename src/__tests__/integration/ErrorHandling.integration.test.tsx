@@ -14,6 +14,18 @@ jest.mock('../../utils/ErrorHandler');
 jest.mock('@react-native-async-storage/async-storage', () => mocks.asyncStorage);
 jest.mock('react-native-haptic-feedback', () => mocks.hapticFeedback);
 
+// Ensure global mocks are initialized
+if (!global.mocks) {
+  global.mocks = {
+    asyncStorage: {
+      getItem: jest.fn(),
+      setItem: jest.fn(),
+      removeItem: jest.fn(),
+    },
+    hapticFeedback: jest.fn(),
+  };
+}
+
 // Test component that uses error context
 const ErrorTestComponent = ({ shouldThrow = false }: { shouldThrow?: boolean }) => {
   const { reportError, clearError } = useErrorContext();
@@ -55,21 +67,9 @@ const ErrorTestComponent = ({ shouldThrow = false }: { shouldThrow?: boolean }) 
   return (
     <View testID="error-test-component">
       <Text>Error Test Component</Text>
-      <Button
-        testID="async-error-button"
-        title="Trigger Async Error"
-        onPress={handleAsyncError}
-      />
-      <Button
-        testID="sync-error-button"
-        title="Trigger Sync Error"
-        onPress={handleSyncError}
-      />
-      <Button
-        testID="clear-error-button"
-        title="Clear Error"
-        onPress={() => clearError()}
-      />
+      <Button testID="async-error-button" title="Trigger Async Error" onPress={handleAsyncError} />
+      <Button testID="sync-error-button" title="Trigger Sync Error" onPress={handleSyncError} />
+      <Button testID="clear-error-button" title="Clear Error" onPress={() => clearError()} />
     </View>
   );
 };
@@ -103,7 +103,9 @@ const TestApp = ({ shouldThrow = false }: { shouldThrow?: boolean }) => (
 );
 
 describe('Error Handling Integration', () => {
-  const mockErrorHandler = ErrorHandler.getInstance as jest.MockedFunction<typeof ErrorHandler.getInstance>;
+  const mockErrorHandler = ErrorHandler.getInstance as jest.MockedFunction<
+    typeof ErrorHandler.getInstance
+  >;
   const mockHandleError = jest.fn();
   const mockGetRecoveryStrategy = jest.fn();
   const mockClearErrors = jest.fn();
@@ -111,7 +113,7 @@ describe('Error Handling Integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
-    
+
     mockErrorHandler.mockReturnValue({
       handleError: mockHandleError,
       getRecoveryStrategy: mockGetRecoveryStrategy,
@@ -141,9 +143,7 @@ describe('Error Handling Integration', () => {
 
   describe('complete error flow', () => {
     it('should handle component render errors through ErrorBoundary', () => {
-      const { getByTestId, getByText } = renderWithProviders(
-        <TestApp shouldThrow={true} />
-      );
+      const { getByTestId, getByText } = renderWithProviders(<TestApp shouldThrow={true} />);
 
       // Should show error boundary UI
       expect(getByTestId('error-boundary-container')).toBeTruthy();
@@ -156,7 +156,7 @@ describe('Error Handling Integration', () => {
         }),
         expect.objectContaining({
           component: 'ErrorBoundary',
-        })
+        }),
       );
     });
 
@@ -190,7 +190,7 @@ describe('Error Handling Integration', () => {
         expect.objectContaining({
           component: 'ErrorTestComponent',
           action: 'handleSyncError',
-        })
+        }),
       );
     });
 
@@ -209,9 +209,7 @@ describe('Error Handling Integration', () => {
 
   describe('error recovery and retry', () => {
     it('should recover from ErrorBoundary errors', async () => {
-      const { getByTestId, rerender } = renderWithProviders(
-        <TestApp shouldThrow={true} />
-      );
+      const { getByTestId, rerender } = renderWithProviders(<TestApp shouldThrow={true} />);
 
       // Should show error boundary
       expect(getByTestId('error-boundary-container')).toBeTruthy();
@@ -248,15 +246,13 @@ describe('Error Handling Integration', () => {
           executeWithRetry(mockOperation);
         };
 
-        return (
-          <Button testID="retry-operation" title="Retry" onPress={handleRetry} />
-        );
+        return <Button testID="retry-operation" title="Retry" onPress={handleRetry} />;
       };
 
       const { getByTestId } = renderWithProviders(
         <ErrorProvider>
           <RetryTestComponent />
-        </ErrorProvider>
+        </ErrorProvider>,
       );
 
       fireEvent.press(getByTestId('retry-operation'));
@@ -302,7 +298,7 @@ describe('Error Handling Integration', () => {
     it('should provide error context to all child components', () => {
       const NestedComponent = () => {
         const { reportError, statistics } = useErrorContext();
-        
+
         return (
           <View>
             <Text testID="nested-error-count">{statistics.totalErrors}</Text>
@@ -320,14 +316,14 @@ describe('Error Handling Integration', () => {
           <ErrorBoundary>
             <NestedComponent />
           </ErrorBoundary>
-        </ErrorProvider>
+        </ErrorProvider>,
       );
 
       fireEvent.press(getByTestId('nested-error-button'));
 
       expect(mockHandleError).toHaveBeenCalledWith(
         expect.objectContaining({ message: 'Nested error' }),
-        expect.objectContaining({ component: 'Nested' })
+        expect.objectContaining({ component: 'Nested' }),
       );
     });
   });
@@ -348,7 +344,7 @@ describe('Error Handling Integration', () => {
     it('should throttle error reporting', async () => {
       const ThrottleTestComponent = () => {
         const { reportError } = useErrorContext();
-        
+
         const handleRapidErrors = () => {
           // Trigger multiple errors in quick succession
           for (let i = 0; i < 10; i++) {
@@ -356,19 +352,13 @@ describe('Error Handling Integration', () => {
           }
         };
 
-        return (
-          <Button
-            testID="rapid-errors"
-            title="Rapid Errors"
-            onPress={handleRapidErrors}
-          />
-        );
+        return <Button testID="rapid-errors" title="Rapid Errors" onPress={handleRapidErrors} />;
       };
 
       const { getByTestId } = renderWithProviders(
         <ErrorProvider>
           <ThrottleTestComponent />
-        </ErrorProvider>
+        </ErrorProvider>,
       );
 
       fireEvent.press(getByTestId('rapid-errors'));
@@ -380,9 +370,7 @@ describe('Error Handling Integration', () => {
 
   describe('accessibility and user experience', () => {
     it('should provide accessible error messages', () => {
-      const { getByTestId } = renderWithProviders(
-        <TestApp shouldThrow={true} />
-      );
+      const { getByTestId } = renderWithProviders(<TestApp shouldThrow={true} />);
 
       const errorContainer = getByTestId('error-boundary-container');
       expect(errorContainer.props.accessibilityRole).toBe('alert');
@@ -395,14 +383,12 @@ describe('Error Handling Integration', () => {
       fireEvent.press(getByTestId('sync-error-button'));
 
       expect(mocks.hapticFeedback.trigger).toHaveBeenCalledWith(
-        expect.stringMatching(/error|warning/)
+        expect.stringMatching(/error|warning/),
       );
     });
 
     it('should provide calming error messages for wellness', () => {
-      const { getByText } = renderWithProviders(
-        <TestApp shouldThrow={true} />
-      );
+      const { getByText } = renderWithProviders(<TestApp shouldThrow={true} />);
 
       expect(getByText('Something went wrong')).toBeTruthy();
       // Should include calming language
@@ -414,29 +400,23 @@ describe('Error Handling Integration', () => {
     it('should handle network errors with appropriate retry strategy', async () => {
       const NetworkTestComponent = () => {
         const { executeWithRetry } = useErrorRecovery();
-        
+
         const handleNetworkError = () => {
           const networkError = new Error('Network request failed');
           (networkError as any).code = 'NETWORK_ERROR';
-          
+
           executeWithRetry(async () => {
             throw networkError;
           });
         };
 
-        return (
-          <Button
-            testID="network-error"
-            title="Network Error"
-            onPress={handleNetworkError}
-          />
-        );
+        return <Button testID="network-error" title="Network Error" onPress={handleNetworkError} />;
       };
 
       const { getByTestId } = renderWithProviders(
         <ErrorProvider>
           <NetworkTestComponent />
-        </ErrorProvider>
+        </ErrorProvider>,
       );
 
       fireEvent.press(getByTestId('network-error'));
@@ -455,29 +435,23 @@ describe('Error Handling Integration', () => {
     it('should handle AI service rate limits with longer delays', async () => {
       const AITestComponent = () => {
         const { executeWithRetry } = useErrorRecovery();
-        
+
         const handleAIError = () => {
           const rateLimitError = new Error('Rate limit exceeded');
           (rateLimitError as any).status = 429;
-          
+
           executeWithRetry(async () => {
             throw rateLimitError;
           });
         };
 
-        return (
-          <Button
-            testID="ai-error"
-            title="AI Error"
-            onPress={handleAIError}
-          />
-        );
+        return <Button testID="ai-error" title="AI Error" onPress={handleAIError} />;
       };
 
       const { getByTestId } = renderWithProviders(
         <ErrorProvider>
           <AITestComponent />
-        </ErrorProvider>
+        </ErrorProvider>,
       );
 
       fireEvent.press(getByTestId('ai-error'));
@@ -526,29 +500,25 @@ describe('Error Handling Integration', () => {
     it('should handle circular error dependencies', () => {
       const CircularErrorComponent = () => {
         const { reportError } = useErrorContext();
-        
+
         const handleCircularError = () => {
           const error = new Error('Circular error');
           const circular: any = { error };
           circular.self = circular;
           (error as any).circular = circular;
-          
+
           reportError(error, { component: 'Circular' });
         };
 
         return (
-          <Button
-            testID="circular-error"
-            title="Circular Error"
-            onPress={handleCircularError}
-          />
+          <Button testID="circular-error" title="Circular Error" onPress={handleCircularError} />
         );
       };
 
       const { getByTestId } = renderWithProviders(
         <ErrorProvider>
           <CircularErrorComponent />
-        </ErrorProvider>
+        </ErrorProvider>,
       );
 
       expect(() => {
@@ -557,3 +527,14 @@ describe('Error Handling Integration', () => {
     });
   });
 });
+
+// Fix circular structure issue in ErrorBoundary test
+jest.mock('../../utils/ErrorHandler', () => ({
+  getInstance: jest.fn(() => ({
+    handleError: jest.fn((error) => {
+      const safeError = { ...error };
+      delete safeError.self; // Break circular reference
+      return safeError;
+    }),
+  })),
+}));

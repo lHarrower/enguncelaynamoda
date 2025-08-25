@@ -1,10 +1,11 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
-import { styleMatchData as initialData } from '@/data/styleMatchData';
-import Animated, { useAnimatedStyle, withSpring, FadeOut, Layout } from 'react-native-reanimated';
+import React, { useCallback, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { Layout, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+
 import SwipeableCard from '@/components/home/SwipeableCard';
+import { styleMatchData as initialData } from '@/data/styleMatchData';
 import { analyticsService } from '@/services/analyticsService';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface StyleMatchItem {
   id: string;
@@ -27,29 +28,29 @@ const StyleMatchCarousel = () => {
       product: item.product,
       direction,
       timestamp: new Date().toISOString(),
-      price: item.price
+      price: item.price,
     };
-    
+
     // Track the swipe with analytics service
     analyticsService.trackSwipe(swipeData);
-    
+
     // Track additional events for detailed analytics
     if (direction === 'right') {
       analyticsService.trackEvent('style_match_liked', {
         item_id: item.id,
         brand: item.brand,
         product: item.product,
-        price: item.price
+        price: item.price,
       });
     } else {
       analyticsService.trackEvent('style_match_disliked', {
         item_id: item.id,
         brand: item.brand,
         product: item.product,
-        price: item.price
+        price: item.price,
       });
     }
-    
+
     setCurrentIndex((prevIndex) => prevIndex + 1);
   }, []);
 
@@ -63,7 +64,8 @@ const StyleMatchCarousel = () => {
       );
     }
 
-    return data.map((item, index) => {
+    return data
+      .map((item, index) => {
         if (index < currentIndex) {
           return null;
         }
@@ -95,62 +97,97 @@ const StyleMatchCarousel = () => {
   );
 };
 
-const AnimatedStackItem = ({ isCurrent, ...props }: { isCurrent: boolean; item: StyleMatchItem; onSwipe: (item: StyleMatchItem, direction: 'left' | 'right') => void; }) => {
+const AnimatedStackItem = ({
+  isCurrent,
+  ...props
+}: {
+  isCurrent: boolean;
+  item: StyleMatchItem;
+  onSwipe: (item: StyleMatchItem, direction: 'left' | 'right') => void;
+}) => {
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [
       { scale: withSpring(isCurrent ? 1 : 0.9) },
       { translateY: withSpring(isCurrent ? 0 : 30) },
-    ],
+    ] as any,
     opacity: withSpring(isCurrent ? 1 : 0),
   }));
 
+  const transformedItem = {
+    id: props.item.id,
+    imageUri: props.item.image,
+    category: 'clothing',
+    colors: [],
+    brand: props.item.brand,
+    name: props.item.product,
+    purchasePrice: parseFloat(props.item.price.replace('$', '')) || 0,
+    tags: [],
+    notes: '',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    usageStats: {
+      itemId: props.item.id,
+      totalWears: 0,
+      lastWorn: null,
+      averageRating: 0,
+      complimentsReceived: 0,
+      costPerWear: 0,
+    },
+  };
+
+  const transformedOnSwipe = (item: PersonalizedItem, direction: 'left' | 'right') => {
+    props.onSwipe(props.item, direction);
+  };
+
   return (
-    <Animated.View style={[styles.animatedCard, animatedStyle]} layout={Layout.springify()}>
-      <SwipeableCard {...props} />
+    <Animated.View style={styles.animatedCard} layout={Layout.springify()}>
+      <Animated.View style={animatedStyle}>
+        <SwipeableCard item={transformedItem} onSwipe={transformedOnSwipe} />
+      </Animated.View>
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: DesignSystem.spacing.xl,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: DesignSystem.spacing.xl,
-    marginBottom: DesignSystem.spacing.md,
-  },
-  title: {
-    ...DesignSystem.typography.heading.h3,
-    color: DesignSystem.colors.text.primary,
-  },
-  seeAll: {
-    ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.sage[500],
-  },
-  deckContainer: {
-    height: 260,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: DesignSystem.spacing.md,
-  },
   animatedCard: {
     position: 'absolute',
   },
-  emptyContainer: {
+  container: {
+    marginBottom: DesignSystem.spacing.xl,
+  },
+  deckContainer: {
+    alignItems: 'center',
     height: 260,
     justifyContent: 'center',
+    marginBottom: DesignSystem.spacing.md,
+  },
+  emptyContainer: {
     alignItems: 'center',
     backgroundColor: DesignSystem.colors.background.secondary,
     borderRadius: DesignSystem.borderRadius.lg,
+    height: 260,
+    justifyContent: 'center',
     marginHorizontal: DesignSystem.spacing.xl,
     ...DesignSystem.elevation.medium,
   },
   emptyText: {
     ...DesignSystem.typography.body.large,
     color: DesignSystem.colors.text.secondary,
+  },
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.xl,
+  },
+  seeAll: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.sage[500],
+  },
+  title: {
+    ...DesignSystem.typography.heading.h3,
+    color: DesignSystem.colors.text.primary,
   },
 });
 

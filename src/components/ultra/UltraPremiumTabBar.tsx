@@ -1,22 +1,13 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming,
-  interpolate,
-} from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import * as React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-const { width } = Dimensions.get('window');
+import { DesignSystem } from '../../theme/DesignSystem';
+
+// const { width: screenWidth } = Dimensions.get('window');
 const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface TabItem {
@@ -26,9 +17,9 @@ interface TabItem {
 }
 
 interface UltraPremiumTabBarProps {
-  state: any;
-  descriptors: any;
-  navigation: any;
+  state: BottomTabBarProps['state'];
+  descriptors: BottomTabBarProps['descriptors'];
+  navigation: BottomTabBarProps['navigation'];
 }
 
 const tabs: TabItem[] = [
@@ -59,143 +50,157 @@ const tabs: TabItem[] = [
   },
 ];
 
-const UltraPremiumTabBar: React.FC<UltraPremiumTabBarProps> = ({ state, descriptors, navigation }) => {
-  const insets = useSafeAreaInsets();
-  const activeIndex = state.index;
-  
-  // Animation values for each tab
-  const tabAnimations = tabs.map(() => ({
-    scale: useSharedValue(1),
-    opacity: useSharedValue(0.6),
-  }));
+// Dedicated tab button to keep hooks at component top-level
+const TabButton: React.FC<{
+  tab: TabItem;
+  isActive: boolean;
+  onPress: () => void;
+  onLongPress: () => void;
+}> = ({ tab, isActive, onPress, onLongPress }) => {
+  const scale = useSharedValue(1);
+  const opacity = useSharedValue(0.6);
 
   React.useEffect(() => {
-    // Update tab animations
-    tabAnimations.forEach((anim, index) => {
-      const isActive = index === activeIndex;
-      anim.scale.value = withTiming(isActive ? 1.05 : 1, { duration: 200 });
-      anim.opacity.value = withTiming(isActive ? 1 : 0.6, { duration: 200 });
-    });
-  }, [activeIndex]);
+    scale.value = withTiming(isActive ? 1.05 : 1, { duration: 200 });
+    opacity.value = withTiming(isActive ? 1 : 0.6, { duration: 200 });
+  }, [isActive, opacity, scale]);
 
-  const renderTab = (tab: TabItem, index: number) => {
-    const isActive = index === activeIndex;
-    const route = state.routes[index];
-    const { options } = descriptors[route.key];
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
 
-    const animatedStyle = useAnimatedStyle(() => {
-      return {
-        transform: [{ scale: tabAnimations[index].scale.value }],
-        opacity: tabAnimations[index].opacity.value,
-      };
-    });
+  return React.createElement(
+    AnimatedTouchableOpacity,
+    {
+      style: [styles.tab, animatedStyle],
+      onPress,
+      onLongPress,
+      activeOpacity: 0.8,
+    },
+    React.createElement(
+      View,
+      { style: [styles.tabContent, isActive && styles.tabContentActive] },
+      React.createElement(Ionicons, {
+        name: tab.icon,
+        size: 20,
+        color: isActive ? DesignSystem.colors.text.primary : DesignSystem.colors.text.tertiary,
+      }),
+      React.createElement(
+        Text,
+        {
+          style: [styles.tabLabel, isActive ? styles.tabLabelActive : styles.tabLabelInactive],
+        },
+        tab.title,
+      ),
+    ),
+  );
+};
 
-    const onPress = () => {
-      const event = navigation.emit({
-        type: 'tabPress',
-        target: route.key,
-        canPreventDefault: true,
-      });
+const UltraPremiumTabBar: React.FC<UltraPremiumTabBarProps> = ({
+  state,
+  descriptors: _descriptors,
+  navigation,
+}) => {
+  const activeIndex = state.index;
 
-      if (!isActive && !event.defaultPrevented) {
-        navigation.navigate(route.name);
-      }
-    };
+  return React.createElement(
+    SafeAreaView,
+    { style: styles.container, edges: ['bottom'] },
+    React.createElement(
+      View,
+      { style: styles.tabBar },
+      React.createElement(
+        View,
+        { style: styles.tabsContainer },
+        state.routes.map((route, index) => {
+          const tab = tabs[index];
+          if (!tab) {
+            return null;
+          }
+          const isActive = index === activeIndex;
 
-    const onLongPress = () => {
-      navigation.emit({
-        type: 'tabLongPress',
-        target: route.key,
-      });
-    };
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
 
-    return (
-      <AnimatedTouchableOpacity
-        key={tab.key}
-        style={[styles.tab, animatedStyle]}
-        onPress={onPress}
-        onLongPress={onLongPress}
-        activeOpacity={0.8}
-      >
-        <View style={[
-          styles.tabContent,
-          isActive && styles.tabContentActive
-        ]}>
-          <Ionicons
-            name={tab.icon}
-            size={20}
-            color={isActive ? DesignSystem.colors.text.primary : DesignSystem.colors.text.tertiary}
-          />
-          <Text
-            style={[
-              styles.tabLabel,
-              {
-                color: isActive ? DesignSystem.colors.text.primary : DesignSystem.colors.text.tertiary,
-              },
-            ]}
-          >
-            {tab.title}
-          </Text>
-        </View>
-      </AnimatedTouchableOpacity>
-    );
-  };
+            if (!isActive && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
 
-  return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
-      <View style={styles.tabBar}>
-        <View style={styles.tabsContainer}>
-          {tabs.map((tab, index) => renderTab(tab, index))}
-        </View>
-      </View>
-    </View>
+          const onLongPress = () => {
+            navigation.emit({
+              type: 'tabLongPress',
+              target: route.key,
+            });
+          };
+
+          return React.createElement(TabButton, {
+            key: tab.key,
+            tab,
+            isActive,
+            onPress,
+            onLongPress,
+          });
+        }),
+      ),
+    ),
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
     bottom: 0,
     left: 0,
+    position: 'absolute',
     right: 0,
-    backgroundColor: 'transparent',
+  },
+  tab: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: DesignSystem.spacing.sm,
   },
   tabBar: {
     backgroundColor: DesignSystem.colors.background.primary,
-    borderTopWidth: 1,
     borderTopColor: DesignSystem.colors.border.secondary,
-    paddingTop: DesignSystem.spacing.md,
+    borderTopWidth: 1,
     paddingBottom: DesignSystem.spacing.sm,
+    paddingTop: DesignSystem.spacing.md,
+  },
+  tabContent: {
+    alignItems: 'center',
+    borderRadius: DesignSystem.radius.sm,
+    justifyContent: 'center',
+    minWidth: 60,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
+  },
+  tabContentActive: {
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderColor: DesignSystem.colors.border.secondary,
+    borderWidth: 1,
+  },
+  tabLabel: {
+    ...DesignSystem.typography.scale.caption,
+    fontSize: 10,
+    letterSpacing: 0.5,
+    marginTop: DesignSystem.spacing.xs,
+    textAlign: 'center',
+  },
+  tabLabelActive: {
+    color: DesignSystem.colors.text.primary,
+  },
+  tabLabelInactive: {
+    color: DesignSystem.colors.text.tertiary,
   },
   tabsContainer: {
     flexDirection: 'row',
     paddingHorizontal: DesignSystem.spacing.sm,
-  },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: DesignSystem.spacing.sm,
-  },
-  tabContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: DesignSystem.spacing.xs,
-    paddingHorizontal: DesignSystem.spacing.sm,
-    borderRadius: DesignSystem.radius.sm,
-    minWidth: 60,
-  },
-  tabContentActive: {
-    backgroundColor: DesignSystem.colors.background.secondary,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.border.secondary,
-  },
-  tabLabel: {
-    ...DesignSystem.typography.scale.caption,
-    marginTop: DesignSystem.spacing.xs,
-    fontSize: 10,
-    letterSpacing: 0.5,
-    textAlign: 'center',
   },
 });
 

@@ -1,27 +1,29 @@
 /**
  * Experience Story Block
- * 
+ *
  * A cinematic scrollable story section inspired by Moments Epic and Obys Agency.
  * Features layered scroll reveals, parallax effects, and narrative storytelling
  * with Turkish content and premium styling.
  */
 
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  Dimensions,
-  StyleSheet,
-  Animated,
-  TouchableOpacity,
-  Platform,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import { ORIGINAL_TYPOGRAPHY, ORIGINAL_SPACING, ORIGINAL_BORDER_RADIUS } from '@/components/auth/originalLoginStyles';
+import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+import { ORIGINAL_SPACING, ORIGINAL_TYPOGRAPHY } from '@/components/auth/originalLoginStyles';
 import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -53,16 +55,16 @@ export interface ExperienceStory {
 export interface ExperienceStoryBlockProps {
   /** Story data to display */
   story: ExperienceStory;
-  
+
   /** Callback when story item is pressed */
   onItemPress?: (item: StoryItem, story: ExperienceStory) => void;
-  
+
   /** Callback when story is completed */
   onStoryComplete?: (story: ExperienceStory) => void;
-  
+
   /** Whether to enable parallax effects */
   enableParallax?: boolean;
-  
+
   /** Whether to enable scroll snapping */
   enableSnapping?: boolean;
 }
@@ -76,7 +78,7 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imagesLoaded, setImagesLoaded] = useState<Set<string>>(new Set());
-  
+
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
   const fadeAnims = useRef<{ [key: string]: Animated.Value }>({}).current;
@@ -92,32 +94,35 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
         scaleAnims[item.id] = new Animated.Value(index === 0 ? 1 : 0.9);
       }
     });
-  }, [story.items]);
+  }, [story.items, fadeAnims, scaleAnims]);
 
-  const handleScroll = (event: any) => {
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetX = event.nativeEvent.contentOffset.x;
     const index = Math.round(offsetX / screenWidth);
-    
+
     if (index !== currentIndex && index >= 0 && index < story.items.length) {
       setCurrentIndex(index);
-      
+
       // Animate current item in, others out
       story.items.forEach((item, i) => {
         const isActive = i === index;
-        
-        Animated.parallel([
-          Animated.timing(fadeAnims[item.id], {
-            toValue: isActive ? 1 : 0.3,
-            duration: 400,
-            useNativeDriver: true,
-          }),
-          Animated.spring(scaleAnims[item.id], {
-            toValue: isActive ? 1 : 0.9,
-            tension: 100,
-            friction: 8,
-            useNativeDriver: true,
-          }),
-        ]).start();
+        const fade = fadeAnims[item.id];
+        const scale = scaleAnims[item.id];
+        if (fade && scale) {
+          Animated.parallel([
+            Animated.timing(fade, {
+              toValue: isActive ? 1 : 0.3,
+              duration: 400,
+              useNativeDriver: true,
+            }),
+            Animated.spring(scale, {
+              toValue: isActive ? 1 : 0.9,
+              tension: 100,
+              friction: 8,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        }
       });
     }
 
@@ -134,7 +139,7 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
   };
 
   const handleImageLoad = (itemId: string) => {
-    setImagesLoaded(prev => new Set([...prev, itemId]));
+    setImagesLoaded((prev) => new Set([...prev, itemId]));
   };
 
   const renderStoryItem = (item: StoryItem, index: number) => {
@@ -144,15 +149,13 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
     const isLoaded = imagesLoaded.has(item.id);
 
     // Parallax effect for background
-    const parallaxOffset = enableParallax ? scrollX.interpolate({
-      inputRange: [
-        (index - 1) * screenWidth,
-        index * screenWidth,
-        (index + 1) * screenWidth,
-      ],
-      outputRange: [50, 0, -50],
-      extrapolate: 'clamp',
-    }) : 0;
+    const parallaxOffset = enableParallax
+      ? scrollX.interpolate({
+          inputRange: [(index - 1) * screenWidth, index * screenWidth, (index + 1) * screenWidth],
+          outputRange: [50, 0, -50],
+          extrapolate: 'clamp',
+        })
+      : 0;
 
     return (
       <View key={item.id} style={styles.storyItem}>
@@ -171,25 +174,21 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
             onLoad={() => handleImageLoad(item.id)}
             resizeMode="cover"
           />
-          
+
           {/* Loading Placeholder */}
           {!isLoaded && (
             <View style={styles.imagePlaceholder}>
-              <Ionicons 
-                name="image-outline" 
-                size={48} 
-                color={DesignSystem.colors.text.placeholder} 
+              <Ionicons
+                name="image-outline"
+                size={48}
+                color={DesignSystem.colors.text.placeholder}
               />
             </View>
           )}
 
           {/* Gradient Overlay */}
           <LinearGradient
-            colors={[
-              'transparent',
-              'rgba(0,0,0,0.3)',
-              'rgba(0,0,0,0.7)',
-            ]}
+            colors={['transparent', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.7)']}
             style={styles.gradientOverlay}
           />
         </Animated.View>
@@ -210,7 +209,12 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
             activeOpacity={0.9}
           >
             {/* Moment Badge */}
-            <View style={[styles.momentBadge, { backgroundColor: item.color || story.accentColor }]}>
+            <View
+              style={[
+                styles.momentBadge,
+                { backgroundColor: item.color || story.accentColor || '#444444' },
+              ]}
+            >
               <Text style={styles.momentText}>{item.moment}</Text>
             </View>
 
@@ -219,7 +223,7 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
               <Text style={styles.itemTitle}>{item.title}</Text>
               <Text style={styles.itemSubtitle}>{item.subtitle}</Text>
               <Text style={styles.itemDescription}>{item.description}</Text>
-              
+
               {/* Tags */}
               {item.tags && item.tags.length > 0 && (
                 <View style={styles.tagsContainer}>
@@ -234,14 +238,10 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
 
             {/* CTA */}
             <BlurView intensity={30} style={styles.ctaButton}>
-              <Text style={[styles.ctaText, { color: story.accentColor }]}>
+              <Text style={[styles.ctaText, { color: story.accentColor || '#FFFFFF' }]}>
                 Keşfet
               </Text>
-              <Ionicons 
-                name="arrow-forward" 
-                size={16} 
-                color={story.accentColor} 
-              />
+              <Ionicons name="arrow-forward" size={16} color={story.accentColor || '#FFFFFF'} />
             </BlurView>
           </TouchableOpacity>
         </Animated.View>
@@ -253,7 +253,11 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
     <View style={styles.container}>
       {/* Header Section */}
       <LinearGradient
-  colors={story.gradientColors as unknown as readonly [string, string, ...string[]]}
+        colors={
+          story.gradientColors && story.gradientColors.length > 0
+            ? (story.gradientColors as unknown as readonly [string, string, ...string[]])
+            : ['#111111', '#000000']
+        }
         style={styles.headerSection}
       >
         <Image
@@ -261,14 +265,14 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
           style={styles.headerBackground}
           resizeMode="cover"
         />
-        
+
         <LinearGradient
           colors={['rgba(0,0,0,0.4)', 'transparent'] as const}
           style={styles.headerOverlay}
         >
           <View style={styles.headerContent}>
             <Text style={styles.themeText}>{story.theme}</Text>
-            <Text style={[styles.storyTitle, { color: story.accentColor }]}>
+            <Text style={[styles.storyTitle, { color: story.accentColor || '#FFFFFF' }]}>
               {story.title}
             </Text>
             <Text style={styles.storySubtitle}>{story.subtitle}</Text>
@@ -282,13 +286,10 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
         horizontal
         pagingEnabled={enableSnapping}
         showsHorizontalScrollIndicator={false}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { 
-            useNativeDriver: false,
-            listener: handleScroll,
-          }
-        )}
+        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
+          useNativeDriver: false,
+          listener: handleScroll,
+        })}
         scrollEventThrottle={16}
         decelerationRate="fast"
         snapToInterval={enableSnapping ? screenWidth : undefined}
@@ -305,12 +306,13 @@ export const ExperienceStoryBlock: React.FC<ExperienceStoryBlockProps> = ({
             style={[
               styles.progressDot,
               {
-                backgroundColor: index === currentIndex 
-                  ? story.accentColor 
-                  : 'rgba(255,255,255,0.3)',
-                transform: [{ 
-                  scale: index === currentIndex ? 1.2 : 1 
-                }],
+                backgroundColor:
+                  index === currentIndex ? story.accentColor || '#FFFFFF' : 'rgba(255,255,255,0.3)',
+                transform: [
+                  {
+                    scale: index === currentIndex ? 1.2 : 1,
+                  },
+                ],
               },
             ]}
           />
@@ -339,9 +341,9 @@ const styles = StyleSheet.create({
   },
 
   headerBackground: {
-    width: '100%',
     height: '100%',
     position: 'absolute',
+    width: '100%',
   },
 
   headerOverlay: {
@@ -355,33 +357,33 @@ const styles = StyleSheet.create({
   },
 
   themeText: {
-    fontSize: 14,
     color: 'rgba(255,255,255,0.8)',
+    fontSize: 14,
     fontWeight: '600',
     letterSpacing: 1,
-    textTransform: 'uppercase',
     marginBottom: 8,
+    textTransform: 'uppercase',
   },
 
   storyTitle: {
+    fontFamily: 'serif',
     fontSize: 32,
     fontWeight: '400',
     lineHeight: 38,
     marginBottom: 8,
-    fontFamily: 'serif',
   },
 
   storySubtitle: {
-    fontSize: 18,
     color: 'rgba(255,255,255,0.9)',
+    fontSize: 18,
     lineHeight: 24,
   },
 
   // Story Items
   storyItem: {
-    width: screenWidth,
     height: screenHeight * 0.7,
     position: 'relative',
+    width: screenWidth,
   },
 
   backgroundContainer: {
@@ -393,27 +395,27 @@ const styles = StyleSheet.create({
   },
 
   backgroundImage: {
-    width: '100%',
     height: '100%',
+    width: '100%',
   },
 
   imagePlaceholder: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: DesignSystem.colors.surface.primary,
     alignItems: 'center',
+    backgroundColor: DesignSystem.colors.surface.primary,
+    bottom: 0,
     justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 
   gradientOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
     bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 
   contentContainer: {
@@ -428,11 +430,11 @@ const styles = StyleSheet.create({
   },
 
   momentBadge: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    alignSelf: 'flex-start',
     borderRadius: 20,
     marginBottom: 24,
-    alignSelf: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
 
   momentText: {
@@ -447,88 +449,88 @@ const styles = StyleSheet.create({
   },
 
   itemTitle: {
+    color: '#FFFFFF',
+    fontFamily: ORIGINAL_TYPOGRAPHY.title.fontFamily,
     fontSize: 28,
     fontWeight: '600',
-    color: '#FFFFFF',
     lineHeight: 34,
     marginBottom: 8,
-    fontFamily: ORIGINAL_TYPOGRAPHY.title.fontFamily,
   },
 
   itemSubtitle: {
-    fontSize: 18,
     color: 'rgba(255,255,255,0.9)',
+    fontSize: 18,
     lineHeight: 24,
     marginBottom: 12,
   },
 
   itemDescription: {
-    fontSize: 16,
     color: 'rgba(255,255,255,0.8)',
+    fontSize: 16,
     lineHeight: 24,
     marginBottom: 16,
   },
 
   tagsContainer: {
     flexDirection: 'row',
-    gap: 8,
     flexWrap: 'wrap',
+    gap: 8,
   },
 
   tag: {
     backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 16,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
   },
 
   tagText: {
-    fontSize: 12,
     color: '#FFFFFF',
+    fontSize: 12,
     fontWeight: '500',
   },
 
   ctaButton: {
-    flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'flex-start',
+    borderRadius: 24,
+    flexDirection: 'row',
+    gap: 8,
     justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 24,
-    gap: 8,
-    alignSelf: 'flex-start',
   },
 
   ctaText: {
+    fontFamily: ORIGINAL_TYPOGRAPHY.button.fontFamily,
     fontSize: 16,
     fontWeight: '600',
-    fontFamily: ORIGINAL_TYPOGRAPHY.button.fontFamily,
   },
 
   // Progress Indicator
   progressContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 20,
+    flexDirection: 'row',
     gap: 8,
+    justifyContent: 'center',
+    paddingVertical: 20,
   },
 
   progressDot: {
-    width: 8,
-    height: 8,
     borderRadius: 4,
+    height: 8,
+    width: 8,
   },
 
   // Counter
   counterContainer: {
-    position: 'absolute',
-    top: 60,
-    right: ORIGINAL_SPACING.containerHorizontal,
     backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 16,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
+    position: 'absolute',
+    right: ORIGINAL_SPACING.containerHorizontal,
+    top: 60,
   },
 
   counterText: {

@@ -1,19 +1,13 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
-  ScrollView,
-} from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 export const WardrobeScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
+
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>Wardrobe</Text>
@@ -34,41 +28,27 @@ export const WardrobeScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: DesignSystem.colors.background.primary,
-  },
-  scrollView: {
     flex: 1,
   },
   content: {
     flexGrow: 1,
   },
-  header: {
-    paddingHorizontal: DesignSystem.spacing.xl,
-    paddingTop: 20,
-    paddingBottom: 40,
-    alignItems: 'center',
-  },
-  title: {
-    ...DesignSystem.typography.scale.hero,
-    color: DesignSystem.colors.text.primary,
-    marginBottom: 8,
-    lineHeight: 44,
-  },
-  subtitle: {
+  emptyDescription: {
     ...DesignSystem.typography.scale.body1,
     color: DesignSystem.colors.text.secondary,
+    lineHeight: 24,
     textAlign: 'center',
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
   },
   emptyEmoji: {
     fontSize: 64,
     marginBottom: 24,
+  },
+  emptyState: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 40,
   },
   emptyTitle: {
     ...DesignSystem.typography.scale.h2,
@@ -76,10 +56,24 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     textAlign: 'center',
   },
-  emptyDescription: {
+  header: {
+    alignItems: 'center',
+    paddingBottom: 40,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingTop: 20,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  subtitle: {
     ...DesignSystem.typography.scale.body1,
     color: DesignSystem.colors.text.secondary,
     textAlign: 'center',
-    lineHeight: 24,
+  },
+  title: {
+    ...DesignSystem.typography.scale.hero,
+    color: DesignSystem.colors.text.primary,
+    lineHeight: 44,
+    marginBottom: 8,
   },
 });

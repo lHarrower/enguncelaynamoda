@@ -1,0 +1,430 @@
+{
+  "totalFiles": 383,
+  "totalSize": 3225674,
+  "fileTypes": {
+    ".tsx": 231,
+    ".ts": 149,
+    ".md": 2,
+    ".js": 1
+  },
+  "largestFiles": [
+    {
+      "path": "services\\aynaMirrorService.ts",
+      "size": 103442,
+      "formattedSize": "101.02 KB"
+    },
+    {
+      "path": "services\\intelligenceService.ts",
+      "size": 61695,
+      "formattedSize": "60.25 KB"
+    },
+    {
+      "path": "screens\\WardrobeScreen.tsx",
+      "size": 53347,
+      "formattedSize": "52.1 KB"
+    },
+    {
+      "path": "services\\enhancedWardrobeService.ts",
+      "size": 45519,
+      "formattedSize": "44.45 KB"
+    },
+    {
+      "path": "services\\performanceOptimizationService.ts",
+      "size": 37703,
+      "formattedSize": "36.82 KB"
+    },
+    {
+      "path": "services\\weatherService.ts",
+      "size": 30555,
+      "formattedSize": "29.84 KB"
+    },
+    {
+      "path": "services\\featureIntegrationCoordinator.ts",
+      "size": 29999,
+      "formattedSize": "29.3 KB"
+    },
+    {
+      "path": "pages\\ai-naming-demo.tsx",
+      "size": 27724,
+      "formattedSize": "27.07 KB"
+    },
+    {
+      "path": "components\\efficiency\\EfficiencyInsights.tsx",
+      "size": 27415,
+      "formattedSize": "26.77 KB"
+    },
+    {
+      "path": "services\\userPreferencesService.ts",
+      "size": 26935,
+      "formattedSize": "26.3 KB"
+    },
+    {
+      "path": "services\\errorHandlingService.ts",
+      "size": 25617,
+      "formattedSize": "25.02 KB"
+    },
+    {
+      "path": "components\\wardrobe\\WardrobeItemForm.tsx",
+      "size": 25525,
+      "formattedSize": "24.93 KB"
+    },
+    {
+      "path": "services\\styleDNAService.ts",
+      "size": 24491,
+      "formattedSize": "23.92 KB"
+    },
+    {
+      "path": "components\\aynaMirror\\OutfitRecommendationCard.tsx",
+      "size": 23803,
+      "formattedSize": "23.25 KB"
+    },
+    {
+      "path": "components\\wardrobe\\ItemDetailsForm\\index.tsx",
+      "size": 23623,
+      "formattedSize": "23.07 KB"
+    },
+    {
+      "path": "services\\efficiencyScoreService.ts",
+      "size": 23189,
+      "formattedSize": "22.65 KB"
+    },
+    {
+      "path": "services\\userJourneyTestingService.ts",
+      "size": 22801,
+      "formattedSize": "22.27 KB"
+    },
+    {
+      "path": "components\\naming\\AINameGenerator.tsx",
+      "size": 22625,
+      "formattedSize": "22.09 KB"
+    },
+    {
+      "path": "services\\antiConsumptionService.ts",
+      "size": 22589,
+      "formattedSize": "22.06 KB"
+    },
+    {
+      "path": "__tests__\\accessibility\\Accessibility.test.tsx",
+      "size": 21832,
+      "formattedSize": "21.32 KB"
+    }
+  ],
+  "directories": {
+    "components": {
+      "size": 1669257,
+      "files": 0
+    },
+    "components\\animated": {
+      "size": 45794,
+      "files": 0
+    },
+    "components\\antiConsumption": {
+      "size": 72673,
+      "files": 0
+    },
+    "components\\artistry": {
+      "size": 62101,
+      "files": 0
+    },
+    "components\\atmospheric": {
+      "size": 61326,
+      "files": 0
+    },
+    "components\\atoms": {
+      "size": 16166,
+      "files": 0
+    },
+    "components\\atoms\\Button": {
+      "size": 4228,
+      "files": 0
+    },
+    "components\\atoms\\Input": {
+      "size": 5729,
+      "files": 0
+    },
+    "components\\atoms\\Text": {
+      "size": 4444,
+      "files": 0
+    },
+    "components\\aura": {
+      "size": 14968,
+      "files": 0
+    },
+    "components\\auth": {
+      "size": 57052,
+      "files": 0
+    },
+    "components\\aynaMirror": {
+      "size": 43576,
+      "files": 0
+    },
+    "components\\charts": {
+      "size": 1032,
+      "files": 0
+    },
+    "components\\common": {
+      "size": 43080,
+      "files": 0
+    },
+    "components\\demo": {
+      "size": 8369,
+      "files": 0
+    },
+    "components\\discovery": {
+      "size": 28526,
+      "files": 0
+    },
+    "components\\editorial": {
+      "size": 47531,
+      "files": 0
+    },
+    "components\\efficiency": {
+      "size": 62094,
+      "files": 0
+    },
+    "components\\error": {
+      "size": 35069,
+      "files": 0
+    },
+    "components\\feedback": {
+      "size": 59899,
+      "files": 0
+    },
+    "components\\haptic": {
+      "size": 14639,
+      "files": 0
+    },
+    "components\\home": {
+      "size": 111799,
+      "files": 0
+    },
+    "components\\home\\Header": {
+      "size": 6331,
+      "files": 0
+    },
+    "components\\home\\SaleBanner": {
+      "size": 6381,
+      "files": 0
+    },
+    "components\\lazy": {
+      "size": 3090,
+      "files": 0
+    },
+    "components\\luxury": {
+      "size": 41876,
+      "files": 0
+    },
+    "components\\modern": {
+      "size": 28235,
+      "files": 0
+    },
+    "components\\molecules": {
+      "size": 9799,
+      "files": 0
+    },
+    "components\\molecules\\Card": {
+      "size": 4279,
+      "files": 0
+    },
+    "components\\molecules\\FormField": {
+      "size": 2329,
+      "files": 0
+    },
+    "components\\naming": {
+      "size": 39955,
+      "files": 0
+    },
+    "components\\navigation": {
+      "size": 53401,
+      "files": 0
+    },
+    "components\\onboarding": {
+      "size": 146886,
+      "files": 0
+    },
+    "components\\optimized": {
+      "size": 8609,
+      "files": 0
+    },
+    "components\\organisms": {
+      "size": 13797,
+      "files": 0
+    },
+    "components\\organisms\\ItemDetailsForm": {
+      "size": 9091,
+      "files": 0
+    },
+    "components\\premium": {
+      "size": 58726,
+      "files": 0
+    },
+    "components\\profile": {
+      "size": 14858,
+      "files": 0
+    },
+    "components\\sanctuary": {
+      "size": 65457,
+      "files": 0
+    },
+    "components\\shared": {
+      "size": 85141,
+      "files": 0
+    },
+    "components\\studio": {
+      "size": 40767,
+      "files": 0
+    },
+    "components\\ultra": {
+      "size": 31242,
+      "files": 0
+    },
+    "components\\vision": {
+      "size": 58629,
+      "files": 0
+    },
+    "components\\vision\\shared": {
+      "size": 31952,
+      "files": 0
+    },
+    "components\\wardrobe": {
+      "size": 127105,
+      "files": 0
+    },
+    "components\\wardrobe\\CameraView": {
+      "size": 12641,
+      "files": 0
+    },
+    "components\\wardrobe\\ImagePreviewModal": {
+      "size": 7606,
+      "files": 0
+    },
+    "components\\wardrobe\\ItemDetailsForm": {
+      "size": 23623,
+      "files": 0
+    },
+    "components\\wardrobe\\PhotoProcessingLoader": {
+      "size": 14343,
+      "files": 0
+    },
+    "config": {
+      "size": 20463,
+      "files": 0
+    },
+    "constants": {
+      "size": 45472,
+      "files": 0
+    },
+    "context": {
+      "size": 14736,
+      "files": 0
+    },
+    "data": {
+      "size": 29167,
+      "files": 0
+    },
+    "hooks": {
+      "size": 101224,
+      "files": 0
+    },
+    "lib": {
+      "size": 7380,
+      "files": 0
+    },
+    "pages": {
+      "size": 27724,
+      "files": 0
+    },
+    "providers": {
+      "size": 59276,
+      "files": 0
+    },
+    "screens": {
+      "size": 96524,
+      "files": 0
+    },
+    "services": {
+      "size": 677269,
+      "files": 0
+    },
+    "services\\api": {
+      "size": 1586,
+      "files": 0
+    },
+    "test": {
+      "size": 5800,
+      "files": 0
+    },
+    "theme": {
+      "size": 151199,
+      "files": 0
+    },
+    "theme\\components": {
+      "size": 23962,
+      "files": 0
+    },
+    "theme\\foundations": {
+      "size": 11310,
+      "files": 0
+    },
+    "theme\\layouts": {
+      "size": 43216,
+      "files": 0
+    },
+    "types": {
+      "size": 29444,
+      "files": 0
+    },
+    "types\\external": {
+      "size": 885,
+      "files": 0
+    },
+    "utils": {
+      "size": 69305,
+      "files": 0
+    },
+    "utils\\data": {
+      "size": 831,
+      "files": 0
+    },
+    "__tests__": {
+      "size": 221197,
+      "files": 0
+    },
+    "__tests__\\accessibility": {
+      "size": 21832,
+      "files": 0
+    },
+    "__tests__\\components": {
+      "size": 27811,
+      "files": 0
+    },
+    "__tests__\\e2e": {
+      "size": 20177,
+      "files": 0
+    },
+    "__tests__\\hooks": {
+      "size": 17908,
+      "files": 0
+    },
+    "__tests__\\integration": {
+      "size": 15653,
+      "files": 0
+    },
+    "__tests__\\mocks": {
+      "size": 13204,
+      "files": 0
+    },
+    "__tests__\\performance": {
+      "size": 16835,
+      "files": 0
+    },
+    "__tests__\\services": {
+      "size": 30662,
+      "files": 0
+    },
+    "__tests__\\utils": {
+      "size": 27984,
+      "files": 0
+    }
+  }
+}

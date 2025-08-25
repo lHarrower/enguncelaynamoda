@@ -1,0 +1,12 @@
+[
+  {
+    "idPattern": "dep:lodash.*CVE-2024-1234",
+    "expires": "2025-12-31",
+    "reason": "Upgrade blocked by upstream lib; tracked in JIRA-123"
+  },
+  {
+    "idPattern": "semgrep:insecure-random",
+    "expires": "2025-10-01",
+    "reason": "Legacy code scheduled for refactor"
+  }
+]

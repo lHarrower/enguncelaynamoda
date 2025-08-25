@@ -1,16 +1,19 @@
 /**
  * Input Atom
- * 
+ *
  * The fundamental text input element in the design system.
  * Supports various input types and follows unified styling.
  */
 
 import React, { useState } from 'react';
-import { TextInput, View, Text, StyleSheet, TextInputProps } from 'react-native';
-import { InputComponentProps } from '@/types/componentProps';
-import { DesignSystem } from '@/theme/DesignSystem';
+import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 
-export interface InputProps extends Omit<InputComponentProps, 'leftIcon' | 'rightIcon' | 'variant'>, Omit<TextInputProps, 'style'> {
+import { DesignSystem } from '@/theme/DesignSystem';
+import { InputComponentProps } from '@/types/componentProps';
+
+export interface InputProps
+  extends Omit<InputComponentProps, 'leftIcon' | 'rightIcon' | 'variant'>,
+    Omit<TextInputProps, 'style'> {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
@@ -52,14 +55,11 @@ const Input: React.FC<InputProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
-  const containerStyle = [
-    styles.container,
-    style,
-  ];
+  const containerStyle = [styles.container, style];
 
   const inputContainerStyle = [
     styles.inputContainer,
-  styles[variant],
+    styles[variant],
     styles[size],
     isFocused && styles.focused,
     error && styles.error,
@@ -73,16 +73,9 @@ const Input: React.FC<InputProps> = ({
     inputStyle,
   ];
 
-  const labelTextStyle = [
-    styles.label,
-    required && styles.requiredLabel,
-    labelStyle,
-  ];
+  const labelTextStyle = [styles.label, required && styles.requiredLabel, labelStyle];
 
-  const errorTextStyle = [
-    styles.errorText,
-    errorStyle,
-  ];
+  const errorTextStyle = [styles.errorText, errorStyle];
 
   return (
     <View style={containerStyle}>
@@ -92,14 +85,10 @@ const Input: React.FC<InputProps> = ({
           {required && <Text style={styles.asterisk}> *</Text>}
         </Text>
       )}
-      
+
       <View style={inputContainerStyle}>
-        {leftIcon && (
-          <View style={styles.iconContainer}>
-            {leftIcon}
-          </View>
-        )}
-        
+        {leftIcon && <View style={styles.iconContainer}>{leftIcon}</View>}
+
         <TextInput
           style={textInputStyle}
           value={value}
@@ -115,25 +104,13 @@ const Input: React.FC<InputProps> = ({
           accessibilityLabel={accessibilityLabel || label}
           {...props}
         />
-        
-        {rightIcon && (
-          <View style={styles.iconContainer}>
-            {rightIcon}
-          </View>
-        )}
+
+        {rightIcon && <View style={styles.iconContainer}>{rightIcon}</View>}
       </View>
-      
-      {error && (
-        <Text style={errorTextStyle}>
-          {error}
-        </Text>
-      )}
-      
-      {hint && !error && (
-        <Text style={styles.hint}>
-          {hint}
-        </Text>
-      )}
+
+      {error && <Text style={errorTextStyle}>{error}</Text>}
+
+      {hint && !error && <Text style={styles.hint}>{hint}</Text>}
     </View>
   );
 };
@@ -142,131 +119,130 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: DesignSystem.spacing.sm,
   },
-  
+
   label: {
-    fontSize: 14,
-    fontFamily: DesignSystem.typography.fontFamily.primary,
-    fontWeight: '500',
     color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    fontSize: 14,
+    fontWeight: '500',
     marginBottom: DesignSystem.spacing.xs,
   },
-  
+
   requiredLabel: {
     // Additional styles for required labels can be added here
   },
-  
+
   asterisk: {
     color: DesignSystem.colors.semantic.error,
   },
-  
+
   inputContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.secondary,
     borderRadius: DesignSystem.borderRadius.md,
     borderWidth: 1,
-    backgroundColor: DesignSystem.colors.background.secondary,
+    flexDirection: 'row',
   },
-  
+
   // Variants
   default: {
-    borderColor: DesignSystem.colors.border.primary,
     backgroundColor: DesignSystem.colors.background.secondary,
+    borderColor: DesignSystem.colors.border.primary,
   },
   glass: {
-    borderColor: DesignSystem.colors.border.glass,
     backgroundColor: 'transparent',
+    borderColor: DesignSystem.colors.border.glass,
   },
   minimal: {
+    backgroundColor: 'transparent',
     borderColor: 'transparent',
-    backgroundColor: 'transparent',
   },
-  
+
   outlined: {
-    borderColor: DesignSystem.colors.border.primary,
     backgroundColor: 'transparent',
+    borderColor: DesignSystem.colors.border.primary,
   },
-  
-  
+
   luxury: {
-  borderColor: DesignSystem.colors.gold[500],
-  backgroundColor: DesignSystem.colors.gold[100],
+    backgroundColor: DesignSystem.colors.gold[100],
+    borderColor: DesignSystem.colors.gold[500],
   },
-  
+
   // Sizes
   small: {
+    minHeight: 36,
     paddingHorizontal: DesignSystem.spacing.sm,
     paddingVertical: DesignSystem.spacing.xs,
-    minHeight: 36,
   },
-  
+
   medium: {
+    minHeight: 44,
     paddingHorizontal: DesignSystem.spacing.md,
     paddingVertical: DesignSystem.spacing.sm,
-    minHeight: 44,
   },
-  
+
   large: {
+    minHeight: 52,
     paddingHorizontal: DesignSystem.spacing.lg,
     paddingVertical: DesignSystem.spacing.md,
-    minHeight: 52,
   },
-  
+
   // States
   focused: {
     borderColor: DesignSystem.colors.primary[500],
     borderWidth: 2,
   },
-  
+
   error: {
     borderColor: DesignSystem.colors.semantic.error,
     borderWidth: 2,
   },
-  
+
   disabled: {
+    backgroundColor: DesignSystem.colors.neutral[100],
     opacity: 0.5,
-  backgroundColor: DesignSystem.colors.neutral[100],
   },
-  
+
   input: {
+    color: DesignSystem.colors.text.primary,
     flex: 1,
     fontFamily: DesignSystem.typography.fontFamily.primary,
     fontSize: 16,
-    color: DesignSystem.colors.text.primary,
     padding: 0, // Remove default padding
   },
-  
+
   smallInput: {
     fontSize: 14,
   },
-  
+
   mediumInput: {
     fontSize: 16,
   },
-  
+
   largeInput: {
     fontSize: 18,
   },
-  
+
   multiline: {
     minHeight: 80,
     textAlignVertical: 'top',
   },
-  
+
   iconContainer: {
     marginHorizontal: DesignSystem.spacing.xs,
   },
-  
+
   errorText: {
-    fontSize: 12,
-    fontFamily: DesignSystem.typography.fontFamily.primary,
     color: DesignSystem.colors.semantic.error,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    fontSize: 12,
     marginTop: DesignSystem.spacing.xs,
   },
-  
+
   hint: {
-    fontSize: 12,
-    fontFamily: DesignSystem.typography.fontFamily.primary,
     color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    fontSize: 12,
     marginTop: DesignSystem.spacing.xs,
   },
 });

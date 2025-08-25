@@ -1,39 +1,34 @@
 /**
  * Original Login Form Component
- * 
+ *
  * A complete login form that matches the original AynaModa design.
  * Combines email and password inputs with proper validation and Turkish error messages.
  */
 
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-  StyleSheet,
-} from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
 import { OriginalInput } from '@/components/auth/OriginalInput';
 import {
+  ACCESSIBILITY_LABELS,
+  ORIGINAL_COLORS,
   originalLoginStyles,
   TURKISH_TEXT,
   VALIDATION_MESSAGES,
-  ORIGINAL_COLORS,
-  ACCESSIBILITY_LABELS,
 } from '@/components/auth/originalLoginStyles';
+
 import { errorInDev } from '../../utils/consoleSuppress';
 
 export interface OriginalLoginFormProps {
   /** Callback when login is attempted */
   onLogin: (email: string, password: string) => Promise<void>;
-  
+
   /** Whether the form is currently loading */
   loading?: boolean;
-  
+
   /** Error message to display */
   error?: string;
-  
+
   /** Callback when forgot password is pressed */
   onForgotPassword?: () => void;
 }
@@ -55,12 +50,12 @@ export const OriginalLoginForm: React.FC<OriginalLoginFormProps> = ({
     if (!email.trim()) {
       return VALIDATION_MESSAGES.emailRequired;
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       return VALIDATION_MESSAGES.emailInvalid;
     }
-    
+
     return undefined;
   };
 
@@ -68,11 +63,11 @@ export const OriginalLoginForm: React.FC<OriginalLoginFormProps> = ({
     if (!password) {
       return VALIDATION_MESSAGES.passwordRequired;
     }
-    
+
     if (password.length < 6) {
       return VALIDATION_MESSAGES.passwordTooShort;
     }
-    
+
     return undefined;
   };
 
@@ -111,9 +106,9 @@ export const OriginalLoginForm: React.FC<OriginalLoginFormProps> = ({
 
     try {
       await onLogin(email.trim(), password);
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Error handling is done by parent component
-      errorInDev('Login error:', err);
+      errorInDev('Login error:', err instanceof Error ? err : String(err));
     } finally {
       setIsSubmitting(false);
     }
@@ -123,11 +118,9 @@ export const OriginalLoginForm: React.FC<OriginalLoginFormProps> = ({
     if (onForgotPassword) {
       onForgotPassword();
     } else {
-      Alert.alert(
-        'Şifremi Unuttum',
-        'Şifre sıfırlama özelliği yakında gelecek!',
-        [{ text: 'Tamam' }]
-      );
+      Alert.alert('Şifremi Unuttum', 'Şifre sıfırlama özelliği yakında gelecek!', [
+        { text: 'Tamam' },
+      ]);
     }
   };
 
@@ -180,34 +173,23 @@ export const OriginalLoginForm: React.FC<OriginalLoginFormProps> = ({
         accessibilityLabel={ACCESSIBILITY_LABELS.forgotPassword}
         accessibilityRole="button"
       >
-        <Text style={[
-          styles.forgotPasswordText,
-          isLoading && styles.disabledText
-        ]}>
+        <Text style={[styles.forgotPasswordText, isLoading && styles.disabledText]}>
           {TURKISH_TEXT.forgotPassword}
         </Text>
       </TouchableOpacity>
 
       {/* Login Button */}
       <TouchableOpacity
-        style={[
-          styles.loginButton,
-          isLoading && styles.loginButtonDisabled
-        ]}
+        style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
         onPress={handleSubmit}
         disabled={isLoading}
         accessibilityLabel={ACCESSIBILITY_LABELS.loginButton}
         accessibilityRole="button"
       >
         {isLoading ? (
-          <ActivityIndicator 
-            color={ORIGINAL_COLORS.primaryButtonText} 
-            size="small"
-          />
+          <ActivityIndicator color={ORIGINAL_COLORS.primaryButtonText} size="small" />
         ) : (
-          <Text style={styles.loginButtonText}>
-            {TURKISH_TEXT.loginButton}
-          </Text>
+          <Text style={styles.loginButtonText}>{TURKISH_TEXT.loginButton}</Text>
         )}
       </TouchableOpacity>
     </View>
@@ -216,39 +198,39 @@ export const OriginalLoginForm: React.FC<OriginalLoginFormProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
     maxWidth: 400,
+    width: '100%',
   },
 
-  globalErrorContainer: {
-    backgroundColor: 'rgba(255, 68, 68, 0.1)',
-    borderWidth: 1,
-    borderColor: ORIGINAL_COLORS.errorColor,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-  },
-
-  globalErrorText: {
-    color: ORIGINAL_COLORS.errorColor,
-    fontSize: 14,
-    textAlign: 'center',
-    fontWeight: '500',
+  disabledText: {
+    opacity: 0.5,
   },
 
   forgotPasswordButton: {
     alignSelf: 'flex-end',
     marginBottom: 24,
-    paddingVertical: 8,
     paddingHorizontal: 4,
+    paddingVertical: 8,
   },
 
   forgotPasswordText: {
     ...originalLoginStyles.forgotPasswordText,
   },
 
-  disabledText: {
-    opacity: 0.5,
+  globalErrorContainer: {
+    backgroundColor: 'rgba(255, 68, 68, 0.1)',
+    borderColor: ORIGINAL_COLORS.errorColor,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 16,
+    padding: 12,
+  },
+
+  globalErrorText: {
+    color: ORIGINAL_COLORS.errorColor,
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 
   loginButton: {

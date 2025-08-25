@@ -1,17 +1,11 @@
-import React, { useRef } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  PanResponder,
-  Animated,
-  Dimensions,
-} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useRef } from 'react';
+import { Animated, Dimensions, PanResponder, StyleSheet, Text, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
+import { IoniconsName } from '@/types/icons';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BENTO_PADDING = DesignSystem.spacing.md;
 const GRID_SIZE = (SCREEN_WIDTH - BENTO_PADDING * 3) / 2;
@@ -19,26 +13,26 @@ const GRID_SIZE = (SCREEN_WIDTH - BENTO_PADDING * 3) / 2;
 interface BentoCardProps {
   title: string;
   subtitle?: string;
-  icon: string;
+  icon: IoniconsName;
   gradient: string[];
   size: 'small' | 'medium' | 'large' | 'hero';
   onPress: () => void;
   children?: React.ReactNode;
 }
 
-const BentoCard: React.FC<BentoCardProps> = ({ 
-  title, 
-  subtitle, 
-  icon, 
-  gradient, 
-  size, 
-  onPress, 
-  children 
+const BentoCard: React.FC<BentoCardProps> = ({
+  title,
+  subtitle,
+  icon,
+  gradient,
+  size,
+  onPress,
+  children,
 }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const magneticAnim = useRef(new Animated.ValueXY()).current;
   const rippleAnim = useRef(new Animated.Value(0)).current;
-  
+
   const cardDimensions = {
     small: { width: GRID_SIZE, height: GRID_SIZE },
     medium: { width: GRID_SIZE * 2 + BENTO_PADDING, height: GRID_SIZE },
@@ -54,10 +48,10 @@ const BentoCard: React.FC<BentoCardProps> = ({
       const { locationX, locationY } = evt.nativeEvent;
       const centerX = cardDimensions[size].width / 2;
       const centerY = cardDimensions[size].height / 2;
-      
+
       const deltaX = (locationX - centerX) * 0.1;
       const deltaY = (locationY - centerY) * 0.1;
-      
+
       Animated.parallel([
         Animated.spring(magneticAnim, {
           toValue: { x: deltaX, y: deltaY },
@@ -76,7 +70,7 @@ const BentoCard: React.FC<BentoCardProps> = ({
         }),
       ]).start();
     },
-    
+
     onPanResponderRelease: () => {
       Animated.parallel([
         Animated.spring(magneticAnim, {
@@ -105,7 +99,7 @@ const BentoCard: React.FC<BentoCardProps> = ({
       { translateX: magneticAnim.x },
       { translateY: magneticAnim.y },
       { scale: scaleAnim },
-    ],
+    ] as any,
   };
 
   const rippleStyle = {
@@ -117,50 +111,36 @@ const BentoCard: React.FC<BentoCardProps> = ({
           outputRange: [0, 2],
         }),
       },
-    ],
+    ] as any,
   };
 
   return (
     <Animated.View
-      style={[
-        styles.bentoCard,
-        cardDimensions[size],
-        animatedStyle,
-      ]}
+      style={[styles.bentoCard, cardDimensions[size], animatedStyle]}
       {...panResponder.panHandlers}
     >
       <LinearGradient
-        colors={gradient as any}
+        colors={gradient as [string, string, ...string[]]}
         style={styles.cardGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
         <BlurView intensity={20} style={styles.cardBlur}>
           <Animated.View style={[styles.ripple, rippleStyle]} />
-          
+
           <View style={styles.cardHeader}>
             <View style={styles.cardTitleContainer}>
-              <Text style={[DesignSystem.typography.body.medium, styles.cardTitle]}>
-                {title}
-              </Text>
+              <Text style={[DesignSystem.typography.body.medium, styles.cardTitle]}>{title}</Text>
               {subtitle && (
                 <Text style={[DesignSystem.typography.scale.caption, styles.cardSubtitle]}>
                   {subtitle}
                 </Text>
               )}
             </View>
-            <Ionicons 
-              name={icon as any} 
-              size={24} 
-              color={DesignSystem.colors.neutral.charcoal}
-            />
+            <Ionicons name={icon} size={24} color={DesignSystem.colors.neutral.charcoal} />
           </View>
-          
-          {children && (
-            <View style={styles.cardContent}>
-              {children}
-            </View>
-          )}
+
+          {children && <View style={styles.cardContent}>{children}</View>}
         </BlurView>
       </LinearGradient>
     </Animated.View>
@@ -173,42 +153,42 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...DesignSystem.layout.card,
   },
+  cardBlur: {
+    flex: 1,
+    justifyContent: 'space-between',
+    padding: DesignSystem.spacing.lg,
+  },
+  cardContent: {
+    marginTop: DesignSystem.spacing.md,
+  },
   cardGradient: {
     flex: 1,
   },
-  cardBlur: {
-    flex: 1,
-    padding: DesignSystem.spacing.lg,
-    justifyContent: 'space-between',
-  },
-  ripple: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    width: 100,
-    height: 100,
-    marginTop: -50,
-    marginLeft: -50,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-  },
   cardHeader: {
-    flexDirection: 'row',
     alignItems: 'flex-start',
+    flexDirection: 'row',
     gap: DesignSystem.spacing.sm,
   },
-  cardTitleContainer: {
-    flex: 1,
+  cardSubtitle: {
+    color: DesignSystem.colors.neutral.slate,
   },
   cardTitle: {
     color: DesignSystem.colors.neutral.charcoal,
     marginBottom: DesignSystem.spacing.xs,
   },
-  cardSubtitle: {
-    color: DesignSystem.colors.neutral.slate,
+  cardTitleContainer: {
+    flex: 1,
   },
-  cardContent: {
-    marginTop: DesignSystem.spacing.md,
+  ripple: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: 50,
+    height: 100,
+    left: '50%',
+    marginLeft: -50,
+    marginTop: -50,
+    position: 'absolute',
+    top: '50%',
+    width: 100,
   },
 });
 

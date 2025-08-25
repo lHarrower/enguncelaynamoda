@@ -1,15 +1,16 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Animated, {
-  useSharedValue,
+  Easing,
+  Extrapolate,
+  interpolate,
   useAnimatedStyle,
+  useSharedValue,
   withRepeat,
   withTiming,
-  interpolate,
-  Extrapolate,
-  Easing,
 } from 'react-native-reanimated';
-import { LinearGradient } from 'expo-linear-gradient';
+
 import { useSafeTheme } from '@/hooks/useSafeTheme';
 import { DesignSystem } from '@/theme/DesignSystem';
 
@@ -20,25 +21,25 @@ interface GoldShimmerProps {
   delay?: number;
 }
 
-export default function GoldShimmer({ 
-  width, 
-  height, 
+export default function GoldShimmer({
+  width,
+  height,
   intensity = 'subtle',
-  delay = 0 
+  delay = 0,
 }: GoldShimmerProps) {
   const theme = useSafeTheme();
-  const { colors } = theme;
+  const { colors: _colors } = theme;
   const shimmerPosition = useSharedValue(0);
 
   useEffect(() => {
     const startAnimation = () => {
       shimmerPosition.value = withRepeat(
-        withTiming(1, { 
+        withTiming(1, {
           duration: intensity === 'subtle' ? 3000 : intensity === 'medium' ? 2500 : 2000,
           easing: Easing.inOut(Easing.ease),
         }),
         -1,
-        false
+        false,
       );
     };
 
@@ -54,7 +55,7 @@ export default function GoldShimmer({
       shimmerPosition.value,
       [0, 1],
       [-width * 1.5, width * 2.5],
-      Extrapolate.CLAMP
+      Extrapolate.CLAMP,
     );
 
     return {
@@ -74,17 +75,29 @@ export default function GoldShimmer({
     <View style={[styles.container, { width, height }]} pointerEvents="none">
       <Animated.View style={[styles.shimmer, { width: width * 3 }, animatedStyle]}>
         <LinearGradient
-          colors={[
-            'transparent',
-            'transparent',
-            `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.3 * 255).toString(16).padStart(2, '0')}`,
-            `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.7 * 255).toString(16).padStart(2, '0')}`,
-            `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.5 * 255).toString(16).padStart(2, '0')}`,
-            `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.7 * 255).toString(16).padStart(2, '0')}`,
-            `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.3 * 255).toString(16).padStart(2, '0')}`,
-            'transparent',
-            'transparent',
-          ] as const}
+          colors={
+            [
+              'transparent',
+              'transparent',
+              `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.3 * 255)
+                .toString(16)
+                .padStart(2, '0')}`,
+              `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.7 * 255)
+                .toString(16)
+                .padStart(2, '0')}`,
+              `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.5 * 255)
+                .toString(16)
+                .padStart(2, '0')}`,
+              `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.7 * 255)
+                .toString(16)
+                .padStart(2, '0')}`,
+              `${DesignSystem.colors.primary[500]}${Math.round(baseOpacity * 0.3 * 255)
+                .toString(16)
+                .padStart(2, '0')}`,
+              'transparent',
+              'transparent',
+            ] as const
+          }
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={styles.gradient}
@@ -96,14 +109,14 @@ export default function GoldShimmer({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    overflow: 'hidden',
     borderRadius: 8,
-  },
-  shimmer: {
-    height: '100%',
+    overflow: 'hidden',
+    position: 'absolute',
   },
   gradient: {
     flex: 1,
+  },
+  shimmer: {
+    height: '100%',
   },
 });

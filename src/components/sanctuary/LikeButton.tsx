@@ -1,23 +1,19 @@
-import React, { useRef, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSequence,
-  withDelay,
-  runOnJS,
-} from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import React, { useEffect } from 'react';
+import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { DesignSystem } from '@/theme/DesignSystem';
-import { logInDev, errorInDev } from '../../utils/consoleSuppress';
+
+import { errorInDev, logInDev } from '../../utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -32,12 +28,12 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   isLiked,
   onPress,
   size = 24,
-  disabled = false
+  disabled = false,
 }) => {
   // Animation values for the heart
   const heartScale = useSharedValue(1);
   const heartRotation = useSharedValue(0);
-  
+
   // Animation values for the wave circles
   const wave1Scale = useSharedValue(0);
   const wave1Opacity = useSharedValue(0);
@@ -72,10 +68,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
 
   // Heart animation styles
   const heartAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: heartScale.value },
-      { rotate: `${heartRotation.value}deg` }
-    ],
+    transform: [{ scale: heartScale.value }, { rotate: `${heartRotation.value}deg` }] as any,
   }));
 
   // Wave animation styles
@@ -98,7 +91,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     } catch (error) {
-      logInDev('Haptics not available:', error);
+      logInDev('Haptics not available:', error instanceof Error ? error : String(error));
     }
   };
 
@@ -112,7 +105,9 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   };
 
   const handlePress = () => {
-    if (disabled) return;
+    if (disabled) {
+      return;
+    }
 
     try {
       // Trigger haptic feedback
@@ -121,12 +116,12 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
       // Heart animation - gentle pop with rotation
       heartScale.value = withSequence(
         withTiming(1.3, { duration: 150 }),
-        withTiming(1, { duration: 200 })
+        withTiming(1, { duration: 200 }),
       );
-      
+
       heartRotation.value = withSequence(
         withTiming(isLiked ? -15 : 15, { duration: 100 }),
-        withTiming(0, { duration: 150 })
+        withTiming(0, { duration: 150 }),
       );
 
       // Reset waves before starting new animation
@@ -136,27 +131,33 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
       wave1Scale.value = withTiming(3, { duration: 600 });
       wave1Opacity.value = withSequence(
         withTiming(0.8, { duration: 100 }),
-        withDelay(200, withTiming(0, { duration: 300 }))
+        withDelay(200, withTiming(0, { duration: 300 })),
       );
 
       // Wave 2 - Second concentric circle (delayed)
       wave2Scale.value = withDelay(150, withTiming(3.5, { duration: 600 }));
-      wave2Opacity.value = withDelay(150, withSequence(
-        withTiming(0.6, { duration: 100 }),
-        withDelay(200, withTiming(0, { duration: 300 }))
-      ));
+      wave2Opacity.value = withDelay(
+        150,
+        withSequence(
+          withTiming(0.6, { duration: 100 }),
+          withDelay(200, withTiming(0, { duration: 300 })),
+        ),
+      );
 
       // Wave 3 - Third concentric circle (more delayed)
       wave3Scale.value = withDelay(300, withTiming(4, { duration: 600 }));
-      wave3Opacity.value = withDelay(300, withSequence(
-        withTiming(0.4, { duration: 100 }),
-        withDelay(200, withTiming(0, { duration: 300 }))
-      ));
+      wave3Opacity.value = withDelay(
+        300,
+        withSequence(
+          withTiming(0.4, { duration: 100 }),
+          withDelay(200, withTiming(0, { duration: 300 })),
+        ),
+      );
 
       // Call the actual onPress handler
       onPress();
     } catch (error) {
-      errorInDev('Error in LikeButton press:', error);
+      errorInDev('Error in LikeButton press:', error instanceof Error ? error : String(error));
       // Still call onPress even if animations fail
       onPress();
     }
@@ -166,50 +167,50 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
   const waveSize = buttonSize * 4; // Waves extend beyond the button
 
   return (
-    <View 
+    <View
       style={[styles.container, { width: buttonSize, height: buttonSize }]}
       accessible={true}
       accessibilityRole="button"
-      accessibilityLabel={isLiked ? "Remove from favorites" : "Add to favorites"}
+      accessibilityLabel={isLiked ? 'Remove from favorites' : 'Add to favorites'}
       accessibilityHint="Double tap to toggle favorite status with wave animation"
     >
       {/* Wave circles - positioned behind the button */}
       <View style={[styles.wavesContainer, { width: waveSize, height: waveSize }]}>
-        <Animated.View 
+        <Animated.View
           style={[
             styles.wave,
-            { 
-              width: waveSize, 
+            {
+              width: waveSize,
               height: waveSize,
               borderRadius: waveSize / 2,
               backgroundColor: DesignSystem.colors.sage[400],
             },
-            wave1AnimatedStyle
-          ]} 
+            wave1AnimatedStyle,
+          ]}
         />
-        <Animated.View 
+        <Animated.View
           style={[
             styles.wave,
-            { 
-              width: waveSize, 
+            {
+              width: waveSize,
               height: waveSize,
               borderRadius: waveSize / 2,
               backgroundColor: DesignSystem.colors.sage[300],
             },
-            wave2AnimatedStyle
-          ]} 
+            wave2AnimatedStyle,
+          ]}
         />
-        <Animated.View 
+        <Animated.View
           style={[
             styles.wave,
-            { 
-              width: waveSize, 
+            {
+              width: waveSize,
               height: waveSize,
               borderRadius: waveSize / 2,
               backgroundColor: DesignSystem.colors.sage[200],
             },
-            wave3AnimatedStyle
-          ]} 
+            wave3AnimatedStyle,
+          ]}
         />
       </View>
 
@@ -217,15 +218,19 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
       <TouchableOpacity
         style={[
           styles.button,
-          { 
-            width: buttonSize, 
+          {
+            width: buttonSize,
             height: buttonSize,
             opacity: disabled ? 0.5 : 1,
-          }
+          },
         ]}
         onPress={handlePress}
         activeOpacity={0.8}
         disabled={disabled}
+        accessibilityRole="button"
+        accessibilityLabel={isLiked ? 'Remove from favorites' : 'Add to favorites'}
+        accessibilityHint="Tap to toggle favorite status with wave animation"
+        accessibilityState={{ selected: isLiked, disabled }}
       >
         <Animated.View style={heartAnimatedStyle}>
           <Ionicons
@@ -240,28 +245,28 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  wavesContainer: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 0,
-  },
-  wave: {
-    position: 'absolute',
-    borderWidth: 1,
-    borderColor: 'rgba(212, 175, 55, 0.3)',
-  },
   button: {
-    justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: DesignSystem.radius.full,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: DesignSystem.radius.full,
+    justifyContent: 'center',
     ...DesignSystem.elevation.soft,
     zIndex: 1,
+  },
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  wave: {
+    borderColor: 'rgba(212, 175, 55, 0.3)',
+    borderWidth: 1,
+    position: 'absolute',
+  },
+  wavesContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    zIndex: 0,
   },
 });

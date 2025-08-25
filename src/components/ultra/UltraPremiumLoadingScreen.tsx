@@ -1,21 +1,17 @@
 import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
-import { DesignSystem } from '@/theme/DesignSystem';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming,
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
   withRepeat,
   withSequence,
-  interpolate,
+  withTiming,
 } from 'react-native-reanimated';
 
-const { width, height } = Dimensions.get('window');
+import { DesignSystem } from '@/theme/DesignSystem';
+
+const { width: _width, height: _height } = Dimensions.get('window');
 
 interface UltraPremiumLoadingScreenProps {
   message?: string;
@@ -41,20 +37,17 @@ const UltraPremiumLoadingScreen: React.FC<UltraPremiumLoadingScreenProps> = ({
 
     // Dots animation
     dotsAnimation.value = withRepeat(
-      withSequence(
-        withTiming(1, { duration: 600 }),
-        withTiming(0, { duration: 600 })
-      ),
+      withSequence(withTiming(1, { duration: 600 }), withTiming(0, { duration: 600 })),
       -1,
-      false
+      false,
     );
-  }, []);
+  }, [dotsAnimation, logoOpacity, logoScale]);
 
   useEffect(() => {
     if (showProgress) {
       progressValue.value = withTiming(progress, { duration: 300 });
     }
-  }, [progress, showProgress]);
+  }, [progress, showProgress, progressValue]);
 
   const logoAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -92,7 +85,7 @@ const UltraPremiumLoadingScreen: React.FC<UltraPremiumLoadingScreenProps> = ({
         {/* Loading Message */}
         <View style={styles.messageContainer}>
           <Text style={styles.loadingMessage}>{message}</Text>
-          
+
           {/* Progress Bar */}
           {showProgress && (
             <View style={styles.progressContainer}>
@@ -102,13 +95,13 @@ const UltraPremiumLoadingScreen: React.FC<UltraPremiumLoadingScreenProps> = ({
               <Text style={styles.progressText}>{Math.round(progress)}%</Text>
             </View>
           )}
-          
+
           {/* Loading Dots */}
           {!showProgress && (
             <View style={styles.dotsContainer}>
               <Animated.View style={[styles.dot, dotsAnimatedStyle]} />
-              <Animated.View style={[styles.dot, dotsAnimatedStyle, { animationDelay: '200ms' }]} />
-              <Animated.View style={[styles.dot, dotsAnimatedStyle, { animationDelay: '400ms' }]} />
+              <Animated.View style={[styles.dot, dotsAnimatedStyle]} />
+              <Animated.View style={[styles.dot, dotsAnimatedStyle]} />
             </View>
           )}
         </View>
@@ -119,36 +112,58 @@ const UltraPremiumLoadingScreen: React.FC<UltraPremiumLoadingScreenProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: DesignSystem.colors.background.primary,
-    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.primary,
+    flex: 1,
+    justifyContent: 'center',
   },
   content: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: DesignSystem.spacing.xl,
   },
+  dot: {
+    backgroundColor: DesignSystem.colors.text.primary,
+    borderRadius: 3,
+    height: 6,
+    width: 6,
+  },
+  dotsContainer: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.sm,
+  },
+  loadingMessage: {
+    ...DesignSystem.typography.body.medium,
+    color: DesignSystem.colors.text.secondary,
+    marginBottom: DesignSystem.spacing.lg,
+    textAlign: 'center',
+  },
+  logoBackground: {
+    alignItems: 'center',
+    backgroundColor: DesignSystem.colors.background.elevated,
+    borderColor: DesignSystem.colors.sage[100],
+    borderRadius: 40,
+    borderWidth: 1,
+    height: 80,
+    justifyContent: 'center',
+    marginBottom: DesignSystem.spacing.lg,
+    width: 80,
+  },
+  logoCircle: {
+    backgroundColor: DesignSystem.colors.text.primary,
+    borderRadius: 20,
+    height: 40,
+    width: 40,
+  },
   logoContainer: {
     alignItems: 'center',
     marginBottom: DesignSystem.spacing.xxxl,
   },
-  logoBackground: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: DesignSystem.colors.background.elevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: DesignSystem.spacing.lg,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.sage[100],
-  },
-  logoCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: DesignSystem.colors.text.primary,
+  logoSubtext: {
+    ...DesignSystem.typography.scale.caption,
+    color: DesignSystem.colors.text.secondary,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   logoText: {
     ...DesignSystem.typography.scale.hero,
@@ -157,51 +172,29 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
     marginBottom: DesignSystem.spacing.xs,
   },
-  logoSubtext: {
-    ...DesignSystem.typography.scale.caption,
-    color: DesignSystem.colors.text.secondary,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
   messageContainer: {
     alignItems: 'center',
   },
-  loadingMessage: {
-  ...DesignSystem.typography.body.medium,
-    color: DesignSystem.colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing.lg,
+  progressBar: {
+    backgroundColor: DesignSystem.colors.text.primary,
+    borderRadius: 1,
+    height: '100%',
   },
   progressContainer: {
     alignItems: 'center',
     width: 200,
   },
-  progressTrack: {
-    width: '100%',
-    height: 2,
-    backgroundColor: DesignSystem.colors.sage[100],
-    borderRadius: 1,
-    overflow: 'hidden',
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: DesignSystem.colors.text.primary,
-    borderRadius: 1,
-  },
   progressText: {
     ...DesignSystem.typography.scale.caption,
     color: DesignSystem.colors.text.tertiary,
   },
-  dotsContainer: {
-    flexDirection: 'row',
-    gap: DesignSystem.spacing.sm,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: DesignSystem.colors.text.primary,
+  progressTrack: {
+    backgroundColor: DesignSystem.colors.sage[100],
+    borderRadius: 1,
+    height: 2,
+    marginBottom: DesignSystem.spacing.sm,
+    overflow: 'hidden',
+    width: '100%',
   },
 });
 

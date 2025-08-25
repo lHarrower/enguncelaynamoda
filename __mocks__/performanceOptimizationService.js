@@ -8,15 +8,15 @@ const mockRecommendations = {
       type: 'outfit',
       items: ['item-1', 'item-2'],
       confidence: 0.9,
-      reasoning: 'Perfect for today\'s weather'
-    }
+      reasoning: "Perfect for today's weather",
+    },
   ],
   weather: {
     temperature: 22,
     condition: 'sunny',
-    humidity: 60
+    humidity: 60,
   },
-  generatedAt: new Date().toISOString()
+  generatedAt: new Date().toISOString(),
 };
 
 const mockWardrobeData = {
@@ -26,17 +26,17 @@ const mockWardrobeData = {
       name: 'Blue Shirt',
       category: 'tops',
       color: 'blue',
-      season: 'all'
+      season: 'all',
     },
     {
       id: 'item-2',
       name: 'Black Pants',
       category: 'bottoms',
       color: 'black',
-      season: 'all'
-    }
+      season: 'all',
+    },
   ],
-  lastUpdated: new Date().toISOString()
+  lastUpdated: new Date().toISOString(),
 };
 
 const mockPerformanceMetrics = {
@@ -45,7 +45,7 @@ const mockPerformanceMetrics = {
   databaseQueryTime: [10, 15, 12],
   cacheHitRate: 0.85,
   errorRate: 0.02,
-  lastUpdated: Date.now()
+  lastUpdated: Date.now(),
 };
 
 export const PerformanceOptimizationService = {
@@ -59,19 +59,19 @@ export const PerformanceOptimizationService = {
     const AsyncStorage = require('@react-native-async-storage/async-storage');
     const dateKey = date || new Date().toISOString().split('T')[0];
     const cacheKey = `recommendations_${userId}_${dateKey}`;
-    
+
     try {
       const cachedDataStr = await AsyncStorage.getItem(cacheKey);
-      
+
       if (cachedDataStr) {
         const cachedData = JSON.parse(cachedDataStr);
-        
+
         // Check if cache is expired (mimicking real implementation)
         if (cachedData.expiresAt && Date.now() > cachedData.expiresAt) {
           await AsyncStorage.removeItem(cacheKey);
           return null;
         }
-        
+
         // Return the cached data (could be test-specific structure)
         return cachedData.data || cachedData;
       }
@@ -79,7 +79,7 @@ export const PerformanceOptimizationService = {
       // Fall back to null on error
       return null;
     }
-    
+
     // Return null if no cached data found
     return null;
   },
@@ -137,7 +137,7 @@ export const PerformanceOptimizationService = {
       cacheHitRate: 0.85,
       errorRate: 0.02,
       totalOperations: 100,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     };
   },
 
@@ -173,7 +173,7 @@ export const PerformanceOptimizationService = {
 
   schedulePeriodicCleanup() {
     // Mock implementation
-  }
+  },
 };
 
 // Default export for CommonJS compatibility

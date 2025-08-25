@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
+
 import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width } = Dimensions.get('window');
@@ -16,38 +17,38 @@ const PastelCircleBackground = () => {
 
 const styles = StyleSheet.create({
   background: {
-    width: '100%',
+    backgroundColor: DesignSystem.colors.background.primary,
     height: '100%',
     overflow: 'hidden',
-    backgroundColor: DesignSystem.colors.background.primary,
+    width: '100%',
   },
   circle1: {
-    position: 'absolute',
-    width: width * 1.6,
-    height: width * 1.6,
-    borderRadius: (width * 1.6) / 2,
     backgroundColor: DesignSystem.colors.neutral[300] + '20',
-    top: -width * 0.8,
+    borderRadius: (width * 1.6) / 2,
+    height: width * 1.6,
     left: -width * 0.3,
+    position: 'absolute',
+    top: -width * 0.8,
+    width: width * 1.6,
   },
   circle2: {
-    position: 'absolute',
-    width: width * 1.2,
-    height: width * 1.2,
-    borderRadius: (width * 1.2) / 2,
     backgroundColor: DesignSystem.colors.gold[300] + '15',
+    borderRadius: (width * 1.2) / 2,
     bottom: -width * 0.6,
+    height: width * 1.2,
+    position: 'absolute',
     right: -width * 0.3,
+    width: width * 1.2,
   },
   circle3: {
-    position: 'absolute',
-    width: width,
-    height: width,
-    borderRadius: width / 2,
     backgroundColor: DesignSystem.colors.sage[300] + '10',
+    borderRadius: width / 2,
     bottom: width * 0.05,
+    height: width,
     left: -width * 0.4,
     opacity: 0.8,
+    position: 'absolute',
+    width: width,
   },
 });
 

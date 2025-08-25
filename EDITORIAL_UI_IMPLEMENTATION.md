@@ -14,12 +14,14 @@ A premium, female-focused fashion shopping experience that combines editorial st
 ## Key Features
 
 ### 🎨 Visual Design
+
 - **Typography Hierarchy**: Serif fonts (Playfair Display) for headings, thin sans-serif (Inter Light) for body text
 - **Color Palette**: Pastel lilac (#B794FF) and soft gold (#FCD34D) accents on clean white background
 - **Card Layout**: Vertical image-dominant cards sized at 80% screen width
 - **Floating Navigation**: Semi-opaque grey blurred pill-shaped bottom navigation
 
 ### 🎭 Micro-Animations
+
 - **Parallax Scroll**: Header content moves with subtle parallax effect
 - **Hover Enlargement**: Cards scale and lift on interaction
 - **Smooth Swipes**: Counter-clockwise curve effects on card swipes
@@ -28,22 +30,26 @@ A premium, female-focused fashion shopping experience that combines editorial st
 ### 📱 Interactive Components
 
 #### 1. Weekly Color Stories
+
 - Large hero cards showcasing weekly color inspiration
 - Color swatches with mood descriptions and styling tips
 - Horizontal scrolling with snap-to-interval
 
 #### 2. Daily Style Picks
+
 - Curated product recommendations
 - Sale indicators and pricing
 - Tag-based categorization
 - Smooth hover effects with image scaling
 
 #### 3. Editorial Stories
+
 - Long-form content with beautiful imagery
 - Category badges and reading time estimates
 - Author attribution and excerpts
 
 #### 4. Swipeable Discovery
+
 - Tinder-style card stack for product discovery
 - Counter-clockwise rotation on swipe
 - Visual feedback with swipe indicators
@@ -77,22 +83,26 @@ app/
 The `EditorialTheme.ts` provides a comprehensive design system:
 
 ### Colors
+
 - **Lilac Palette**: 50-900 range for primary accents
-- **Gold Palette**: 50-900 range for secondary accents  
+- **Gold Palette**: 50-900 range for secondary accents
 - **Grey Neutrals**: Text and background variations
 - **Semantic Colors**: Background, surface, accent mappings
 
 ### Typography
+
 - **Serif Family**: Playfair Display for headings (xs-5xl sizes)
 - **Sans Family**: Inter Light for body text (xs-2xl sizes)
 - **Weight Variations**: Thin to bold options
 
 ### Layout
+
 - **Responsive Sizing**: 80% width cards, adaptive spacing
 - **Consistent Spacing**: xs (4px) to 3xl (64px) scale
 - **Border Radius**: sm (8px) to full (9999px) options
 
 ### Shadows & Effects
+
 - **Soft Shadows**: Subtle depth without heaviness
 - **Blur Effects**: Semi-transparent navigation
 - **Animation Timing**: Fast (200ms) to slow (500ms) options
@@ -122,11 +132,7 @@ export default function DemoScreen() {
 ### Individual Components
 
 ```tsx
-import { 
-  WeeklyColorCard, 
-  StylePickCard, 
-  SwipeableCardStack 
-} from '../components/editorial';
+import { WeeklyColorCard, StylePickCard, SwipeableCardStack } from '../components/editorial';
 
 // Use individual components as needed
 ```
@@ -134,6 +140,7 @@ import {
 ## Content Management
 
 ### Weekly Color Stories
+
 ```tsx
 interface WeeklyColorStory {
   id: string;
@@ -149,6 +156,7 @@ interface WeeklyColorStory {
 ```
 
 ### Daily Style Picks
+
 ```tsx
 interface DailyStylePick {
   id: string;
@@ -164,6 +172,7 @@ interface DailyStylePick {
 ```
 
 ### Editorial Stories
+
 ```tsx
 interface EditorialStory {
   id: string;
@@ -180,16 +189,19 @@ interface EditorialStory {
 ## Animations & Interactions
 
 ### Card Interactions
+
 - **Press In**: Scale to 98%, slight upward movement
 - **Press Out**: Spring back to original position
 - **Image Hover**: Scale to 105% with smooth timing
 
 ### Swipe Gestures
+
 - **Horizontal Swipe**: Counter-clockwise rotation effect
 - **Threshold**: 30% of screen width to trigger action
 - **Visual Feedback**: Opacity and scale changes on background cards
 
 ### Scroll Effects
+
 - **Parallax Header**: Subtle movement and opacity changes
 - **Smooth Scrolling**: Optimized scroll event throttling
 - **Snap Scrolling**: Horizontal card carousels snap to positions
@@ -211,12 +223,14 @@ interface EditorialStory {
 ## Demo Navigation
 
 The demo includes multiple screens accessible via the floating navigation bar:
+
 1. **Home**: Full editorial experience with all sections
 2. **Discover**: Swipeable card stack for product discovery
 3. **Wardrobe**: Digital wardrobe management (placeholder)
 4. **Profile**: User profile and settings (placeholder)
 
 ### Navigation Features
+
 - **Animated Indicator**: Smooth sliding indicator that follows the active tab
 - **Synchronized Movement**: Indicator moves in perfect sync with tab selection
 - **Spring Animations**: Natural, bouncy transitions for the indicator
@@ -224,18 +238,21 @@ The demo includes multiple screens accessible via the floating navigation bar:
 ## Recent Fixes & Improvements
 
 ### Swipeable Card Improvements
+
 - **Horizontal-Only Movement**: Cards now only move left/right, no vertical drift
 - **Curved Motion**: Added subtle curved trajectory for more natural feel
 - **Crash Prevention**: Fixed gesture handler crashes with proper error handling
 - **Improved Thresholds**: Reduced swipe threshold to 25% for better UX
 
 ### Navigation Bar Enhancements
+
 - **Animated Indicator**: Added smooth sliding colored bar that tracks active tab
 - **Synchronized Movement**: Indicator position updates perfectly with tab changes
 - **Spring Physics**: Natural bouncy animation for indicator movement
 - **Proper Positioning**: Indicator centers correctly under each tab
 
 ### Performance Optimizations
+
 - **Safe Callbacks**: Added error handling for swipe callbacks
 - **Memory Management**: Proper cleanup of animations and timers
 - **Gesture Stability**: Improved gesture handler reliability
@@ -243,7 +260,7 @@ The demo includes multiple screens accessible via the floating navigation bar:
 ## Integration Notes
 
 - Requires `react-native-reanimated` v3+
-- Requires `react-native-gesture-handler` 
+- Requires `react-native-gesture-handler`
 - Requires `expo-blur` for navigation effects
 - Uses `@expo/vector-icons` for iconography
 - Compatible with Expo SDK 53+
@@ -251,6 +268,7 @@ The demo includes multiple screens accessible via the floating navigation bar:
 ## Customization
 
 The theme system is fully customizable. Modify `EditorialTheme.ts` to:
+
 - Adjust color palettes
 - Change typography scales
 - Modify spacing and sizing

@@ -1,6 +1,7 @@
 # AynaModa Mobile Application
 
 ## 🎯 Project Overview
+
 AynaModa is a hyper-personalized fashion app that saves users from discount noise and decision fatigue by recommending sales on items that complement their existing virtual wardrobe.
 
 ## 📱 Mobile UI Skeleton (v1.0)
@@ -10,13 +11,15 @@ AynaModa is a hyper-personalized fashion app that saves users from discount nois
 We have successfully built the complete mobile UI skeleton with:
 
 #### Technical Stack
+
 - **Platform**: Expo SDK 53
-- **Frontend**: React Native + TypeScript (strict mode)  
+- **Frontend**: React Native + TypeScript (strict mode)
 - **Navigation**: expo-router (file-based routing)
 - **UI Components**: Native React Native components with custom styling
 - **Icons**: @expo/vector-icons (Ionicons)
 
 #### App Structure
+
 ```
 app/
 ├── _layout.tsx          # Root layout with tab navigation
@@ -30,33 +33,39 @@ app/
 #### Key Features Implemented
 
 **🏠 Home Screen**
+
 - Personalized greeting and welcome message
 - Smart recommendations section with CTA
 - Quick action buttons (Add to Wardrobe, Browse Sales, Find Boutiques)
 - Recent activity section
 
 **👕 Wardrobe Screen**
+
 - Empty state with guidance for new users
 - Multiple options to add items (camera, gallery, browse)
 - Category grid (Tops, Bottoms, Dresses, Shoes)
 
 **🔍 Discover Screen**
+
 - Search functionality with search bar
 - Quick filter chips (All, On Sale, New Arrivals, Designer, Accessories)
 - Featured boutiques carousel
 
 **❤️ Favorites Screen**
+
 - Tab-based interface (Items vs Boutiques)
 - Empty states for both tabs
 
-**👤 Profile Screen** 
+**👤 Profile Screen**
+
 - Guest user state with sign-in prompt
 - User stats and comprehensive settings menu
 
 #### 🎨 Design System & Colors
+
 - **Colorful Theme**: Vibrant and modern mid-tone palette
   - **Sea Green** (#2E8B57) - Primary actions, home screen accents
-  - **Steel Blue** (#4682B4) - Secondary actions, wardrobe features  
+  - **Steel Blue** (#4682B4) - Secondary actions, wardrobe features
   - **Peach** (#FFB347) - Highlights, discover functionality
   - **Coral** (#FF6B6B) - Favorites, emotional connections
   - **Purple** (#9370DB) - Profile, personalization features
@@ -68,16 +77,19 @@ app/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js (18+)
 - Expo CLI
 - Expo Go app on your mobile device
 
 ### Installation & Setup
+
 1. Install dependencies: `npm install`
 2. Start development server: `npm start`
 3. Scan QR code with Expo Go app
 
 ### Available Scripts
+
 - `npm start` - Start Expo development server
 - `npm run android` - Run on Android
 - `npm run ios` - Run on iOS (macOS only)
@@ -130,7 +142,8 @@ import Constants from 'expo-constants';
 
 const googleExtra = (Constants.expoConfig?.extra as any)?.google || {};
 const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || googleExtra.iosClientId;
-const androidClientId = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || googleExtra.androidClientId;
+const androidClientId =
+  process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || googleExtra.androidClientId;
 ```
 
 EAS secrets (examples):
@@ -164,3 +177,57 @@ eas secret:create --name preview_GOOGLE_ANDROID_CLIENT_ID --value <client-id>
 
 - Removed references to deprecated models.
 - No hardcoded OAuth client IDs remain in docs.
+
+---
+
+## 🛡️ Continuous Governance & Audit (Pipeline Overview)
+
+The repository includes an autonomous multi-domain audit pipeline (see `scripts/audit`):
+
+Domains covered:
+
+- Static Quality: ESLint (baseline diff), dead exports (ts-prune)
+- Security: Semgrep, dependency vulns (OSV/Snyk normalized), secrets (gitleaks), RLS negative tests, risk acceptance
+- Supply Chain: SBOM (CycloneDX), license policy allow/deny, vulnerability dedupe
+- Test Integrity: Coverage thresholds, mutation score (Stryker)
+- Performance: Startup latency percentiles & frame drop parsing (Detox trace parser scaffold)
+- Accessibility: Label coverage & contrast metrics (scan scaffold)
+- Reporting: master-report.json, SUMMARY.md, HTML (`audit/out/report.html`), optional PDF, SVG badges, trend + deltas, history snapshots (rotated)
+
+Key paths:
+
+```
+audit/out/
+  master-report.json
+  SUMMARY.md
+  report.html / report.pdf (opsiyonel)
+  badges/*.svg
+  trend.json
+  perf/perf.json
+  a11y/a11y.json
+```
+
+Badges (embed example):
+
+```
+![Coverage](audit/out/badges/coverage.svg)
+![Mutation](audit/out/badges/mutation.svg)
+![ESLint New](audit/out/badges/eslint-new.svg)
+![Security HC](audit/out/badges/security-hc.svg)
+```
+
+Risk Acceptance (`config/audit/risk-acceptance.json`): regex tabanlı geçici kabuller; süresi dolanlar gate failure üretir.
+
+Ekstralar: master-report.json artık `gatesDetailed` (domain + name + message) içerir; `run-deps.ps1` Snyk CLI + `SNYK_TOKEN` varsa `deps/snyk.json` üretip OSV ile normalize edilir.
+
+Commands:
+
+```
+npm run audit:pr      # Hafif PR hattı
+npm run audit:full    # Gece / push tam kapsam
+npm run audit:pdf     # PDF rapor (puppeteer varsa)
+```
+
+History pruning: `config/audit/history.config.json` ile `{"maxFiles": N}` tanımlayarak geçmiş dosya sınırı.
+
+> Not: Performans ve a11y parser'ları gerçek ölçüm entegrasyonu için iskelet; Detox / axe-core çıktıları `audit/in/**` altına bırakıldığında otomatik rapora dahil olur.

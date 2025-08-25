@@ -1,7 +1,8 @@
 // Animation Provider - Global animation context and settings
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { AccessibilityInfo, Platform, AppState, AppStateStatus } from 'react-native';
-import { AnimationSystem } from '@/theme/foundations/Animation';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { AccessibilityInfo, AppState, AppStateStatus, Platform } from 'react-native';
+
+import { AnimationConfig, AnimationSystem } from '@/theme/foundations/Animation';
 import { logInDev } from '@/utils/consoleSuppress';
 
 /**
@@ -11,38 +12,38 @@ interface AnimationContextType {
   // Accessibility settings
   isReducedMotionEnabled: boolean;
   isHighContrastEnabled: boolean;
-  
+
   // Performance settings
   isLowPowerModeEnabled: boolean;
   shouldUseNativeDriver: boolean;
-  
+
   // Global animation controls
   globalAnimationsEnabled: boolean;
   animationSpeed: number; // 0.5 = half speed, 1 = normal, 2 = double speed
-  
+
   // Animation preferences
   preferredTransitionType: 'fade' | 'slide' | 'scale' | 'push';
   enableHapticFeedback: boolean;
   enableSoundEffects: boolean;
-  
+
   // Methods
   setGlobalAnimationsEnabled: (enabled: boolean) => void;
   setAnimationSpeed: (speed: number) => void;
   setPreferredTransitionType: (type: 'fade' | 'slide' | 'scale' | 'push') => void;
   setEnableHapticFeedback: (enabled: boolean) => void;
   setEnableSoundEffects: (enabled: boolean) => void;
-  
+
   // Animation utilities
   getEffectiveDuration: (baseDuration: number) => number;
   shouldAnimate: () => boolean;
-  getAccessibleAnimation: (animation: any) => any;
+  getAccessibleAnimation: (animation: AnimationConfig) => AnimationConfig;
 
   // Back-compat settings shape referenced elsewhere
   settings?: {
     accessibility: {
       reduceMotion: boolean;
       highContrast?: boolean;
-    }
+    };
   };
 }
 
@@ -70,9 +71,9 @@ const defaultContext: AnimationContextType = {
   settings: {
     accessibility: {
       reduceMotion: false,
-      highContrast: false
-    }
-  }
+      highContrast: false,
+    },
+  },
 };
 
 /**
@@ -99,33 +100,31 @@ interface AnimationProviderProps {
  */
 export const AnimationProvider: React.FC<AnimationProviderProps> = ({
   children,
-  initialSettings = {}
+  initialSettings = {},
 }) => {
   // Accessibility states
   const [isReducedMotionEnabled, setIsReducedMotionEnabled] = useState(false);
   const [isHighContrastEnabled, setIsHighContrastEnabled] = useState(false);
-  
+
   // Performance states
   const [isLowPowerModeEnabled, setIsLowPowerModeEnabled] = useState(false);
   const [shouldUseNativeDriver, setShouldUseNativeDriver] = useState(true);
-  
+
   // User preference states
   const [globalAnimationsEnabled, setGlobalAnimationsEnabled] = useState(
-    initialSettings.globalAnimationsEnabled ?? true
+    initialSettings.globalAnimationsEnabled ?? true,
   );
-  const [animationSpeed, setAnimationSpeed] = useState(
-    initialSettings.animationSpeed ?? 1
-  );
-  const [preferredTransitionType, setPreferredTransitionType] = useState<'fade' | 'slide' | 'scale' | 'push'>(
-    initialSettings.preferredTransitionType ?? 'slide'
-  );
+  const [animationSpeed, setAnimationSpeed] = useState(initialSettings.animationSpeed ?? 1);
+  const [preferredTransitionType, setPreferredTransitionType] = useState<
+    'fade' | 'slide' | 'scale' | 'push'
+  >(initialSettings.preferredTransitionType ?? 'slide');
   const [enableHapticFeedback, setEnableHapticFeedback] = useState(
-    initialSettings.enableHapticFeedback ?? true
+    initialSettings.enableHapticFeedback ?? true,
   );
   const [enableSoundEffects, setEnableSoundEffects] = useState(
-    initialSettings.enableSoundEffects ?? false
+    initialSettings.enableSoundEffects ?? false,
   );
-  
+
   /**
    * Check accessibility settings on mount and when they change
    */
@@ -142,7 +141,7 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({
           const screenReaderEnabled = await AccessibilityInfo.isScreenReaderEnabled();
           setIsReducedMotionEnabled(screenReaderEnabled);
         }
-        
+
         // Check high contrast (iOS only)
         if (Platform.OS === 'ios') {
           try {
@@ -150,37 +149,43 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({
             // const highContrast = await AccessibilityInfo.isHighContrastEnabled();
             // setIsHighContrastEnabled(highContrast);
           } catch (error) {
-            logInDev('High contrast detection not available:', error);
+            logInDev(
+              'High contrast detection not available:',
+              error instanceof Error ? error : String(error),
+            );
           }
         }
       } catch (error) {
-        logInDev('Error checking accessibility settings:', error);
+        logInDev(
+          'Error checking accessibility settings:',
+          error instanceof Error ? error : String(error),
+        );
       }
     };
-    
+
     checkAccessibilitySettings();
-    
+
     // Listen for accessibility changes
     const reducedMotionSubscription = AccessibilityInfo.addEventListener(
       'reduceMotionChanged',
-      setIsReducedMotionEnabled
+      setIsReducedMotionEnabled,
     );
-    
+
     const screenReaderSubscription = AccessibilityInfo.addEventListener(
       'screenReaderChanged',
       (enabled) => {
         if (Platform.OS === 'android') {
           setIsReducedMotionEnabled(enabled);
         }
-      }
+      },
     );
-    
+
     return () => {
       reducedMotionSubscription?.remove();
       screenReaderSubscription?.remove();
     };
   }, []);
-  
+
   /**
    * Monitor app state for performance optimization
    */
@@ -194,14 +199,14 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({
         setShouldUseNativeDriver(true);
       }
     };
-    
+
     const subscription = AppState.addEventListener('change', handleAppStateChange);
-    
+
     return () => {
       subscription?.remove();
     };
   }, []);
-  
+
   /**
    * Get effective duration based on speed and accessibility settings
    */
@@ -209,44 +214,40 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({
     if (isReducedMotionEnabled) {
       return 0; // Instant for reduced motion
     }
-    
+
     if (isLowPowerModeEnabled) {
       return baseDuration * 0.5; // Faster for low power mode
     }
-    
+
     return baseDuration / animationSpeed;
   };
-  
+
   /**
    * Determine if animations should run
    */
   const shouldAnimate = (): boolean => {
-    return (
-      globalAnimationsEnabled &&
-      !isReducedMotionEnabled &&
-      shouldUseNativeDriver
-    );
+    return globalAnimationsEnabled && !isReducedMotionEnabled && shouldUseNativeDriver;
   };
-  
+
   /**
    * Get accessible version of animation config
    */
-  const getAccessibleAnimation = (animation: any): any => {
+  const getAccessibleAnimation = (animation: AnimationConfig): AnimationConfig => {
     if (!shouldAnimate()) {
       return {
         ...animation,
         duration: 0,
-        useNativeDriver: false
+        useNativeDriver: false,
       };
     }
-    
+
     return {
       ...animation,
       duration: getEffectiveDuration(animation.duration || 300),
-      useNativeDriver: shouldUseNativeDriver
+      useNativeDriver: shouldUseNativeDriver,
     };
   };
-  
+
   /**
    * Context value
    */
@@ -254,27 +255,27 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({
     // Accessibility settings
     isReducedMotionEnabled,
     isHighContrastEnabled,
-    
+
     // Performance settings
     isLowPowerModeEnabled,
     shouldUseNativeDriver,
-    
+
     // Global animation controls
     globalAnimationsEnabled,
     animationSpeed,
-    
+
     // Animation preferences
     preferredTransitionType,
     enableHapticFeedback,
     enableSoundEffects,
-    
+
     // Methods
     setGlobalAnimationsEnabled,
     setAnimationSpeed,
     setPreferredTransitionType,
     setEnableHapticFeedback,
     setEnableSoundEffects,
-    
+
     // Animation utilities
     getEffectiveDuration,
     shouldAnimate,
@@ -282,16 +283,12 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({
     settings: {
       accessibility: {
         reduceMotion: isReducedMotionEnabled,
-        highContrast: isHighContrastEnabled
-      }
-    }
+        highContrast: isHighContrastEnabled,
+      },
+    },
   };
-  
-  return (
-    <AnimationContext.Provider value={contextValue}>
-      {children}
-    </AnimationContext.Provider>
-  );
+
+  return <AnimationContext.Provider value={contextValue}>{children}</AnimationContext.Provider>;
 };
 
 /**
@@ -299,11 +296,11 @@ export const AnimationProvider: React.FC<AnimationProviderProps> = ({
  */
 export const useAnimationContext = (): AnimationContextType => {
   const context = useContext(AnimationContext);
-  
+
   if (!context) {
     throw new Error('useAnimationContext must be used within an AnimationProvider');
   }
-  
+
   return context;
 };
 
@@ -311,43 +308,41 @@ export const useAnimationContext = (): AnimationContextType => {
  * Hook for accessible animations
  */
 export const useAccessibleAnimation = () => {
-  const {
-    shouldAnimate,
-    getAccessibleAnimation,
-    getEffectiveDuration,
-    isReducedMotionEnabled
-  } = useAnimationContext();
-  
+  const { shouldAnimate, getAccessibleAnimation, getEffectiveDuration, isReducedMotionEnabled } =
+    useAnimationContext();
+
   return {
     shouldAnimate,
     getAccessibleAnimation,
     getEffectiveDuration,
     isReducedMotionEnabled,
-    
+
     // Convenience methods
-    createTiming: (config: any) => getAccessibleAnimation({
-      ...AnimationSystem.animations.fade.in,
-      ...config
-    }),
-    
-    createSpring: (config: any) => getAccessibleAnimation({
-      ...AnimationSystem.spring.gentle,
-      ...config
-    }),
-    
-    createSequence: (animations: any[]) => {
+    createTiming: (config: Partial<AnimationConfig>) =>
+      getAccessibleAnimation({
+        ...AnimationSystem.animations.fade.in,
+        ...config,
+      }),
+
+    createSpring: (config: Partial<AnimationConfig>) =>
+      getAccessibleAnimation({
+        ...AnimationSystem.spring.gentle,
+        ...config,
+      }),
+
+    createSequence: (animations: AnimationConfig[]) => {
       if (!shouldAnimate()) {
         return { start: (callback?: () => void) => callback?.() };
       }
-      
+
       return {
         start: (callback?: () => void) => {
           const accessibleAnimations = animations.map(getAccessibleAnimation);
           // Implementation would depend on your animation library
           callback?.();
-        }
+        },
       };
-    }
+    },
   };
 };
 
@@ -355,44 +350,46 @@ export const useAccessibleAnimation = () => {
  * Hook for performance-aware animations
  */
 export const usePerformantAnimation = () => {
-  const {
-    shouldUseNativeDriver,
-    isLowPowerModeEnabled,
-    getEffectiveDuration
-  } = useAnimationContext();
-  
+  const { shouldUseNativeDriver, isLowPowerModeEnabled, getEffectiveDuration } =
+    useAnimationContext();
+
   return {
     shouldUseNativeDriver,
     isLowPowerModeEnabled,
-    
+
     // Optimized animation configs
-    getOptimizedConfig: (baseConfig: any) => ({
+    getOptimizedConfig: (baseConfig: AnimationConfig) => ({
       ...baseConfig,
       useNativeDriver: shouldUseNativeDriver,
       duration: getEffectiveDuration(baseConfig.duration || 300),
       // Reduce complexity for low power mode
       ...(isLowPowerModeEnabled && {
         easing: AnimationSystem.easing.standard, // Use simpler easing
-        iterations: 1 // Disable loops
-      })
+        iterations: 1, // Disable loops
+      }),
     }),
-    
+
     // Memory-efficient animation creation
-    createOptimizedAnimation: (type: 'timing' | 'spring', config: any) => {
+    createOptimizedAnimation: (type: 'timing' | 'spring', config: AnimationConfig) => {
       const optimizedConfig = {
         ...config,
         useNativeDriver: shouldUseNativeDriver,
-        duration: getEffectiveDuration(config.duration || 300)
+        duration: getEffectiveDuration(config.duration || 300),
       };
-      
+
       // Return animation factory instead of instance to save memory
       return () => {
         if (type === 'spring') {
-          return AnimationSystem.createOrganicSpring(optimizedConfig);
+          return AnimationSystem.createOrganicSpring(1, AnimationSystem.spring.gentle);
         }
-        return AnimationSystem.createLuxuryTiming(optimizedConfig);
+        return AnimationSystem.createLuxuryTiming(
+          1,
+          (optimizedConfig.duration ||
+            AnimationSystem.timing.standard) as typeof AnimationSystem.timing.standard,
+          optimizedConfig.easing || AnimationSystem.easing.luxury.elegant,
+        );
       };
-    }
+    },
   };
 };
 
@@ -425,9 +422,9 @@ export const AnimationSettings: React.FC<AnimationSettingsProps> = ({ children }
     setAnimationSpeed,
     setPreferredTransitionType,
     setEnableHapticFeedback,
-    setEnableSoundEffects
+    setEnableSoundEffects,
   } = useAnimationContext();
-  
+
   const settings = {
     globalAnimationsEnabled,
     animationSpeed,
@@ -438,9 +435,9 @@ export const AnimationSettings: React.FC<AnimationSettingsProps> = ({ children }
     onSpeedChange: setAnimationSpeed,
     onTransitionTypeChange: setPreferredTransitionType,
     onToggleHaptic: () => setEnableHapticFeedback(!enableHapticFeedback),
-    onToggleSounds: () => setEnableSoundEffects(!enableSoundEffects)
+    onToggleSounds: () => setEnableSoundEffects(!enableSoundEffects),
   };
-  
+
   return <>{children(settings)}</>;
 };
 

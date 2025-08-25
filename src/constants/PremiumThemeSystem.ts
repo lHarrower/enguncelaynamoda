@@ -18,7 +18,7 @@ export const PREMIUM_PALETTE = {
     800: '#3C4043',
     900: '#202124', // Primary obsidian - deep, confident black
   },
-  
+
   // Accent Colors - Liquid luxury metals
   champagne: {
     50: '#FFFEF7',
@@ -32,7 +32,7 @@ export const PREMIUM_PALETTE = {
     800: '#B38600',
     900: '#996600',
   },
-  
+
   platinum: {
     50: '#FAFBFC',
     100: '#F1F3F4',
@@ -45,7 +45,7 @@ export const PREMIUM_PALETTE = {
     800: '#3C4043',
     900: '#202124',
   },
-  
+
   // Emotional Colors - Confidence and serenity
   confidence: {
     50: '#FFF8F5',
@@ -59,7 +59,7 @@ export const PREMIUM_PALETTE = {
     800: '#A04000',
     900: '#873600',
   },
-  
+
   serenity: {
     50: '#F0F8FF',
     100: '#E6F3FF',
@@ -72,7 +72,7 @@ export const PREMIUM_PALETTE = {
     800: '#1B4F72',
     900: '#154360',
   },
-  
+
   // Neutral Foundation - Premium whites and grays
   pearl: '#FEFEFE',
   silk: '#FDFDFD',
@@ -94,7 +94,7 @@ export const LUXURY_TYPOGRAPHY = {
     accent: 'Karla', // Geometric sans for UI elements
     script: 'Playfair Display', // Italic script for poetry
   },
-  
+
   // Typography Scale - Harmonious proportions
   scale: {
     // Display Typography - Magazine-style headlines
@@ -105,7 +105,7 @@ export const LUXURY_TYPOGRAPHY = {
       letterSpacing: -0.8,
       fontFamily: 'Playfair Display',
     },
-    
+
     display: {
       fontSize: 36,
       lineHeight: 44,
@@ -113,7 +113,7 @@ export const LUXURY_TYPOGRAPHY = {
       letterSpacing: -0.6,
       fontFamily: 'Playfair Display',
     },
-    
+
     headline1: {
       fontSize: 32,
       lineHeight: 40,
@@ -121,7 +121,7 @@ export const LUXURY_TYPOGRAPHY = {
       letterSpacing: -0.4,
       fontFamily: 'Playfair Display',
     },
-    
+
     headline2: {
       fontSize: 28,
       lineHeight: 36,
@@ -129,7 +129,7 @@ export const LUXURY_TYPOGRAPHY = {
       letterSpacing: -0.3,
       fontFamily: 'Inter',
     },
-    
+
     headline3: {
       fontSize: 24,
       lineHeight: 32,
@@ -137,7 +137,7 @@ export const LUXURY_TYPOGRAPHY = {
       letterSpacing: -0.2,
       fontFamily: 'Inter',
     },
-    
+
     // Body Typography - Readable and elegant
     body1: {
       fontSize: 18,
@@ -146,7 +146,7 @@ export const LUXURY_TYPOGRAPHY = {
       letterSpacing: 0,
       fontFamily: 'Inter',
     },
-    
+
     body2: {
       fontSize: 16,
       lineHeight: 24,
@@ -154,7 +154,7 @@ export const LUXURY_TYPOGRAPHY = {
       letterSpacing: 0.1,
       fontFamily: 'Inter',
     },
-    
+
     body3: {
       fontSize: 14,
       lineHeight: 20,
@@ -162,7 +162,7 @@ export const LUXURY_TYPOGRAPHY = {
       letterSpacing: 0.15,
       fontFamily: 'Inter',
     },
-    
+
     // UI Typography - Interface elements
     button: {
       fontSize: 16,
@@ -172,7 +172,7 @@ export const LUXURY_TYPOGRAPHY = {
       fontFamily: 'Inter',
       textTransform: 'uppercase' as TextStyle['textTransform'],
     },
-    
+
     caption: {
       fontSize: 12,
       lineHeight: 16,
@@ -181,7 +181,7 @@ export const LUXURY_TYPOGRAPHY = {
       fontFamily: 'Inter',
       textTransform: 'uppercase' as TextStyle['textTransform'],
     },
-    
+
     // Poetic Typography - Emotional moments
     poetry: {
       fontSize: 20,
@@ -191,7 +191,7 @@ export const LUXURY_TYPOGRAPHY = {
       fontFamily: 'Playfair Display',
       fontStyle: 'italic' as TextStyle['fontStyle'],
     },
-    
+
     whisper: {
       fontSize: 16,
       lineHeight: 24,
@@ -217,7 +217,7 @@ export const PREMIUM_GLASSMORPHISM = {
     shadowRadius: 32,
     elevation: 8,
   } as ViewStyle,
-  
+
   // Subtle Elegance
   silk: {
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
@@ -230,7 +230,7 @@ export const PREMIUM_GLASSMORPHISM = {
     shadowRadius: 16,
     elevation: 4,
   } as ViewStyle,
-  
+
   // Dark Luxury
   obsidian: {
     backgroundColor: 'rgba(0, 0, 0, 0.25)',
@@ -243,7 +243,7 @@ export const PREMIUM_GLASSMORPHISM = {
     shadowRadius: 24,
     elevation: 12,
   } as ViewStyle,
-  
+
   // Champagne Glow
   champagne: {
     backgroundColor: 'rgba(244, 196, 48, 0.12)',
@@ -268,7 +268,7 @@ export const LUXURY_ELEVATION = {
     shadowRadius: 40,
     elevation: 16,
   } as ViewStyle,
-  
+
   // Elevated Cards
   elevate: {
     shadowColor: PREMIUM_PALETTE.midnight,
@@ -277,7 +277,7 @@ export const LUXURY_ELEVATION = {
     shadowRadius: 24,
     elevation: 8,
   } as ViewStyle,
-  
+
   // Gentle Lift
   lift: {
     shadowColor: PREMIUM_PALETTE.midnight,
@@ -286,7 +286,7 @@ export const LUXURY_ELEVATION = {
     shadowRadius: 16,
     elevation: 4,
   } as ViewStyle,
-  
+
   // Subtle Presence
   hover: {
     shadowColor: PREMIUM_PALETTE.midnight,
@@ -295,7 +295,7 @@ export const LUXURY_ELEVATION = {
     shadowRadius: 8,
     elevation: 2,
   } as ViewStyle,
-  
+
   // Dramatic Depth
   dramatic: {
     shadowColor: PREMIUM_PALETTE.midnight,
@@ -341,21 +341,21 @@ export const PREMIUM_ANIMATIONS = {
     friction: 14,
     duration: 400,
   },
-  
+
   // Confident, decisive motion
   confident: {
     tension: 180,
     friction: 12,
     duration: 300,
   },
-  
+
   // Gentle, meditative flow
   meditative: {
     tension: 80,
     friction: 16,
     duration: 600,
   },
-  
+
   // Luxury bounce
   luxury: {
     tension: 200,
@@ -373,7 +373,7 @@ export const PREMIUM_THEME = {
   spacing: LUXURY_SPACING,
   radius: LUXURY_RADIUS,
   animation: PREMIUM_ANIMATIONS,
-  
+
   // Semantic Mappings - Context-aware color system
   semantic: {
     // Backgrounds
@@ -383,7 +383,7 @@ export const PREMIUM_THEME = {
       tertiary: PREMIUM_PALETTE.cashmere,
       elevated: PREMIUM_PALETTE.pearl,
     },
-    
+
     // Surfaces
     surface: {
       primary: PREMIUM_PALETTE.pearl,
@@ -391,7 +391,7 @@ export const PREMIUM_THEME = {
       elevated: PREMIUM_PALETTE.pearl,
       glass: 'rgba(255, 255, 255, 0.15)',
     },
-    
+
     // Text Colors
     text: {
       primary: PREMIUM_PALETTE.obsidian[900],
@@ -402,7 +402,7 @@ export const PREMIUM_THEME = {
       confidence: PREMIUM_PALETTE.confidence[500],
       serenity: PREMIUM_PALETTE.serenity[500],
     },
-    
+
     // Interactive Elements
     interactive: {
       primary: PREMIUM_PALETTE.obsidian[900],
@@ -410,7 +410,7 @@ export const PREMIUM_THEME = {
       tertiary: PREMIUM_PALETTE.platinum[500],
       disabled: PREMIUM_PALETTE.obsidian[300],
     },
-    
+
     // Borders and Dividers
     border: {
       primary: PREMIUM_PALETTE.stone,
@@ -418,7 +418,7 @@ export const PREMIUM_THEME = {
       accent: PREMIUM_PALETTE.champagne[200],
       glass: 'rgba(255, 255, 255, 0.2)',
     },
-    
+
     // Status Colors
     status: {
       success: '#27AE60',
@@ -427,7 +427,7 @@ export const PREMIUM_THEME = {
       info: PREMIUM_PALETTE.serenity[500],
     },
   },
-  
+
   // Component Variants - Pre-designed component styles
   components: {
     // Button Variants
@@ -457,7 +457,7 @@ export const PREMIUM_THEME = {
         color: PREMIUM_PALETTE.obsidian[900],
       },
     },
-    
+
     // Card Variants
     card: {
       elevated: {
@@ -475,7 +475,7 @@ export const PREMIUM_THEME = {
         ...LUXURY_ELEVATION.levitate,
       },
     },
-    
+
     // Input Variants
     input: {
       default: {

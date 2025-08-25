@@ -1,584 +1,597 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, StatusBar, Alert, TextInput, Dimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { DesignSystem } from '@/theme/DesignSystem';
-import * as ImagePicker from 'expo-image-picker';
-import * as Haptics from 'expo-haptics';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  interpolate,
-} from 'react-native-reanimated';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  FlatList,
+  Image,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Sample wardrobe data
-const wardrobeItems = [
-  { id: '1', brand: 'ZARA', name: 'White Cotton Shirt', price: '$49.90', image: 'https://images.unsplash.com/photo-1581044777550-4cfa6ce670c0?w=400&h=600&fit=crop' },
-  { id: '2', brand: 'MANGO', name: 'Black Trousers', price: '$89.00', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=600&fit=crop' },
-  { id: '3', brand: 'COS', name: 'Wool Sweater', price: '$125.00', image: 'https://images.unsplash.com/photo-1545291730-faff8ca1d4b0?w=400&h=600&fit=crop' },
-  { id: '4', brand: 'ARKET', name: 'Midi Skirt', price: '$79.00', image: 'https://images.unsplash.com/photo-1594619336195-39a8f2712533?w=400&h=600&fit=crop' },
-  { id: '5', brand: 'UNIQLO', name: 'Cashmere Cardigan', price: '$99.90', image: 'https://images.unsplash.com/photo-1551803091-e2ab622d37e6?w=400&h=600&fit=crop' },
-  { id: '6', brand: 'EVERLANE', name: 'Silk Blouse', price: '$118.00', image: 'https://images.unsplash.com/photo-1506629905607-c7a8b3bb0aa3?w=400&h=600&fit=crop' },
-];
+import { enhancedWardrobeService } from '../../src/services/enhancedWardrobeService';
+import { WardrobeItem } from '../../src/types/aynaMirror';
 
-const categories = ['All', 'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Shoes', 'Accessories'];
+const { width } = Dimensions.get('window');
+const CARD_WIDTH = (width - 48) / 2; // 2 columns with margins
 
-const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
-
-const WardrobeItemCard = ({ item, onPress, onLongPress, isSelected }: { 
-  item: any; 
+// Premium Wardrobe Item Card Component
+interface WardrobeItemCardProps {
+  item: WardrobeItem;
   onPress: () => void;
-  onLongPress: () => void;
-  isSelected: boolean;
-}) => (
-  <TouchableOpacity 
-    style={[styles.itemCard, isSelected && styles.selectedItemCard]} 
-    onPress={onPress}
-    onLongPress={onLongPress}
-    activeOpacity={0.9}
-  >
-    <Image source={{ uri: item.image }} style={styles.itemImage} />
-    {isSelected && (
-      <View style={styles.selectionOverlay}>
-        <Ionicons name="checkmark-circle" size={24} color={DesignSystem.colors.sage[500]} />
-      </View>
-    )}
-    <View style={styles.itemContent}>
-      <Text style={styles.itemBrand}>{item.brand}</Text>
-      <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
-      <Text style={styles.itemPrice}>{item.price}</Text>
-    </View>
-  </TouchableOpacity>
-);
+  onLongPress?: () => void;
+  onFavoriteToggle?: () => void;
+  isSelected?: boolean;
+  isFavorite?: boolean;
+}
 
-export default function WardrobeScreen() {
-  const insets = useSafeAreaInsets();
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const scrollY = useSharedValue(0);
+const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
+  item,
+  onPress,
+  onFavoriteToggle,
+  isSelected = false,
+  isFavorite = false,
+}) => {
+  const imageUri = item.imageUri || '';
+  const displayPrice = item.purchasePrice;
+  const brandName = item.brand || 'AYNAMODA';
+  const itemName = item.name || item.aiGeneratedName || 'Premium Item';
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
-  // Handle item selection
-  const handleItemLongPress = (itemId: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setSelectedItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    );
-  };
-
-  const handleItemPress = (item: any) => {
-    if (selectedItems.length > 0) {
-      handleItemLongPress(item.id);
-    } else {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      // Navigate to item details
-  router.push(`/item/${item.id}` as any);
+  // Premium gradient colors based on category
+  const gradientColors = React.useMemo(() => {
+    const category = item.category?.toLowerCase() || '';
+    switch (category) {
+      case 'dresses':
+        return ['#FDF8F5', '#F5E8DD', '#EDD0B8'] as const;
+      case 'tops':
+        return ['#F5F8FD', '#DDE8F5', '#B8D0ED'] as const;
+      case 'bottoms':
+        return ['#F8F5FD', '#E8DDF5', '#D0B8ED'] as const;
+      case 'shoes':
+        return ['#FDF5F8', '#F5DDE8', '#EDB8D0'] as const;
+      case 'accessories':
+        return ['#F5FDF8', '#DDF5E8', '#B8EDD0'] as const;
+      case 'outerwear':
+        return ['#F8FDF5', '#E8F5DD', '#D0EDB8'] as const;
+      default:
+        return ['#FDFCFA', '#F5F3F0', '#EDEBE8'] as const;
     }
-  };
-
-  // Filter items based on search and category
-  const filteredItems = wardrobeItems.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         item.brand.toLowerCase().includes(searchQuery.toLowerCase());
-  const matchesCategory = activeCategory === 'All' || (item as any).category === activeCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  // Calculate responsive grid columns
-  const screenWidth = Dimensions.get('window').width;
-  const getItemWidth = () => {
-    const padding = DesignSystem.spacing.lg * 2;
-    const gap = DesignSystem.spacing.md;
-    if (screenWidth > 768) {
-      // 3 columns for tablets
-      return (screenWidth - padding - gap * 2) / 3;
-    } else {
-      // 2 columns for phones
-      return (screenWidth - padding - gap) / 2;
-    }
-  };
-
-  const itemWidth = getItemWidth();
-
-  const headerAnimatedStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollY.value,
-      [0, 100],
-      [0, 1],
-      'clamp'
-    );
-
-    return {
-      opacity,
-    };
-  });
-
-  // Handle add item - show camera/gallery options
-  const handleAddItem = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    
-    Alert.alert(
-      'Add New Item',
-      'How would you like to add this item to your wardrobe?',
-      [
-        {
-          text: 'Take Photo',
-          onPress: handleTakePhoto,
-          style: 'default',
-        },
-        {
-          text: 'Choose from Gallery',
-          onPress: handleChooseFromGallery,
-          style: 'default',
-        },
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  // Handle take photo
-  const handleTakePhoto = async () => {
-    try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      
-      if (status !== 'granted') {
-        Alert.alert(
-          'Camera Permission Required',
-          'Please allow camera access to take photos of your wardrobe items.',
-          [{ text: 'OK' }]
-        );
-        return;
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [3, 4],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        console.log('Photo taken:', result.assets[0].uri);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      }
-    } catch (error) {
-      console.error('Error taking photo:', error);
-    }
-  };
-
-  // Handle choose from gallery
-  const handleChooseFromGallery = async () => {
-    try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (status !== 'granted') {
-        Alert.alert(
-          'Gallery Permission Required',
-          'Please allow gallery access to choose photos of your wardrobe items.',
-          [{ text: 'OK' }]
-        );
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [3, 4],
-        quality: 0.8,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        console.log('Image selected:', result.assets[0].uri);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      }
-    } catch (error) {
-      console.error('Error choosing from gallery:', error);
-    }
-  };
-
-  const CategoryChip = ({ label, isActive, onPress }: { label: string; isActive: boolean; onPress: () => void }) => (
-    <TouchableOpacity
-      style={[
-        styles.categoryChip,
-        isActive && styles.activeCategoryChip
-      ]}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <Text style={[
-        styles.categoryChipText,
-        isActive && styles.activeCategoryChipText
-      ]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-
-  const renderFloatingHeader = () => (
-    <Animated.View style={[styles.floatingHeader, headerAnimatedStyle]}>
-      <View style={styles.headerContent}>
-        <Text style={styles.headerTitle}>Wardrobe</Text>
-        <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="options-outline" size={18} color={DesignSystem.colors.text.primary} />
-        </TouchableOpacity>
-      </View>
-    </Animated.View>
-  );
-
-  const renderSearchBar = () => (
-  <View style={styles.searchBarContainer}>
-      <View style={styles.searchBar}>
-  <Ionicons name="search-outline" size={20} color={DesignSystem.colors.text.tertiary} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search your wardrobe..."
-          placeholderTextColor={DesignSystem.colors.text.tertiary}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          returnKeyType="search"
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
-            <Ionicons name="close-circle" size={20} color={DesignSystem.colors.text.tertiary} />
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
-  );
-
-  const EmptyState = () => (
-    <View style={styles.emptyState}>
-      <View style={styles.emptyIconContainer}>
-        <Ionicons name="shirt-outline" size={48} color={DesignSystem.colors.text.tertiary} />
-      </View>
-      <Text style={styles.emptyTitle}>Build Your Wardrobe</Text>
-      <Text style={styles.emptySubtitle}>
-        Add your favorite pieces to create the perfect digital closet
-      </Text>
-      <TouchableOpacity
-        style={styles.addFirstButton}
-        onPress={handleAddItem}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.addFirstButtonText}>Add First Item</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  }, [item.category]);
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
-      
-      {renderFloatingHeader()}
-      
-      <AnimatedScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: insets.bottom + DesignSystem.spacing.xxxl }
-        ]}
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
+    <TouchableOpacity
+      style={[styles.premiumCard, isSelected && styles.selectedCard]}
+      onPress={onPress}
+      activeOpacity={0.92}
+      accessibilityRole="button"
+      accessibilityLabel={`${brandName} ${itemName}`}
+    >
+      <LinearGradient
+        colors={gradientColors}
+        style={styles.cardGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>My Wardrobe</Text>
-          <Text style={styles.subtitle}>
-            {filteredItems.length} {filteredItems.length === 1 ? 'piece' : 'pieces'}
-          </Text>
-        </View>
+        {/* Premium Header */}
+        <View style={styles.cardHeader}>
+          <View style={styles.brandSection}>
+            <Text style={styles.brandText}>{brandName}</Text>
+            <View style={styles.premiumBadge}>
+              <Ionicons name="diamond-outline" size={10} color="#B8860B" />
+            </View>
+          </View>
 
-        {/* Categories */}
-        <View style={styles.categoriesSection}>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesContainer}
-          >
-            {categories.map((category) => (
-              <CategoryChip
-                key={category}
-                label={category}
-                isActive={activeCategory === category}
-                onPress={() => setActiveCategory(category)}
+          {onFavoriteToggle && (
+            <TouchableOpacity
+              onPress={onFavoriteToggle}
+              style={styles.favoriteButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons
+                name={isFavorite ? 'heart' : 'heart-outline'}
+                size={18}
+                color={isFavorite ? '#D4A574' : '#8B5A3C'}
               />
-            ))}
-          </ScrollView>
+            </TouchableOpacity>
+          )}
         </View>
 
-        {/* Search Bar */}
-        {renderSearchBar()}
+        {/* Premium Image Container */}
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: imageUri }} style={styles.itemImage} resizeMode="cover" />
 
-        {/* Content */}
-        {filteredItems.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <View style={styles.itemsSection}>
-            <View style={styles.itemsGrid}>
-              {filteredItems.map((item) => (
-                <WardrobeItemCard
-                  key={item.id}
-                  item={item}
-                  onPress={() => handleItemPress(item.id)}
-                  onLongPress={() => handleItemLongPress(item.id)}
-                  isSelected={selectedItems.includes(item.id)}
-                />
-              ))}
+          {/* Category Badge */}
+          <View style={styles.categoryBadge}>
+            <Text style={styles.categoryText}>{item.category.toUpperCase()}</Text>
+          </View>
+
+          {/* Usage Stats Badge */}
+          {item.usageStats && (
+            <View style={styles.usageBadge}>
+              <Ionicons name="refresh-outline" size={10} color="#FFFFFF" />
+              <Text style={styles.usageText}>{item.usageStats.totalWears}</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Premium Footer */}
+        <View style={styles.cardFooter}>
+          <View style={styles.itemInfo}>
+            <Text style={styles.itemName} numberOfLines={2}>
+              {itemName}
+            </Text>
+
+            {/* Color Indicators */}
+            {item.colors && item.colors.length > 0 && (
+              <View style={styles.colorsRow}>
+                {item.colors.slice(0, 4).map((color, index) => (
+                  <View
+                    key={index}
+                    style={[styles.colorIndicator, { backgroundColor: color.toLowerCase() }]}
+                  />
+                ))}
+                {item.colors.length > 4 && (
+                  <Text style={styles.moreColors}>+{item.colors.length - 4}</Text>
+                )}
+              </View>
+            )}
+
+            {/* Size and Tags */}
+            <View style={styles.detailsRow}>
+              {item.size && <Text style={styles.sizeText}>Size {item.size}</Text>}
+              {item.tags && item.tags.length > 0 && (
+                <Text style={styles.tagsText}>{item.tags.slice(0, 2).join(', ')}</Text>
+              )}
+            </View>
+          </View>
+
+          {/* Premium Price Display */}
+          {displayPrice && (
+            <View style={styles.priceSection}>
+              <Text style={styles.priceText}>${displayPrice.toFixed(0)}</Text>
+              <Text style={styles.currencyText}>�</Text>
+            </View>
+          )}
+        </View>
+
+        {/* Selection Overlay */}
+        {isSelected && (
+          <View style={styles.selectionOverlay}>
+            <View style={styles.selectionIndicator}>
+              <Ionicons name="checkmark" size={16} color="#FFFFFF" />
             </View>
           </View>
         )}
-      </AnimatedScrollView>
 
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + DesignSystem.spacing.xl }]}
-        onPress={handleAddItem}
-        activeOpacity={0.9}
-      >
-  <Ionicons name="camera" size={24} color={DesignSystem.colors.text.inverse} />
-      </TouchableOpacity>
-    </View>
+        {/* Premium Border Accent */}
+        <View style={styles.borderAccent} />
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+};
+
+// Main Wardrobe Screen Component
+export default function WardrobeScreen() {
+  const [wardrobeItems, setWardrobeItems] = useState<WardrobeItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [favoriteItems, setFavoriteItems] = useState<Set<string>>(new Set());
+  const [selectionMode, setSelectionMode] = useState(false);
+
+  const loadWardrobeItems = useCallback(async () => {
+    try {
+      setLoading(true);
+      const items = await enhancedWardrobeService.getUserWardrobe('user-id');
+      setWardrobeItems(items);
+    } catch (error) {
+      console.error('Error loading wardrobe items:', error);
+      Alert.alert('Error', 'Failed to load wardrobe items');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadWardrobeItems();
+    setRefreshing(false);
+  }, [loadWardrobeItems]);
+
+  const handleItemPress = useCallback(
+    (item: WardrobeItem) => {
+      if (selectionMode) {
+        const newSelected = new Set(selectedItems);
+        if (newSelected.has(item.id)) {
+          newSelected.delete(item.id);
+        } else {
+          newSelected.add(item.id);
+        }
+        setSelectedItems(newSelected);
+      } else {
+        router.push(`/item/${item.id}`);
+      }
+    },
+    [selectionMode, selectedItems],
+  );
+
+  const handleFavoriteToggle = useCallback(
+    (itemId: string) => {
+      const newFavorites = new Set(favoriteItems);
+      if (newFavorites.has(itemId)) {
+        newFavorites.delete(itemId);
+      } else {
+        newFavorites.add(itemId);
+      }
+      setFavoriteItems(newFavorites);
+    },
+    [favoriteItems],
+  );
+
+  const renderWardrobeItem = useCallback(
+    ({ item }: { item: WardrobeItem }) => (
+      <WardrobeItemCard
+        item={item}
+        onPress={() => handleItemPress(item)}
+        onFavoriteToggle={() => handleFavoriteToggle(item.id)}
+        isSelected={selectedItems.has(item.id)}
+        isFavorite={favoriteItems.has(item.id)}
+      />
+    ),
+    [handleItemPress, handleFavoriteToggle, selectedItems, favoriteItems],
+  );
+
+  const keyExtractor = useCallback((item: WardrobeItem) => item.id, []);
+
+  useEffect(() => {
+    loadWardrobeItems();
+  }, [loadWardrobeItems]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#D4A574" />
+        <Text style={styles.loadingText}>Loading your wardrobe...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <LinearGradient colors={['#FDFCFA', '#F8F6F2', '#F0EDE8']} style={styles.backgroundGradient}>
+        {/* Premium Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.headerTitle}>My Wardrobe</Text>
+            <Text style={styles.headerSubtitle}>{wardrobeItems.length} premium pieces</Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => router.push('/add-item')}
+            accessibilityRole="button"
+            accessibilityLabel="Add new item"
+            accessibilityHint="Navigate to add new wardrobe item screen"
+          >
+            <Ionicons name="add" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Premium Grid */}
+        <FlatList
+          data={wardrobeItems}
+          renderItem={renderWardrobeItem}
+          keyExtractor={keyExtractor}
+          numColumns={2}
+          contentContainerStyle={styles.gridContainer}
+          columnWrapperStyle={styles.gridRow}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#D4A574']}
+              tintColor="#D4A574"
+            />
+          }
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="shirt-outline" size={64} color="#D4A574" />
+              <Text style={styles.emptyTitle}>Your wardrobe awaits</Text>
+              <Text style={styles.emptySubtitle}>Add your first premium piece to get started</Text>
+            </View>
+          }
+        />
+      </LinearGradient>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  addButton: {
+    backgroundColor: '#D4A574',
+    borderRadius: 20,
+    elevation: 6,
+    padding: 12,
+    shadowColor: '#D4A574',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  backgroundGradient: {
     flex: 1,
-  backgroundColor: DesignSystem.colors.background.primary,
   },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  floatingHeader: {
-    position: 'absolute',
-    top: 0,
+  borderAccent: {
+    backgroundColor: '#D4A574',
+    height: 2,
     left: 0,
-    right: 0,
-    zIndex: 1000,
-  backgroundColor: DesignSystem.colors.background.primary,
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.colors.sage[100],
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: 60,
-    paddingBottom: DesignSystem.spacing.md,
-  },
-  headerTitle: {
-  fontSize: DesignSystem.typography.scale.h2.fontSize,
-  fontWeight: DesignSystem.typography.scale.h2.fontWeight,
-    color: DesignSystem.colors.sage[900],
-  },
-  headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: DesignSystem.radius.round,
-    backgroundColor: DesignSystem.colors.sage[50],
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.sage[200],
-  },
-  header: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: 100,
-    paddingBottom: DesignSystem.spacing.xl,
-  },
-  title: {
-    fontSize: DesignSystem.typography.display.fontSize,
-    fontWeight: '300',
-    color: DesignSystem.colors.sage[900],
-    marginBottom: DesignSystem.spacing.sm,
-  },
-  subtitle: {
-    fontSize: DesignSystem.typography.body1.fontSize,
-    color: DesignSystem.colors.sage[600],
-  },
-  categoriesSection: {
-    marginBottom: DesignSystem.spacing.xl,
-  },
-  categoriesContainer: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    gap: DesignSystem.spacing.sm,
-  },
-  searchBarContainer: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-    marginBottom: DesignSystem.spacing.lg,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: DesignSystem.colors.sage[50],
-    borderRadius: DesignSystem.radius.lg,
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.sage[200],
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: DesignSystem.typography.body1.fontSize,
-    color: DesignSystem.colors.sage[900],
-    marginLeft: DesignSystem.spacing.sm,
-  },
-  clearButton: {
-    padding: DesignSystem.spacing.xs,
-  },
-  itemsSection: {
-    paddingHorizontal: DesignSystem.spacing.lg,
-  },
-  itemsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  itemCard: {
-    width: '48%',
-    marginBottom: DesignSystem.spacing.lg,
-    backgroundColor: DesignSystem.colors.background.primary,
-    borderRadius: DesignSystem.radius.lg,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: DesignSystem.colors.sage[200],
-  },
-  selectedItemCard: {
-    borderColor: DesignSystem.colors.sage[500],
-    borderWidth: 2,
-  },
-  selectionOverlay: {
+    opacity: 0.3,
     position: 'absolute',
-    top: DesignSystem.spacing.sm,
-    right: DesignSystem.spacing.sm,
-    backgroundColor: DesignSystem.colors.background.primary,
-    borderRadius: DesignSystem.radius.round,
-    padding: DesignSystem.spacing.xs,
-    zIndex: 1,
+    right: 0,
+    top: 0,
   },
-  itemImage: {
-    width: '100%',
-    height: 200,
-    backgroundColor: DesignSystem.colors.sage[50],
+  brandSection: {
+    alignItems: 'center',
+    flexDirection: 'row',
   },
-  itemContent: {
-    padding: DesignSystem.spacing.md,
-  },
-  itemBrand: {
-    fontSize: DesignSystem.typography.overline.fontSize,
-    fontWeight: DesignSystem.typography.overline.fontWeight,
-    color: DesignSystem.colors.sage[500],
-    marginBottom: DesignSystem.spacing.xs,
+  brandText: {
+    color: '#8B5A3C',
+    fontFamily: 'System',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
-  itemName: {
-    fontSize: DesignSystem.typography.body1.fontSize,
-    color: DesignSystem.colors.sage[900],
-    marginBottom: DesignSystem.spacing.xs,
-    fontWeight: '400',
+  cardFooter: {
+    alignItems: 'flex-end',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
-  itemPrice: {
-    fontSize: DesignSystem.typography.body2.fontSize,
-    color: DesignSystem.colors.sage[600],
-    fontWeight: '500',
-  },
-  emptyState: {
+  cardGradient: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingTop: DesignSystem.spacing.xxxl,
+    padding: 16,
   },
-  emptyIconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: DesignSystem.colors.sage[50],
+  cardHeader: {
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: DesignSystem.spacing.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  categoryBadge: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: 12,
+    bottom: 8,
+    left: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    position: 'absolute',
+  },
+  categoryText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  colorIndicator: {
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.sage[200],
+    elevation: 1,
+    height: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    width: 12,
   },
-  emptyTitle: {
-  fontSize: DesignSystem.typography.scale.h2.fontSize,
-  fontWeight: DesignSystem.typography.scale.h2.fontWeight,
-    color: DesignSystem.colors.sage[900],
-    marginBottom: DesignSystem.spacing.sm,
-    textAlign: 'center',
+  colorsRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 4,
+    marginBottom: 4,
+  },
+  container: {
+    backgroundColor: '#FDFCFA',
+    flex: 1,
+  },
+  currencyText: {
+    color: '#8B5A3C',
+    fontSize: 11,
+    fontWeight: '500',
+    opacity: 0.7,
+  },
+  detailsRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    paddingVertical: 80,
   },
   emptySubtitle: {
-    fontSize: DesignSystem.typography.body1.fontSize,
-    color: DesignSystem.colors.sage[600],
-    textAlign: 'center',
-    marginBottom: DesignSystem.spacing.xl,
-    lineHeight: 22,
-  },
-  addFirstButton: {
-    backgroundColor: DesignSystem.colors.sage[900],
-    paddingHorizontal: DesignSystem.spacing.lg,
-    paddingVertical: DesignSystem.spacing.md,
-    borderRadius: DesignSystem.radius.sm,
-    marginTop: DesignSystem.spacing.md,
-  },
-  addFirstButtonText: {
-  fontSize: DesignSystem.typography.button.medium.fontSize,
-  fontWeight: DesignSystem.typography.button.medium.fontWeight,
-  color: DesignSystem.colors.text.inverse,
+    color: '#8B5A3C',
+    fontSize: 14,
+    lineHeight: 20,
     textAlign: 'center',
   },
-  categoryChip: {
-    paddingHorizontal: DesignSystem.spacing.md,
-    paddingVertical: DesignSystem.spacing.sm,
-    borderRadius: DesignSystem.radius.round,
-    backgroundColor: DesignSystem.colors.sage[50],
+  emptyTitle: {
+    color: '#2D2D2D',
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  favoriteButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    elevation: 3,
+    padding: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  gridContainer: {
+    paddingBottom: 24,
+    paddingHorizontal: 24,
+  },
+  gridRow: {
+    justifyContent: 'space-between',
+  },
+  header: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+  },
+  headerSubtitle: {
+    color: '#8B5A3C',
+    fontSize: 14,
+    fontWeight: '500',
+    marginTop: 4,
+  },
+  headerTitle: {
+    color: '#2D2D2D',
+    fontFamily: 'System',
+    fontSize: 28,
+    fontWeight: '800',
+  },
+  imageContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: 16,
+    flex: 1,
+    marginBottom: 12,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  itemImage: {
+    height: '100%',
+    width: '100%',
+  },
+  itemInfo: {
+    flex: 1,
+    marginRight: 8,
+  },
+  itemName: {
+    color: '#2D2D2D',
+    fontFamily: 'System',
+    fontSize: 13,
+    fontWeight: '600',
+    lineHeight: 17,
+    marginBottom: 6,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    backgroundColor: '#FDFCFA',
+    flex: 1,
+    justifyContent: 'center',
+  },
+  loadingText: {
+    color: '#8B5A3C',
+    fontSize: 16,
+    fontWeight: '500',
+    marginTop: 16,
+  },
+  moreColors: {
+    color: '#8B5A3C',
+    fontSize: 9,
+    fontWeight: '500',
+    marginLeft: 2,
+  },
+  premiumBadge: {
+    backgroundColor: 'rgba(184, 134, 11, 0.15)',
+    borderRadius: 8,
+    marginLeft: 6,
+    padding: 2,
+  },
+  premiumCard: {
+    aspectRatio: 0.75,
+    backgroundColor: '#FFFFFF',
+    borderColor: 'rgba(139, 90, 60, 0.1)',
+    borderRadius: 24,
     borderWidth: 1,
-    borderColor: DesignSystem.colors.sage[200],
+    elevation: 8,
+    marginBottom: 16,
+    overflow: 'hidden',
+    shadowColor: '#8B5A3C',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    width: CARD_WIDTH,
   },
-  activeCategoryChip: {
-    backgroundColor: DesignSystem.colors.sage[900],
-    borderColor: DesignSystem.colors.sage[900],
+  priceSection: {
+    alignItems: 'flex-end',
   },
-  categoryChipText: {
-    fontSize: DesignSystem.typography.body2.fontSize,
-    color: DesignSystem.colors.sage[600],
+  priceText: {
+    color: '#8B5A3C',
+    fontFamily: 'System',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  selectedCard: {
+    borderColor: '#D4A574',
+    borderWidth: 2.5,
+    shadowColor: '#D4A574',
+    shadowOpacity: 0.25,
+    transform: [{ scale: 1.02 }],
+  },
+  selectionIndicator: {
+    backgroundColor: '#D4A574',
+    borderRadius: 20,
+    elevation: 6,
+    padding: 8,
+    shadowColor: '#D4A574',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  selectionOverlay: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(212, 165, 116, 0.2)',
+    bottom: 0,
+    justifyContent: 'center',
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  sizeText: {
+    color: '#8B5A3C',
+    fontSize: 9,
     fontWeight: '500',
   },
-  activeCategoryChipText: {
-  color: DesignSystem.colors.text.inverse,
+  tagsText: {
+    color: '#A67C52',
+    fontSize: 8,
+    fontStyle: 'italic',
+    fontWeight: '400',
   },
-  fab: {
-    position: 'absolute',
-    right: DesignSystem.spacing.lg,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: DesignSystem.colors.sage[900],
+  usageBadge: {
     alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: DesignSystem.colors.sage[900],
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
+    backgroundColor: 'rgba(212, 165, 116, 0.9)',
+    borderRadius: 10,
+    flexDirection: 'row',
+    gap: 3,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    position: 'absolute',
+    right: 8,
+    top: 8,
+  },
+  usageText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '600',
   },
 });

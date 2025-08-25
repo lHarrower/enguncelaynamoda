@@ -1,14 +1,26 @@
 import { AynaMirrorService } from '@/services/aynaMirrorService';
 import { WeatherService } from '@/services/weatherService';
-import NotificationService from '@/services/notificationService';
+import NotificationService, { notificationService } from '@/services/notificationService';
 import { errorHandlingService } from '@/services/errorHandlingService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
+
+const mockNotifications = Notifications as jest.Mocked<typeof Notifications>;
 
 // Mock all external dependencies
 jest.mock('@react-native-async-storage/async-storage');
-jest.mock('expo-notifications');
+jest.mock('expo-notifications', () => ({
+  getPermissionsAsync: jest.fn(),
+  requestPermissionsAsync: jest.fn(),
+  getExpoPushTokenAsync: jest.fn(),
+  scheduleNotificationAsync: jest.fn(),
+  getAllScheduledNotificationsAsync: jest.fn(),
+  cancelScheduledNotificationAsync: jest.fn(),
+  cancelAllScheduledNotificationsAsync: jest.fn(),
+}));
 jest.mock('expo-location');
-jest.mock('@/config/supabaseClient');
+// Using global supabaseClient mock from jest.setup.js
+// jest.mock('@/config/supabaseClient');
 
 // Mock the services
 jest.mock('@/services/enhancedWardrobeService', () => ({
@@ -39,33 +51,39 @@ describe('Error Handling Integration Tests', () => {
   describe('AYNA Mirror Service Error Handling', () => {
     it('should handle complete service failure gracefully', async () => {
       // Mock all services to fail
-  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
+      const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
       enhancedWardrobeService.getUserWardrobe.mockRejectedValue(new Error('Wardrobe service down'));
 
       // Mock cached data to be available
       (AsyncStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key.includes('wardrobe')) {
-          return Promise.resolve(JSON.stringify({
-            items: [{
-              id: 'cached-item',
-              userId: mockUserId,
-              category: 'tops',
-              colors: ['blue'],
-              tags: ['casual'],
-              usageStats: { averageRating: 4, totalWears: 5 },
-            }],
-            cachedAt: new Date().toISOString(),
-          }));
+          return Promise.resolve(
+            JSON.stringify({
+              items: [
+                {
+                  id: 'cached-item',
+                  userId: mockUserId,
+                  category: 'tops',
+                  colors: ['blue'],
+                  tags: ['casual'],
+                  usageStats: { averageRating: 4, totalWears: 5 },
+                },
+              ],
+              cachedAt: new Date().toISOString(),
+            }),
+          );
         }
         if (key.includes('weather')) {
-          return Promise.resolve(JSON.stringify({
-            temperature: 70,
-            condition: 'sunny',
-            humidity: 50,
-            location: 'Cached City',
-            timestamp: new Date().toISOString(),
-            cachedAt: new Date().toISOString(),
-          }));
+          return Promise.resolve(
+            JSON.stringify({
+              temperature: 70,
+              condition: 'sunny',
+              humidity: 50,
+              location: 'Cached City',
+              timestamp: new Date().toISOString(),
+              cachedAt: new Date().toISOString(),
+            }),
+          );
         }
         return Promise.resolve(null);
       });
@@ -79,20 +97,22 @@ describe('Error Handling Integration Tests', () => {
     });
 
     it('should retry failed operations with exponential backoff', async () => {
-  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
-      
+      const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
+
       // Mock to fail twice, then succeed
       enhancedWardrobeService.getUserWardrobe
         .mockRejectedValueOnce(new Error('Temporary failure 1'))
         .mockRejectedValueOnce(new Error('Temporary failure 2'))
-        .mockResolvedValueOnce([{
-          id: 'retry-item',
-          userId: mockUserId,
-          category: 'tops',
-          colors: ['green'],
-          tags: ['work'],
-          usageStats: { averageRating: 4.5, totalWears: 3 },
-        }]);
+        .mockResolvedValueOnce([
+          {
+            id: 'retry-item',
+            userId: mockUserId,
+            category: 'tops',
+            colors: ['green'],
+            tags: ['work'],
+            usageStats: { averageRating: 4.5, totalWears: 3 },
+          },
+        ]);
 
       const startTime = Date.now();
       const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
@@ -105,27 +125,29 @@ describe('Error Handling Integration Tests', () => {
     });
 
     it('should cache successful results for offline use', async () => {
-  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
-      
-      enhancedWardrobeService.getUserWardrobe.mockResolvedValue([{
-        id: 'cache-test-item',
-        userId: mockUserId,
-        category: 'bottoms',
-        colors: ['black'],
-        tags: ['formal'],
-        usageStats: { averageRating: 5, totalWears: 10 },
-      }]);
+      const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
+
+      enhancedWardrobeService.getUserWardrobe.mockResolvedValue([
+        {
+          id: 'cache-test-item',
+          userId: mockUserId,
+          category: 'bottoms',
+          colors: ['black'],
+          tags: ['formal'],
+          usageStats: { averageRating: 5, totalWears: 10 },
+        },
+      ]);
 
       await AynaMirrorService.generateDailyRecommendations(mockUserId);
 
       // Should have cached the results
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         expect.stringContaining('recommendations'),
-        expect.stringContaining(mockUserId)
+        expect.stringContaining(mockUserId),
       );
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         expect.stringContaining('wardrobe'),
-        expect.stringContaining('cache-test-item')
+        expect.stringContaining('cache-test-item'),
       );
     });
   });
@@ -136,7 +158,7 @@ describe('Error Handling Integration Tests', () => {
       const mockLocation = require('expo-location');
       mockLocation.requestForegroundPermissionsAsync.mockResolvedValue({ status: 'granted' });
       mockLocation.getCurrentPositionAsync.mockResolvedValue({
-        coords: { latitude: 40.7128, longitude: -74.0060 }
+        coords: { latitude: 40.7128, longitude: -74.006 },
       });
 
       // Mock fetch to fail
@@ -145,16 +167,18 @@ describe('Error Handling Integration Tests', () => {
       // Mock cached weather data
       (AsyncStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key.includes('weather_cache')) {
-          return Promise.resolve(JSON.stringify({
-            data: {
-              temperature: 75,
-              condition: 'cloudy',
-              humidity: 60,
-              location: 'Cached Location',
-              timestamp: new Date(),
-            },
-            timestamp: Date.now() - 1000 * 60 * 10, // 10 minutes ago (fresh)
-          }));
+          return Promise.resolve(
+            JSON.stringify({
+              data: {
+                temperature: 75,
+                condition: 'cloudy',
+                humidity: 60,
+                location: 'Cached Location',
+                timestamp: new Date(),
+              },
+              timestamp: Date.now() - 1000 * 60 * 10, // 10 minutes ago (fresh)
+            }),
+          );
         }
         return Promise.resolve(null);
       });
@@ -171,7 +195,7 @@ describe('Error Handling Integration Tests', () => {
       const mockLocation = require('expo-location');
       mockLocation.requestForegroundPermissionsAsync.mockResolvedValue({ status: 'granted' });
       mockLocation.getCurrentPositionAsync.mockResolvedValue({
-        coords: { latitude: 40.7128, longitude: -74.0060 }
+        coords: { latitude: 40.7128, longitude: -74.006 },
       });
 
       // Mock fetch to fail
@@ -189,7 +213,7 @@ describe('Error Handling Integration Tests', () => {
 
     it('should handle location permission denial gracefully', async () => {
       const mockLocation = require('expo-location');
-      mockLocation.requestForegroundPermissionsAsync.mockResolvedValue({ status: 'denied' });
+      mockLocation.requestForegroundPermissionsAsync.mockResolvedValue({ status: 'denied' } as any);
 
       // Should use default location
       const result = await WeatherService.getCurrentWeatherContext(mockUserId);
@@ -201,11 +225,17 @@ describe('Error Handling Integration Tests', () => {
 
   describe('Notification Service Error Handling', () => {
     it('should handle notification permission denial', async () => {
-      const mockNotifications = require('expo-notifications');
-      mockNotifications.getPermissionsAsync.mockResolvedValue({ status: 'denied' });
-      mockNotifications.requestPermissionsAsync.mockResolvedValue({ status: 'denied' });
+      // Reset the service for fresh initialization
+      notificationService.resetForTesting();
+      
+      // Get the global mock notifications object from the service
+      const notificationServiceModule = require('@/services/notificationService');
+      const mockNotifications = await notificationServiceModule.loadNotifications();
+      
+      // Mock permission denial
+      mockNotifications.getPermissionsAsync.mockResolvedValue({ status: 'denied' } as any);
+      mockNotifications.requestPermissionsAsync.mockResolvedValue({ status: 'denied' } as any);
 
-      const notificationService = NotificationService;
       const result = await notificationService.initialize();
 
       expect(result).toBe(false);
@@ -213,8 +243,17 @@ describe('Error Handling Integration Tests', () => {
 
     it('should store failed notifications for retry', async () => {
       const mockNotifications = require('expo-notifications');
-      mockNotifications.getPermissionsAsync.mockResolvedValue({ status: 'granted' });
-      mockNotifications.scheduleNotificationAsync.mockRejectedValue(new Error('Notification failed'));
+      mockNotifications.getPermissionsAsync.mockResolvedValue({ status: 'granted' } as any);
+      mockNotifications.scheduleNotificationAsync.mockRejectedValue(
+        new Error('Notification failed'),
+      );
+
+      // Mock errorHandlingService.executeWithRetry to fail after retries
+      const { errorHandlingService } = require('@/services/errorHandlingService');
+      const originalExecuteWithRetry = errorHandlingService.executeWithRetry;
+      errorHandlingService.executeWithRetry = jest.fn().mockRejectedValue(
+        new Error('Failed after retries'),
+      );
 
       const notificationService = NotificationService;
       await notificationService.initialize();
@@ -235,19 +274,26 @@ describe('Error Handling Integration Tests', () => {
       // Should have stored pending notification
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         'pending_notifications',
-        expect.stringContaining(mockUserId)
+        expect.stringContaining(mockUserId),
       );
+
+      // Restore original method
+      errorHandlingService.executeWithRetry = originalExecuteWithRetry;
     });
 
     it('should retry failed notifications on service recovery', async () => {
       // Mock pending notifications in storage
       (AsyncStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === 'pending_notifications') {
-          return Promise.resolve(JSON.stringify([{
-            userId: mockUserId,
-            payload: { type: 'daily_mirror' },
-            timestamp: new Date().toISOString(),
-          }]));
+          return Promise.resolve(
+            JSON.stringify([
+              {
+                userId: mockUserId,
+                payload: { type: 'daily_mirror' },
+                timestamp: new Date().toISOString(),
+              },
+            ]),
+          );
         }
         return Promise.resolve(null);
       });
@@ -262,8 +308,8 @@ describe('Error Handling Integration Tests', () => {
 
   describe('Cross-Service Error Recovery', () => {
     it('should maintain service when multiple services fail', async () => {
-  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
-      
+      const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
+
       // Mock all services to fail initially
       enhancedWardrobeService.getUserWardrobe.mockRejectedValue(new Error('Wardrobe down'));
       global.fetch = jest.fn().mockRejectedValue(new Error('Weather API down'));
@@ -271,17 +317,21 @@ describe('Error Handling Integration Tests', () => {
       // Mock some cached data
       (AsyncStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key.includes('wardrobe')) {
-          return Promise.resolve(JSON.stringify({
-            items: [{
-              id: 'fallback-item',
-              userId: mockUserId,
-              category: 'tops',
-              colors: ['red'],
-              tags: ['emergency'],
-              usageStats: { averageRating: 3, totalWears: 1 },
-            }],
-            cachedAt: new Date().toISOString(),
-          }));
+          return Promise.resolve(
+            JSON.stringify({
+              items: [
+                {
+                  id: 'fallback-item',
+                  userId: mockUserId,
+                  category: 'tops',
+                  colors: ['red'],
+                  tags: ['emergency'],
+                  usageStats: { averageRating: 3, totalWears: 1 },
+                },
+              ],
+              cachedAt: new Date().toISOString(),
+            }),
+          );
         }
         return Promise.resolve(null);
       });
@@ -299,17 +349,17 @@ describe('Error Handling Integration Tests', () => {
       (AsyncStorage.getItem as jest.Mock).mockImplementation((key) => {
         switch (key) {
           case 'pending_feedback':
-            return Promise.resolve(JSON.stringify([
-              { id: 'feedback-1', userId: mockUserId, rating: 5 }
-            ]));
+            return Promise.resolve(
+              JSON.stringify([{ id: 'feedback-1', userId: mockUserId, rating: 5 }]),
+            );
           case 'pending_notifications':
-            return Promise.resolve(JSON.stringify([
-              { userId: mockUserId, payload: { type: 'daily_mirror' } }
-            ]));
+            return Promise.resolve(
+              JSON.stringify([{ userId: mockUserId, payload: { type: 'daily_mirror' } }]),
+            );
           case 'pending_wardrobe_updates':
-            return Promise.resolve(JSON.stringify([
-              { id: 'update-1', userId: mockUserId, action: 'add' }
-            ]));
+            return Promise.resolve(
+              JSON.stringify([{ id: 'update-1', userId: mockUserId, action: 'add' }]),
+            );
           default:
             return Promise.resolve(null);
         }
@@ -325,10 +375,16 @@ describe('Error Handling Integration Tests', () => {
 
     it('should provide user-friendly error messages across services', () => {
       const networkError = new Error('Network timeout');
-      
-      const weatherMessage = errorHandlingService.getUserFriendlyErrorMessage(networkError, 'weather');
+
+      const weatherMessage = errorHandlingService.getUserFriendlyErrorMessage(
+        networkError,
+        'weather',
+      );
       const aiMessage = errorHandlingService.getUserFriendlyErrorMessage(networkError, 'ai');
-      const notificationMessage = errorHandlingService.getUserFriendlyErrorMessage(networkError, 'notification');
+      const notificationMessage = errorHandlingService.getUserFriendlyErrorMessage(
+        networkError,
+        'notification',
+      );
 
       expect(weatherMessage).toContain('Weather service');
       expect(aiMessage).toContain('styling AI');
@@ -343,25 +399,25 @@ describe('Error Handling Integration Tests', () => {
 
   describe('Performance Under Error Conditions', () => {
     it('should not block user experience during retries', async () => {
-  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
-      
+      const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
+
       // Mock slow failing service
-      enhancedWardrobeService.getUserWardrobe.mockImplementation(() => 
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Slow failure')), 100)
-        )
+      enhancedWardrobeService.getUserWardrobe.mockImplementation(
+        () => new Promise((_, reject) => setTimeout(() => reject(new Error('Slow failure')), 100)),
       );
 
       // Mock cached data available
       (AsyncStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key.includes('recommendations')) {
-          return Promise.resolve(JSON.stringify({
-            id: 'fast-cache',
-            userId: mockUserId,
-            recommendations: [],
-            generatedAt: new Date(Date.now() - 1000 * 60 * 10), // 10 minutes ago
-            cachedAt: new Date().toISOString(),
-          }));
+          return Promise.resolve(
+            JSON.stringify({
+              id: 'fast-cache',
+              userId: mockUserId,
+              recommendations: [],
+              generatedAt: new Date(Date.now() - 1000 * 60 * 10), // 10 minutes ago
+              cachedAt: new Date().toISOString(),
+            }),
+          );
         }
         return Promise.resolve(null);
       });
@@ -387,12 +443,12 @@ describe('Error Handling Integration Tests', () => {
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(largeErrorLog));
 
       const mockOperation = jest.fn().mockRejectedValue(new Error('New error'));
-      
+
       try {
         await errorHandlingService.executeWithRetry(
           mockOperation,
           { service: 'test', operation: 'testOp' },
-          { maxRetries: 0 }
+          { maxRetries: 0 },
         );
       } catch (error) {
         // Expected to fail
@@ -400,9 +456,9 @@ describe('Error Handling Integration Tests', () => {
 
       // Should have limited the log size
       const setItemCall = (AsyncStorage.setItem as jest.Mock).mock.calls.find(
-        call => call[0] === 'error_logs'
+        (call) => call[0] === 'error_logs',
       );
-      
+
       expect(setItemCall).toBeDefined();
       const savedLogs = JSON.parse(setItemCall[1]);
       expect(savedLogs.length).toBeLessThanOrEqual(100);
@@ -411,17 +467,19 @@ describe('Error Handling Integration Tests', () => {
 
   describe('Data Consistency During Errors', () => {
     it('should maintain data integrity when partial operations fail', async () => {
-  const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
-      
+      const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
+
       // Mock wardrobe service to succeed
-      enhancedWardrobeService.getUserWardrobe.mockResolvedValue([{
-        id: 'consistency-item',
-        userId: mockUserId,
-        category: 'tops',
-        colors: ['purple'],
-        tags: ['test'],
-        usageStats: { averageRating: 4, totalWears: 2 },
-      }]);
+      enhancedWardrobeService.getUserWardrobe.mockResolvedValue([
+        {
+          id: 'consistency-item',
+          userId: mockUserId,
+          category: 'tops',
+          colors: ['purple'],
+          tags: ['test'],
+          usageStats: { averageRating: 4, totalWears: 2 },
+        },
+      ]);
 
       // Mock cache operations to partially fail
       (AsyncStorage.setItem as jest.Mock).mockImplementation((key, value) => {
@@ -439,7 +497,7 @@ describe('Error Handling Integration Tests', () => {
       // Should have attempted to cache wardrobe data (which succeeds)
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         expect.stringContaining('wardrobe'),
-        expect.any(String)
+        expect.any(String),
       );
     });
   });
