@@ -18,8 +18,8 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 
-import { DesignSystem } from '../../theme/DesignSystem';
-import { OptimizedImage } from '../shared/OptimizedImage';
+import { OptimizedImage } from '@/components/shared/OptimizedImage';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 const SWIPE_THRESHOLD = 120;
@@ -201,7 +201,7 @@ const SwipeableCard: React.FC<SwipeableCardProps> = ({
         { translateX: translateX.value },
         { translateY: translateY.value },
         { rotate: `${rotation}deg` },
-      ],
+      ] as any,
       opacity,
     };
   });

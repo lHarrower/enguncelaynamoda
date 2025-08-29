@@ -1,5 +1,7 @@
 // Enhanced Wardrobe Service - AYNA Mirror Intelligence Features
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+
 import {
   AIAnalysisData,
   ItemCategory,
@@ -11,7 +13,6 @@ import {
   WardrobeItem,
   WardrobeItemRecord,
 } from '../types/aynaMirror';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
 import { AINameingService } from './aiNamingService';
 
 export interface NewClothingItem {
@@ -151,7 +152,9 @@ export class EnhancedWardrobeService {
    */
   private async getComplimentsCount(itemId: string): Promise<number> {
     try {
-      const { data, error } = await (supabase.from('outfit_feedback').select('id') as any)
+      const { data, error } = await supabase
+        .from('outfit_feedback')
+        .select('id')
         .contains('item_ids', [itemId])
         .eq('feedback_type', 'compliment');
 
@@ -160,7 +163,7 @@ export class EnhancedWardrobeService {
         return 0;
       }
 
-      return data?.length || 0;
+      return Array.isArray(data) ? data.length : 0;
     } catch (error) {
       logInDev(
         '[EnhancedWardrobeService] Failed to get compliments count:',
@@ -187,34 +190,36 @@ export class EnhancedWardrobeService {
         colors?: unknown;
         tags?: unknown;
       }
-      const { data: rawRows, error } = (await (
-        supabase.from('wardrobe_items').select('id, category, colors, tags') as any
-      )
-        .neq('id', record.id)
-        .limit(50)) as { data: RawCompatRow[] | null; error: { message?: string } | null };
+      const { data: rawRows, error } = await supabase
+        .from('wardrobe_items')
+        .select('id, category, colors, tags')
+        .not('id', 'eq', String(record.id))
+        .limit(50);
 
       if (error || !rawRows) {
         return compatibility;
       }
 
-      const rows = rawRows
-        .map((r) => {
-          const id = typeof r.id === 'string' ? r.id : undefined;
-          const category = typeof r.category === 'string' ? r.category : undefined;
-          if (!id || !category) {
-            return undefined;
-          }
-          const colors = Array.isArray(r.colors)
-            ? r.colors.filter((c): c is string => typeof c === 'string')
-            : [];
-          const tags = Array.isArray(r.tags)
-            ? r.tags.filter((t): t is string => typeof t === 'string')
-            : [];
-          return { id, category, colors, tags };
-        })
-        .filter(
-          (r): r is { id: string; category: string; colors: string[]; tags: string[] } => !!r,
-        );
+      const rows = Array.isArray(rawRows)
+        ? rawRows
+            .map((r) => {
+              const id = typeof r.id === 'string' ? r.id : undefined;
+              const category = typeof r.category === 'string' ? r.category : undefined;
+              if (!id || !category) {
+                return undefined;
+              }
+              const colors = Array.isArray(r.colors)
+                ? r.colors.filter((c): c is string => typeof c === 'string')
+                : [];
+              const tags = Array.isArray(r.tags)
+                ? r.tags.filter((t): t is string => typeof t === 'string')
+                : [];
+              return { id, category, colors, tags };
+            })
+            .filter(
+              (r): r is { id: string; category: string; colors: string[]; tags: string[] } => !!r,
+            )
+        : [];
 
       rows.forEach((item) => {
         let score = 0;
@@ -249,15 +254,11 @@ export class EnhancedWardrobeService {
         created_at?: unknown;
         rating?: unknown;
       }
-      const { data, error } = (await (
-        supabase
-          .from('confidence_ratings')
-          .select('created_at, rating')
-          .eq('item_id', itemId) as any
-      ).order('created_at', { ascending: true })) as {
-        data: ConfidenceRow[] | null;
-        error: { message?: string } | null;
-      };
+      const { data, error } = await supabase
+        .from('confidence_ratings')
+        .select('created_at, rating')
+        .eq('item_id', itemId)
+        .order('created_at', { ascending: true });
 
       if (error || !data) {
         if (error) {
@@ -266,7 +267,7 @@ export class EnhancedWardrobeService {
         return [];
       }
 
-      return data
+      return (Array.isArray(data) ? data : [])
         .map((entry) => {
           const dateValue = (() => {
             const raw = entry.created_at;
@@ -396,11 +397,11 @@ export class EnhancedWardrobeService {
         confidence_score: 0,
         tags: item.tags || [],
       };
-      const insertResult = (await (supabase as any)
+      const insertResult = await supabase
         .from('wardrobe_items')
         .insert([insertPayload])
         .select()
-        .single()) as any;
+        .single();
       const data = insertResult.data as WardrobeItemRecord | null;
       const error = insertResult.error as { message?: string } | null;
 
@@ -433,10 +434,12 @@ export class EnhancedWardrobeService {
         data: WardrobeItemRecord[] | null;
         error: { message?: string } | null;
       }
-      const query = (
-        supabase.from('wardrobe_items').select('*').eq('user_id', userId) as any
-      ).order('created_at', { ascending: false });
-      const { data, error } = (await query) as any as WardrobeItemsSelectResult;
+      const query = supabase
+        .from('wardrobe_items')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      const { data, error } = await query;
       if (error) {
         throw new Error(error.message || 'Failed to fetch wardrobe');
       }
@@ -644,10 +647,10 @@ export class EnhancedWardrobeService {
     try {
       // Prefer RPC if available; fall back to direct update for test/mocked envs
       if (this.supportsRpc(supabase)) {
-        const { error } = await (supabase.rpc('track_item_usage', {
+        const { error } = await supabase.rpc('track_item_usage', {
           item_id: itemId,
           outfit_id: outfitId || null,
-        }) as any);
+        });
         if (error) {
           throw new Error(error.message || 'Failed to track item usage');
         }
@@ -672,12 +675,12 @@ export class EnhancedWardrobeService {
           const current: UsageCountRow | null = fetchResult.data as UsageCountRow | null;
           const currentVal = typeof current?.usage_count === 'number' ? current.usage_count : 0;
           const newCount = currentVal + 1;
-          const updateResult = await (supabase
+          const updateResult = await supabase
             .from('wardrobe_items')
             .update({ usage_count: newCount, last_worn: new Date().toISOString() })
             .eq('id', itemId)
             .eq('usage_count', currentVal)
-            .select('id') as any);
+            .select('id');
           if (updateResult.error) {
             throw new Error(updateResult.error.message || 'Failed to track item usage');
           }
@@ -714,11 +717,11 @@ export class EnhancedWardrobeService {
         confidence_score: number | null;
         purchase_price: number | null;
       }
-      const result = await (supabase
+      const result = await supabase
         .from('wardrobe_items')
         .select('id, usage_count, last_worn, confidence_score, purchase_price')
         .eq('id', itemId)
-        .single() as any);
+        .single();
       if (result.error) {
         throw result.error;
       }
@@ -755,7 +758,7 @@ export class EnhancedWardrobeService {
     try {
       // Support both legacy and current SQL parameter names
       type NeglectedFunctionRow = { id?: string | null } | null;
-      const { data, error } = await (supabase as any).rpc('get_neglected_items', {
+      const { data, error } = await supabase.rpc('get_neglected_items', {
         // legacy names
         user_uuid: userId,
         days_threshold: daysSince,
@@ -778,7 +781,7 @@ export class EnhancedWardrobeService {
         return [];
       }
       // Fetch all records in one query when possible (fallback to per-id if limit constraints)
-      const { data: records, error: fetchErr } = await (supabase as any)
+      const { data: records, error: fetchErr } = await supabase
         .from('wardrobe_items')
         .select('*')
         .in('id', ids);
@@ -843,7 +846,7 @@ export class EnhancedWardrobeService {
         average_cost_per_wear?: number | string | null;
         utilization_percentage?: number | string | null;
       } | null;
-      const { data, error } = await (supabase as any).rpc('get_wardrobe_utilization_stats', {
+      const { data, error } = await supabase.rpc('get_wardrobe_utilization_stats', {
         user_uuid: userId,
       });
       if (error) {
@@ -899,7 +902,7 @@ export class EnhancedWardrobeService {
   // Using a distinct alias clarifies intent and avoids redundant union complaints when widened later
   private async fetchImageAnalysis(imageUri: string): Promise<unknown | null> {
     try {
-      const { data, error } = await (supabase as any).functions.invoke('ai-analysis', {
+      const { data, error } = await supabase.functions.invoke('ai-analysis', {
         body: { imageUrl: imageUri },
       });
       if (error) {
@@ -1117,7 +1120,7 @@ export class EnhancedWardrobeService {
    */
   async updateItemConfidenceScore(itemId: string, rating: number): Promise<void> {
     try {
-      const { error } = await (supabase as any).rpc('update_item_confidence_score', {
+      const { error } = await supabase.rpc('update_item_confidence_score', {
         item_id: itemId,
         new_rating: rating,
       });
@@ -1169,10 +1172,7 @@ export class EnhancedWardrobeService {
         name_override: isUserOverride,
       };
 
-      const { error } = await (supabase
-        .from('wardrobe_items')
-        .update(updateData)
-        .eq('id', itemId) as any);
+      const { error } = await supabase.from('wardrobe_items').update(updateData).eq('id', itemId);
 
       if (error) {
         throw new Error(error.message || 'Failed to update item name');
@@ -1194,22 +1194,23 @@ export class EnhancedWardrobeService {
   async regenerateItemName(itemId: string): Promise<string | null> {
     try {
       // First get the item details
-      const { data: item, error: fetchError } = await (supabase
+      const { data: item, error: fetchError } = await supabase
         .from('wardrobe_items')
         .select('image_uri, category, colors, brand')
         .eq('id', itemId)
-        .single() as any);
+        .single();
 
       if (fetchError || !item) {
         throw new Error('Item not found');
       }
 
       // Generate new AI name
+      const itemRecord = item as WardrobeItemRecord;
       const namingResponse = await this.generateItemName({
-        imageUri: item.image_uri,
-        category: item.category as ItemCategory,
-        colors: item.colors,
-        brand: item.brand,
+        imageUri: itemRecord.image_uri,
+        category: itemRecord.category as ItemCategory,
+        colors: itemRecord.colors || [],
+        brand: itemRecord.brand,
       });
 
       if (!namingResponse) {
@@ -1217,13 +1218,13 @@ export class EnhancedWardrobeService {
       }
 
       // Update the item with new AI name
-      const { error: updateError } = await (supabase
+      const { error: updateError } = await supabase
         .from('wardrobe_items')
         .update({
           ai_generated_name: namingResponse.aiGeneratedName,
           ai_analysis_data: namingResponse.analysisData,
         })
-        .eq('id', itemId) as any);
+        .eq('id', itemId);
 
       if (updateError) {
         throw new Error(updateError.message || 'Failed to update AI name');

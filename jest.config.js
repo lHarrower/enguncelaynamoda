@@ -3,15 +3,15 @@ module.exports = {
   preset: 'react-native',
   testEnvironment: 'node',
   coverageProvider: 'v8',
-  
+
   // ESM support for dynamic imports
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   globals: {
     'ts-jest': {
-      useESM: true
-    }
+      useESM: true,
+    },
   },
-  
+
   // Node.js options for dynamic imports
   testEnvironmentOptions: {
     customExportConditions: ['node', 'node-addons'],
@@ -66,7 +66,9 @@ module.exports = {
     '^@expo/vector-icons$': '<rootDir>/__mocks__/expo-vector-icons.js',
 
     '^@/theme/DesignSystem$': '<rootDir>/__mocks__/DesignSystem.js',
-    '^@/components/aynaMirror/OutfitRecommendationCard$': '<rootDir>/__mocks__/OutfitRecommendationCard.js',
+    '^@/components/aynaMirror/OutfitRecommendationCard$':
+      '<rootDir>/__mocks__/OutfitRecommendationCard.js',
+    '^@/services/enhancedWardrobeService$': '<rootDir>/__mocks__/enhancedWardrobeService.js',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testPathIgnorePatterns: ['/node_modules/'],

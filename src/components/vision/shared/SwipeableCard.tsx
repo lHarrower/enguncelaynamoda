@@ -14,7 +14,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { OptimizedImage } from '../../shared/OptimizedImage';
+import { OptimizedImage } from '@/components/shared/OptimizedImage';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const CARD_WIDTH = screenWidth * 0.85;

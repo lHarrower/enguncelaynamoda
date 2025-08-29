@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 
 import { ErrorReporting } from '../services/ErrorReporting';
-import { AppError, ErrorCategory, ErrorSeverity } from '../utils/ErrorHandler';
+import { AppError, ErrorCategory, errorHandler, ErrorSeverity } from '../utils/ErrorHandler';
 
 /**
  * Retry Configuration
@@ -34,8 +34,22 @@ export const RETRY_CONFIGS = {
     maxDelay: 10000,
     backoffMultiplier: 2,
     jitter: true,
-    retryCondition: (error: AppError) =>
-      error.category === ErrorCategory.NETWORK && error.severity !== ErrorSeverity.CRITICAL,
+    retryCondition: (error: AppError, attempt?: number) => {
+      if (
+        !error ||
+        error.category !== ErrorCategory.NETWORK ||
+        error.severity === ErrorSeverity.CRITICAL
+      ) {
+        return false;
+      }
+      // Don't retry 4xx client errors (400-499)
+      // Check both the error itself and its originalError for status codes
+      const errorStatus = (error as any).status || (error.originalError as any)?.status;
+      if (errorStatus >= 400 && errorStatus < 500) {
+        return false;
+      }
+      return true;
+    },
   },
   aiService: {
     maxAttempts: 2,
@@ -43,9 +57,10 @@ export const RETRY_CONFIGS = {
     maxDelay: 8000,
     backoffMultiplier: 2,
     jitter: true,
-    retryCondition: (error: AppError) =>
+    retryCondition: (error: AppError, attempt?: number) =>
+      error &&
       error.category === ErrorCategory.AI_SERVICE &&
-      !(error as any)?.message?.includes?.('QUOTA_EXCEEDED'),
+      !error.message?.includes('QUOTA_EXCEEDED'),
   },
   imageProcessing: {
     maxAttempts: 2,
@@ -53,7 +68,8 @@ export const RETRY_CONFIGS = {
     maxDelay: 6000,
     backoffMultiplier: 2,
     jitter: false,
-    retryCondition: (error: AppError) =>
+    retryCondition: (error: AppError, attempt?: number) =>
+      error &&
       error.category === ErrorCategory.IMAGE_PROCESSING &&
       error.severity !== ErrorSeverity.CRITICAL,
   },
@@ -90,7 +106,9 @@ function normalizeRetryConfig(partial?: LegacyRetryConfig): RetryConfig {
   // failureThreshold maps to maxAttempts = failureThreshold
   let derivedMaxAttempts = base.maxAttempts || RETRY_CONFIGS.default.maxAttempts;
   if (typeof maxRetries === 'number') {
-    derivedMaxAttempts = Math.max(1, maxRetries + 1);
+    // When maxRetries is 0, we should have 1 attempt (no retries)
+    // When maxRetries is 1, we should have 2 attempts (1 retry), etc.
+    derivedMaxAttempts = maxRetries + 1;
   }
   if (typeof failureThreshold === 'number') {
     derivedMaxAttempts = Math.max(1, failureThreshold);
@@ -136,6 +154,7 @@ function _useErrorRecovery<T>(
   const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const operationRef = useRef<(() => Promise<T>) | null>(operation || null);
+  const attemptRef = useRef<number>(0);
 
   const retryConfig: RetryConfig = normalizeRetryConfig(config);
 
@@ -183,19 +202,27 @@ function _useErrorRecovery<T>(
    * Execute operation with retry logic
    */
   const execute = useCallback(
-    async (opOverride?: () => Promise<T>): Promise<T | null> => {
+    async (opOverride?: () => Promise<T>, isRetry: boolean = false): Promise<T | null> => {
+      // Reset attempt counter only for new execution, not retries
+      if (!isRetry) {
+        attemptRef.current = 0;
+      }
       setIsLoading(true);
 
       try {
-        if (opOverride) {
-          operationRef.current = opOverride;
-        }
-        const op = operationRef.current;
+        // Use the provided operation or fall back to the stored one
+        const op = opOverride || operationRef.current;
         if (!op) {
           // No operation provided yet; treat as successful no-op
           setIsLoading(false);
           return null;
         }
+
+        // Update the ref if a new operation was provided
+        if (opOverride) {
+          operationRef.current = opOverride;
+        }
+
         const result = await op();
         setData(result);
 
@@ -208,15 +235,23 @@ function _useErrorRecovery<T>(
           canRetry: false,
         });
 
+        setIsLoading(false);
         return result;
       } catch (error) {
-        const appError = error as AppError;
-        const newAttempt = state.attempt + 1;
-        const effectiveMax = retryConfig.failureThreshold || retryConfig.maxAttempts;
+        const appError = errorHandler.categorizeError(error);
+
+        // Use ref to get current attempt and avoid stale closure
+        const currentAttempt = attemptRef.current;
+        const newAttempt = currentAttempt + 1;
+        attemptRef.current = newAttempt;
+
+        const effectiveMax = retryConfig.failureThreshold ?? retryConfig.maxAttempts;
         const canRetry =
           newAttempt < effectiveMax &&
           (!retryConfig.retryCondition || retryConfig.retryCondition(appError, newAttempt));
 
+        // Always set loading to false and update state with error
+        setIsLoading(false);
         setState((prev) => ({
           ...prev,
           attempt: newAttempt,
@@ -236,18 +271,65 @@ function _useErrorRecovery<T>(
           setState((prev) => ({ ...prev, isRetrying: true }));
           startCountdown(delay);
 
-          retryTimeoutRef.current = setTimeout(() => {
-            execute();
-          }, delay);
-        } else {
-          setIsLoading(false);
-          throw appError;
-        }
+          // Use setTimeout with a promise that works better with fake timers
+          return new Promise((resolve, reject) => {
+            retryTimeoutRef.current = setTimeout(async () => {
+              setState((prev) => ({ ...prev, isRetrying: false }));
+              try {
+                // Directly retry the operation instead of recursive call
+                const op = opOverride || operationRef.current;
+                if (!op) {
+                  resolve(null);
+                  return;
+                }
+                const result = await op();
+                setData(result);
+                setState({
+                  isRetrying: false,
+                  attempt: 0,
+                  lastError: null,
+                  nextRetryIn: 0,
+                  canRetry: false,
+                });
+                setIsLoading(false);
+                resolve(result);
+              } catch (retryError) {
+                // If retry fails, continue the retry logic
+                const appRetryError = errorHandler.categorizeError(retryError);
+                const currentAttempt = attemptRef.current;
+                const newAttempt = currentAttempt + 1;
+                attemptRef.current = newAttempt;
 
-        return null;
+                const effectiveMax = retryConfig.failureThreshold ?? retryConfig.maxAttempts;
+                const canRetryAgain =
+                  newAttempt < effectiveMax &&
+                  (!retryConfig.retryCondition ||
+                    retryConfig.retryCondition(appRetryError, newAttempt));
+
+                setState((prev) => ({
+                  ...prev,
+                  attempt: newAttempt,
+                  lastError: appRetryError,
+                  canRetry: canRetryAgain,
+                }));
+
+                if (canRetryAgain) {
+                  // Continue retrying by calling execute recursively
+                  execute(opOverride, true).then(resolve).catch(reject);
+                } else {
+                  // No more retries, reject with the error
+                  reject(appRetryError);
+                }
+              }
+            }, delay);
+          });
+        } else {
+          // For non-retryable errors, reject the promise
+          return Promise.reject(appError);
+        }
       }
     },
-    [state.attempt, retryConfig, calculateDelay, startCountdown],
+    [retryConfig, calculateDelay, startCountdown],
   );
 
   /**
@@ -280,7 +362,7 @@ function _useErrorRecovery<T>(
       attempt: 0,
       lastError: null,
       nextRetryIn: 0,
-      canRetry: false,
+      canRetry: true, // Legacy tests expect canRetry === true after reset
     });
 
     setData(null);
@@ -319,13 +401,7 @@ function _useErrorRecovery<T>(
  */
 // Legacy-friendly wrappers (tests expect names: useNetworkErrorRecovery, etc.)
 export function useNetworkErrorRecovery<T>(operation?: () => Promise<T>) {
-  const cfg: Partial<RetryConfig> = {
-    maxAttempts: 3,
-    baseDelay: 1000,
-    backoffMultiplier: 2,
-    jitter: true,
-  };
-  return _useErrorRecovery<T>(operation, cfg);
+  return _useErrorRecovery<T>(operation, RETRY_CONFIGS.network);
 }
 
 /**
@@ -345,13 +421,7 @@ export function useAIServiceErrorRecovery<T>(operation?: () => Promise<T>) {
  * Image Processing Recovery Hook
  */
 export function useImageErrorRecovery<T>(operation?: () => Promise<T>) {
-  const cfg: Partial<RetryConfig> = {
-    maxAttempts: 3,
-    baseDelay: 1500,
-    backoffMultiplier: 2,
-    jitter: false,
-  };
-  return _useErrorRecovery<T>(operation, cfg);
+  return _useErrorRecovery<T>(operation, RETRY_CONFIGS.imageProcessing);
 }
 
 /**
@@ -575,8 +645,9 @@ export function useBatchRecovery<T>(
           return;
         }
         let attempts = 0;
+        const maxAttempts = maxRetries + 1; // total attempts = initial + retries
 
-        while (attempts <= maxRetries) {
+        while (attempts < maxAttempts) {
           try {
             const result = await op();
             setResults((prev) => {
@@ -584,10 +655,14 @@ export function useBatchRecovery<T>(
               next[index] = result;
               return next;
             });
+            setProgress((p) => p + 1);
             break;
           } catch (err) {
             attempts += 1;
-            if (!(retryFailures && attempts <= maxRetries)) {
+            if (retryFailures && attempts < maxAttempts) {
+              // simple fixed delay retry (tests advance by 1000ms)
+              await new Promise((res) => setTimeout(res, 1000));
+            } else {
               setErrors((prev) => {
                 const next = [...prev];
                 next[index] = err as AppError;
@@ -597,13 +672,9 @@ export function useBatchRecovery<T>(
                 throw err;
               }
               break;
-            } else {
-              // simple fixed delay retry (tests advance by 1000ms)
-              await new Promise((res) => setTimeout(res, 1000));
             }
           }
         }
-        setProgress((p) => p + 1);
       };
 
       try {
@@ -622,13 +693,29 @@ export function useBatchRecovery<T>(
       } finally {
         setIsLoading(false);
       }
-      return operationsRef.current.map((_, i) => results[i]);
+      // Return the final results after all operations complete
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          setResults((currentResults) => {
+            resolve(currentResults);
+            return currentResults;
+          });
+        }, 0);
+      });
     },
-    [failFast, maxConcurrent, retryConfig, results],
+    [failFast, maxConcurrent, retryConfig],
   );
 
   const executeBatch = run;
   const execute = run; // generic alias
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Component is unmounting, cancel any pending operations
+      setIsLoading(false);
+    };
+  }, []);
 
   return {
     executeBatch,

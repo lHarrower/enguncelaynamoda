@@ -46,39 +46,42 @@ fs.mkdirSync(OUTPUT_DIR, { recursive: true });
  */
 async function runLighthouseAudit(url: string): Promise<PerformanceMetrics['lighthouse'] | null> {
   try {
-    console.log(`🔍 Attempting Lighthouse audit on ${url}...`);
     
+
     // Check if server is running first
     try {
       const response = await fetch(url);
       if (!response.ok) {
-        console.log('⚠️ Server not responding, skipping Lighthouse audit');
+        
         return null;
       }
     } catch {
-      console.log('⚠️ Server not available, skipping Lighthouse audit');
+      
       return null;
     }
-    
+
     // Check if web build exists
     const webBuildPath = path.join(process.cwd(), 'dist');
     if (!fs.existsSync(webBuildPath)) {
-      console.log('📦 Building web version for Lighthouse audit...');
+      
       execSync('npm run build:web', { stdio: 'inherit' });
     }
 
     const outputPath = path.join(OUTPUT_DIR, 'lighthouse-results.json');
-    execSync(`npx lighthouse ${url} --output=json --output-path=${outputPath} --only-categories=performance --chrome-flags="--headless"`, {
-      stdio: 'pipe'
-    });
-    
+    execSync(
+      `npx lighthouse ${url} --output=json --output-path=${outputPath} --only-categories=performance --chrome-flags="--headless"`,
+      {
+        stdio: 'pipe',
+      },
+    );
+
     if (fs.existsSync(outputPath)) {
       const results = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
       return results;
     }
     return null;
   } catch (error) {
-    console.log('⚠️ Lighthouse audit skipped - server not available');
+    
     return null;
   }
 }
@@ -88,8 +91,8 @@ async function runLighthouseAudit(url: string): Promise<PerformanceMetrics['ligh
  */
 function measureBundleSizes(): PerformanceMetrics['bundleSize'] | null {
   try {
-    console.log('📦 Measuring bundle sizes...');
     
+
     const bundleSize: PerformanceMetrics['bundleSize'] = {
       android: 0,
       ios: 0,
@@ -104,23 +107,34 @@ function measureBundleSizes(): PerformanceMetrics['bundleSize'] | null {
     }
 
     // Android bundle size (if exists)
-    const androidBundlePath = path.join(process.cwd(), 'android', 'app', 'build', 'outputs', 'bundle');
+    const androidBundlePath = path.join(
+      process.cwd(),
+      'android',
+      'app',
+      'build',
+      'outputs',
+      'bundle',
+    );
     if (fs.existsSync(androidBundlePath)) {
-      const androidStats = execSync(`du -sb "${androidBundlePath}" 2>/dev/null || echo "0"`, { encoding: 'utf8' });
+      const androidStats = execSync(`du -sb "${androidBundlePath}" 2>/dev/null || echo "0"`, {
+        encoding: 'utf8',
+      });
       bundleSize.android = parseInt(androidStats.split('\t')[0]) || 0;
     }
 
     // iOS bundle size (if exists)
     const iosBundlePath = path.join(process.cwd(), 'ios', 'build');
     if (fs.existsSync(iosBundlePath)) {
-      const iosStats = execSync(`du -sb "${iosBundlePath}" 2>/dev/null || echo "0"`, { encoding: 'utf8' });
+      const iosStats = execSync(`du -sb "${iosBundlePath}" 2>/dev/null || echo "0"`, {
+        encoding: 'utf8',
+      });
       bundleSize.ios = parseInt(iosStats.split('\t')[0]) || 0;
     }
 
-    console.log('✅ Bundle size measurement completed');
+    
     return bundleSize;
   } catch (error) {
-    console.error('❌ Bundle size measurement failed:', error);
+    
     return null;
   }
 }
@@ -130,20 +144,20 @@ function measureBundleSizes(): PerformanceMetrics['bundleSize'] | null {
  * In a real implementation, this would integrate with React Native Profiler
  */
 function measureStartupPerformance(): PerformanceMetrics['startup'] {
-  console.log('⏱️ Measuring startup performance...');
   
+
   // These would be real measurements in production
   // For now, we'll use realistic baseline values
   const startup = {
     p50: 1200, // 1.2s median startup time
     p95: 2000, // 2.0s 95th percentile
     coldStart: 1800, // Cold start time
-    warmStart: 800,  // Warm start time
+    warmStart: 800, // Warm start time
   };
 
-  console.log('✅ Startup performance measurement completed');
-  console.log(`📊 Cold Start: ${startup.coldStart}ms, Warm Start: ${startup.warmStart}ms`);
   
+  
+
   return startup;
 }
 
@@ -152,19 +166,19 @@ function measureStartupPerformance(): PerformanceMetrics['startup'] {
  */
 function measureMemoryUsage(): PerformanceMetrics['memoryUsage'] | null {
   try {
-    console.log('🧠 Measuring memory usage...');
     
+
     // In a real implementation, this would use React Native Profiler or Chrome DevTools
     const memoryUsage = {
       jsHeapSizeLimit: 2172649472, // ~2GB
-      totalJSHeapSize: 50331648,   // ~48MB
-      usedJSHeapSize: 35651584,    // ~34MB
+      totalJSHeapSize: 50331648, // ~48MB
+      usedJSHeapSize: 35651584, // ~34MB
     };
 
-    console.log('✅ Memory usage measurement completed');
+    
     return memoryUsage;
   } catch (error) {
-    console.error('❌ Memory usage measurement failed:', error);
+    
     return null;
   }
 }
@@ -173,8 +187,8 @@ function measureMemoryUsage(): PerformanceMetrics['memoryUsage'] | null {
  * Main performance audit function
  */
 async function runPerformanceAudit(): Promise<void> {
-  console.log('🎯 Starting comprehensive performance audit...');
   
+
   const metrics: PerformanceMetrics = {
     startup: measureStartupPerformance(),
     jsFrameDropPct: 1.2, // This would be measured from React Native Profiler
@@ -199,10 +213,7 @@ async function runPerformanceAudit(): Promise<void> {
   }
 
   // Save comprehensive performance report
-  fs.writeFileSync(
-    path.join(OUTPUT_DIR, 'perf.json'),
-    JSON.stringify(metrics, null, 2)
-  );
+  fs.writeFileSync(path.join(OUTPUT_DIR, 'perf.json'), JSON.stringify(metrics, null, 2));
 
   // Generate performance summary
   const summary = {
@@ -218,13 +229,10 @@ async function runPerformanceAudit(): Promise<void> {
     recommendations: generateRecommendations(metrics),
   };
 
-  fs.writeFileSync(
-    path.join(OUTPUT_DIR, 'perf-summary.json'),
-    JSON.stringify(summary, null, 2)
-  );
+  fs.writeFileSync(path.join(OUTPUT_DIR, 'perf-summary.json'), JSON.stringify(summary, null, 2));
 
-  console.log('🎉 Performance audit completed successfully!');
-  console.log(`📊 Results saved to: ${OUTPUT_DIR}`);
+  
+  
 }
 
 /**
@@ -240,7 +248,9 @@ function generateRecommendations(metrics: PerformanceMetrics): string[] {
 
   // Frame drop recommendations
   if (metrics.jsFrameDropPct > 2.0) {
-    recommendations.push('High frame drop percentage detected - review animations and heavy computations');
+    recommendations.push(
+      'High frame drop percentage detected - review animations and heavy computations',
+    );
   }
 
   // Lighthouse recommendations
@@ -257,7 +267,8 @@ function generateRecommendations(metrics: PerformanceMetrics): string[] {
   }
 
   // Bundle size recommendations
-  if (metrics.bundleSize?.web && metrics.bundleSize.web > 5000000) { // 5MB
+  if (metrics.bundleSize?.web && metrics.bundleSize.web > 5000000) {
+    // 5MB
     recommendations.push('Web bundle size > 5MB - consider code splitting and tree shaking');
   }
 
@@ -266,6 +277,6 @@ function generateRecommendations(metrics: PerformanceMetrics): string[] {
 
 // Run the audit
 runPerformanceAudit().catch((error) => {
-  console.error('💥 Performance audit failed:', error);
+  
   process.exit(1);
 });

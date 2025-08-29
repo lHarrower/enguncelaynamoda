@@ -1,5 +1,5 @@
-import { supabase } from '../config/supabaseClient';
-import type { AiAnalysisDataJSON } from '../types/aynaMirror';
+import { supabase } from '@/config/supabaseClient';
+import type { AiAnalysisDataJSON } from '@/types/aynaMirror';
 
 export interface ApplyAnalysisPayload {
   cloudUrl?: string;

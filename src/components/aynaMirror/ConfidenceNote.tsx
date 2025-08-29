@@ -14,7 +14,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { SPACING_V2 } from '../../constants/AppThemeV2';
+import { SPACING_V2 } from '@/constants/AppThemeV2';
 
 // AYNAMODA Color Palette
 const COLORS = {

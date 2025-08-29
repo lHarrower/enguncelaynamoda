@@ -6,7 +6,7 @@ module.exports = {
     appId: 'com.aynamoda.app',
     teamId: process.env.APPLE_TEAM_ID || 'YOUR_APPLE_TEAM_ID',
     bundleId: 'com.aynamoda.app',
-    
+
     // App Store Metadata
     metadata: {
       name: 'AYNAMODA',
@@ -30,41 +30,50 @@ Key Features:
 - Style confidence tracking
 - Social sharing and community features
 
-Join thousands of users who have transformed their relationship with fashion through AYNAMODA's intelligent approach to personal style.`
+Join thousands of users who have transformed their relationship with fashion through AYNAMODA's intelligent approach to personal style.`,
       },
-      
+
       keywords: [
-        'fashion', 'AI', 'wardrobe', 'style', 'sustainable fashion',
-        'outfit planning', 'personal stylist', 'clothing organization',
-        'fashion AI', 'style guide', 'wardrobe management', 'eco fashion'
+        'fashion',
+        'AI',
+        'wardrobe',
+        'style',
+        'sustainable fashion',
+        'outfit planning',
+        'personal stylist',
+        'clothing organization',
+        'fashion AI',
+        'style guide',
+        'wardrobe management',
+        'eco fashion',
       ],
-      
+
       categories: {
         primary: 'Lifestyle',
-        secondary: 'Shopping'
+        secondary: 'Shopping',
       },
-      
+
       ageRating: '4+',
-      
+
       supportUrl: 'https://aynamoda.app/support',
       marketingUrl: 'https://aynamoda.app',
       privacyPolicyUrl: 'https://aynamoda.app/privacy',
       termsOfServiceUrl: 'https://aynamoda.app/terms',
-      
+
       // Contact Information
       contactEmail: 'support@aynamoda.app',
       contactPhone: '+90-555-0123',
-      
+
       // App Store Specific
       appStoreCategory: 'Lifestyle',
       secondaryCategory: 'Shopping',
       contentRating: '4+',
-      
+
       // Localization
       defaultLanguage: 'en',
-      availableLanguages: ['en', 'tr', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh']
+      availableLanguages: ['en', 'tr', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'ko', 'zh'],
     },
-    
+
     // App Store Review Information
     reviewInformation: {
       firstName: 'AYNAMODA',
@@ -73,7 +82,7 @@ Join thousands of users who have transformed their relationship with fashion thr
       email: 'review@aynamoda.app',
       demoAccount: {
         username: 'demo@aynamoda.app',
-        password: 'DemoPass123!'
+        password: 'DemoPass123!',
       },
       notes: `Thank you for reviewing AYNAMODA!
 
@@ -86,17 +95,18 @@ This app uses AI to help users organize their wardrobe and make sustainable fash
 
 Demo Account: demo@aynamoda.app / DemoPass123!
 
-The app requires camera and photo library permissions for wardrobe photo capture and organization features.`
-    }
+The app requires camera and photo library permissions for wardrobe photo capture and organization features.`,
+    },
   },
-  
+
   // Google Play Store Configuration
   googlePlay: {
     packageName: 'com.aynamoda.app',
-    
+
     metadata: {
       title: 'AYNAMODA - AI Fashion Companion',
-      shortDescription: 'AI-powered fashion companion for sustainable style choices and smart wardrobe management',
+      shortDescription:
+        'AI-powered fashion companion for sustainable style choices and smart wardrobe management',
       fullDescription: `Transform your fashion experience with AYNAMODA, the intelligent fashion companion that helps you discover your unique style while making sustainable choices.
 
 🤖 AI-POWERED STYLING
@@ -130,23 +140,30 @@ The app requires camera and photo library permissions for wardrobe photo capture
 • Exclusive style content
 
 Join the fashion revolution and make every outfit count with AYNAMODA!`,
-      
+
       tags: [
-        'fashion', 'AI', 'wardrobe', 'style', 'sustainable',
-        'outfit', 'clothing', 'personal stylist', 'fashion AI'
+        'fashion',
+        'AI',
+        'wardrobe',
+        'style',
+        'sustainable',
+        'outfit',
+        'clothing',
+        'personal stylist',
+        'fashion AI',
       ],
-      
+
       category: 'LIFESTYLE',
       contentRating: 'Everyone',
-      
+
       website: 'https://aynamoda.app',
       email: 'support@aynamoda.app',
       phone: '+90-555-0123',
       privacyPolicy: 'https://aynamoda.app/privacy',
-      termsOfService: 'https://aynamoda.app/terms'
-    }
+      termsOfService: 'https://aynamoda.app/terms',
+    },
   },
-  
+
   // Screenshots and Assets Requirements
   assets: {
     ios: {
@@ -156,33 +173,29 @@ Join the fashion revolution and make every outfit count with AYNAMODA!`,
           '6.1_inch_display', // iPhone 14 Pro
           '5.5_inch_display', // iPhone 8 Plus
           '12.9_inch_display', // iPad Pro 12.9
-          '11_inch_display'   // iPad Pro 11
+          '11_inch_display', // iPad Pro 11
         ],
-        path: './assets/screenshots/ios/'
+        path: './assets/screenshots/ios/',
       },
       appPreview: {
         path: './assets/previews/ios/',
         formats: ['mp4', 'mov'],
-        maxDuration: 30 // seconds
-      }
+        maxDuration: 30, // seconds
+      },
     },
-    
+
     android: {
       screenshots: {
-        required: [
-          'phone',
-          'sevenInchTablet',
-          'tenInchTablet'
-        ],
-        path: './assets/screenshots/android/'
+        required: ['phone', 'sevenInchTablet', 'tenInchTablet'],
+        path: './assets/screenshots/android/',
       },
       featureGraphic: {
         path: './assets/feature-graphic.png',
-        dimensions: '1024x500'
-      }
-    }
+        dimensions: '1024x500',
+      },
+    },
   },
-  
+
   // Localization
   localization: {
     defaultLanguage: 'en-US',
@@ -196,10 +209,10 @@ Join the fashion revolution and make every outfit count with AYNAMODA!`,
       'pt-BR', // Portuguese (Brazil)
       'ja-JP', // Japanese
       'ko-KR', // Korean
-      'zh-CN'  // Chinese (Simplified)
-    ]
+      'zh-CN', // Chinese (Simplified)
+    ],
   },
-  
+
   // Release Notes Template
   releaseNotes: {
     template: {
@@ -215,7 +228,7 @@ Join the fashion revolution and make every outfit count with AYNAMODA!`,
 • {bug_fixes}
 
 Thank you for using AYNAMODA! Keep styling sustainably! 💚`,
-      
+
       'tr-TR': `🎉 AYNAMODA v{version} Yenilikleri
 
 ✨ Yeni Özellikler:
@@ -227,7 +240,7 @@ Thank you for using AYNAMODA! Keep styling sustainably! 💚`,
 🐛 Hata Düzeltmeleri:
 • {bug_fixes}
 
-AYNAMODA'yı kullandığınız için teşekkürler! Sürdürülebilir stil yapmaya devam edin! 💚`
-    }
-  }
+AYNAMODA'yı kullandığınız için teşekkürler! Sürdürülebilir stil yapmaya devam edin! 💚`,
+    },
+  },
 };

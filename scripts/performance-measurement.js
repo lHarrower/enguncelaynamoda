@@ -19,7 +19,7 @@ const performanceMetrics = {
 };
 
 function measureBundleSize() {
-  console.log('📦 Measuring bundle size...');
+  
 
   try {
     // Check if dist directories exist
@@ -52,7 +52,7 @@ function measureBundleSize() {
       };
     }
   } catch (error) {
-    console.error('❌ Error measuring bundle size:', error.message);
+    
   }
 }
 
@@ -91,7 +91,7 @@ function formatBytes(bytes) {
 }
 
 function measureBuildTime() {
-  console.log('⏱️ Measuring build time...');
+  
 
   try {
     const startTime = Date.now();
@@ -103,12 +103,12 @@ function measureBuildTime() {
       formattedDuration: `${(endTime - startTime) / 1000}s`,
     };
   } catch (error) {
-    console.error('❌ Error measuring build time:', error.message);
+    
   }
 }
 
 function measureTestTime() {
-  console.log('🧪 Measuring test execution time...');
+  
 
   try {
     const startTime = Date.now();
@@ -120,12 +120,12 @@ function measureTestTime() {
       formattedDuration: `${(endTime - startTime) / 1000}s`,
     };
   } catch (error) {
-    console.error('❌ Error measuring test time:', error.message);
+    
   }
 }
 
 function measureLintTime() {
-  console.log('🔍 Measuring lint time...');
+  
 
   try {
     const startTime = Date.now();
@@ -142,7 +142,7 @@ function measureLintTime() {
       note: 'Completed (may have warnings/errors)',
     };
   } catch (error) {
-    console.error('❌ Error measuring lint time:', error.message);
+    
     performanceMetrics.lintTime = {
       duration: 0,
       formattedDuration: 'N/A',
@@ -152,7 +152,7 @@ function measureLintTime() {
 }
 
 function generateReport() {
-  console.log('📊 Generating performance report...');
+  
 
   const reportPath = path.join(process.cwd(), 'performance-report.json');
 
@@ -168,33 +168,33 @@ function generateReport() {
 
   fs.writeFileSync(reportPath, JSON.stringify(performanceMetrics, null, 2));
 
-  console.log('✅ Performance report generated:', reportPath);
-  console.log('\n📈 Performance Summary:');
+  
+  
 
   if (performanceMetrics.bundleSize.android) {
-    console.log(`   Android Bundle: ${performanceMetrics.bundleSize.android.formattedSize}`);
+    
   }
 
   if (performanceMetrics.bundleSize.ios) {
-    console.log(`   iOS Bundle: ${performanceMetrics.bundleSize.ios.formattedSize}`);
+    
   }
 
   if (performanceMetrics.buildTime) {
-    console.log(`   Build Time: ${performanceMetrics.buildTime.formattedDuration}`);
+    
   }
 
   if (performanceMetrics.testExecutionTime) {
-    console.log(`   Test Time: ${performanceMetrics.testExecutionTime.formattedDuration}`);
+    
   }
 
   if (performanceMetrics.lintTime) {
-    console.log(`   Lint Time: ${performanceMetrics.lintTime.formattedDuration}`);
+    
   }
 }
 
 // Main execution
 async function main() {
-  console.log('🚀 Starting AYNAMODA Performance Measurement\n');
+  
 
   measureBundleSize();
   measureBuildTime();
@@ -203,7 +203,7 @@ async function main() {
 
   generateReport();
 
-  console.log('\n✨ Performance measurement completed!');
+  
 }
 
 if (require.main === module) {

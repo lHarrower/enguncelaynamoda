@@ -1,9 +1,9 @@
 // Performance tests for WardrobeService
-import { WardrobeService } from '../../services/wardrobeService';
-import { createMockWardrobeItem } from '../utils/testUtils';
-import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
-import { createPostgrestBuilder } from '../../test/supabaseMockBuilder';
-import { mocks } from '../mocks';
+import { WardrobeService } from '@/services/wardrobeService';
+import { createMockWardrobeItem } from '@/__tests__/utils/testUtils';
+import { WardrobeCategory, WardrobeColor } from '@/types/wardrobe';
+import { createPostgrestBuilder } from '@/test/supabaseMockBuilder';
+import { mocks } from '@/__tests__/mocks';
 
 // Mock dependencies
 jest.mock('../../config/supabaseClient', () => ({
@@ -17,11 +17,17 @@ jest.mock('../../config/supabaseClient', () => ({
   },
 }));
 
-jest.mock('@react-native-async-storage/async-storage', () => mocks.asyncStorage);
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+}));
 
 describe('WardrobeService Performance', () => {
   let wardrobeService: WardrobeService;
-  const mockSupabase: any = require('../../config/supabaseClient').supabase;
+  const mockSupabase = require('../../config/supabaseClient').supabase as jest.Mocked<
+    typeof import('../../config/supabaseClient').supabase
+  >;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -44,12 +50,12 @@ describe('WardrobeService Performance', () => {
         }),
       );
 
-      mockSupabase.from.mockImplementation(() => {
+      (mockSupabase.from as jest.MockedFunction<any>).mockImplementation(() => {
         const b = createPostgrestBuilder();
-        b.eq.mockReturnValue({
+        b.eq.mockImplementation(() => ({
           order: jest.fn().mockReturnValue({ data: largeDataset, error: null }),
-        });
-        b.order.mockReturnValue({ data: largeDataset, error: null });
+        }));
+        b.order.mockImplementation(() => ({ data: largeDataset, error: null }));
         return b;
       });
 
@@ -70,16 +76,16 @@ describe('WardrobeService Performance', () => {
         }),
       );
 
-      mockSupabase.from.mockImplementation(() => {
+      (mockSupabase.from as jest.MockedFunction<any>).mockImplementation(() => {
         const b = createPostgrestBuilder();
-        b.eq.mockReturnValue({
-          or: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({
+        b.eq.mockImplementation(() => ({
+          or: jest.fn().mockImplementation(() => ({
+            order: jest.fn().mockImplementation(() => ({
               data: largeDataset.filter((item) => (item.name || '').includes('Summer')),
               error: null,
-            }),
-          }),
-        });
+            })),
+          })),
+        }));
         return b;
       });
 
@@ -99,9 +105,9 @@ describe('WardrobeService Performance', () => {
         }),
       );
 
-      mockSupabase.from.mockImplementation(() => {
+      (mockSupabase.from as jest.MockedFunction<any>).mockImplementation(() => {
         const b = createPostgrestBuilder();
-        b.upsert.mockResolvedValue({ data: bulkItems, error: null });
+        b.upsert.mockImplementation(() => Promise.resolve({ data: bulkItems, error: null }));
         return b;
       });
 
@@ -119,13 +125,13 @@ describe('WardrobeService Performance', () => {
         createMockWardrobeItem({ id: `cached-item-${index}` }),
       );
 
-      mockSupabase.from.mockImplementation(() => {
+      (mockSupabase.from as jest.MockedFunction<any>).mockImplementation(() => {
         const b = createPostgrestBuilder();
-        b.select.mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({ data: testData, error: null }),
-          }),
-        });
+        b.select.mockImplementation(() => ({
+          eq: jest.fn().mockImplementation(() => ({
+            order: jest.fn().mockImplementation(() => ({ data: testData, error: null })),
+          })),
+        }));
         return b;
       });
 
@@ -149,17 +155,19 @@ describe('WardrobeService Performance', () => {
     it('should handle cache invalidation efficiently', async () => {
       const testData = [createMockWardrobeItem()];
 
-      mockSupabase.from.mockImplementation(() => {
+      (mockSupabase.from as jest.MockedFunction<any>).mockImplementation(() => {
         const b = createPostgrestBuilder();
-        b.select.mockReturnValue({
-          eq: jest.fn().mockReturnValue({
-            order: jest.fn().mockReturnValue({ data: testData, error: null }),
+        b.select.mockImplementation(() => ({
+          eq: jest.fn().mockImplementation(() => ({
+            order: jest.fn().mockImplementation(() => ({ data: testData, error: null })),
+          })),
+        }));
+        b.insert.mockImplementation(() =>
+          Promise.resolve({
+            data: [createMockWardrobeItem({ id: 'new-item' })],
+            error: null,
           }),
-        });
-        b.insert.mockResolvedValue({
-          data: [createMockWardrobeItem({ id: 'new-item' })],
-          error: null,
-        });
+        );
         return b;
       });
 
@@ -183,13 +191,13 @@ describe('WardrobeService Performance', () => {
           createMockWardrobeItem({ id: `dataset-${i}-item-${index}` }),
         );
 
-        mockSupabase.from.mockImplementation(() => {
+        (mockSupabase.from as jest.MockedFunction<any>).mockImplementation(() => {
           const b = createPostgrestBuilder();
-          b.select.mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              order: jest.fn().mockReturnValue({ data: dataset, error: null }),
-            }),
-          });
+          b.select.mockImplementation(() => ({
+            eq: jest.fn().mockImplementation(() => ({
+              order: jest.fn().mockImplementation(() => ({ data: dataset, error: null })),
+            })),
+          }));
           return b;
         });
 
@@ -210,7 +218,7 @@ describe('WardrobeService Performance', () => {
         createMockWardrobeItem({ id: `concurrent-item-${index}` }),
       );
 
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from as any).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             order: jest.fn().mockResolvedValue({
@@ -238,7 +246,7 @@ describe('WardrobeService Performance', () => {
       const readData = [createMockWardrobeItem({ id: 'read-item' })];
       const writeData = createMockWardrobeItem({ id: 'write-item' });
 
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from as any).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             order: jest.fn().mockResolvedValue({
@@ -279,7 +287,7 @@ describe('WardrobeService Performance', () => {
     it('should prevent race conditions in cache updates', async () => {
       const testData = [createMockWardrobeItem({ id: 'race-item' })];
 
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from as any).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             order: jest.fn().mockResolvedValue({
@@ -315,7 +323,7 @@ describe('WardrobeService Performance', () => {
         createMockWardrobeItem({ id: `cleanup-item-${index}` }),
       );
 
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from as any).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             order: jest.fn().mockResolvedValue({
@@ -346,7 +354,7 @@ describe('WardrobeService Performance', () => {
     it('should handle rapid successive operations without memory leaks', async () => {
       const testData = [createMockWardrobeItem()];
 
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from as any).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             order: jest.fn().mockResolvedValue({
@@ -374,7 +382,7 @@ describe('WardrobeService Performance', () => {
 
   describe('error handling performance', () => {
     it('should handle errors efficiently without performance degradation', async () => {
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from as any).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             order: jest.fn().mockRejectedValue(new Error('Database error')),
@@ -398,7 +406,7 @@ describe('WardrobeService Performance', () => {
 
     it('should recover quickly from temporary failures', async () => {
       let callCount = 0;
-      mockSupabase.from.mockReturnValue({
+      (mockSupabase.from as any).mockReturnValue({
         select: jest.fn().mockReturnValue({
           eq: jest.fn().mockReturnValue({
             order: jest.fn().mockImplementation(() => {
@@ -447,7 +455,7 @@ describe('WardrobeService Performance', () => {
           createMockWardrobeItem({ id: `scale-item-${index}` }),
         );
 
-        mockSupabase.from.mockReturnValue({
+        (mockSupabase.from as any).mockReturnValue({
           select: jest.fn().mockReturnValue({
             eq: jest.fn().mockReturnValue({
               order: jest.fn().mockResolvedValue({
@@ -483,7 +491,7 @@ describe('WardrobeService Performance', () => {
       for (const userCount of userCounts) {
         const testData = [createMockWardrobeItem()];
 
-        mockSupabase.from.mockReturnValue({
+        (mockSupabase.from as any).mockReturnValue({
           select: jest.fn().mockReturnValue({
             eq: jest.fn().mockReturnValue({
               order: jest.fn().mockResolvedValue({

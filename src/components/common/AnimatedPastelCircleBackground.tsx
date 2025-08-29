@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import type { ViewStyle } from 'react-native';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
@@ -9,7 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { DesignSystem } from '../../theme/DesignSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 
@@ -32,7 +33,7 @@ const Circle = ({ style, delay, size, initialX, initialY }: CircleProps) => {
     );
   }, [progress]);
 
-  const animatedStyle = useAnimatedStyle(() => {
+  const animatedStyle = useAnimatedStyle((): ViewStyle => {
     const translateX = interpolate(
       progress.value,
       [0, 1],

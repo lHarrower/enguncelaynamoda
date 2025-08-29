@@ -11,14 +11,13 @@ import {
   View,
 } from 'react-native';
 
+import { AINameGenerator } from '@/components/naming/AINameGenerator';
 import { supabase } from '@/config/supabaseClient';
 import { useAINaming } from '@/hooks/useAINaming';
 import { enhancedWardrobeService } from '@/services/enhancedWardrobeService';
 import { DesignSystem } from '@/theme/DesignSystem';
 import { ItemCategory, WardrobeItem } from '@/types/aynaMirror';
 import { errorInDev } from '@/utils/consoleSuppress';
-
-import { AINameGenerator } from '../naming/AINameGenerator';
 
 interface WardrobeItemFormProps {
   item?: Partial<WardrobeItem>;
@@ -136,99 +135,113 @@ export const WardrobeItemForm: React.FC<WardrobeItemFormProps> = ({
     setShowAINaming(false);
   };
 
+  // Helper function to validate form data
+  const validateFormData = () => {
+    if (!formData.imageUri) {
+      throw new Error('Image is required');
+    }
+    if (!formData.name && !formData.aiGeneratedName) {
+      throw new Error('Item name is required');
+    }
+  };
+
+  // Helper function to prepare item data
+  const prepareItemData = (): Partial<WardrobeItem> => {
+    return {
+      ...item,
+      name: formData.name,
+      aiGeneratedName: formData.aiGeneratedName,
+      nameOverride: formData.nameOverride,
+      category: formData.category,
+      subcategory: formData.subcategory || undefined,
+      colors: formData.colors,
+      brand: formData.brand || undefined,
+      size: formData.size || undefined,
+      purchaseDate: formData.purchaseDate ? new Date(formData.purchaseDate) : undefined,
+      purchasePrice:
+        typeof formData.purchasePrice === 'number'
+          ? formData.purchasePrice
+          : parseFloat(String(formData.purchasePrice)) || undefined,
+      tags: formData.tags,
+      notes: formData.notes || undefined,
+      imageUri: formData.imageUri,
+    };
+  };
+
+  // Helper function to update existing item
+  const updateExistingItem = async (itemData: Partial<WardrobeItem>) => {
+    const { error: updateError } = await supabase
+      .from('wardrobe_items')
+      .update({
+        name: itemData.name,
+        ai_generated_name: itemData.aiGeneratedName,
+        name_override: itemData.nameOverride,
+        category: itemData.category,
+        subcategory: itemData.subcategory,
+        colors: itemData.colors,
+        brand: itemData.brand,
+        size: itemData.size,
+        purchase_date: itemData.purchaseDate
+          ? itemData.purchaseDate.toISOString().slice(0, 10)
+          : undefined,
+        purchase_price: itemData.purchasePrice,
+        tags: itemData.tags,
+        notes: itemData.notes,
+      })
+      .eq('id', item!.id);
+
+    if (updateError) {
+      throw new Error(updateError.message);
+    }
+
+    onSave(itemData as WardrobeItem);
+  };
+
+  // Helper function to create new item
+  const createNewItem = async (itemData: Partial<WardrobeItem>) => {
+    const newItemData = await enhancedWardrobeService.saveClothingItem(
+      {
+        image_uri: itemData.imageUri!,
+        processed_image_uri: itemData.imageUri!,
+        category: itemData.category!,
+        subcategory: itemData.subcategory,
+        colors: itemData.colors!,
+        brand: itemData.brand,
+        size: itemData.size,
+        purchase_date: itemData.purchaseDate
+          ? itemData.purchaseDate.toISOString().slice(0, 10)
+          : undefined,
+        purchase_price: itemData.purchasePrice,
+        tags: itemData.tags,
+        notes: itemData.notes,
+        name: itemData.name,
+        ai_generated_name: itemData.aiGeneratedName,
+        name_override: itemData.nameOverride,
+      },
+      false,
+    );
+
+    onSave({
+      ...itemData,
+      id: newItemData.id,
+      userId: newItemData.user_id,
+      createdAt: new Date(newItemData.created_at),
+      updatedAt: new Date(newItemData.updated_at),
+    } as WardrobeItem);
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     setError(null);
 
     try {
-      // Validate required fields
-      if (!formData.imageUri) {
-        throw new Error('Image is required');
-      }
-
-      if (!formData.name && !formData.aiGeneratedName) {
-        throw new Error('Item name is required');
-      }
-
-      // Prepare item data
-      const itemData: Partial<WardrobeItem> = {
-        ...item,
-        name: formData.name,
-        aiGeneratedName: formData.aiGeneratedName,
-        nameOverride: formData.nameOverride,
-        category: formData.category,
-        subcategory: formData.subcategory || undefined,
-        colors: formData.colors,
-        brand: formData.brand || undefined,
-        size: formData.size || undefined,
-        purchaseDate: formData.purchaseDate ? new Date(formData.purchaseDate) : undefined,
-        purchasePrice:
-          typeof formData.purchasePrice === 'number'
-            ? formData.purchasePrice
-            : parseFloat(String(formData.purchasePrice)) || undefined,
-        tags: formData.tags,
-        notes: formData.notes || undefined,
-        imageUri: formData.imageUri,
-      };
+      validateFormData();
+      const itemData = prepareItemData();
 
       if (isEditing && item?.id) {
-        // Update existing item
-        const { error: updateError } = await supabase
-          .from('wardrobe_items')
-          .update({
-            name: itemData.name,
-            ai_generated_name: itemData.aiGeneratedName,
-            name_override: itemData.nameOverride,
-            category: itemData.category,
-            subcategory: itemData.subcategory,
-            colors: itemData.colors,
-            brand: itemData.brand,
-            size: itemData.size,
-            purchase_date: itemData.purchaseDate
-              ? itemData.purchaseDate.toISOString().slice(0, 10)
-              : undefined,
-            purchase_price: itemData.purchasePrice,
-            tags: itemData.tags,
-            notes: itemData.notes,
-          })
-          .eq('id', item.id);
-
-        if (updateError) {
-          throw new Error(updateError.message);
-        }
-
-        onSave(itemData as WardrobeItem);
+        await updateExistingItem(itemData);
       } else {
-        // Create new item
-        const newItemData = await enhancedWardrobeService.saveClothingItem(
-          {
-            image_uri: itemData.imageUri!,
-            processed_image_uri: itemData.imageUri!, // Assuming same for now
-            category: itemData.category!,
-            subcategory: itemData.subcategory,
-            colors: itemData.colors!,
-            brand: itemData.brand,
-            size: itemData.size,
-            purchase_date: itemData.purchaseDate
-              ? itemData.purchaseDate.toISOString().slice(0, 10)
-              : undefined,
-            purchase_price: itemData.purchasePrice,
-            tags: itemData.tags,
-            notes: itemData.notes,
-            name: itemData.name,
-            ai_generated_name: itemData.aiGeneratedName,
-            name_override: itemData.nameOverride,
-          },
-          false,
-        ); // Don't auto-generate AI name since we handle it manually
-
-        onSave({
-          ...itemData,
-          id: newItemData.id,
-          userId: newItemData.user_id,
-          createdAt: new Date(newItemData.created_at),
-          updatedAt: new Date(newItemData.updated_at),
-        } as WardrobeItem);
+        await createNewItem(itemData);
       }
     } catch (err) {
       errorInDev('Error saving item:', err instanceof Error ? err : String(err));
@@ -635,8 +648,8 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.secondary[500],
   },
   chipText: {
-    color: 'white',
-    fontSize: 12,
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.sizes.xs,
     fontWeight: '500',
   },
   container: {
@@ -645,7 +658,7 @@ const styles = StyleSheet.create({
   },
   currentName: {
     color: DesignSystem.colors.text.primary,
-    fontSize: 16,
+    fontSize: DesignSystem.typography.sizes.md,
     fontWeight: '500',
     marginRight: DesignSystem.spacing.sm,
   },
@@ -657,7 +670,7 @@ const styles = StyleSheet.create({
   },
   currentNameLabel: {
     color: DesignSystem.colors.text.secondary,
-    fontSize: 14,
+    fontSize: DesignSystem.typography.sizes.sm,
     marginRight: DesignSystem.spacing.sm,
   },
   divider: {
@@ -673,7 +686,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: DesignSystem.colors.error.main,
-    fontSize: 14,
+    fontSize: DesignSystem.typography.sizes.sm,
   },
   formSection: {
     marginBottom: DesignSystem.spacing.lg,
@@ -695,7 +708,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: DesignSystem.colors.text.primary,
-    fontSize: 16,
+    fontSize: DesignSystem.typography.sizes.md,
     fontWeight: '500',
     marginBottom: DesignSystem.spacing.xs,
   },
@@ -713,7 +726,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     color: DesignSystem.colors.text.primary,
-    fontSize: 20,
+    fontSize: DesignSystem.typography.sizes.lg,
     fontWeight: 'bold',
   },
   nameHeader: {
@@ -737,7 +750,7 @@ const styles = StyleSheet.create({
   },
   pickerText: {
     color: DesignSystem.colors.text.primary,
-    fontSize: 16,
+    fontSize: DesignSystem.typography.sizes.md,
   },
   row: {
     flexDirection: 'row',
@@ -757,7 +770,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   saveButtonText: {
-    color: 'white',
+    color: DesignSystem.colors.text.inverse,
     fontWeight: '500',
   },
   section: {
@@ -765,7 +778,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: DesignSystem.colors.text.primary,
-    fontSize: 18,
+    fontSize: DesignSystem.typography.sizes.lg,
     fontWeight: '600',
   },
   textArea: {
@@ -778,12 +791,12 @@ const styles = StyleSheet.create({
     borderRadius: DesignSystem.borderRadius.md,
     borderWidth: 1,
     color: DesignSystem.colors.text.primary,
-    fontSize: 16,
+    fontSize: DesignSystem.typography.sizes.md,
     padding: DesignSystem.spacing.md,
   },
   title: {
     color: DesignSystem.colors.text.primary,
-    fontSize: 24,
+    fontSize: DesignSystem.typography.sizes.xl,
     fontWeight: 'bold',
     marginBottom: DesignSystem.spacing.lg,
   },

@@ -12,8 +12,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AynamodaColors } from '../../theme/AynamodaColors';
-import { DesignSystem } from '../../theme/DesignSystem';
+import { AynamodaColors } from '@/theme/AynamodaColors';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width } = Dimensions.get('window');
 const TAB_BAR_HEIGHT = 64; // Base tab bar height without safe area inset

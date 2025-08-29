@@ -25,7 +25,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { ModernDesignSystem } from '../../theme/ModernDesignSystem';
+import { ModernDesignSystem } from '@/theme/ModernDesignSystem';
 
 interface ModernInputProps extends Omit<TextInputProps, 'style'> {
   label?: string;

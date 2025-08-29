@@ -3,8 +3,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { useHapticFeedback } from '../../hooks/useHapticFeedback';
-import { WardrobeItem } from '../../types/aynaMirror';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { WardrobeItem } from '@/types/aynaMirror';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2; // 2 columns with margins
@@ -98,7 +99,7 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
       accessibilityActions={[
         { name: 'activate', label: 'View details' },
         { name: 'longpress', label: 'Show options' },
-        { name: 'magicTap', label: 'Toggle favorite' }
+        { name: 'magicTap', label: 'Toggle favorite' },
       ]}
       testID={testID}
     >
@@ -113,7 +114,7 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
           <View style={styles.brandSection}>
             <Text style={styles.brandText}>{brandName}</Text>
             <View style={styles.premiumBadge}>
-              <Ionicons name="diamond-outline" size={10} color="#B8860B" />
+              <Ionicons name="diamond-outline" size={10} color={DesignSystem.colors.gold[600]} />
             </View>
           </View>
 
@@ -132,7 +133,9 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
                 <Ionicons
                   name={isFavorite ? 'heart' : 'heart-outline'}
                   size={18}
-                  color={isFavorite ? '#D4A574' : '#8B5A3C'}
+                  color={
+                    isFavorite ? DesignSystem.colors.gold[500] : DesignSystem.colors.primary[700]
+                  }
                 />
               </TouchableOpacity>
             )}
@@ -143,7 +146,11 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 testID={`${testID}-edit`}
               >
-                <Ionicons name="pencil-outline" size={16} color="#8B5A3C" />
+                <Ionicons
+                  name="pencil-outline"
+                  size={16}
+                  color={DesignSystem.colors.primary[700]}
+                />
               </TouchableOpacity>
             )}
             {showActions && onDelete && (
@@ -153,7 +160,7 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 testID={`${testID}-delete`}
               >
-                <Ionicons name="trash-outline" size={16} color="#8B5A3C" />
+                <Ionicons name="trash-outline" size={16} color={DesignSystem.colors.primary[700]} />
               </TouchableOpacity>
             )}
           </View>
@@ -171,7 +178,7 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
           {/* Usage Stats Badge */}
           {item.usageStats && (
             <View style={styles.usageBadge}>
-              <Ionicons name="refresh-outline" size={10} color="#FFFFFF" />
+              <Ionicons name="refresh-outline" size={10} color={DesignSystem.colors.text.inverse} />
               <Text style={styles.usageText}>{item.usageStats.totalWears}</Text>
             </View>
           )}
@@ -225,7 +232,7 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
             onPress={() => onSelectionToggle?.(item.id, true)}
           >
             <View style={styles.selectionIndicator}>
-              <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+              <Ionicons name="checkmark" size={16} color={DesignSystem.colors.text.inverse} />
             </View>
           </TouchableOpacity>
         )}
@@ -239,7 +246,7 @@ export const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
 
 const styles = StyleSheet.create({
   borderAccent: {
-    backgroundColor: 'rgba(212, 165, 116, 0.3)',
+    backgroundColor: DesignSystem.colors.terracotta[300] + '4D',
     bottom: 0,
     height: 2,
     left: 0,
@@ -251,8 +258,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   brandText: {
-    color: '#8B5A3C',
-    fontSize: 10,
+    color: DesignSystem.colors.primary[700],
+    fontSize: DesignSystem.typography.sizes.xs,
     fontWeight: '700',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
@@ -276,27 +283,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   categoryBadge: {
-    backgroundColor: 'rgba(139, 90, 60, 0.9)',
-    borderRadius: 8,
-    left: 8,
-    paddingHorizontal: 6,
+    backgroundColor: DesignSystem.colors.terracotta[500] + 'E6',
+    borderRadius: DesignSystem.spacing.xs,
+    left: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.xs,
     paddingVertical: 2,
     position: 'absolute',
-    top: 8,
+    top: DesignSystem.spacing.xs,
   },
   categoryText: {
-    color: '#FFFFFF',
-    fontSize: 8,
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.sizes.xs,
     fontWeight: '700',
     letterSpacing: 0.3,
   },
   colorIndicator: {
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 6,
+    borderColor: DesignSystem.colors.background.elevated + 'CC',
+    borderRadius: DesignSystem.spacing.xs,
     borderWidth: 1,
-    height: 12,
+    height: DesignSystem.spacing.sm,
     marginRight: 3,
-    width: 12,
+    width: DesignSystem.spacing.sm,
   },
   colorsRow: {
     alignItems: 'center',
@@ -304,8 +311,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   currencyText: {
-    color: '#8B5A3C',
-    fontSize: 11,
+    color: DesignSystem.colors.primary[700],
+    fontSize: DesignSystem.typography.sizes.xs,
     fontWeight: '500',
     opacity: 0.7,
   },
@@ -315,34 +322,38 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   favoriteButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 12,
+    backgroundColor: DesignSystem.colors.background.elevated + 'E6',
+    borderRadius: DesignSystem.spacing.sm,
     elevation: 3,
-    padding: 6,
-    shadowColor: '#000',
+    padding: DesignSystem.spacing.xs,
+    shadowColor: DesignSystem.colors.text.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 32,
+    height: 32,
   },
   actionButtons: {
     flexDirection: 'row',
     gap: 4,
   },
   actionButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 10,
+    backgroundColor: DesignSystem.colors.background.elevated + 'E6',
+    borderRadius: DesignSystem.spacing.xs,
     elevation: 2,
-    padding: 4,
-    shadowColor: '#000',
+    padding: DesignSystem.spacing.xs,
+    shadowColor: DesignSystem.colors.text.primary,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
   imageContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    borderRadius: 16,
+    backgroundColor: DesignSystem.colors.background.elevated + '80',
+    borderRadius: DesignSystem.spacing.md,
     flex: 1,
-    marginBottom: 12,
+    marginBottom: DesignSystem.spacing.sm,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -355,35 +366,35 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   itemName: {
-    color: '#2D2D2D',
-    fontFamily: 'System',
-    fontSize: 13,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.sm,
     fontWeight: '600',
     lineHeight: 17,
-    marginBottom: 6,
+    marginBottom: DesignSystem.spacing.xs,
   },
   moreColors: {
-    color: '#8B5A3C',
-    fontSize: 9,
+    color: DesignSystem.colors.terracotta[500],
+    fontSize: DesignSystem.typography.sizes.xs,
     fontWeight: '500',
     marginLeft: 2,
   },
   premiumBadge: {
-    backgroundColor: 'rgba(184, 134, 11, 0.15)',
-    borderRadius: 8,
-    marginLeft: 6,
+    backgroundColor: DesignSystem.colors.sage[600] + '26',
+    borderRadius: DesignSystem.spacing.xs,
+    marginLeft: DesignSystem.spacing.xs,
     padding: 2,
   },
   premiumCard: {
     aspectRatio: 0.75,
-    backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(139, 90, 60, 0.1)',
-    borderRadius: 24,
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderColor: DesignSystem.colors.terracotta[500] + '1A',
+    borderRadius: DesignSystem.spacing.xl,
     borderWidth: 1,
     elevation: 8,
-    marginBottom: 16,
+    marginBottom: DesignSystem.spacing.md,
     overflow: 'hidden',
-    shadowColor: '#8B5A3C',
+    shadowColor: DesignSystem.colors.terracotta[500],
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 20,
@@ -393,31 +404,31 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   priceText: {
-    color: '#8B5A3C',
-    fontFamily: 'System',
-    fontSize: 15,
+    color: DesignSystem.colors.terracotta[500],
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.md,
     fontWeight: '700',
   },
   selectedCard: {
-    borderColor: '#D4A574',
+    borderColor: DesignSystem.colors.sage[400],
     borderWidth: 2.5,
-    shadowColor: '#D4A574',
+    shadowColor: DesignSystem.colors.sage[400],
     shadowOpacity: 0.25,
     transform: [{ scale: 1.02 }],
   },
   selectionIndicator: {
-    backgroundColor: '#D4A574',
+    backgroundColor: DesignSystem.colors.sage[400],
     borderRadius: 20,
     elevation: 6,
-    padding: 8,
-    shadowColor: '#D4A574',
+    padding: DesignSystem.spacing.xs,
+    shadowColor: DesignSystem.colors.sage[400],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
   selectionOverlay: {
     alignItems: 'center',
-    backgroundColor: 'rgba(212, 165, 116, 0.2)',
+    backgroundColor: DesignSystem.colors.sage[400] + '33',
     bottom: 0,
     justifyContent: 'center',
     left: 0,
@@ -426,27 +437,27 @@ const styles = StyleSheet.create({
     top: 0,
   },
   sizeText: {
-    color: '#8B5A3C',
-    fontSize: 9,
+    color: DesignSystem.colors.primary[700],
+    fontSize: DesignSystem.typography.sizes.xs,
     fontWeight: '500',
   },
   tagsText: {
-    color: '#A67C52',
-    fontSize: 8,
+    color: DesignSystem.colors.primary[600],
+    fontSize: DesignSystem.typography.sizes.xs,
     fontStyle: 'italic',
     fontWeight: '400',
   },
   usageBadge: {
     alignItems: 'center',
-    backgroundColor: 'rgba(212, 165, 116, 0.9)',
-    borderRadius: 10,
+    backgroundColor: DesignSystem.colors.sage[400] + 'E6',
+    borderRadius: DesignSystem.spacing.xs,
     flexDirection: 'row',
     gap: 3,
-    paddingHorizontal: 6,
+    paddingHorizontal: DesignSystem.spacing.xs,
     paddingVertical: 3,
     position: 'absolute',
-    right: 8,
-    top: 8,
+    right: DesignSystem.spacing.xs,
+    top: DesignSystem.spacing.xs,
   },
   usageText: {
     color: '#FFFFFF',

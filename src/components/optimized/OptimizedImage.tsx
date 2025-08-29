@@ -29,8 +29,6 @@ import { PerformanceOptimizationService } from '@/services/performanceOptimizati
 import { DesignSystem } from '@/theme/DesignSystem';
 import { optimizeImageUri } from '@/utils/performanceUtils';
 
-import { warnInDev } from '../../utils/consoleSuppress';
-
 interface OptimizedImageProps {
   /** Image source URI */
   source: string | ImageSourcePropType;
@@ -78,6 +76,147 @@ interface ImageState {
   loaded: boolean;
 }
 
+// Helper function to optimize image URI
+const optimizeImageUri = (uri: string, enableWebP: boolean, quality: number): string => {
+  if (!enableWebP || uri.includes('.gif')) {
+    return uri;
+  }
+
+  if (uri.includes('unsplash.com') || uri.includes('images.')) {
+    const separator = uri.includes('?') ? '&' : '?';
+    return `${uri}${separator}fm=webp&q=${quality}`;
+  }
+
+  return uri;
+};
+
+// Helper function to apply size optimization
+const applySizeOptimization = (
+  uri: string,
+  targetWidth?: number,
+  targetHeight?: number,
+): string => {
+  if (targetWidth && targetHeight) {
+    // Apply actual size optimization logic here
+    const separator = uri.includes('?') ? '&' : '?';
+    return `${uri}${separator}w=${targetWidth}&h=${targetHeight}`;
+  }
+  return uri;
+};
+
+// Custom hook for image optimization
+const useImageOptimization = (
+  source: string | ImageSourcePropType,
+  cache: boolean,
+  enableWebP: boolean,
+  quality: number,
+  targetWidth?: number,
+  targetHeight?: number,
+) => {
+  const [optimizedSource, setOptimizedSource] = useState<ImageSourcePropType | undefined>(
+    typeof source === 'string' ? { uri: source } : source,
+  );
+
+  useEffect(() => {
+    const optimizeSource = async () => {
+      if (typeof source === 'string' && cache) {
+        try {
+          let optimizedUri = optimizeImageUri(source, enableWebP, quality);
+          optimizedUri = applySizeOptimization(optimizedUri, targetWidth, targetHeight);
+
+          const cachedUri = await PerformanceOptimizationService.optimizeImageLoading(optimizedUri);
+          setOptimizedSource({ uri: cachedUri });
+        } catch (error) {
+          warnInDev('Image optimization failed:', String(error));
+          setOptimizedSource(typeof source === 'string' ? { uri: source } : source);
+        }
+      } else {
+        setOptimizedSource(typeof source === 'string' ? { uri: source } : source);
+      }
+    };
+
+    optimizeSource();
+  }, [source, cache, enableWebP, quality, targetWidth, targetHeight]);
+
+  return optimizedSource;
+};
+
+// Custom hook for lazy loading
+const useLazyLoading = (lazy: boolean) => {
+  const [isInView, setIsInView] = useState(!lazy);
+  const viewRef = useRef<View>(null);
+
+  useEffect(() => {
+    if (!lazy) return;
+
+    const checkVisibility = () => {
+      if (viewRef.current) {
+        setIsInView(true);
+      }
+    };
+
+    const timer = setTimeout(checkVisibility, 100);
+    return () => clearTimeout(timer);
+  }, [lazy]);
+
+  return { isInView, viewRef };
+};
+
+// Custom hook for image loading handlers
+const useImageHandlers = (
+  progressive: boolean,
+  fadeDuration: number,
+  opacity: SharedValue<number>,
+  scale: SharedValue<number>,
+  loadingOpacity: SharedValue<number>,
+  onLoad?: () => void,
+  onError?: (error: NativeSyntheticEvent<ImageErrorEventData>) => void,
+  onLoadStart?: () => void,
+) => {
+  const [imageState, setImageState] = useState<ImageState>({
+    loading: false,
+    error: false,
+    loaded: false,
+  });
+
+  const handleLoadStart = useCallback(() => {
+    setImageState((prev) => ({ ...prev, loading: true, error: false }));
+    loadingOpacity.value = withTiming(1, { duration: 200 });
+    onLoadStart?.();
+  }, [loadingOpacity, onLoadStart]);
+
+  const handleLoad = useCallback(() => {
+    const completeLoad = () => {
+      setImageState((prev) => ({ ...prev, loading: false, loaded: true }));
+      onLoad?.();
+    };
+
+    if (progressive) {
+      opacity.value = withTiming(1, { duration: fadeDuration });
+      scale.value = withSpring(1, { damping: 15, stiffness: 150 });
+      loadingOpacity.value = withTiming(0, { duration: 200 }, () => {
+        runOnJS(completeLoad)();
+      });
+    } else {
+      opacity.value = 1;
+      scale.value = 1;
+      loadingOpacity.value = 0;
+      completeLoad();
+    }
+  }, [opacity, scale, loadingOpacity, progressive, fadeDuration, onLoad]);
+
+  const handleError = useCallback(
+    (error: NativeSyntheticEvent<ImageErrorEventData>) => {
+      setImageState((prev) => ({ ...prev, loading: false, error: true }));
+      loadingOpacity.value = withTiming(0, { duration: 200 });
+      onError?.(error);
+    },
+    [loadingOpacity, onError],
+  );
+
+  return { imageState, handleLoadStart, handleLoad, handleError };
+};
+
 export const OptimizedImage: React.FC<OptimizedImageProps> = memo(
   ({
     source,
@@ -100,116 +239,30 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = memo(
     onLoadStart,
     accessibilityLabel,
   }) => {
-    const [imageState, setImageState] = useState<ImageState>({
-      loading: false,
-      error: false,
-      loaded: false,
-    });
-    const [optimizedSource, setOptimizedSource] = useState<ImageSourcePropType | undefined>(
-      typeof source === 'string' ? { uri: source } : source,
-    );
-    const [isInView, setIsInView] = useState(!lazy);
-    const viewRef = useRef<View>(null);
-
     // Animation values
     const opacity = useSharedValue(0);
     const scale = useSharedValue(0.95);
     const loadingOpacity = useSharedValue(0);
 
-    // Optimize image source
-    useEffect(() => {
-      const optimizeSource = async () => {
-        if (typeof source === 'string' && cache) {
-          try {
-            let optimizedUri = source;
-
-            // Apply WebP format if supported
-            if (enableWebP && !source.includes('.gif')) {
-              if (source.includes('unsplash.com') || source.includes('images.')) {
-                const separator = source.includes('?') ? '&' : '?';
-                optimizedUri = `${source}${separator}fm=webp&q=${quality}`;
-              }
-            }
-
-            // Apply size optimization
-            if (targetWidth && targetHeight) {
-              optimizedUri = optimizeImageUri(optimizedUri, targetWidth, targetHeight);
-            }
-
-            // Use performance service for caching
-            const cachedUri =
-              await PerformanceOptimizationService.optimizeImageLoading(optimizedUri);
-            setOptimizedSource({ uri: cachedUri });
-          } catch (error) {
-            warnInDev('Image optimization failed:', String(error));
-            setOptimizedSource(typeof source === 'string' ? { uri: source } : source);
-          }
-        } else {
-          setOptimizedSource(typeof source === 'string' ? { uri: source } : source);
-        }
-      };
-
-      optimizeSource();
-    }, [source, cache, enableWebP, quality, targetWidth, targetHeight]);
-
-    // Lazy loading intersection observer simulation
-    useEffect(() => {
-      if (!lazy) {
-        return;
-      }
-
-      const checkVisibility = () => {
-        if (viewRef.current) {
-          // Simple visibility check - in a real implementation,
-          // you might use react-native-intersection-observer or similar
-          setIsInView(true);
-        }
-      };
-
-      const timer = setTimeout(checkVisibility, 100);
-      return () => clearTimeout(timer);
-    }, [lazy]);
-
-    // Handle loading start
-    const handleLoadStart = useCallback(() => {
-      setImageState((prev) => ({ ...prev, loading: true, error: false }));
-      loadingOpacity.value = withTiming(1, { duration: 200 });
-      onLoadStart?.();
-    }, [loadingOpacity, onLoadStart]);
-
-    // Handle successful load
-    const handleLoad = useCallback(() => {
-      const completeLoad = () => {
-        setImageState((prev) => ({ ...prev, loading: false, loaded: true }));
-        onLoad?.();
-      };
-
-      if (progressive) {
-        // Progressive loading animation
-        opacity.value = withTiming(1, { duration: fadeDuration });
-        scale.value = withSpring(1, {
-          damping: 15,
-          stiffness: 150,
-        });
-        loadingOpacity.value = withTiming(0, { duration: 200 }, () => {
-          runOnJS(completeLoad)();
-        });
-      } else {
-        opacity.value = 1;
-        scale.value = 1;
-        loadingOpacity.value = 0;
-        completeLoad();
-      }
-    }, [opacity, scale, loadingOpacity, progressive, fadeDuration, onLoad]);
-
-    // Handle load error
-    const handleError = useCallback(
-      (error: NativeSyntheticEvent<ImageErrorEventData>) => {
-        setImageState((prev) => ({ ...prev, loading: false, error: true }));
-        loadingOpacity.value = withTiming(0, { duration: 200 });
-        onError?.(error);
-      },
-      [loadingOpacity, onError],
+    // Custom hooks
+    const optimizedSource = useImageOptimization(
+      source,
+      cache,
+      enableWebP,
+      quality,
+      targetWidth,
+      targetHeight,
+    );
+    const { isInView, viewRef } = useLazyLoading(lazy);
+    const { imageState, handleLoadStart, handleLoad, handleError } = useImageHandlers(
+      progressive,
+      fadeDuration,
+      opacity,
+      scale,
+      loadingOpacity,
+      onLoad,
+      onError,
+      onLoadStart,
     );
 
     // Animated styles
@@ -224,10 +277,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = memo(
 
     // Render loading placeholder
     const renderLoadingPlaceholder = () => {
-      if (placeholder) {
-        return placeholder;
-      }
-
+      if (placeholder) return placeholder;
       return (
         <Animated.View style={[styles.loadingContainer, loadingAnimatedStyle]}>
           <ActivityIndicator size="small" color={loadingColor} />
@@ -237,10 +287,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = memo(
 
     // Render error placeholder
     const renderErrorPlaceholder = () => {
-      if (errorPlaceholder) {
-        return errorPlaceholder;
-      }
-
+      if (errorPlaceholder) return errorPlaceholder;
       return (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>Failed to load image</Text>
@@ -259,7 +306,6 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = memo(
 
     return (
       <View ref={viewRef} style={[styles.container, containerStyle]}>
-        {/* Main Image */}
         {isInView && (
           <Animated.View style={[styles.imageWrapper, imageAnimatedStyle]}>
             <Image
@@ -273,11 +319,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = memo(
             />
           </Animated.View>
         )}
-
-        {/* Loading Overlay */}
         {imageState.loading && renderLoadingPlaceholder()}
-
-        {/* Error Overlay */}
         {imageState.error && renderErrorPlaceholder()}
       </View>
     );

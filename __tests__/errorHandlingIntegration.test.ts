@@ -227,11 +227,11 @@ describe('Error Handling Integration Tests', () => {
     it('should handle notification permission denial', async () => {
       // Reset the service for fresh initialization
       notificationService.resetForTesting();
-      
+
       // Get the global mock notifications object from the service
       const notificationServiceModule = require('@/services/notificationService');
       const mockNotifications = await notificationServiceModule.loadNotifications();
-      
+
       // Mock permission denial
       mockNotifications.getPermissionsAsync.mockResolvedValue({ status: 'denied' } as any);
       mockNotifications.requestPermissionsAsync.mockResolvedValue({ status: 'denied' } as any);
@@ -251,9 +251,9 @@ describe('Error Handling Integration Tests', () => {
       // Mock errorHandlingService.executeWithRetry to fail after retries
       const { errorHandlingService } = require('@/services/errorHandlingService');
       const originalExecuteWithRetry = errorHandlingService.executeWithRetry;
-      errorHandlingService.executeWithRetry = jest.fn().mockRejectedValue(
-        new Error('Failed after retries'),
-      );
+      errorHandlingService.executeWithRetry = jest
+        .fn()
+        .mockRejectedValue(new Error('Failed after retries'));
 
       const notificationService = NotificationService;
       await notificationService.initialize();

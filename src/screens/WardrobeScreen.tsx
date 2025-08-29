@@ -13,15 +13,15 @@ import {
   View,
 } from 'react-native';
 
-import { AINameGenerator } from '@/components/naming/AINameGenerator';
-import { NamingPreferences } from '@/components/naming/NamingPreferences';
-import { WardrobeItemCard } from '@/components/sanctuary/WardrobeItemCard';
-import { WardrobeItemForm } from '@/components/wardrobe/WardrobeItemForm';
-import { useAINaming } from '@/hooks/useAINaming';
-import { enhancedWardrobeService } from '@/services/enhancedWardrobeService';
-import { DesignSystem } from '@/theme/DesignSystem';
-import { ItemCategory, WardrobeItem } from '@/types/aynaMirror';
-import { errorInDev } from '@/utils/consoleSuppress';
+import { AINameGenerator } from '../components/naming/AINameGenerator';
+import { NamingPreferences } from '../components/naming/NamingPreferences';
+import { WardrobeItemCard } from '../components/sanctuary/WardrobeItemCard';
+import { WardrobeItemForm } from '../components/wardrobe/WardrobeItemForm';
+import { useAINaming } from '../hooks/useAINaming';
+import { enhancedWardrobeService } from '../services/enhancedWardrobeService';
+import { DesignSystem } from '../theme/DesignSystem';
+import { ItemCategory, WardrobeItem } from '../types/aynaMirror';
+import { errorInDev } from '../utils/consoleSuppress';
 
 interface FilterOptions {
   category: ItemCategory | 'all';
@@ -103,9 +103,14 @@ export const WardrobeScreen: React.FC = () => {
 
   useEffect(() => {
     loadItems();
-  }, [loadItems]);
+  }, []);
 
   const filteredAndSortedItems = React.useMemo(() => {
+    // Ensure items is an array before filtering
+    if (!Array.isArray(items)) {
+      return [];
+    }
+
     const filtered = items.filter((item) => {
       // Category filter
       if (filters.category !== 'all' && item.category !== filters.category) {
@@ -216,7 +221,7 @@ export const WardrobeScreen: React.FC = () => {
           setItems((prev) =>
             prev.map((i) =>
               i.id === id
-                ? ({
+                ? {
                     ...i,
                     ...('processedImageUri' in update
                       ? { processedImageUri: update.processedImageUri }
@@ -224,7 +229,7 @@ export const WardrobeScreen: React.FC = () => {
                     ...('aiAnalysisData' in update
                       ? { aiAnalysisData: update.aiAnalysisData }
                       : {}),
-                  } as any)
+                  }
                 : i,
             ),
           );
@@ -304,7 +309,7 @@ export const WardrobeScreen: React.FC = () => {
       } else {
         // Create new item
         // Temporary local add; service method will be integrated later
-        setItems((prev) => [{ ...(itemData as any), id: `${Date.now()}` }, ...prev]);
+        setItems((prev) => [{ ...itemData, id: `${Date.now()}` } as WardrobeItem, ...prev]);
         setSnackbar({
           open: true,
           message: 'Item added successfully',
@@ -328,7 +333,7 @@ export const WardrobeScreen: React.FC = () => {
   const handleBulkAIGeneration = async () => {
     setIsGenerating(true);
     try {
-      const itemsToUpdate = items.filter((item) => !item.name || item.name.trim() === '');
+      const itemsToUpdate = items?.filter((item) => !item.name || item.name.trim() === '') || [];
 
       for (const itemLocal of itemsToUpdate) {
         try {
@@ -337,7 +342,7 @@ export const WardrobeScreen: React.FC = () => {
             setItems((prev) =>
               prev.map((i) =>
                 i.id === itemLocal.id
-                  ? ({ ...i, aiGeneratedName: resp.aiGeneratedName, nameOverride: false } as any)
+                  ? { ...i, aiGeneratedName: resp.aiGeneratedName, nameOverride: false }
                   : i,
               ),
             );
@@ -373,26 +378,30 @@ export const WardrobeScreen: React.FC = () => {
 
   const getUniqueColors = (): string[] => {
     const colors = new Set<string>();
-    items.forEach((item) => {
-      if (item.colors) {
-        item.colors.forEach((color) => colors.add(color));
-      }
-    });
+    if (Array.isArray(items)) {
+      items.forEach((item) => {
+        if (item.colors) {
+          item.colors.forEach((color) => colors.add(color));
+        }
+      });
+    }
     return Array.from(colors).sort();
   };
 
   const getUniqueBrands = (): string[] => {
     const brands = new Set<string>();
-    items.forEach((item) => {
-      if (item.brand) {
-        brands.add(item.brand);
-      }
-    });
+    if (Array.isArray(items)) {
+      items.forEach((item) => {
+        if (item.brand) {
+          brands.add(item.brand);
+        }
+      });
+    }
     return Array.from(brands).sort();
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} testID="wardrobe-screen">
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>My Wardrobe</Text>
@@ -423,12 +432,12 @@ export const WardrobeScreen: React.FC = () => {
       {/* Stats */}
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{items.length}</Text>
+          <Text style={styles.statValue}>{items?.length || 0}</Text>
           <Text style={styles.statLabel}>Total Items</Text>
         </View>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>
-            {items.filter((item) => item.aiGeneratedName && !item.nameOverride).length}
+            {items?.filter((item) => item.aiGeneratedName && !item.nameOverride)?.length || 0}
           </Text>
           <Text style={styles.statLabel}>AI Named</Text>
         </View>
@@ -545,7 +554,7 @@ export const WardrobeScreen: React.FC = () => {
 
       {/* Error Display */}
       {error && (
-        <View style={styles.errorContainer}>
+        <View style={styles.errorContainer} testID="error-state-container">
           <Ionicons name="alert-circle" size={20} color={DesignSystem.colors.error.main} />
           <Text style={styles.errorText}>{error}</Text>
           <TouchableOpacity
@@ -563,14 +572,17 @@ export const WardrobeScreen: React.FC = () => {
       {/* Items Grid/List */}
       <View style={styles.itemsContainer}>
         {filteredAndSortedItems.length === 0 ? (
-          <View style={styles.emptyContainer}>
+          <View style={styles.emptyContainer} testID="empty-state-container">
             <Ionicons name="shirt-outline" size={64} color={DesignSystem.colors.text.secondary} />
             <Text style={styles.emptyText}>
-              {items.length === 0 ? 'No items in your wardrobe yet' : 'No items match your filters'}
+              {(items?.length || 0) === 0
+                ? 'No items in your wardrobe yet'
+                : 'No items match your filters'}
             </Text>
           </View>
         ) : (
           <FlatList
+            testID="wardrobe-list"
             data={filteredAndSortedItems}
             renderItem={renderItem}
             keyExtractor={keyExtractor}
@@ -1083,7 +1095,10 @@ export const WardrobeScreen: React.FC = () => {
                   sortOptions.field === option.value && styles.pickerOptionSelected,
                 ]}
                 onPress={() => {
-                  setSortOptions((prev) => ({ ...prev, field: option.value as any }));
+                  setSortOptions((prev) => ({
+                    ...prev,
+                    field: option.value as SortOptions['field'],
+                  }));
                   setShowSortPicker(false);
                 }}
                 accessibilityRole="button"
@@ -1128,7 +1143,7 @@ export const WardrobeScreen: React.FC = () => {
                       : 'information-circle'
               }
               size={20}
-              color={DesignSystem.colors.background.primary}
+              color={DesignSystem.colors.text.inverse}
             />
             <Text style={styles.snackbarText}>{snackbar.message}</Text>
             <TouchableOpacity
@@ -1137,7 +1152,7 @@ export const WardrobeScreen: React.FC = () => {
               accessibilityLabel="Close notification"
               accessibilityHint="Tap to dismiss this notification"
             >
-              <Ionicons name="close" size={20} color={DesignSystem.colors.background.primary} />
+              <Ionicons name="close" size={20} color={DesignSystem.colors.text.inverse} />
             </TouchableOpacity>
           </View>
         </View>
@@ -1154,7 +1169,7 @@ const styles = StyleSheet.create({
     paddingVertical: DesignSystem.spacing.md,
   },
   chip: {
-    backgroundColor: DesignSystem.colors.background.tertiary,
+    backgroundColor: DesignSystem.colors.background[50],
     borderColor: DesignSystem.colors.border.primary,
     borderRadius: DesignSystem.borderRadius.full,
     borderWidth: 1,
@@ -1178,7 +1193,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.text.inverse,
   },
   clearButton: {
-    backgroundColor: DesignSystem.colors.background.tertiary,
+    backgroundColor: DesignSystem.colors.background[50],
     borderColor: DesignSystem.colors.border.primary,
     borderWidth: 1,
   },
@@ -1236,7 +1251,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     right: DesignSystem.spacing.lg,
-    shadowColor: '#000',
+    shadowColor: DesignSystem.colors.shadow.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -1274,7 +1289,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.background.secondary,
+    backgroundColor: DesignSystem.colors.background[50],
     borderBottomColor: DesignSystem.colors.border.primary,
     borderBottomWidth: 1,
     flexDirection: 'row',
@@ -1293,7 +1308,7 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.xs,
   },
   headerButtonSecondary: {
-    backgroundColor: DesignSystem.colors.background.tertiary,
+    backgroundColor: DesignSystem.colors.background[50],
   },
   headerTitle: {
     color: DesignSystem.colors.text.primary,
@@ -1336,7 +1351,7 @@ const styles = StyleSheet.create({
     paddingVertical: DesignSystem.spacing.md,
   },
   modalContainer: {
-    backgroundColor: DesignSystem.colors.background.primary,
+    backgroundColor: '#FAF9F6',
     flex: 1,
   },
   modalContent: {
@@ -1435,7 +1450,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: DesignSystem.spacing.sm,
   },
   searchFilterContainer: {
-    backgroundColor: DesignSystem.colors.background.secondary,
+    backgroundColor: DesignSystem.colors.background[50],
     paddingHorizontal: DesignSystem.spacing.md,
     paddingVertical: DesignSystem.spacing.sm,
   },
@@ -1465,22 +1480,22 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.error.main,
   },
   snackbarInfo: {
-    backgroundColor: DesignSystem.colors.info?.main || '#2196f3',
+    backgroundColor: DesignSystem.colors.info.main,
   },
   snackbarSuccess: {
-    backgroundColor: DesignSystem.colors.success?.main || '#4caf50',
+    backgroundColor: DesignSystem.colors.success.main,
   },
   snackbarText: {
-    color: DesignSystem.colors.background.primary,
+    color: DesignSystem.colors.text.inverse,
     flex: 1,
     fontSize: DesignSystem.typography.sizes.sm,
   },
   snackbarWarning: {
-    backgroundColor: DesignSystem.colors.warning?.main || '#ff9800',
+    backgroundColor: DesignSystem.colors.warning.main,
   },
   sortButton: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.background.tertiary,
+    backgroundColor: DesignSystem.colors.background[50],
     borderRadius: DesignSystem.borderRadius.sm,
     flexDirection: 'row',
     gap: DesignSystem.spacing.xs,
@@ -1498,7 +1513,7 @@ const styles = StyleSheet.create({
   },
   sortViewContainer: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.background.secondary,
+    backgroundColor: DesignSystem.colors.background[50],
     borderBottomColor: DesignSystem.colors.border.primary,
     borderBottomWidth: 1,
     flexDirection: 'row',
@@ -1520,7 +1535,7 @@ const styles = StyleSheet.create({
     fontWeight: DesignSystem.typography.weights.bold,
   },
   statsContainer: {
-    backgroundColor: DesignSystem.colors.background.secondary,
+    backgroundColor: DesignSystem.colors.background[50],
     borderBottomColor: DesignSystem.colors.border.primary,
     borderBottomWidth: 1,
     flexDirection: 'row',
@@ -1535,7 +1550,7 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.primary[500],
   },
   viewToggleContainer: {
-    backgroundColor: DesignSystem.colors.background.tertiary,
+    backgroundColor: DesignSystem.colors.background[50],
     borderRadius: DesignSystem.borderRadius.sm,
     flexDirection: 'row',
     padding: 2,

@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 
-import { PerformanceMonitor } from '../../hooks/usePerformanceMonitor';
+import { PerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 
 interface PerformanceOverlayProps {
   visible?: boolean;

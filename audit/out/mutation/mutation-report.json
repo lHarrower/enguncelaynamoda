@@ -1,1 +1,4 @@
-﻿{"note":"No mutation-report.json produced. Ensure Stryker json reporter enabled.","systemUnderTestMetrics":{"mutationScore":0}}
+﻿{
+  "note": "No mutation-report.json produced. Ensure Stryker json reporter enabled.",
+  "systemUnderTestMetrics": { "mutationScore": 0 }
+}

@@ -24,31 +24,56 @@ const mockAuth = {
 // Helper to create a chainable builder whose methods are jest mocks returning self
 function createQueryBuilder() {
   const builder = {};
-  
+
   // Create chainable methods that return the builder
   const chainableMethods = [
-    'select', 'insert', 'update', 'delete', 'upsert',
-    'eq', 'neq', 'gt', 'gte', 'lt', 'lte',
-    'like', 'ilike', 'in', 'contains', 'or',
-    'order', 'limit', 'range', 'not'
+    'select',
+    'insert',
+    'update',
+    'delete',
+    'upsert',
+    'eq',
+    'neq',
+    'gt',
+    'gte',
+    'lt',
+    'lte',
+    'like',
+    'ilike',
+    'in',
+    'contains',
+    'or',
+    'order',
+    'limit',
+    'range',
+    'not',
   ];
-  
-  chainableMethods.forEach(method => {
+
+  chainableMethods.forEach((method) => {
     builder[method] = jest.fn(() => builder);
   });
-  
+
   // Terminal methods that return promises
   builder.single = jest.fn(() =>
-    Promise.resolve({ data: { id: 'test-id', user_id: 'test-user-id', usage_count: 1 }, error: null })
+    Promise.resolve({
+      data: { id: 'test-id', user_id: 'test-user-id', usage_count: 1 },
+      error: null,
+    }),
   );
-  
-  builder.maybeSingle = jest.fn(() => 
-    Promise.resolve({ data: { id: 'test-id', user_id: 'test-user-id', usage_count: 0 }, error: null })
+
+  builder.maybeSingle = jest.fn(() =>
+    Promise.resolve({
+      data: { id: 'test-id', user_id: 'test-user-id', usage_count: 0 },
+      error: null,
+    }),
   );
-  
+
   // Add other terminal methods
   builder.then = jest.fn((resolve) => {
-    const result = { data: [{ id: 'test-id', user_id: 'test-user-id', usage_count: 0 }], error: null };
+    const result = {
+      data: [{ id: 'test-id', user_id: 'test-user-id', usage_count: 0 }],
+      error: null,
+    };
     return Promise.resolve(result).then(resolve);
   });
 
@@ -59,6 +84,9 @@ const supabase = {
   from: jest.fn(() => createQueryBuilder()),
   rpc: jest.fn(() => Promise.resolve({ data: [], error: null })),
   auth: mockAuth,
+  functions: {
+    invoke: jest.fn(() => Promise.resolve({ data: { result: 'test-result' }, error: null })),
+  },
   storage: {
     from: jest.fn(() => ({
       upload: jest.fn(() => Promise.resolve({ data: { path: 'test-path' }, error: null })),

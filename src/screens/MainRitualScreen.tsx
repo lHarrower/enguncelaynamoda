@@ -4,18 +4,18 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ModernCard } from '../components';
-import LinenCanvas from '../components/luxury/LinenCanvas';
-import { AynaOutfitCard } from '../components/sanctuary/AynaOutfitCard';
-import { ClothingItem, Outfit } from '../data/sanctuaryModels';
-import { ModernDesignSystem } from '../theme/ModernDesignSystem';
-import { logInDev } from '../utils/consoleSuppress';
+import { ModernCard } from '@/components';
+import LinenCanvas from '@/components/luxury/LinenCanvas';
+import { AynaOutfitCard } from '@/components/sanctuary/AynaOutfitCard';
+import { ClothingCategory, ClothingItem, Outfit } from '@/data/sanctuaryModels';
+import { ModernDesignSystem } from '@/theme/ModernDesignSystem';
+import { logInDev } from '@/utils/consoleSuppress';
 
 // Sample outfit data with correct types
 const createClothingItem = (
   id: string,
   name: string,
-  category: any,
+  category: ClothingCategory,
   imageUrl: string,
 ): ClothingItem => ({
   id,

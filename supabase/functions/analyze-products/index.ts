@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
     // 2. Loop through each product and analyze it
     for (const product of products) {
       try {
-        console.log(`Analyzing product ID: ${product.id}`);
+        
 
         // Introduce a delay to avoid rate-limiting
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -111,11 +111,11 @@ Deno.serve(async (req) => {
           throw updateError;
         }
 
-        console.log(`Successfully updated product ID: ${product.id} with category: ${category}`);
+        
         processedCount++;
       } catch (e) {
         const errorMessage = `Product ${product.id}: Analysis or update failed: ${e.message}`;
-        console.error(errorMessage);
+        
         errors.push(errorMessage);
       }
     }

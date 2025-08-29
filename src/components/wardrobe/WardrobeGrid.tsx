@@ -1,6 +1,6 @@
 // Premium Wardrobe Grid Component
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Dimensions, FlatList, StyleSheet, View, ViewStyle } from 'react-native';
+import { Dimensions, FlatList, StyleSheet, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 import { DesignSystem } from '@/theme/DesignSystem';
 import { WardrobeItem as WardrobeItemType } from '@/types';
@@ -43,7 +43,7 @@ const WardrobeGrid: React.FC<WardrobeGridProps> = ({
 }) => {
   const flatListRef = useRef<FlatList>(null);
   const isMountedRef = useRef(true);
-  const itemRefs = useRef<Map<string, any>>(new Map());
+  const itemRefs = useRef<Map<string, React.ElementRef<typeof TouchableOpacity> | null>>(new Map());
 
   // Enhanced cleanup on unmount to prevent memory leaks
   useEffect(() => {

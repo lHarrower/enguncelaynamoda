@@ -3,6 +3,7 @@
 ## Version 1.0.0 - Initial Release
 
 ### English (en-US)
+
 ```
 🎉 Welcome to AYNAMODA - Your AI Fashion Stylist!
 
@@ -38,6 +39,7 @@ Thank you for choosing AYNAMODA. Happy styling! 💚
 ```
 
 ### Turkish (tr-TR)
+
 ```
 🎉 AYNAMODA'ya Hoş Geldiniz - AI Moda Stilistiniz!
 
@@ -75,6 +77,7 @@ AYNAMODA'yı seçtiğiniz için teşekkürler. Mutlu stillemeler! 💚
 ## Version 1.1.0 - Feature Update Template
 
 ### English (en-US)
+
 ```
 🎉 What's New in AYNAMODA v1.1.0
 
@@ -103,6 +106,7 @@ Thank you for your continued support! Keep styling sustainably! 💚
 ```
 
 ### Turkish (tr-TR)
+
 ```
 🎉 AYNAMODA v1.1.0 Yenilikleri
 
@@ -133,6 +137,7 @@ Desteğiniz için teşekkürler! Sürdürülebilir stil yapmaya devam edin! 💚
 ## Version 1.2.0 - Major Update Template
 
 ### English (en-US)
+
 ```
 🚀 AYNAMODA v1.2.0 - Major Update!
 
@@ -178,6 +183,7 @@ This is our biggest update yet! Thank you for being part of the sustainable fash
 ```
 
 ### Turkish (tr-TR)
+
 ```
 🚀 AYNAMODA v1.2.0 - Büyük Güncelleme!
 
@@ -225,6 +231,7 @@ Bu şimdiye kadarki en büyük güncellememiz! Sürdürülebilir moda devriminin
 ## Bug Fix Release Template
 
 ### English (en-US)
+
 ```
 🔧 AYNAMODA v{version} - Bug Fix Release
 
@@ -241,6 +248,7 @@ Thank you for your patience. We're committed to providing the best styling exper
 ```
 
 ### Turkish (tr-TR)
+
 ```
 🔧 AYNAMODA v{version} - Hata Düzeltme Sürümü
 
@@ -259,6 +267,7 @@ Sabrınız için teşekkürler. En iyi stil deneyimini sunmaya kararlıyız! �
 ## Holiday/Seasonal Update Template
 
 ### English (en-US)
+
 ```
 🎄 AYNAMODA Holiday Update v{version}
 
@@ -285,6 +294,7 @@ Wishing you a stylish and sustainable holiday season! 🎄💚
 ```
 
 ### Turkish (tr-TR)
+
 ```
 🎄 AYNAMODA Tatil Güncellemesi v{version}
 
@@ -313,6 +323,7 @@ Stilli ve sürdürülebilir bir tatil sezonu diliyoruz! 🎄💚
 ## Release Notes Guidelines
 
 ### Content Guidelines
+
 1. **Lead with Benefits**: Focus on user value, not technical details
 2. **Use Emojis**: Make release notes visually appealing and scannable
 3. **Be Specific**: Provide concrete examples of improvements
@@ -320,6 +331,7 @@ Stilli ve sürdürülebilir bir tatil sezonu diliyoruz! 🎄💚
 5. **Maintain Tone**: Keep consistent with brand voice (friendly, sustainable, empowering)
 
 ### Structure Guidelines
+
 1. **Version Header**: Clear version number and release type
 2. **New Features**: Most exciting updates first
 3. **Improvements**: Performance and usability enhancements
@@ -327,6 +339,7 @@ Stilli ve sürdürülebilir bir tatil sezonu diliyoruz! 🎄💚
 5. **Call to Action**: Encourage engagement or feedback
 
 ### Localization Guidelines
+
 1. **Cultural Adaptation**: Adjust content for local markets
 2. **Length Considerations**: Some languages require more/less space
 3. **Emoji Usage**: Ensure emojis are culturally appropriate
@@ -334,6 +347,7 @@ Stilli ve sürdürülebilir bir tatil sezonu diliyoruz! 🎄💚
 5. **Release Timing**: Consider local holidays and events
 
 ### Character Limits
+
 - **iOS**: 4000 characters per language
 - **Android**: 500 characters for recent changes, unlimited for full description
 - **Recommended**: Keep under 300 words for better readability

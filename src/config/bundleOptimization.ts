@@ -5,8 +5,6 @@
 
 import { Platform } from 'react-native';
 
-import { logInDev } from '../utils/consoleSuppress';
-
 export interface BundleOptimizationConfig {
   enableCodeSplitting: boolean;
   enableTreeShaking: boolean;
@@ -201,7 +199,10 @@ export class BundleOptimizationMetrics {
    * Get all metrics
    */
   getMetrics(): Record<string, number | { used: number; total: number; limit: number }> {
-    return Object.fromEntries(this.metrics);
+    return Object.fromEntries(this.metrics) as Record<
+      string,
+      number | { used: number; total: number; limit: number }
+    >;
   }
 
   /**

@@ -10,11 +10,11 @@
 
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
-import { KVKKBanner } from '../components/privacy/KVKKBanner';
-import { KVKKConsentModal } from '../components/privacy/KVKKConsentModal';
-import { useAuth } from '../hooks/useAuth';
-import { useKVKK } from '../hooks/useKVKK';
-import { ConsentType, DataProcessingPurpose, LegalBasis } from '../services/kvkkConsentService';
+import { KVKKBanner } from '@/components/privacy/KVKKBanner';
+import { KVKKConsentModal } from '@/components/privacy/KVKKConsentModal';
+import { useAuth } from '@/hooks/useAuth';
+import { useKVKK } from '@/hooks/useKVKK';
+import { ConsentType, DataProcessingPurpose, LegalBasis } from '@/services/kvkkConsentService';
 
 interface KVKKContextType {
   // Compliance Status

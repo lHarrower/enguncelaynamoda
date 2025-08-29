@@ -270,7 +270,7 @@ describe('IntelligenceService', () => {
         })),
       );
       const score = intelligenceService.calculateOutfitCompatibility(compatibleItems);
-      console.log('Final score:', score);
+      
 
       expect(score).toBeGreaterThan(0.5);
       expect(score).toBeLessThanOrEqual(1);
@@ -306,7 +306,7 @@ describe('IntelligenceService', () => {
         })),
       );
       const score = intelligenceService.calculateOutfitCompatibility(neutralItems);
-      console.log('Neutral final score:', score);
+      
 
       expect(score).toBeGreaterThan(0.7); // Neutral colors should score well
     });
@@ -734,8 +734,13 @@ describe('IntelligenceService', () => {
       // Mock the updateStylePreferences method
       jest.spyOn(intelligenceService, 'updateStylePreferences').mockResolvedValue(undefined);
 
-      await expect(intelligenceService.updateStylePreferences('user1', mockFeedback)).resolves.not.toThrow();
-      expect(intelligenceService.updateStylePreferences).toHaveBeenCalledWith('user1', mockFeedback);
+      await expect(
+        intelligenceService.updateStylePreferences('user1', mockFeedback),
+      ).resolves.not.toThrow();
+      expect(intelligenceService.updateStylePreferences).toHaveBeenCalledWith(
+        'user1',
+        mockFeedback,
+      );
     });
 
     it('should handle negative feedback appropriately', async () => {
@@ -753,7 +758,9 @@ describe('IntelligenceService', () => {
       // Mock the updateStylePreferences method
       jest.spyOn(intelligenceService, 'updateStylePreferences').mockResolvedValue(undefined);
 
-      await expect(intelligenceService.updateStylePreferences('user1', negativeFeedback)).resolves.not.toThrow();
+      await expect(
+        intelligenceService.updateStylePreferences('user1', negativeFeedback),
+      ).resolves.not.toThrow();
     });
 
     it('should create new style profile if none exists', async () => {
@@ -773,7 +780,7 @@ describe('IntelligenceService', () => {
           complimentsReceived: 2,
 
           positiveReactions: [],
-            socialContext: 'Test context',
+          socialContext: 'Test context',
         },
         occasion: 'casual',
         comfort: {
@@ -788,7 +795,9 @@ describe('IntelligenceService', () => {
       // Mock the updateStylePreferences method
       jest.spyOn(intelligenceService, 'updateStylePreferences').mockResolvedValue(undefined);
 
-      await expect(intelligenceService.updateStylePreferences('user1', mockNewUserFeedback)).resolves.not.toThrow();
+      await expect(
+        intelligenceService.updateStylePreferences('user1', mockNewUserFeedback),
+      ).resolves.not.toThrow();
     });
   });
 
@@ -876,7 +885,7 @@ describe('IntelligenceService', () => {
       expect(note).toBeTruthy();
       expect(typeof note).toBe('string');
       expect(note.length).toBeGreaterThan(5);
-      
+
       // Should be a valid string response
       expect(note.trim()).not.toBe('');
     });
@@ -964,13 +973,13 @@ describe('IntelligenceService', () => {
 
       expect(recommendations).toBeDefined();
       expect(recommendations.length).toBeGreaterThan(0);
-      
+
       // Should generate valid recommendations regardless of color preferences
-       recommendations.forEach(rec => {
-         expect(rec.items).toBeDefined();
-         expect(Array.isArray(rec.items)).toBe(true);
-         expect(rec.confidenceScore).toBeGreaterThanOrEqual(0);
-       });
+      recommendations.forEach((rec) => {
+        expect(rec.items).toBeDefined();
+        expect(Array.isArray(rec.items)).toBe(true);
+        expect(rec.confidenceScore).toBeGreaterThanOrEqual(0);
+      });
     });
 
     it('should handle weekend vs weekday context', async () => {

@@ -115,18 +115,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Setup Google authentication request hook from expo-auth-session
   // Always call hooks in the same order - moved to top level
-  const googleExtra = (Constants.expoConfig?.extra as Record<string, any>)?.google || {};
+  const googleExtra =
+    ((Constants.expoConfig?.extra as Record<string, unknown>)?.google as Record<string, unknown>) ||
+    {};
   const iosClientId =
     process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ||
-    googleExtra.iosClientId ||
+    (googleExtra.iosClientId as string) ||
     (process.env.NODE_ENV === 'test' ? 'test-ios-client-id' : undefined);
   const androidClientId =
     process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID ||
-    googleExtra.androidClientId ||
+    (googleExtra.androidClientId as string) ||
     (process.env.NODE_ENV === 'test' ? 'test-android-client-id' : undefined);
   const webClientId =
     process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ||
-    googleExtra.webClientId ||
+    (googleExtra.webClientId as string) ||
     (process.env.NODE_ENV === 'test' ? 'test-web-client-id' : undefined);
   const expoClientId = webClientId;
   const clientId = webClientId;
@@ -200,11 +202,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (!data || !data.onboarding_completed) {
+      const profileData = data as any;
+      if (!profileData || !profileData.onboarding_completed) {
         setNeedsOnboarding(true);
       } else {
         setNeedsOnboarding(false);
-        const profileData = data as Record<string, any>;
         const userProfileData: AuthUserProfile = {
           user_id: profileData.user_id || user?.id || '',
           style_dna: profileData.style_dna,
@@ -487,7 +489,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 // Ensure environment validation for mock data
 if (process.env.NODE_ENV === 'development') {
-  console.warn('Using mock data in development environment');
+  // Mock data warning removed for production readiness
 } else {
   throw new Error('Mock data should not be used in production');
 }

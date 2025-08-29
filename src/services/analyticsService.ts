@@ -100,12 +100,17 @@ class AnalyticsService {
    */
   trackEvent(eventName: string, properties: Record<string, unknown> = {}): void {
     try {
-      const eventData = {
+      const eventData: {
+        event: string;
+        properties: Record<string, unknown>;
+        timestamp: string;
+        userId: string;
+      } = {
         event: eventName,
         properties,
         timestamp: new Date().toISOString(),
         userId: 'current_user', // In real app, get from auth service
-      } as const;
+      };
 
       logger.info('analytics_event_tracked', eventData);
 

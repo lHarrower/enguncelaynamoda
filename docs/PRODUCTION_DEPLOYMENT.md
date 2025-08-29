@@ -5,6 +5,7 @@
 ### Prerequisites
 
 1. **EAS CLI Installation**
+
    ```bash
    npm install -g @expo/eas-cli
    eas login
@@ -53,6 +54,7 @@ eas secret:create --scope project --name APPLE_TEAM_ID --value "XXXXXXXXXX"
 #### 2. Service Account Keys
 
 Create `keys/` directory and add:
+
 - `google-play-service-account.json` (Google Play Console API)
 - `AuthKey_XXXXXXXXXX.p8` (App Store Connect API)
 
@@ -87,16 +89,19 @@ Create `keys/` directory and add:
 ### 🏗️ Build Process
 
 #### 1. Development Build
+
 ```bash
 eas build --profile development --platform all
 ```
 
 #### 2. Preview Build
+
 ```bash
 eas build --profile preview --platform all
 ```
 
 #### 3. Production Build
+
 ```bash
 # Build for both platforms
 eas build --profile production --platform all
@@ -109,6 +114,7 @@ eas build --profile production --platform android
 ### 📤 Submission Process
 
 #### Automated Submission
+
 ```bash
 # Submit to both stores
 eas submit --profile production --platform all
@@ -119,6 +125,7 @@ eas submit --profile production --platform android
 ```
 
 #### Manual Submission
+
 1. Download builds from EAS dashboard
 2. Upload to respective stores manually
 3. Configure store listings and metadata
@@ -126,6 +133,7 @@ eas submit --profile production --platform android
 ### 🔍 Pre-Deployment Checklist
 
 #### Code Quality
+
 - [ ] All TypeScript errors resolved
 - [ ] All tests passing
 - [ ] Code review completed
@@ -133,6 +141,7 @@ eas submit --profile production --platform android
 - [ ] Performance testing completed
 
 #### Configuration
+
 - [ ] All production environment variables set
 - [ ] App icons and splash screens updated
 - [ ] App metadata and descriptions finalized
@@ -140,6 +149,7 @@ eas submit --profile production --platform android
 - [ ] Store screenshots and descriptions ready
 
 #### Services
+
 - [ ] Supabase production database configured
 - [ ] RLS policies tested and verified
 - [ ] Sentry error monitoring configured
@@ -148,6 +158,7 @@ eas submit --profile production --platform android
 - [ ] Deep linking configured
 
 #### Platform Specific
+
 - [ ] iOS: Certificates and provisioning profiles valid
 - [ ] iOS: App Store Connect metadata complete
 - [ ] Android: App signing configured
@@ -191,6 +202,7 @@ eas submit --profile production --platform android
 ### 🔄 CI/CD Pipeline
 
 #### GitHub Actions Workflow
+
 ```yaml
 # .github/workflows/production-deploy.yml
 name: Production Deployment
@@ -234,6 +246,7 @@ jobs:
    - Verify API endpoints are accessible
 
 #### Support Resources
+
 - [Expo Documentation](https://docs.expo.dev/)
 - [EAS Build Documentation](https://docs.expo.dev/build/introduction/)
 - [App Store Review Guidelines](https://developer.apple.com/app-store/review/guidelines/)

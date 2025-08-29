@@ -1,5 +1,10 @@
 // AYNA Mirror Service - Core Daily Ritual Orchestrator
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { ErrorHandler } from '@/utils/ErrorHandler';
+import { ensureSupabaseOk, mapSupabaseError } from '@/utils/supabaseErrorMapping';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
+
 import {
   CalendarContext,
   ConfidencePattern,
@@ -12,10 +17,6 @@ import {
   WardrobeItem,
   WeatherContext,
 } from '../types/aynaMirror';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
-import { ErrorHandler } from '../utils/ErrorHandler';
-import { ensureSupabaseOk, mapSupabaseError } from '../utils/supabaseErrorMapping';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
 import { enhancedWardrobeService } from './enhancedWardrobeService';
 import { errorHandlingService } from './errorHandlingService';
 import { intelligenceService } from './intelligenceService';
@@ -376,7 +377,7 @@ export class AynaMirrorService {
       if (process.env.NODE_ENV === 'test') {
         return;
       }
-      const { data, error } = await (supabase
+      const { data, error } = await supabase
         .from('daily_recommendations')
         .insert({
           id: recs.id,
@@ -397,7 +398,7 @@ export class AynaMirrorService {
           created_at: new Date().toISOString(),
         })
         .select('id')
-        .single() as any);
+        .single();
       if (error) {
         throw error;
       }
@@ -2203,11 +2204,11 @@ export class AynaMirrorService {
    */
   private static async getUserPreferences(userId: string): Promise<UserPreferences> {
     try {
-      const { data, error } = await (supabase
+      const { data, error } = await supabase
         .from('user_preferences')
         .select('*')
         .eq('user_id', userId)
-        .single() as any);
+        .single();
 
       if (error && error.code !== 'PGRST116') {
         // PGRST116 = no rows returned
@@ -2225,11 +2226,11 @@ export class AynaMirrorService {
           engagement_history: {},
         };
 
-        const { data: newData, error: insertError } = await (supabase
+        const { data: newData, error: insertError } = await supabase
           .from('user_preferences')
           .insert(defaultPreferences)
           .select()
-          .single() as any);
+          .single();
 
         if (insertError) {
           throw insertError;
@@ -2377,13 +2378,13 @@ export class AynaMirrorService {
     try {
       const res = await wrap(
         async () =>
-          await (supabase.from('outfit_logs').insert({
+          await supabase.from('outfit_logs').insert({
             // user_id not present on recommendation; stored separately if needed
             outfit_id: recommendation.id,
             worn_at: new Date().toISOString(),
             confidence_score: recommendation.confidenceScore,
             items: recommendation.items.map((item) => item.id),
-          }) as any),
+          }),
       );
       ensureSupabaseOk(res, { action: 'logOutfitAsWorn' });
 
@@ -2404,14 +2405,14 @@ export class AynaMirrorService {
     try {
       const res = await wrap(
         async () =>
-          await (supabase.from('favorite_outfits').insert({
+          await supabase.from('favorite_outfits').insert({
             // user_id not present on recommendation; stored separately if needed
             outfit_id: recommendation.id,
             saved_at: new Date().toISOString(),
             confidence_score: recommendation.confidenceScore,
             items: recommendation.items.map((item) => item.id),
             confidence_note: recommendation.confidenceNote,
-          }) as any),
+          }),
       );
       ensureSupabaseOk(res, { action: 'saveOutfitToFavorites' });
 
@@ -2587,7 +2588,12 @@ export class AynaMirrorService {
     if (!isSupabaseOk(insertRes)) {
       const mapped = mapSupabaseError(insertRes.error, { action: 'saveFeedback' });
       try {
-        void ErrorHandler.getInstance().handleError(mapped);
+        void ErrorHandler.getInstance().handleError(
+          mapped.message,
+          mapped.category,
+          mapped.severity,
+          mapped.context,
+        );
       } catch {}
       throw mapped;
     }
@@ -2674,11 +2680,11 @@ export class AynaMirrorService {
       }
       const outfitRes = await wrap(
         async () =>
-          await (supabase
+          await supabase
             .from('outfit_recommendations')
             .select('item_ids')
             .eq('id', outfitRecommendationId)
-            .single() as any),
+            .single(),
       );
       if (!isSupabaseOk(outfitRes)) {
         // Gracefully fail but report
@@ -2686,7 +2692,12 @@ export class AynaMirrorService {
           action: 'getOutfitRecommendationItems',
         });
         try {
-          void ErrorHandler.getInstance().handleError(mapped);
+          void ErrorHandler.getInstance().handleError(
+            mapped.message,
+            mapped.category,
+            mapped.severity,
+            mapped.context,
+          );
         } catch (_error) {
           // Intentionally ignore error handling failures
         }
@@ -2705,12 +2716,17 @@ export class AynaMirrorService {
         id?: unknown;
       }
       const itemsRes = await wrap(
-        async () => await (supabase.from('wardrobe_items').select('id').in('id', itemIds) as any),
+        async () => await supabase.from('wardrobe_items').select('id').in('id', itemIds),
       );
       if (!isSupabaseOk(itemsRes)) {
         const mapped = mapSupabaseError(itemsRes.error, { action: 'getWardrobeItemsForOutfit' });
         try {
-          void ErrorHandler.getInstance().handleError(mapped);
+          void ErrorHandler.getInstance().handleError(
+            mapped.message,
+            mapped.category,
+            mapped.severity,
+            mapped.context,
+          );
         } catch (_error) {
           // Intentionally ignore error handling failures
         }

@@ -7,6 +7,7 @@ import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
+import type { ViewStyle } from 'react-native';
 import {
   Dimensions,
   Image,
@@ -77,6 +78,54 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({ facets, onFacetChan
   const liquidGoldShimmer = useSharedValue(0);
   const glassOpacity = useSharedValue(0.06);
 
+  // Helper functions for gesture handling
+  const settleTotem = () => {
+    scale.value = withTiming(1, { duration: 400 });
+    elevation.value = withTiming(8, { duration: 400 });
+    glassOpacity.value = withTiming(0.06, { duration: 400 });
+  };
+
+  const calculateNextFacetIndex = (translationX: number) => {
+    const swipeThreshold = 80;
+    if (Math.abs(translationX) <= swipeThreshold) {
+      return currentFacetIndex;
+    }
+
+    if (translationX > 0) {
+      // Swipe right - next facet
+      return facets.length > 0 ? (currentFacetIndex + 1) % facets.length : 0;
+    } else {
+      // Swipe left - previous facet
+      return facets.length === 0
+        ? 0
+        : currentFacetIndex === 0
+          ? facets.length - 1
+          : currentFacetIndex - 1;
+    }
+  };
+
+  const handleFacetSwipe = (translationX: number) => {
+    const newFacetIndex = calculateNextFacetIndex(translationX);
+
+    if (newFacetIndex !== currentFacetIndex) {
+      // Haptic feedback for facet change
+      runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
+      runOnJS(setCurrentFacetIndex)(newFacetIndex);
+
+      if (onFacetChange && facets[newFacetIndex]) {
+        const facet = facets[newFacetIndex];
+        if (facet) {
+          runOnJS(onFacetChange)(facet.id);
+        }
+      }
+    }
+  };
+
+  const resetRotation = () => {
+    rotationY.value = withTiming(0, { duration: 800 });
+    rotationX.value = withTiming(0, { duration: 800 });
+  };
+
   // Gesture handler for swipe-to-rotate
   const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
     onStart: () => {
@@ -94,43 +143,9 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({ facets, onFacetChan
       rotationX.value = -event.translationY * 0.15;
     },
     onEnd: (event) => {
-      // Settle the totem
-      scale.value = withTiming(1, { duration: 400 });
-      elevation.value = withTiming(8, { duration: 400 });
-      glassOpacity.value = withTiming(0.06, { duration: 400 });
-
-      // Determine facet change based on swipe direction
-      const swipeThreshold = 80;
-      let newFacetIndex = currentFacetIndex;
-
-      if (Math.abs(event.translationX) > swipeThreshold) {
-        if (event.translationX > 0) {
-          // Swipe right - next facet
-          newFacetIndex = facets.length > 0 ? (currentFacetIndex + 1) % facets.length : 0;
-        } else {
-          // Swipe left - previous facet
-          newFacetIndex =
-            facets.length === 0
-              ? 0
-              : currentFacetIndex === 0
-                ? facets.length - 1
-                : currentFacetIndex - 1;
-        }
-
-        // Haptic feedback for facet change
-        runOnJS(Haptics.impactAsync)(Haptics.ImpactFeedbackStyle.Medium);
-        runOnJS(setCurrentFacetIndex)(newFacetIndex);
-        if (onFacetChange && facets[newFacetIndex]) {
-          const facet = facets[newFacetIndex];
-          if (facet) {
-            runOnJS(onFacetChange)(facet.id);
-          }
-        }
-      }
-
-      // Smooth rotation back to center
-      rotationY.value = withTiming(0, { duration: 800 });
-      rotationX.value = withTiming(0, { duration: 800 });
+      settleTotem();
+      handleFacetSwipe(event.translationX);
+      resetRotation();
     },
   });
 
@@ -152,7 +167,7 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({ facets, onFacetChan
   }, [atmosphericFloat, liquidGoldShimmer]);
 
   // Animated styles
-  const totemStyle = useAnimatedStyle(() => {
+  const totemStyle = useAnimatedStyle((): ViewStyle => {
     return {
       transform: [
         { perspective: 1000 },
@@ -166,13 +181,13 @@ const InteractiveTotem: React.FC<InteractiveTotemProps> = ({ facets, onFacetChan
     };
   });
 
-  const shimmerStyle = useAnimatedStyle(() => {
+  const shimmerStyle = useAnimatedStyle((): ViewStyle => {
     return {
       opacity: interpolate(liquidGoldShimmer.value, [0, 1], [0, 0.3]),
     };
   });
 
-  const glassStyle = useAnimatedStyle(() => {
+  const glassStyle = useAnimatedStyle((): ViewStyle => {
     return {
       backgroundColor: `rgba(255, 255, 255, ${glassOpacity.value})`,
     };

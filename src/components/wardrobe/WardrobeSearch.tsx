@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 export interface WardrobeSearchProps {
   value: string;
@@ -41,7 +42,7 @@ const WardrobeSearch: React.FC<WardrobeSearchProps> = ({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor={DesignSystem.colors.text.tertiary}
         autoFocus={autoFocus}
         autoCapitalize="none"
         autoCorrect={false}
@@ -71,28 +72,28 @@ const WardrobeSearch: React.FC<WardrobeSearchProps> = ({
 
 const styles = StyleSheet.create({
   clearButton: {
-    marginLeft: 8,
-    padding: 4,
+    marginLeft: DesignSystem.spacing.xs,
+    padding: DesignSystem.spacing.xs,
   },
   clearButtonText: {
-    color: '#9CA3AF',
-    fontSize: 14,
+    color: DesignSystem.colors.text.tertiary,
+    fontSize: DesignSystem.typography.fontSize.sm,
   },
   container: {
     alignItems: 'center',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: DesignSystem.colors.background.secondary,
     borderColor: 'transparent',
-    borderRadius: 12,
+    borderRadius: DesignSystem.radius.sm,
     borderWidth: 1,
     flexDirection: 'row',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   focusedContainer: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#3B82F6',
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderColor: DesignSystem.colors.sage[500],
     elevation: 2,
-    shadowColor: '#3B82F6',
+    shadowColor: DesignSystem.colors.sage[500],
     shadowOffset: {
       width: 0,
       height: 0,
@@ -101,17 +102,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   input: {
-    color: '#1F2937',
+    color: DesignSystem.colors.text.primary,
     flex: 1,
-    fontSize: 16,
-    paddingVertical: 4,
+    fontSize: DesignSystem.typography.fontSize.md,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: DesignSystem.spacing.xs,
   },
   searchIconText: {
-    color: '#6B7280',
-    fontSize: 16,
+    color: DesignSystem.colors.text.secondary,
+    fontSize: DesignSystem.typography.fontSize.md,
   },
 });
 

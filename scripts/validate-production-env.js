@@ -2,7 +2,7 @@
 
 /**
  * AYNAMODA Production Environment Validation Script
- * 
+ *
  * This script validates that all required environment variables
  * are properly configured for production deployment.
  */
@@ -20,96 +20,96 @@ const colors = {
   blue: '\x1b[34m',
   magenta: '\x1b[35m',
   cyan: '\x1b[36m',
-  white: '\x1b[37m'
+  white: '\x1b[37m',
 };
 
 // Required environment variables for production
 const REQUIRED_ENV_VARS = {
   // Supabase
-  'EXPO_PUBLIC_SUPABASE_URL': {
+  EXPO_PUBLIC_SUPABASE_URL: {
     description: 'Supabase project URL',
     pattern: /^https:\/\/[a-z0-9]+\.supabase\.co$/,
-    critical: true
+    critical: true,
   },
-  'EXPO_PUBLIC_SUPABASE_ANON_KEY': {
+  EXPO_PUBLIC_SUPABASE_ANON_KEY: {
     description: 'Supabase anonymous key',
     pattern: /^eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/,
-    critical: true
+    critical: true,
   },
-  
+
   // Google OAuth
-  'EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID': {
+  EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: {
     description: 'Google OAuth Web Client ID',
     pattern: /^[0-9]+-[a-zA-Z0-9]+\.apps\.googleusercontent\.com$/,
-    critical: true
+    critical: true,
   },
-  'EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID': {
+  EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID: {
     description: 'Google OAuth Android Client ID',
     pattern: /^[0-9]+-[a-zA-Z0-9]+\.apps\.googleusercontent\.com$/,
-    critical: false
+    critical: false,
   },
-  'EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID': {
+  EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: {
     description: 'Google OAuth iOS Client ID',
     pattern: /^[0-9]+-[a-zA-Z0-9]+\.apps\.googleusercontent\.com$/,
-    critical: false
+    critical: false,
   },
-  
+
   // AI Services
-  'EXPO_PUBLIC_HUGGINGFACE_TOKEN': {
+  EXPO_PUBLIC_HUGGINGFACE_TOKEN: {
     description: 'Hugging Face API token',
     pattern: /^hf_[a-zA-Z0-9]{34}$/,
-    critical: true
+    critical: true,
   },
-  'EXPO_PUBLIC_OPENAI_API_KEY': {
+  EXPO_PUBLIC_OPENAI_API_KEY: {
     description: 'OpenAI API key',
     pattern: /^sk-[a-zA-Z0-9]{48}$/,
-    critical: false
+    critical: false,
   },
-  
+
   // Cloudinary
-  'EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME': {
+  EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME: {
     description: 'Cloudinary cloud name',
     pattern: /^[a-zA-Z0-9_-]+$/,
-    critical: true
+    critical: true,
   },
-  'EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET': {
+  EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET: {
     description: 'Cloudinary upload preset',
     pattern: /^[a-zA-Z0-9_-]+$/,
-    critical: true
+    critical: true,
   },
-  
+
   // Monitoring
-  'EXPO_PUBLIC_SENTRY_DSN': {
+  EXPO_PUBLIC_SENTRY_DSN: {
     description: 'Sentry DSN for error monitoring',
     pattern: /^https:\/\/[a-f0-9]+@[a-z0-9.-]+\/[0-9]+$/,
-    critical: true
+    critical: true,
   },
-  
+
   // Optional services
-  'EXPO_PUBLIC_WEATHER_API_KEY': {
+  EXPO_PUBLIC_WEATHER_API_KEY: {
     description: 'Weather API key',
     pattern: /^[a-zA-Z0-9]+$/,
-    critical: false
-  }
+    critical: false,
+  },
 };
 
 // App Store submission variables
 const APP_STORE_VARS = {
-  'APPLE_ID': {
+  APPLE_ID: {
     description: 'Apple ID email',
     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    critical: true
+    critical: true,
   },
-  'ASC_APP_ID': {
+  ASC_APP_ID: {
     description: 'App Store Connect App ID',
     pattern: /^[0-9]{10}$/,
-    critical: true
+    critical: true,
   },
-  'APPLE_TEAM_ID': {
+  APPLE_TEAM_ID: {
     description: 'Apple Team ID',
     pattern: /^[A-Z0-9]{10}$/,
-    critical: true
-  }
+    critical: true,
+  },
 };
 
 class ProductionValidator {
@@ -120,7 +120,7 @@ class ProductionValidator {
   }
 
   log(message, color = 'white') {
-    console.log(`${colors[color]}${message}${colors.reset}`);
+    
   }
 
   logError(message) {
@@ -140,7 +140,7 @@ class ProductionValidator {
 
   validateEnvironmentVariable(name, config) {
     const value = process.env[name];
-    
+
     if (!value) {
       if (config.critical) {
         this.logError(`Missing critical environment variable: ${name}`);
@@ -174,8 +174,8 @@ class ProductionValidator {
 
     try {
       const response = await this.makeHttpRequest(`${url}/rest/v1/`, {
-        'apikey': key,
-        'Authorization': `Bearer ${key}`
+        apikey: key,
+        Authorization: `Bearer ${key}`,
       });
 
       if (response.statusCode === 200) {
@@ -193,7 +193,7 @@ class ProductionValidator {
 
   async validateSentryDSN() {
     const dsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
-    
+
     if (!dsn) {
       this.logError('Cannot validate Sentry: missing DSN');
       return false;
@@ -203,9 +203,9 @@ class ProductionValidator {
       // Extract the base URL from DSN
       const url = new URL(dsn);
       const baseUrl = `${url.protocol}//${url.host}`;
-      
+
       const response = await this.makeHttpRequest(baseUrl);
-      
+
       if (response.statusCode < 400) {
         this.logSuccess('Sentry DSN: Valid');
         return true;
@@ -248,25 +248,19 @@ class ProductionValidator {
 
   validateAppConfig() {
     const configPath = path.join(process.cwd(), 'app.config.ts');
-    
+
     if (!this.validateFileExists(configPath, 'App configuration')) {
       return false;
     }
 
     try {
       const configContent = fs.readFileSync(configPath, 'utf8');
-      
+
       // Check for required configurations
-      const requiredConfigs = [
-        'bundleIdentifier',
-        'package',
-        'name',
-        'slug',
-        'version'
-      ];
+      const requiredConfigs = ['bundleIdentifier', 'package', 'name', 'slug', 'version'];
 
       let allConfigsFound = true;
-      requiredConfigs.forEach(config => {
+      requiredConfigs.forEach((config) => {
         if (!configContent.includes(config)) {
           this.logError(`Missing configuration in app.config.ts: ${config}`);
           allConfigsFound = false;
@@ -286,14 +280,14 @@ class ProductionValidator {
 
   validateEASConfig() {
     const easConfigPath = path.join(process.cwd(), 'eas.json');
-    
+
     if (!this.validateFileExists(easConfigPath, 'EAS configuration')) {
       return false;
     }
 
     try {
       const easConfig = JSON.parse(fs.readFileSync(easConfigPath, 'utf8'));
-      
+
       // Check for production build profile
       if (!easConfig.build || !easConfig.build.production) {
         this.logError('Missing production build profile in eas.json');
@@ -315,7 +309,7 @@ class ProductionValidator {
 
   async runValidation() {
     this.log('\n🔍 AYNAMODA Production Environment Validation', 'cyan');
-    this.log('=' .repeat(50), 'cyan');
+    this.log('='.repeat(50), 'cyan');
 
     // Validate environment variables
     this.log('\n📋 Validating Environment Variables...', 'blue');
@@ -343,26 +337,26 @@ class ProductionValidator {
     this.log('\n📁 Validating Required Files...', 'blue');
     this.validateFileExists(
       path.join(process.cwd(), 'keys', 'google-play-service-account.json'),
-      'Google Play Service Account Key'
+      'Google Play Service Account Key',
     );
 
     // Summary
     this.log('\n📊 Validation Summary', 'magenta');
-    this.log('=' .repeat(30), 'magenta');
+    this.log('='.repeat(30), 'magenta');
     this.log(`✅ Passed: ${this.passed.length}`, 'green');
     this.log(`⚠️  Warnings: ${this.warnings.length}`, 'yellow');
     this.log(`❌ Errors: ${this.errors.length}`, 'red');
 
     if (this.errors.length > 0) {
       this.log('\n🚨 Critical Issues Found:', 'red');
-      this.errors.forEach(error => {
+      this.errors.forEach((error) => {
         this.log(`  • ${error}`, 'red');
       });
       this.log('\n❌ Production deployment is NOT ready!', 'red');
       process.exit(1);
     } else if (this.warnings.length > 0) {
       this.log('\n⚠️  Warnings Found:', 'yellow');
-      this.warnings.forEach(warning => {
+      this.warnings.forEach((warning) => {
         this.log(`  • ${warning}`, 'yellow');
       });
       this.log('\n✅ Production deployment is ready with warnings.', 'yellow');
@@ -375,8 +369,8 @@ class ProductionValidator {
 // Run validation if this script is executed directly
 if (require.main === module) {
   const validator = new ProductionValidator();
-  validator.runValidation().catch(error => {
-    console.error('Validation failed:', error);
+  validator.runValidation().catch((error) => {
+    
     process.exit(1);
   });
 }

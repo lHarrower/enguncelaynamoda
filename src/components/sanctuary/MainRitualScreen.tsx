@@ -18,8 +18,7 @@ import { SAMPLE_WARDROBE } from '@/data/sanctuarySampleData';
 import AynaAIService from '@/services/sanctuaryService';
 import { DesignSystem } from '@/theme/DesignSystem';
 import { IoniconsName } from '@/types/icons';
-
-import { errorInDev, logInDev } from '../../utils/consoleSuppress';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
 
 const MOODS: { tag: MoodTag; icon: IoniconsName; description: string }[] = [
   {

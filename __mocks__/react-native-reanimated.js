@@ -61,9 +61,15 @@ const React = require('react');
 const Animated = {
   View: React.forwardRef((props, ref) => React.createElement('Animated.View', { ...props, ref })),
   Text: React.forwardRef((props, ref) => React.createElement('Animated.Text', { ...props, ref })),
-  Pressable: React.forwardRef((props, ref) => React.createElement('Animated.Pressable', { ...props, ref })),
-  ScrollView: React.forwardRef((props, ref) => React.createElement('Animated.ScrollView', { ...props, ref })),
-  FlatList: React.forwardRef((props, ref) => React.createElement('Animated.FlatList', { ...props, ref })),
+  Pressable: React.forwardRef((props, ref) =>
+    React.createElement('Animated.Pressable', { ...props, ref }),
+  ),
+  ScrollView: React.forwardRef((props, ref) =>
+    React.createElement('Animated.ScrollView', { ...props, ref }),
+  ),
+  FlatList: React.forwardRef((props, ref) =>
+    React.createElement('Animated.FlatList', { ...props, ref }),
+  ),
   Image: React.forwardRef((props, ref) => React.createElement('Animated.Image', { ...props, ref })),
 
   // Entering animations

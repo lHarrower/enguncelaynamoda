@@ -1,8 +1,8 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 
-import { useHapticFeedback } from '../../hooks/useHapticFeedback';
-import { BORDER_RADIUS, SPACING, TYPOGRAPHY, UNIFIED_COLORS } from '../../theme/DesignSystem';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { BORDER_RADIUS, SPACING, TYPOGRAPHY, UNIFIED_COLORS } from '@/theme/DesignSystem';
 
 export interface CategorySelectorProps {
   categories: string[];

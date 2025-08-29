@@ -46,17 +46,20 @@ describe('NotificationService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    
+
     // Reset singleton instance for testing
     (NotificationService as any)._instance = null;
     notificationService = defaultNotificationService;
-    
+
     // Set default mock implementations
     mockNotifications.getPermissionsAsync.mockResolvedValue({ status: 'granted' } as any);
     mockNotifications.requestPermissionsAsync.mockResolvedValue({ status: 'granted' } as any);
-    mockNotifications.getExpoPushTokenAsync.mockResolvedValue({ type: 'expo', data: 'mock-token' } as any);
-     mockNotifications.scheduleNotificationAsync.mockResolvedValue('mock-notification-id');
-     mockNotifications.getAllScheduledNotificationsAsync.mockResolvedValue([]);
+    mockNotifications.getExpoPushTokenAsync.mockResolvedValue({
+      type: 'expo',
+      data: 'mock-token',
+    } as any);
+    mockNotifications.scheduleNotificationAsync.mockResolvedValue('mock-notification-id');
+    mockNotifications.getAllScheduledNotificationsAsync.mockResolvedValue([]);
   });
 
   describe('Initialization', () => {
@@ -239,7 +242,9 @@ describe('NotificationService', () => {
       (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
         status: 'granted',
       } as any);
-      (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue('re-engagement-123');
+      (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue(
+        're-engagement-123',
+      );
 
       await notificationService.initialize();
     });
@@ -401,12 +406,18 @@ describe('NotificationService', () => {
         },
       ];
 
-      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(JSON.stringify(mockStoredNotifications));
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify(mockStoredNotifications),
+      );
 
       await notificationService.cancelScheduledNotifications('user-123');
 
-      expect(mockNotifications.cancelScheduledNotificationAsync).toHaveBeenCalledWith('notification-1');
-      expect(mockNotifications.cancelScheduledNotificationAsync).toHaveBeenCalledWith('notification-2');
+      expect(mockNotifications.cancelScheduledNotificationAsync).toHaveBeenCalledWith(
+        'notification-1',
+      );
+      expect(mockNotifications.cancelScheduledNotificationAsync).toHaveBeenCalledWith(
+        'notification-2',
+      );
       expect(AsyncStorage.removeItem).toHaveBeenCalledWith('notifications_user-123');
     });
 
@@ -448,7 +459,10 @@ describe('NotificationService', () => {
         status: 'granted',
       } as any);
       mockNotifications.scheduleNotificationAsync.mockResolvedValue('time-calc-123');
-      mockNotifications.getExpoPushTokenAsync.mockResolvedValue({ type: 'expo', data: 'test-token' } as any);
+      mockNotifications.getExpoPushTokenAsync.mockResolvedValue({
+        type: 'expo',
+        data: 'test-token',
+      } as any);
       (AsyncStorage.getItem as jest.Mock).mockResolvedValue(null);
       (AsyncStorage.setItem as jest.Mock).mockResolvedValue(undefined);
 
@@ -458,7 +472,8 @@ describe('NotificationService', () => {
       // Verify that a notification was scheduled
       expect(mockNotifications.scheduleNotificationAsync).toHaveBeenCalled();
 
-      const scheduledCall = (mockNotifications.scheduleNotificationAsync as jest.Mock).mock.calls[0][0];
+      const scheduledCall = (mockNotifications.scheduleNotificationAsync as jest.Mock).mock
+        .calls[0][0];
       const scheduledDate = scheduledCall.trigger.date;
 
       // Should be scheduled for 6 AM
@@ -470,7 +485,7 @@ describe('NotificationService', () => {
   describe('Error Handling and Retry Logic', () => {
     it('should handle getPushTokenSafely retry logic', async () => {
       const { getPushTokenSafely } = require('@/services/notificationService');
-      
+
       // Mock getExpoPushTokenAsync to fail twice then succeed
       mockNotifications.getExpoPushTokenAsync
         .mockRejectedValueOnce(new Error('Network error'))
@@ -478,19 +493,19 @@ describe('NotificationService', () => {
         .mockResolvedValueOnce({ type: 'expo', data: 'retry-token' } as any);
 
       const token = await getPushTokenSafely(3);
-      
+
       expect(token).toBe('retry-token');
       expect(mockNotifications.getExpoPushTokenAsync).toHaveBeenCalledTimes(3);
     });
 
     it('should return null after all retries fail in getPushTokenSafely', async () => {
       const { getPushTokenSafely } = require('@/services/notificationService');
-      
+
       // Mock getExpoPushTokenAsync to always fail
       mockNotifications.getExpoPushTokenAsync.mockRejectedValue(new Error('Persistent error'));
 
       const token = await getPushTokenSafely(2);
-      
+
       expect(token).toBe(null);
       expect(mockNotifications.getExpoPushTokenAsync).toHaveBeenCalledTimes(2);
     });
@@ -499,15 +514,17 @@ describe('NotificationService', () => {
       // Mock the isExpoGo check by mocking Application at runtime
       const originalApplicationId = require('expo-application').applicationId;
       require('expo-application').applicationId = 'host.exp.Exponent';
-      
+
       // Re-import the module to get the updated isExpoGo value
       jest.resetModules();
-      const { getPushTokenSafely: freshGetPushTokenSafely } = require('@/services/notificationService');
-      
+      const {
+        getPushTokenSafely: freshGetPushTokenSafely,
+      } = require('@/services/notificationService');
+
       const token = await freshGetPushTokenSafely();
-      
+
       expect(token).toBe(null);
-      
+
       // Restore original value
       require('expo-application').applicationId = originalApplicationId;
     });
@@ -522,15 +539,13 @@ describe('NotificationService', () => {
       };
 
       // Mock scheduleNotificationAsync to fail
-      mockNotifications.scheduleNotificationAsync.mockRejectedValue(
-        new Error('Scheduling failed')
-      );
+      mockNotifications.scheduleNotificationAsync.mockRejectedValue(new Error('Scheduling failed'));
 
       await notificationService.initialize();
-      
+
       // Should handle error gracefully (errorHandlingService catches and handles errors)
       await expect(
-        notificationService.scheduleDailyMirrorNotification('user-123', mockPreferences)
+        notificationService.scheduleDailyMirrorNotification('user-123', mockPreferences),
       ).resolves.not.toThrow();
     });
 
@@ -539,22 +554,22 @@ describe('NotificationService', () => {
       mockNotifications.getPermissionsAsync.mockRejectedValue(new Error('Permission check failed'));
 
       const isEnabled = await notificationService.areNotificationsEnabled();
-      
+
       expect(isEnabled).toBe(false);
     });
 
     it('should handle initialization errors when notifications unavailable', async () => {
       // Reset service to clean state
       notificationService.resetForTesting();
-      
+
       // Mock Device.isDevice to false to simulate unavailable notifications
       const originalIsDevice = require('expo-device').isDevice;
       require('expo-device').isDevice = false;
-      
+
       const result = await notificationService.initialize();
-      
+
       expect(result).toBe(false);
-      
+
       // Restore original value
       require('expo-device').isDevice = originalIsDevice;
     });

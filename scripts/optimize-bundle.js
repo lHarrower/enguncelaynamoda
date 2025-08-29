@@ -32,7 +32,7 @@ class BundleOptimizer {
       error: '\x1b[31m',
       reset: '\x1b[0m',
     };
-    console.log(`${colors[type]}${message}${colors.reset}`);
+    
   }
 
   async analyzeUnusedDependencies() {
@@ -163,9 +163,9 @@ class BundleOptimizer {
   }
 
   printReport() {
-    console.log('\n' + '='.repeat(60));
+    
     this.log('📊 BUNDLE OPTIMIZATION REPORT', 'info');
-    console.log('='.repeat(60));
+    
 
     if (this.optimizations.length === 0) {
       this.log('🎉 No optimizations needed! Bundle is already optimized.', 'success');
@@ -173,30 +173,30 @@ class BundleOptimizer {
     }
 
     this.optimizations.forEach((opt, index) => {
-      console.log(`\n${index + 1}. ${opt.description}`);
-      console.log(`   Priority: ${opt.priority.toUpperCase()}`);
-      console.log(`   Impact: ${opt.impact}`);
-      console.log(`   Action: ${opt.action}`);
+      
+      
+      
+      
 
       if (opt.dependencies) {
-        console.log(`   Items: ${opt.dependencies.join(', ')}`);
+        
       }
 
       if (opt.files) {
-        console.log('   Files with most unused exports:');
+        
         opt.files.slice(0, 5).forEach((file) => {
-          console.log(`     - ${file.filePath} (${file.unusedExports} unused)`);
+          
         });
       }
     });
 
-    console.log('\n' + '='.repeat(60));
+    
     this.log('📋 NEXT STEPS:', 'info');
-    console.log('1. Review the recommendations above');
-    console.log('2. Run with --auto-fix to automatically remove unused dependencies');
-    console.log('3. Manually review and clean up dead code files');
-    console.log('4. Run bundle analysis: npm run bundle:analyze');
-    console.log('5. Test the application after optimizations');
+    
+    
+    
+    
+    
   }
 
   async optimize(autoFix = false) {
@@ -226,7 +226,7 @@ if (require.main === module) {
   const optimizer = new BundleOptimizer();
 
   optimizer.optimize(autoFix).catch((error) => {
-    console.error('❌ Optimization failed:', error.message);
+    
     process.exit(1);
   });
 }

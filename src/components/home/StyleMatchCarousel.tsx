@@ -6,6 +6,7 @@ import SwipeableCard from '@/components/home/SwipeableCard';
 import { styleMatchData as initialData } from '@/data/styleMatchData';
 import { analyticsService } from '@/services/analyticsService';
 import { DesignSystem } from '@/theme/DesignSystem';
+import { WardrobeItem } from '@/types';
 
 interface StyleMatchItem {
   id: string;
@@ -135,7 +136,7 @@ const AnimatedStackItem = ({
     },
   };
 
-  const transformedOnSwipe = (item: PersonalizedItem, direction: 'left' | 'right') => {
+  const transformedOnSwipe = (item: WardrobeItem, direction: 'left' | 'right') => {
     props.onSwipe(props.item, direction);
   };
 

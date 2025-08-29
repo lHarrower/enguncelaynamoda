@@ -5,8 +5,8 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import * as Haptics from 'expo-haptics';
 
-import { QuickActionButton } from '../src/components/aynaMirror/QuickActionButton';
-import { QuickAction } from '../src/types/aynaMirror';
+import { QuickActionButton } from '@/components/aynaMirror/QuickActionButton';
+import { QuickAction } from '@/types/aynaMirror';
 
 // Mock dependencies are handled in jest.setup.js
 

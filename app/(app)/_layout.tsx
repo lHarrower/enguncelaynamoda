@@ -1,4 +1,4 @@
-import '../../src/ignore-warnings';
+import '@/ignore-warnings';
 
 import { DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
@@ -6,9 +6,8 @@ import { Stack } from 'expo-router';
 import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { useI18n } from '../../src/context/I18nContext';
-import { AppProvider } from '../../src/providers/AppProvider';
-import { DesignSystem } from '../../src/theme/DesignSystem';
+import { AppProvider } from '@/providers/AppProvider';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 // ContextNavigator primary color hatası için özel navigasyon teması
 const customTheme = {

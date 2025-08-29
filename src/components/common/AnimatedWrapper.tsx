@@ -22,7 +22,7 @@ interface AnimatedTextWrapperProps {
 // Animated View Wrapper - Transform uyarılarını önler
 const AnimatedWrapper: React.FC<AnimatedWrapperProps> = ({ children, style, animatedStyle }) => {
   return (
-    <View style={style}>
+    <View style={style as ViewStyle}>
       <Animated.View style={animatedStyle || {}}>{children}</Animated.View>
     </View>
   );
@@ -45,7 +45,7 @@ const AnimatedTextWrapper: React.FC<AnimatedTextWrapperProps> = ({
 const SafeAnimatedView: React.FC<AnimatedWrapperProps> = ({ children, style, animatedStyle }) => {
   return (
     <Animated.View style={style}>
-      <View style={animatedStyle || {}}>{children}</View>
+      <View style={(animatedStyle as ViewStyle) || {}}>{children}</View>
     </Animated.View>
   );
 };

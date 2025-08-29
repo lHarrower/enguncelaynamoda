@@ -38,7 +38,7 @@ describe('AINameingService', () => {
   beforeEach(() => {
     service = new AINameingService();
     jest.clearAllMocks();
-    
+
     // Setup supabase mock chain
     mockSupabaseFrom.mockReturnValue({
       select: mockSelect,
@@ -46,33 +46,33 @@ describe('AINameingService', () => {
       update: mockUpdate,
       upsert: mockUpsert,
     });
-    
+
     mockSelect.mockReturnValue({
       eq: mockEq,
       single: mockSingle,
     });
-    
+
     mockInsert.mockReturnValue({
       select: mockSelect,
       single: mockSingle,
     });
-    
+
     mockUpdate.mockReturnValue({
       eq: mockEq,
       select: mockSelect,
       single: mockSingle,
     });
-    
+
     mockUpsert.mockReturnValue({
       select: mockSelect,
       single: mockSingle,
     });
-    
+
     mockEq.mockReturnValue({
       single: mockSingle,
       select: mockSelect,
     });
-    
+
     mockSingle.mockResolvedValue({
       data: null,
       error: null,
@@ -99,11 +99,11 @@ describe('AINameingService', () => {
           confidence: 0.85,
           visualFeatures: {
             style: 'casual',
-            material: 'cotton'
+            material: 'cotton',
           },
           namingSuggestions: ['Blue Nike Shirt', 'Nike Blue Top', 'Casual Blue Shirt'],
-          analysisTimestamp: new Date()
-        }
+          analysisTimestamp: new Date(),
+        },
       };
 
       // Mock the static method
@@ -137,11 +137,11 @@ describe('AINameingService', () => {
           confidence: 0.75,
           visualFeatures: {
             style: 'casual',
-            fit: 'regular'
+            fit: 'regular',
           },
           namingSuggestions: ['Black Pants', 'Dark Trousers', 'Black Bottoms'],
-          analysisTimestamp: new Date()
-        }
+          analysisTimestamp: new Date(),
+        },
       };
 
       jest.spyOn(AINameingService, 'generateItemName').mockResolvedValueOnce(mockResponse);
@@ -174,11 +174,11 @@ describe('AINameingService', () => {
           confidence: 0.9,
           visualFeatures: {
             style: 'elegant',
-            occasion: 'formal'
+            occasion: 'formal',
           },
           namingSuggestions: ['My Red Zara Dress', 'Elegant Red Dress', 'Zara Crimson Dress'],
-          analysisTimestamp: new Date()
-        }
+          analysisTimestamp: new Date(),
+        },
       };
 
       jest.spyOn(AINameingService, 'generateItemName').mockResolvedValueOnce(mockResponse);
@@ -207,11 +207,11 @@ describe('AINameingService', () => {
           dominantColors: [],
           confidence: 0.6,
           visualFeatures: {
-            style: 'casual'
+            style: 'casual',
           },
           namingSuggestions: ['My Jacket', 'Casual Jacket', 'Stylish Jacket'],
-          analysisTimestamp: new Date()
-        }
+          analysisTimestamp: new Date(),
+        },
       };
 
       jest.spyOn(AINameingService, 'generateItemName').mockResolvedValueOnce(mockResponse);
@@ -243,8 +243,8 @@ describe('AINameingService', () => {
           confidence: 0.3,
           visualFeatures: {},
           namingSuggestions: ['My Shirt'],
-          analysisTimestamp: new Date()
-        }
+          analysisTimestamp: new Date(),
+        },
       };
 
       jest.spyOn(AINameingService, 'generateItemName').mockResolvedValueOnce(mockErrorResponse);
@@ -277,7 +277,9 @@ describe('AINameingService', () => {
         error: null,
       });
 
-      jest.spyOn(AINameingService, 'getUserNamingPreferences').mockResolvedValueOnce(mockPreferences);
+      jest
+        .spyOn(AINameingService, 'getUserNamingPreferences')
+        .mockResolvedValueOnce(mockPreferences);
 
       const result = await AINameingService.getUserNamingPreferences('user123');
 
@@ -298,7 +300,9 @@ describe('AINameingService', () => {
         updatedAt: new Date(),
       };
 
-      jest.spyOn(AINameingService, 'getUserNamingPreferences').mockResolvedValueOnce(defaultPreferences);
+      jest
+        .spyOn(AINameingService, 'getUserNamingPreferences')
+        .mockResolvedValueOnce(defaultPreferences);
 
       const result = await AINameingService.getUserNamingPreferences('user123');
 
@@ -328,7 +332,9 @@ describe('AINameingService', () => {
         error: null,
       });
 
-      jest.spyOn(AINameingService, 'createDefaultNamingPreferences').mockResolvedValueOnce(defaultPreferences);
+      jest
+        .spyOn(AINameingService, 'createDefaultNamingPreferences')
+        .mockResolvedValueOnce(defaultPreferences);
 
       const result = await AINameingService.createDefaultNamingPreferences('user123');
 
@@ -351,7 +357,9 @@ describe('AINameingService', () => {
         updatedAt: new Date(),
       };
 
-      jest.spyOn(AINameingService, 'createDefaultNamingPreferences').mockResolvedValueOnce(fallbackPreferences);
+      jest
+        .spyOn(AINameingService, 'createDefaultNamingPreferences')
+        .mockResolvedValueOnce(fallbackPreferences);
 
       const result = await AINameingService.createDefaultNamingPreferences('user123');
 
@@ -404,12 +412,14 @@ describe('AINameingService', () => {
     });
 
     it('should handle update errors', async () => {
-      jest.spyOn(AINameingService, 'updateNamingPreferences').mockRejectedValueOnce(new Error('Database error'));
+      jest
+        .spyOn(AINameingService, 'updateNamingPreferences')
+        .mockRejectedValueOnce(new Error('Database error'));
 
       await expect(
         AINameingService.updateNamingPreferences('user123', {
           namingStyle: 'creative',
-        })
+        }),
       ).rejects.toThrow('Database error');
     });
   });
@@ -419,7 +429,7 @@ describe('AINameingService', () => {
       // Mock the wrap function to return success
       const mockWrap = require('@/utils/supabaseResult').wrap as jest.Mock;
       const mockIsSupabaseOk = require('@/utils/supabaseResult').isSupabaseOk as jest.Mock;
-      
+
       mockWrap.mockImplementationOnce(async (fn) => {
         await fn();
         return { data: {}, error: null };
@@ -453,132 +463,128 @@ describe('AINameingService', () => {
             dominantColors: ['blue'],
             namingSuggestions: ['Blue Nike Shirt', 'Casual Blue Top'],
             analysisTimestamp: new Date(),
-          }
-        )
+          },
+        ),
       ).resolves.not.toThrow();
     });
 
     it('should handle save errors gracefully', async () => {
       const mockWrap = require('@/utils/supabaseResult').wrap as jest.Mock;
       const mockIsSupabaseOk = require('@/utils/supabaseResult').isSupabaseOk as jest.Mock;
-      
+
       mockWrap.mockImplementationOnce(async () => {
         return { data: null, error: new Error('Database error') };
       });
       mockIsSupabaseOk.mockReturnValueOnce(false);
 
       await expect(
-        AINameingService.saveNamingHistory(
-          'item123',
-          'user123',
-          'Blue Nike Shirt'
-        )
+        AINameingService.saveNamingHistory('item123', 'user123', 'Blue Nike Shirt'),
       ).resolves.not.toThrow();
     });
 
     it('should handle getAIAnalysis supabase function errors', async () => {
-        const request: NamingRequest = {
-          itemId: 'item123',
-          imageUri: 'https://example.com/image.jpg',
-          category: 'shirt' as ItemCategory,
-        };
-  
-        // Mock supabase functions to return error
-        const mockSupabase = supabase as any;
-        mockSupabase.functions = {
-          invoke: jest.fn().mockResolvedValue({
-            data: null,
-            error: new Error('AI analysis failed')
-          })
-        };
+      const request: NamingRequest = {
+        itemId: 'item123',
+        imageUri: 'https://example.com/image.jpg',
+        category: 'shirt' as ItemCategory,
+      };
 
-        // Mock the static method to return fallback response
-        const fallbackResponse: NamingResponse = {
-          aiGeneratedName: 'My Shirt',
+      // Mock supabase functions to return error
+      const mockSupabase = supabase as any;
+      mockSupabase.functions = {
+        invoke: jest.fn().mockResolvedValue({
+          data: null,
+          error: new Error('AI analysis failed'),
+        }),
+      };
+
+      // Mock the static method to return fallback response
+      const fallbackResponse: NamingResponse = {
+        aiGeneratedName: 'My Shirt',
+        confidence: 0.3,
+        suggestions: ['My Shirt'],
+        analysisData: {
+          detectedTags: [],
+          dominantColors: [],
           confidence: 0.3,
-          suggestions: ['My Shirt'],
-          analysisData: {
-            detectedTags: [],
-            dominantColors: [],
-            confidence: 0.3,
-            visualFeatures: {},
-            namingSuggestions: ['My Shirt'],
-            analysisTimestamp: new Date()
-          }
-        };
-        jest.spyOn(AINameingService, 'generateItemName').mockResolvedValueOnce(fallbackResponse);
-  
-        const result = await AINameingService.generateItemName(request);
-  
-        expect(result).toBeDefined();
-        expect(result.confidence).toBe(0.3);
-        expect(result.aiGeneratedName).toContain('Shirt'); // fallback name
-        expect(result.suggestions).toHaveLength(1);
-      });
+          visualFeatures: {},
+          namingSuggestions: ['My Shirt'],
+          analysisTimestamp: new Date(),
+        },
+      };
+      jest.spyOn(AINameingService, 'generateItemName').mockResolvedValueOnce(fallbackResponse);
+
+      const result = await AINameingService.generateItemName(request);
+
+      expect(result).toBeDefined();
+      expect(result.confidence).toBe(0.3);
+      expect(result.aiGeneratedName).toContain('Shirt'); // fallback name
+      expect(result.suggestions).toHaveLength(1);
+    });
 
     it('should handle getUserNamingPreferences database errors', async () => {
-       // Mock database error (not PGRST116)
-       mockEq.mockReturnValue({
-         single: jest.fn().mockResolvedValue({
-           data: null,
-           error: { code: 'PGRST301', message: 'Database connection failed' }
-         })
-       });
- 
-       const result = await AINameingService.getUserNamingPreferences('user123');
- 
-       // Should return default preferences on error
-       expect(result.namingStyle).toBe('descriptive');
-       expect(result.includeBrand).toBe(true);
-       expect(result.userId).toBe('user123');
-     });
+      // Mock database error (not PGRST116)
+      mockEq.mockReturnValue({
+        single: jest.fn().mockResolvedValue({
+          data: null,
+          error: { code: 'PGRST301', message: 'Database connection failed' },
+        }),
+      });
+
+      const result = await AINameingService.getUserNamingPreferences('user123');
+
+      // Should return default preferences on error
+      expect(result.namingStyle).toBe('descriptive');
+      expect(result.includeBrand).toBe(true);
+      expect(result.userId).toBe('user123');
+    });
 
     it('should handle createDefaultNamingPreferences database errors', async () => {
-       // Mock database insert error
-       mockInsert.mockReturnValue({
-         select: jest.fn().mockReturnValue({
-           single: jest.fn().mockResolvedValue({
-             data: null,
-             error: new Error('Insert failed')
-           })
-         })
-       });
- 
-       const result = await AINameingService.createDefaultNamingPreferences('user123');
- 
-       // Should return default preferences on error
-       expect(result).toBeDefined();
-       expect(result.namingStyle).toBe('descriptive');
-       expect(result.userId).toBe('user123');
-     });
- 
-     it('should handle saveNamingHistory when isSupabaseOk returns false', async () => {
-       const mockWrap = require('@/utils/supabaseResult').wrap as jest.Mock;
-       const mockIsSupabaseOk = require('@/utils/supabaseResult').isSupabaseOk as jest.Mock;
-       
-       mockWrap.mockImplementationOnce(async () => {
-         return { data: null, error: new Error('Database error') };
-       });
-       mockIsSupabaseOk.mockReturnValueOnce(false);
- 
-       // Should not throw error, just log it
-       await expect(
-         AINameingService.saveNamingHistory(
-           'item123',
-           'user123',
-           'Blue Nike Shirt',
-           'My Favorite Shirt',
-           {
-             confidence: 0.85,
-             detectedTags: ['shirt', 'blue', 'casual'],
-             visualFeatures: { style: 'casual', material: 'cotton' },
-             dominantColors: ['blue'],
-             namingSuggestions: ['Blue Nike Shirt', 'Casual Blue Top'],
-             analysisTimestamp: new Date(),
-           }
-         )
-       ).resolves.not.toThrow();
-     });
+      // Mock database insert error
+      mockInsert.mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({
+            data: null,
+            error: new Error('Insert failed'),
+          }),
+        }),
+      });
+
+      const result = await AINameingService.createDefaultNamingPreferences('user123');
+
+      // Should return default preferences on error
+      expect(result).toBeDefined();
+      expect(result.namingStyle).toBe('descriptive');
+      expect(result.userId).toBe('user123');
+    });
+
+    it('should handle saveNamingHistory when isSupabaseOk returns false', async () => {
+      const mockWrap = require('@/utils/supabaseResult').wrap as jest.Mock;
+      const mockIsSupabaseOk = require('@/utils/supabaseResult').isSupabaseOk as jest.Mock;
+
+      mockWrap.mockImplementationOnce(async () => {
+        return { data: null, error: new Error('Database error') };
+      });
+      mockIsSupabaseOk.mockReturnValueOnce(false);
+
+      // Should not throw error, just log it
+      await expect(
+        AINameingService.saveNamingHistory(
+          'item123',
+          'user123',
+          'Blue Nike Shirt',
+          'My Favorite Shirt',
+          {
+            confidence: 0.85,
+            detectedTags: ['shirt', 'blue', 'casual'],
+            visualFeatures: { style: 'casual', material: 'cotton' },
+            dominantColors: ['blue'],
+            namingSuggestions: ['Blue Nike Shirt', 'Casual Blue Top'],
+            analysisTimestamp: new Date(),
+          },
+        ),
+      ).resolves.not.toThrow();
+    });
   });
 
   describe('getEffectiveItemName', () => {
@@ -587,52 +593,34 @@ describe('AINameingService', () => {
         'My Custom Name',
         'AI Generated Name',
         'shirt',
-        ['blue']
+        ['blue'],
       );
 
       expect(result).toBe('My Custom Name');
     });
 
     it('should return AI-generated name when user name is not available', () => {
-      const result = AINameingService.getEffectiveItemName(
-        '',
-        'AI Generated Name',
-        'shirt',
-        ['blue']
-      );
+      const result = AINameingService.getEffectiveItemName('', 'AI Generated Name', 'shirt', [
+        'blue',
+      ]);
 
       expect(result).toBe('AI Generated Name');
     });
 
     it('should generate fallback name from color and category', () => {
-      const result = AINameingService.getEffectiveItemName(
-        '',
-        '',
-        'shirt',
-        ['blue']
-      );
+      const result = AINameingService.getEffectiveItemName('', '', 'shirt', ['blue']);
 
       expect(result).toBe('Blue Shirt');
     });
 
     it('should return category when no other data available', () => {
-      const result = AINameingService.getEffectiveItemName(
-        '',
-        '',
-        'shirt',
-        []
-      );
+      const result = AINameingService.getEffectiveItemName('', '', 'shirt', []);
 
       expect(result).toBe('Shirt');
     });
 
     it('should return "Item" as ultimate fallback', () => {
-      const result = AINameingService.getEffectiveItemName(
-        '',
-        '',
-        '',
-        []
-      );
+      const result = AINameingService.getEffectiveItemName('', '', '', []);
 
       expect(result).toBe('Item');
     });
@@ -660,12 +648,12 @@ describe('AINameingService', () => {
                 visualFeatures: {
                   style: 'casual',
                   material: 'cotton',
-                  fit: 'regular'
-                }
-              }
+                  fit: 'regular',
+                },
+              },
             },
-            error: null
-          })
+            error: null,
+          }),
         };
 
         // Mock user preferences for descriptive style
@@ -708,12 +696,12 @@ describe('AINameingService', () => {
                 dominantColors: ['red'],
                 visualFeatures: {
                   style: 'elegant',
-                  occasion: 'formal'
-                }
-              }
+                  occasion: 'formal',
+                },
+              },
             },
-            error: null
-          })
+            error: null,
+          }),
         };
 
         // Mock user preferences for creative style
@@ -754,17 +742,17 @@ describe('AINameingService', () => {
               tags: ['casual', 'denim', 'blue', 'fitted'],
               colors: [
                 { name: 'blue', value: '#0000FF' },
-                { name: 'white', value: '#FFFFFF' }
+                { name: 'white', value: '#FFFFFF' },
               ],
-              confidence: 0.85
+              confidence: 0.85,
             },
-            error: null
-          })
+            error: null,
+          }),
         };
 
         mockSingle.mockResolvedValueOnce({
           data: null,
-          error: { code: 'PGRST116' }
+          error: { code: 'PGRST116' },
         });
 
         const result = await AINameingService.generateItemName(request);
@@ -791,13 +779,13 @@ describe('AINameingService', () => {
               tags: ['basic'],
               colors: ['black'],
             },
-            error: null
-          })
+            error: null,
+          }),
         };
 
         mockSingle.mockResolvedValueOnce({
           data: null,
-          error: { code: 'PGRST116' }
+          error: { code: 'PGRST116' },
         });
 
         const result = await AINameingService.generateItemName(request);
@@ -823,13 +811,13 @@ describe('AINameingService', () => {
               tags: ['cotton', 'soft', 'breathable'],
               colors: ['white'],
             },
-            error: null
-          })
+            error: null,
+          }),
         };
 
         mockSingle.mockResolvedValueOnce({
           data: null,
-          error: { code: 'PGRST116' }
+          error: { code: 'PGRST116' },
         });
 
         const result = await AINameingService.generateItemName(request);
@@ -851,13 +839,13 @@ describe('AINameingService', () => {
               tags: ['floral', 'summer', 'light'],
               colors: ['pink', 'green'],
             },
-            error: null
-          })
+            error: null,
+          }),
         };
 
         mockSingle.mockResolvedValueOnce({
           data: null,
-          error: { code: 'PGRST116' }
+          error: { code: 'PGRST116' },
         });
 
         const result = await AINameingService.generateItemName(request);
@@ -886,17 +874,17 @@ describe('AINameingService', () => {
                 visualFeatures: {
                   style: 'casual',
                   material: 'wool',
-                  occasion: 'casual'
-                }
-              }
+                  occasion: 'casual',
+                },
+              },
             },
-            error: null
-          })
+            error: null,
+          }),
         };
 
         mockSingle.mockResolvedValueOnce({
           data: null,
-          error: { code: 'PGRST116' }
+          error: { code: 'PGRST116' },
         });
 
         const result = await AINameingService.generateItemName(request);
@@ -904,7 +892,7 @@ describe('AINameingService', () => {
         expect(result.suggestions.length).toBeGreaterThan(0);
         expect(result.suggestions[0]).toContain('Gray');
         expect(result.suggestions[0]).toContain('Sweater');
-        expect(result.suggestions.some(s => s.includes('Sweater'))).toBe(true);
+        expect(result.suggestions.some((s) => s.includes('Sweater'))).toBe(true);
       });
     });
 
@@ -914,7 +902,7 @@ describe('AINameingService', () => {
           itemId: 'item123',
           imageUri: 'https://example.com/image.jpg',
           category: 'jeans' as ItemCategory,
-          brand: 'Levi\'s',
+          brand: "Levi's",
           colors: ['blue'],
         };
 
@@ -928,17 +916,17 @@ describe('AINameingService', () => {
                 visualFeatures: {
                   style: 'casual',
                   material: 'denim',
-                  fit: 'fitted'
-                }
-              }
+                  fit: 'fitted',
+                },
+              },
             },
-            error: null
-          })
+            error: null,
+          }),
         };
 
         mockSingle.mockResolvedValueOnce({
           data: null,
-          error: { code: 'PGRST116' }
+          error: { code: 'PGRST116' },
         });
 
         const result = await AINameingService.generateItemName(request);
@@ -960,13 +948,13 @@ describe('AINameingService', () => {
               tags: [],
               colors: [],
             },
-            error: null
-          })
+            error: null,
+          }),
         };
 
         mockSingle.mockResolvedValueOnce({
           data: null,
-          error: { code: 'PGRST116' }
+          error: { code: 'PGRST116' },
         });
 
         const result = await AINameingService.generateItemName(request);
@@ -976,6 +964,4 @@ describe('AINameingService', () => {
       });
     });
   });
-
-
 });

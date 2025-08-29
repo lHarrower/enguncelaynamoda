@@ -35,16 +35,16 @@ function TabPanel(props: TabPanelProps) {
 
 const styles = StyleSheet.create({
   activeTab: {
-    backgroundColor: DesignSystem.colors.primary[500] + '10',
+    backgroundColor: DesignSystem.colors.primary + '10',
     borderRadius: DesignSystem.borderRadius.md,
   },
   activeTabText: {
-    color: DesignSystem.colors.primary[500],
+    color: DesignSystem.colors.primary,
     fontWeight: '600',
   },
   callToActionButton: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.primary[500],
+    backgroundColor: DesignSystem.colors.primary,
     borderRadius: DesignSystem.borderRadius.md,
     flexDirection: 'row',
     gap: DesignSystem.spacing.sm,
@@ -58,20 +58,20 @@ const styles = StyleSheet.create({
   },
   callToActionContainer: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.primary[500] + '10',
+    backgroundColor: DesignSystem.colors.primary + '10',
     borderRadius: DesignSystem.borderRadius.lg,
     margin: DesignSystem.spacing.lg,
     padding: DesignSystem.spacing.xl,
   },
   callToActionDescription: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
     marginBottom: DesignSystem.spacing.lg,
     textAlign: 'center',
   },
   callToActionTitle: {
-    color: DesignSystem.colors.text.primary,
+    color: DesignSystem.colors.textPrimary,
     fontSize: 20,
     fontWeight: '600',
     marginBottom: DesignSystem.spacing.sm,
@@ -82,15 +82,15 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.md,
   },
   colorChip: {
-    backgroundColor: DesignSystem.colors.background.primary,
-    borderColor: DesignSystem.colors.border.primary,
+    backgroundColor: DesignSystem.colors.backgroundPrimary,
+    borderColor: DesignSystem.colors.borderPrimary,
     borderRadius: DesignSystem.borderRadius.sm,
     borderWidth: 1,
     paddingHorizontal: DesignSystem.spacing.xs,
     paddingVertical: 2,
   },
   colorChipText: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 10,
   },
   colorsContainer: {
@@ -99,11 +99,11 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.xs,
   },
   container: {
-    backgroundColor: DesignSystem.colors.background.primary,
+    backgroundColor: DesignSystem.colors.backgroundPrimary,
     flex: 1,
   },
   demoItemCard: {
-    backgroundColor: DesignSystem.colors.background.elevated,
+    backgroundColor: DesignSystem.colors.backgroundElevated,
     borderRadius: DesignSystem.borderRadius.lg,
     flex: 1,
     marginHorizontal: DesignSystem.spacing.xs,
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.xl,
   },
   emptyHistoryText: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
     marginTop: DesignSystem.spacing.md,
@@ -129,8 +129,8 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.error[100],
-    borderColor: DesignSystem.colors.error[300],
+    backgroundColor: DesignSystem.colors.error + '20',
+    borderColor: DesignSystem.colors.error + '50',
     borderRadius: DesignSystem.borderRadius.md,
     borderWidth: 1,
     flexDirection: 'row',
@@ -139,19 +139,19 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.md,
   },
   errorText: {
-    color: DesignSystem.colors.error[600],
+    color: DesignSystem.colors.error as any,
     fontSize: 14,
   },
   featureCard: {
-    backgroundColor: DesignSystem.colors.background.elevated,
-    borderColor: DesignSystem.colors.border.primary,
+    backgroundColor: DesignSystem.colors.backgroundElevated,
+    borderColor: DesignSystem.colors.borderPrimary,
     borderRadius: DesignSystem.borderRadius.lg,
     borderWidth: 1,
     padding: DesignSystem.spacing.lg,
     ...DesignSystem.elevation.soft,
   },
   featureCardTitle: {
-    color: DesignSystem.colors.primary[500],
+    color: DesignSystem.colors.primary,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: DesignSystem.spacing.md,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   featureDescription: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
     textAlign: 'center',
@@ -172,12 +172,12 @@ const styles = StyleSheet.create({
     gap: DesignSystem.spacing.sm,
   },
   featureListItem: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
   featureTitle: {
-    color: DesignSystem.colors.text.primary,
+    color: DesignSystem.colors.textPrimary,
     fontSize: 18,
     fontWeight: '600',
     marginBottom: DesignSystem.spacing.sm,
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   },
   generateButton: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.primary[500],
+    backgroundColor: DesignSystem.colors.primary,
     borderRadius: DesignSystem.borderRadius.md,
     flexDirection: 'row',
     gap: DesignSystem.spacing.xs,
@@ -206,8 +206,8 @@ const styles = StyleSheet.create({
   },
   generatedNameBox: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.primary[500] + '10',
-    borderColor: DesignSystem.colors.primary[500] + '30',
+    backgroundColor: DesignSystem.colors.primary + '10',
+    borderColor: DesignSystem.colors.primary + '30',
     borderRadius: DesignSystem.borderRadius.md,
     borderWidth: 1,
     flexDirection: 'row',
@@ -218,12 +218,12 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.md,
   },
   generatedNameLabel: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 12,
     marginBottom: DesignSystem.spacing.xs,
   },
   generatedNameText: {
-    color: DesignSystem.colors.text.primary,
+    color: DesignSystem.colors.textPrimary,
     flex: 1,
     fontSize: 14,
     fontWeight: '500',
@@ -242,11 +242,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   historyItemSubtitle: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 12,
   },
   historyItemTitle: {
-    color: DesignSystem.colors.text.primary,
+    color: DesignSystem.colors.textPrimary,
     fontSize: 16,
     fontWeight: '500',
     marginBottom: DesignSystem.spacing.xs,
@@ -259,14 +259,14 @@ const styles = StyleSheet.create({
   },
   imagePlaceholder: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.background.primary,
+    backgroundColor: DesignSystem.colors.backgroundPrimary,
     flex: 1,
     justifyContent: 'center',
   },
   infoAlert: {
     alignItems: 'flex-start',
-    backgroundColor: DesignSystem.colors.primary[500] + '10',
-    borderColor: DesignSystem.colors.primary[500] + '30',
+    backgroundColor: DesignSystem.colors.primary + '10',
+    borderColor: DesignSystem.colors.primary + '30',
     borderRadius: DesignSystem.borderRadius.md,
     borderWidth: 1,
     flexDirection: 'row',
@@ -274,14 +274,14 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.md,
   },
   infoText: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
   },
   itemButton: {
     alignItems: 'center',
-    backgroundColor: DesignSystem.colors.primary[500],
+    backgroundColor: DesignSystem.colors.primary,
     borderRadius: DesignSystem.borderRadius.md,
     flexDirection: 'row',
     gap: DesignSystem.spacing.xs,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   },
   itemButtonOutlined: {
     backgroundColor: 'transparent',
-    borderColor: DesignSystem.colors.primary[500],
+    borderColor: DesignSystem.colors.primary,
     borderWidth: 1,
   },
   itemButtonText: {
@@ -299,10 +299,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   itemButtonTextOutlined: {
-    color: DesignSystem.colors.primary[500],
+    color: DesignSystem.colors.primary,
   },
   itemCategory: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 12,
     marginBottom: DesignSystem.spacing.xs,
   },
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.md,
   },
   placeholderText: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 12,
     textAlign: 'center',
   },
@@ -324,12 +324,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   separator: {
-    backgroundColor: DesignSystem.colors.border.primary,
+    backgroundColor: DesignSystem.colors.borderPrimary,
     height: 1,
     marginHorizontal: DesignSystem.spacing.lg,
   },
   subtitle: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 18,
     marginBottom: DesignSystem.spacing.lg,
     textAlign: 'center',
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.lg,
   },
   tabDescription: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
     marginBottom: DesignSystem.spacing.lg,
@@ -359,28 +359,28 @@ const styles = StyleSheet.create({
     marginBottom: DesignSystem.spacing.lg,
   },
   tabText: {
-    color: DesignSystem.colors.text.secondary,
+    color: DesignSystem.colors.textSecondary,
     fontSize: 14,
   },
   tabTitle: {
-    color: DesignSystem.colors.text.primary,
+    color: DesignSystem.colors.textPrimary,
     fontSize: 20,
     fontWeight: '600',
     marginBottom: DesignSystem.spacing.sm,
   },
   tabsContainer: {
-    backgroundColor: DesignSystem.colors.background.elevated,
+    backgroundColor: DesignSystem.colors.backgroundElevated,
     borderRadius: DesignSystem.borderRadius.lg,
     marginHorizontal: DesignSystem.spacing.lg,
     ...DesignSystem.elevation.soft,
   },
   tabsHeader: {
-    backgroundColor: DesignSystem.colors.background.primary,
+    backgroundColor: DesignSystem.colors.backgroundPrimary,
     borderRadius: DesignSystem.borderRadius.lg,
     flexDirection: 'row',
   },
   title: {
-    color: DesignSystem.colors.text.primary,
+    color: DesignSystem.colors.textPrimary,
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: DesignSystem.spacing.md,
@@ -433,7 +433,7 @@ export default function AINamingDemoPage() {
     error,
   } = useAINaming();
 
-  const [activeTab, setActiveTab] = useState<any>(0);
+  const [activeTab, setActiveTab] = useState<number>(0);
   const [selectedItem, setSelectedItem] = useState<Partial<WardrobeItem> | null>(null);
   const [generatedNames, setGeneratedNames] = useState<Record<string, string>>({});
   const [showPreferences, setShowPreferences] = useState(false);
@@ -639,53 +639,59 @@ export default function AINamingDemoPage() {
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.tab, activeTab === 1 && styles.activeTab]}
+                    style={[styles.tab, (activeTab as number) === 1 && styles.activeTab]}
                     onPress={() => setActiveTab(1)}
                   >
                     <Ionicons
                       name="settings"
                       size={20}
                       color={
-                        activeTab === 1
-                          ? DesignSystem.colors.primary['500']
-                          : DesignSystem.colors.text.secondary
+                        (activeTab as number) === 1
+                          ? DesignSystem.colors.primary
+                          : DesignSystem.colors.textSecondary
                       }
                     />
-                    <Text style={[styles.tabText, activeTab === 1 && styles.activeTabText]}>
+                    <Text
+                      style={[styles.tabText, (activeTab as number) === 1 && styles.activeTabText]}
+                    >
                       Preferences
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.tab, activeTab === 2 && styles.activeTab]}
+                    style={[styles.tab, (activeTab as number) === 2 && styles.activeTab]}
                     onPress={() => setActiveTab(2)}
                   >
                     <Ionicons
                       name="time"
                       size={20}
                       color={
-                        activeTab === 2
-                          ? DesignSystem.colors.primary['500']
-                          : DesignSystem.colors.text.secondary
+                        (activeTab as number) === 2
+                          ? DesignSystem.colors.primary
+                          : DesignSystem.colors.textSecondary
                       }
                     />
-                    <Text style={[styles.tabText, activeTab === 2 && styles.activeTabText]}>
+                    <Text
+                      style={[styles.tabText, (activeTab as number) === 2 && styles.activeTabText]}
+                    >
                       History
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.tab, activeTab === 3 && styles.activeTab]}
+                    style={[styles.tab, (activeTab as number) === 3 && styles.activeTab]}
                     onPress={() => setActiveTab(3)}
                   >
                     <Ionicons
                       name="information-circle"
                       size={20}
                       color={
-                        activeTab === 3
+                        (activeTab as number) === 3
                           ? DesignSystem.colors.primary['500']
                           : DesignSystem.colors.text.secondary
                       }
                     />
-                    <Text style={[styles.tabText, activeTab === 3 && styles.activeTabText]}>
+                    <Text
+                      style={[styles.tabText, (activeTab as number) === 3 && styles.activeTabText]}
+                    >
                       Features
                     </Text>
                   </TouchableOpacity>

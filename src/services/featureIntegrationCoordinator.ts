@@ -1,9 +1,10 @@
 // Feature Integration Coordinator - Cohesive User Experience Management
 // Coordinates all app features to work seamlessly together
 
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
 // import { notificationService } from './notificationService'; // reserved for future cross-feature notifications
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+
 import { performanceOptimizationService } from './performanceOptimizationService';
 import { styleDNAService } from './styleDNAService';
 import { userJourneyTestingService } from './userJourneyTestingService';

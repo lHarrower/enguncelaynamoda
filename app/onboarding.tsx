@@ -4,6 +4,7 @@ import { Alert, StyleSheet, View } from 'react-native';
 
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import { OnboardingData, useAuth } from '@/context/AuthContext';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 export default function OnboardingScreen() {
   const { completeOnboarding } = useAuth();
@@ -14,7 +15,6 @@ export default function OnboardingScreen() {
       await completeOnboarding(userData);
       // Navigation will be handled automatically by AuthContext
     } catch (error) {
-      console.error('Error completing onboarding:', error);
       Alert.alert(
         'Onboarding Error',
         'There was an issue saving your preferences. Please try again.',
@@ -39,7 +39,7 @@ export default function OnboardingScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F8F6F0',
+    backgroundColor: DesignSystem.colors.background.secondary,
     flex: 1,
   },
 });

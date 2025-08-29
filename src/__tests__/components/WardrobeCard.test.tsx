@@ -1,5 +1,5 @@
 // Mock dependencies first
-import { mocks } from '../mocks';
+import { mocks } from '@/__tests__/mocks';
 
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(),
@@ -41,9 +41,9 @@ jest.mock('react-native-reanimated', () => ({
 // Unit tests for WardrobeCard component
 import React from 'react';
 import { fireEvent, waitFor, render } from '@testing-library/react-native';
-import { WardrobeItemCard as WardrobeCard } from '../../components/wardrobe/WardrobeItemCard';
-import { createMockWardrobeItem } from '../utils/testUtils';
-import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
+import { WardrobeItemCard as WardrobeCard } from '@/components/wardrobe/WardrobeItemCard';
+import { createMockWardrobeItem } from '@/__tests__/utils/testUtils';
+import { WardrobeCategory, WardrobeColor } from '@/types/wardrobe';
 
 describe('Gardırop Kartı', () => {
   const mockItem = createMockWardrobeItem({
@@ -100,9 +100,7 @@ describe('Gardırop Kartı', () => {
         colors: [WardrobeColor.BLUE, WardrobeColor.WHITE, WardrobeColor.BLACK],
       };
 
-      const { getByTestId } = render(
-        <WardrobeCard {...defaultProps} item={multiColorItem} />,
-      );
+      const { getByTestId } = render(<WardrobeCard {...defaultProps} item={multiColorItem} />);
 
       expect(getByTestId(`wardrobe-card-${mockItem.id}`)).toBeTruthy();
     });
@@ -113,18 +111,14 @@ describe('Gardırop Kartı', () => {
         tags: ['casual', 'summer', 'comfortable'],
       };
 
-      const { getByText } = render(
-        <WardrobeCard {...defaultProps} item={taggedItem} />,
-      );
+      const { getByText } = render(<WardrobeCard {...defaultProps} item={taggedItem} />);
 
       expect(getByText('casual, summer')).toBeTruthy();
     });
 
     it('öğe arşivlendiğinde arşiv göstergesini göstermeli', () => {
       const archivedItem = { ...mockItem, isArchived: true };
-      const { getByTestId } = render(
-        <WardrobeCard {...defaultProps} item={archivedItem} />,
-      );
+      const { getByTestId } = render(<WardrobeCard {...defaultProps} item={archivedItem} />);
 
       expect(getByTestId(`wardrobe-card-${mockItem.id}`)).toBeTruthy();
     });
@@ -153,18 +147,14 @@ describe('Gardırop Kartı', () => {
     });
 
     it('düzenle butonu basıldığında onEdit çağırmalı', () => {
-      const { getByTestId } = render(
-        <WardrobeCard {...defaultProps} showActions={true} />,
-      );
+      const { getByTestId } = render(<WardrobeCard {...defaultProps} showActions={true} />);
 
       fireEvent.press(getByTestId(`wardrobe-card-${mockItem.id}-edit`));
       expect(defaultProps.onEdit).toHaveBeenCalledWith(mockItem);
     });
 
     it('sil butonu basıldığında onDelete çağırmalı', () => {
-      const { getByTestId } = render(
-        <WardrobeCard {...defaultProps} showActions={true} />,
-      );
+      const { getByTestId } = render(<WardrobeCard {...defaultProps} showActions={true} />);
 
       fireEvent.press(getByTestId(`wardrobe-card-${mockItem.id}-delete`));
       expect(defaultProps.onDelete).toHaveBeenCalledWith(mockItem.id);
@@ -194,32 +184,8 @@ describe('Gardırop Kartı', () => {
     });
   });
 
-  describe('animasyonlar', () => {
-    it('yüklendiğinde animasyon yapmalı', async () => {
-      const { getByTestId } = render(<WardrobeCard {...defaultProps} />);
-
-      await waitFor(() => {
-        expect(mocks.reanimated.withTiming).toHaveBeenCalled();
-      });
-    });
-
-    it('basıldığında animasyon yapmalı', () => {
-      const { getByTestId } = render(<WardrobeCard {...defaultProps} />);
-
-      fireEvent(getByTestId(`wardrobe-card-${mockItem.id}`), 'pressIn');
-      expect(mocks.reanimated.withSpring).toHaveBeenCalledWith(0.95);
-
-      fireEvent(getByTestId(`wardrobe-card-${mockItem.id}`), 'pressOut');
-      expect(mocks.reanimated.withSpring).toHaveBeenCalledWith(1);
-    });
-
-    it('favori değiştirildiğinde animasyon yapmalı', () => {
-      const { getByTestId } = render(<WardrobeCard {...defaultProps} />);
-
-      fireEvent.press(getByTestId(`wardrobe-card-${mockItem.id}-favorite`));
-      expect(mocks.reanimated.withSpring).toHaveBeenCalled();
-    });
-  });
+  // Note: WardrobeItemCard doesn't use react-native-reanimated animations
+  // Animation tests removed as they don't apply to this component
 
   describe('erişilebilirlik', () => {
     it('uygun erişilebilirlik etiketlerine sahip olmalı', () => {
@@ -264,9 +230,7 @@ describe('Gardırop Kartı', () => {
   describe('hata işleme', () => {
     it('eksik görüntüyü zarif şekilde işlemeli', () => {
       const itemWithoutImage = { ...mockItem, imageUri: '' };
-      const { getByTestId } = render(
-        <WardrobeCard {...defaultProps} item={itemWithoutImage} />,
-      );
+      const { getByTestId } = render(<WardrobeCard {...defaultProps} item={itemWithoutImage} />);
 
       expect(getByTestId(`wardrobe-card-${mockItem.id}`)).toBeTruthy();
     });
@@ -287,9 +251,7 @@ describe('Gardırop Kartı', () => {
         // Missing other required fields
       } as any;
 
-      const { getByText } = render(
-        <WardrobeCard {...defaultProps} item={incompleteItem} />,
-      );
+      const { getByText } = render(<WardrobeCard {...defaultProps} item={incompleteItem} />);
 
       expect(getByText('Test Item')).toBeTruthy();
     });
@@ -323,40 +285,32 @@ describe('Gardırop Kartı', () => {
 
   describe('farklı kart varyantları', () => {
     it('kompakt varyantı doğru şekilde render etmeli', () => {
-      const { getByTestId } = render(
-        <WardrobeCard {...defaultProps} variant="compact" />,
-      );
+      const { getByTestId } = render(<WardrobeCard {...defaultProps} variant="compact" />);
 
       const card = getByTestId(`wardrobe-card-${mockItem.id}`);
       const styles = Array.isArray(card.props.style) ? card.props.style : [card.props.style];
-      expect(styles.some(style => style && typeof style.height === 'number')).toBe(true);
+      expect(styles.some((style) => style && typeof style.height === 'number')).toBe(true);
     });
 
     it('detaylı varyantı doğru şekilde render etmeli', () => {
-      const { getByText } = render(
-        <WardrobeCard {...defaultProps} variant="detailed" />,
-      );
+      const { getByText } = render(<WardrobeCard {...defaultProps} variant="detailed" />);
 
       expect(getByText(mockItem.brand || 'Unknown Brand')).toBeTruthy();
       expect(getByText(`Size ${mockItem.size || 'Unknown Size'}`)).toBeTruthy();
     });
 
     it('ızgara varyantını doğru şekilde render etmeli', () => {
-      const { getByTestId } = render(
-        <WardrobeCard {...defaultProps} variant="grid" />,
-      );
+      const { getByTestId } = render(<WardrobeCard {...defaultProps} variant="grid" />);
 
       const card = getByTestId(`wardrobe-card-${mockItem.id}`);
       const styles = Array.isArray(card.props.style) ? card.props.style : [card.props.style];
-      expect(styles.some(style => style && style.aspectRatio === 1)).toBe(true);
+      expect(styles.some((style) => style && style.aspectRatio === 1)).toBe(true);
     });
   });
 
   describe('seçim modu', () => {
     it('component render olmalı', () => {
-      const { getByTestId } = render(
-        <WardrobeCard {...defaultProps} />,
-      );
+      const { getByTestId } = render(<WardrobeCard {...defaultProps} />);
 
       expect(getByTestId(`wardrobe-card-${mockItem.id}`)).toBeTruthy();
     });

@@ -2,7 +2,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, ViewStyle, TextStyle, ImageStyle } from 'react-native';
+import {
+  ImageStyle,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -213,7 +222,8 @@ export default function SampleOutfitGeneration({ onComplete }: SampleOutfitGener
               <Animated.View entering={FadeInUp.delay(200).duration(600)} style={styles.header}>
                 <Text style={styles.title}>Your Sample Recommendations</Text>
                 <Text style={styles.subtitle}>
-                  Here&apos;s a preview of how AYNA creates personalized outfit recommendations for you
+                  Here&apos;s a preview of how AYNA creates personalized outfit recommendations for
+                  you
                 </Text>
               </Animated.View>
 

@@ -1,0 +1,47 @@
+{
+  "emergencyProcedures": {
+    "total_database_loss": {
+      "priority": "CRITICAL",
+      "steps": [
+        "Activate disaster recovery team",
+        "Restore from latest full backup",
+        "Apply incremental backups",
+        "Verify data integrity",
+        "Update DNS to point to recovery instance",
+        "Notify users of service restoration"
+      ],
+      "rto": "4 hours",
+      "rpo": "1 hour"
+    },
+    "partial_data_loss": {
+      "priority": "HIGH",
+      "steps": [
+        "Identify affected data scope",
+        "Restore specific tables from backup",
+        "Reconcile with current data",
+        "Validate data consistency",
+        "Resume normal operations"
+      ],
+      "rto": "2 hours",
+      "rpo": "30 minutes"
+    },
+    "service_degradation": {
+      "priority": "MEDIUM",
+      "steps": [
+        "Enable fallback mechanisms",
+        "Scale infrastructure",
+        "Optimize database queries",
+        "Monitor performance metrics",
+        "Gradually restore full service"
+      ],
+      "rto": "30 minutes",
+      "rpo": "5 minutes"
+    }
+  },
+  "emergencyContacts": {
+    "database_admin": "dba@aynamoda.com",
+    "infrastructure_team": "infra@aynamoda.com",
+    "product_team": "product@aynamoda.com",
+    "external_support": "support@supabase.com"
+  }
+}

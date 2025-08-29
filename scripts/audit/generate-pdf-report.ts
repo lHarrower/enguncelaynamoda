@@ -9,7 +9,7 @@ async function main() {
   const outDir = path.join(process.cwd(), 'audit', 'out');
   const htmlPath = path.join(outDir, 'report.html');
   if (!fs.existsSync(htmlPath)) {
-    console.error('HTML raporu bulunamadı. Önce toplayıcıyı çalıştırın.');
+    
     process.exit(1);
   }
   let puppeteer: any;
@@ -24,7 +24,7 @@ async function main() {
     const page = await browser.newPage();
     await page.goto('file://' + htmlPath.replace(/\\/g, '/'));
     await page.pdf({ path: path.join(outDir, 'report.pdf'), format: 'A4', printBackground: true });
-    console.log('PDF audit/out/report.pdf dosyasına yazıldı');
+    
   } finally {
     await browser.close();
   }

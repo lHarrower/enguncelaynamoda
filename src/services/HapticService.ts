@@ -1,7 +1,7 @@
 // Haptic Service - Tactile feedback system with accessibility support
 import { Platform, Vibration } from 'react-native';
 
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
 
 /**
  * Haptic feedback types aligned with AYNAMODA's wellness philosophy

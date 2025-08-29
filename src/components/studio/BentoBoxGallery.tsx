@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   imageOverlay: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: DesignSystem.colors.background.overlay,
     borderBottomLeftRadius: DesignSystem.borderRadius.lg,
     borderBottomRightRadius: DesignSystem.borderRadius.lg,
     bottom: 0,

@@ -1,8 +1,8 @@
 // Haptic Hook - React hook for haptic feedback integration
 import { useCallback, useContext, useEffect, useRef } from 'react';
 
-import { AnimationContext } from '../providers/AnimationProvider';
-import hapticService, { HapticIntensity, HapticType } from '../services/HapticService';
+import { AnimationContext } from '@/providers/AnimationProvider';
+import hapticService, { HapticIntensity, HapticType } from '@/services/HapticService';
 
 /**
  * Haptic hook options

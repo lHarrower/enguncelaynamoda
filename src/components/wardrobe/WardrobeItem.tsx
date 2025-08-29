@@ -16,7 +16,7 @@ import { useHapticFeedback } from '@/hooks/useHapticFeedback';
 // P0 Analyze Flow: integrate Analyze button + modal & optimistic UI hooks
 import { callAiAnalysis } from '@/lib/callAiAnalysis';
 import { DesignSystem } from '@/theme/DesignSystem';
-import { WardrobeItem as WardrobeItemType } from '@/types';
+import { AIAnalysisData, WardrobeItem as WardrobeItemType } from '@/types';
 import { warnInDev } from '@/utils/consoleSuppress';
 
 export interface WardrobeItemProps {
@@ -32,9 +32,7 @@ const WardrobeItem = React.forwardRef<View, WardrobeItemProps>(
     const { triggerSelection, triggerLight } = useHapticFeedback();
     const [analyzing, setAnalyzing] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    const [analysis, setAnalysis] = useState<Record<string, any> | null>(
-      item.aiAnalysisData || null,
-    );
+    const [analysis, setAnalysis] = useState<AIAnalysisData | null>(item.aiAnalysisData || null);
     const [processedImageUri, setProcessedImageUri] = useState(
       item.processedImageUri || item.imageUri,
     );
@@ -92,79 +90,104 @@ const WardrobeItem = React.forwardRef<View, WardrobeItemProps>(
       onFavoritePress?.();
     }, [triggerSelection, onFavoritePress]);
 
+    // Helper function to setup abort controller
+    const setupAbortController = useCallback(() => {
+      if (analysisAbortControllerRef.current) {
+        analysisAbortControllerRef.current.abort();
+        analysisAbortControllerRef.current = null;
+      }
+      const abortController = new AbortController();
+      analysisAbortControllerRef.current = abortController;
+      return abortController;
+    }, []);
+
+    // Helper function to setup analysis timeout
+    const setupAnalysisTimeout = useCallback(() => {
+      timeoutRef.current = setTimeout(() => {
+        if (analysisAbortControllerRef.current) {
+          analysisAbortControllerRef.current.abort();
+        }
+      }, 30000);
+    }, []);
+
+    // Helper function to clear timeout
+    const clearAnalysisTimeout = useCallback(() => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    }, []);
+
+    // Helper function to process analysis result
+    const processAnalysisResult = useCallback((res: any, abortController: AbortController) => {
+      if (isMountedRef.current && !abortController.signal.aborted) {
+        const newAnalysis = res?.analysis || res?.data?.analysis || res?.data;
+        setAnalysis(newAnalysis);
+        if (res?.cloudinary?.url) {
+          setProcessedImageUri(res.cloudinary.url);
+        }
+      }
+    }, []);
+
+    // Helper function to handle analysis error
+    const handleAnalysisError = useCallback(
+      (error: any, abortController: AbortController, prevAnalysis: any) => {
+        clearAnalysisTimeout();
+        if (isMountedRef.current && !abortController.signal.aborted) {
+          setAnalysis(prevAnalysis);
+          warnInDev('Analysis failed:', error);
+        }
+      },
+      [clearAnalysisTimeout],
+    );
+
+    // Helper function to cleanup analysis
+    const cleanupAnalysis = useCallback((abortController: AbortController) => {
+      if (analysisAbortControllerRef.current === abortController) {
+        analysisAbortControllerRef.current = null;
+      }
+      if (isMountedRef.current) {
+        setAnalyzing(false);
+      }
+    }, []);
+
     const handleAnalyze = useCallback(async () => {
       if (analyzing || !item.id || !processedImageUri || !isMountedRef.current) {
         return;
       }
 
-      // Cancel any previous analysis request
-      if (analysisAbortControllerRef.current) {
-        analysisAbortControllerRef.current.abort();
-        analysisAbortControllerRef.current = null;
-      }
+      const abortController = setupAbortController();
+      if (!isMountedRef.current) return;
 
-      // Create new abort controller for this request
-      const abortController = new AbortController();
-      analysisAbortControllerRef.current = abortController;
-
-      if (!isMountedRef.current) {
-        return;
-      }
       setAnalyzing(true);
       const prevAnalysis = analysis;
 
       try {
-        // Optimistic state: show modal immediately
         if (isMountedRef.current) {
           setShowModal(true);
         }
 
-        // Set timeout for analysis to prevent hanging requests
-        timeoutRef.current = setTimeout(() => {
-          if (analysisAbortControllerRef.current) {
-            analysisAbortControllerRef.current.abort();
-          }
-        }, 30000); // 30 second timeout
-
+        setupAnalysisTimeout();
         const res = await callAiAnalysis(item.id, processedImageUri);
-
-        // Clear timeout on successful completion
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
-        }
-
-        // Check if component is still mounted and request wasn't aborted
-        if (isMountedRef.current && !abortController.signal.aborted) {
-          const newAnalysis = res?.analysis || res?.data?.analysis || res?.data;
-          setAnalysis(newAnalysis);
-          if (res?.cloudinary?.url) {
-            setProcessedImageUri(res.cloudinary.url);
-          }
-        }
+        clearAnalysisTimeout();
+        processAnalysisResult(res, abortController);
       } catch (e) {
-        // Clear timeout on error
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
-        }
-
-        // Only handle error if component is still mounted and request wasn't aborted
-        if (isMountedRef.current && !abortController.signal.aborted) {
-          setAnalysis(prevAnalysis);
-          warnInDev('Analysis failed:', e);
-        }
+        handleAnalysisError(e, abortController, prevAnalysis);
       } finally {
-        // Clean up abort controller
-        if (analysisAbortControllerRef.current === abortController) {
-          analysisAbortControllerRef.current = null;
-        }
-
-        if (isMountedRef.current) {
-          setAnalyzing(false);
-        }
+        cleanupAnalysis(abortController);
       }
-    }, [analyzing, item.id, processedImageUri, analysis]);
+    }, [
+      analyzing,
+      item.id,
+      processedImageUri,
+      analysis,
+      setupAbortController,
+      setupAnalysisTimeout,
+      clearAnalysisTimeout,
+      processAnalysisResult,
+      handleAnalysisError,
+      cleanupAnalysis,
+    ]);
 
     return (
       <TouchableOpacity
@@ -246,7 +269,10 @@ const WardrobeItem = React.forwardRef<View, WardrobeItemProps>(
               {item.colors.slice(0, 3).map((color, index) => (
                 <View
                   key={index}
-                  style={[styles.colorDot, { backgroundColor: color || '#CCCCCC' }]}
+                  style={[
+                    styles.colorDot,
+                    { backgroundColor: color || DesignSystem.colors.neutral[300] },
+                  ]}
                 />
               ))}
               {item.colors.length > 3 && (
@@ -285,8 +311,8 @@ const WardrobeItem = React.forwardRef<View, WardrobeItemProps>(
           >
             <View style={styles.modalCard}>
               <Text style={styles.modalTitle}>AI Analysis</Text>
-              <Text style={styles.modalLine}>Main: {analysis?.mainCategory || '-'}</Text>
-              <Text style={styles.modalLine}>Sub: {analysis?.subCategory || '-'}</Text>
+              <Text style={styles.modalLine}>Main: {(analysis as any)?.mainCategory || '-'}</Text>
+              <Text style={styles.modalLine}>Sub: {(analysis as any)?.subCategory || '-'}</Text>
               <Text style={styles.modalLine}>
                 Tags: {(analysis?.detectedTags || []).join(', ') || '-'}
               </Text>
@@ -313,9 +339,9 @@ const styles = StyleSheet.create({
     backgroundColor: DesignSystem.colors.terracotta[500],
     borderRadius: DesignSystem.borderRadius.md,
     elevation: 2,
-    marginBottom: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    marginBottom: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
     shadowColor: DesignSystem.colors.terracotta[600],
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -324,13 +350,13 @@ const styles = StyleSheet.create({
   analyzeText: {
     color: DesignSystem.colors.text.inverse,
     fontFamily: DesignSystem.typography.fontFamily.body,
-    fontSize: 12,
+    fontSize: DesignSystem.typography.fontSize.sm,
     fontWeight: '600',
   },
   brand: {
     color: DesignSystem.colors.text.tertiary,
     fontFamily: DesignSystem.typography.fontFamily.body,
-    fontSize: 11,
+    fontSize: DesignSystem.typography.fontSize.xs,
   },
   brandContainer: {
     alignSelf: 'flex-start',
@@ -338,12 +364,12 @@ const styles = StyleSheet.create({
     borderRadius: DesignSystem.borderRadius.sm,
     marginBottom: DesignSystem.spacing.xs,
     paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: 4,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   brandLabel: {
     color: DesignSystem.colors.terracotta[600],
     fontFamily: DesignSystem.typography.fontFamily.body,
-    fontSize: 10,
+    fontSize: DesignSystem.typography.fontSize.xs,
     fontWeight: '600',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
@@ -351,24 +377,34 @@ const styles = StyleSheet.create({
   category: {
     color: DesignSystem.colors.text.secondary,
     fontFamily: DesignSystem.typography.fontFamily.body,
-    fontSize: 12,
-    marginBottom: 2,
+    fontSize: DesignSystem.typography.fontSize.sm,
+    marginBottom: DesignSystem.spacing.xs,
     textTransform: 'capitalize',
   },
   colorDot: {
     borderColor: DesignSystem.colors.warmNeutral[300],
-    borderRadius: 7,
+    borderRadius: DesignSystem.radius.sm,
     borderWidth: 1,
-    height: 14,
-    marginRight: 6,
-    width: 14,
+    height: DesignSystem.spacing.sm,
+    marginRight: DesignSystem.spacing.xs,
+    width: DesignSystem.spacing.sm,
   },
-  colorRow: { flexDirection: 'row', gap: 6, marginTop: 6 },
-  colorSwatch: { borderColor: '#ddd', borderRadius: 10, borderWidth: 1, height: 20, width: 20 },
+  colorRow: {
+    flexDirection: 'row',
+    gap: DesignSystem.spacing.xs,
+    marginTop: DesignSystem.spacing.xs,
+  },
+  colorSwatch: {
+    borderColor: DesignSystem.colors.border.secondary,
+    borderRadius: DesignSystem.radius.sm,
+    borderWidth: 1,
+    height: DesignSystem.spacing.lg,
+    width: DesignSystem.spacing.lg,
+  },
   colorsContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    marginBottom: 6,
+    marginBottom: DesignSystem.spacing.xs,
   },
   container: {
     backgroundColor: DesignSystem.colors.background.card,
@@ -388,11 +424,11 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.lg,
   },
   details: {
-    marginBottom: 8,
+    marginBottom: DesignSystem.spacing.sm,
   },
   favoriteButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: DesignSystem.colors.background.elevated + 'F2',
     borderRadius: DesignSystem.borderRadius.round,
     elevation: 3,
     height: 36,
@@ -408,7 +444,7 @@ const styles = StyleSheet.create({
   },
   favoriteIcon: {
     color: DesignSystem.colors.text.tertiary,
-    fontSize: 18,
+    fontSize: DesignSystem.typography.fontSize.lg,
   },
   favoriteIconActive: {
     color: DesignSystem.colors.terracotta[500],
@@ -423,28 +459,35 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   modalBackdrop: {
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: DesignSystem.colors.background.overlay,
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: DesignSystem.spacing.xl,
   },
   modalCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderRadius: DesignSystem.radius.md,
+    padding: DesignSystem.spacing.md,
   },
-  modalLine: { fontSize: 14, marginBottom: 4 },
-  modalTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
+  modalLine: {
+    fontSize: DesignSystem.typography.fontSize.sm,
+    marginBottom: DesignSystem.spacing.xs,
+  },
+  modalTitle: {
+    fontSize: DesignSystem.typography.fontSize.lg,
+    fontWeight: '700',
+    marginBottom: DesignSystem.spacing.xs,
+  },
   moreColors: {
     color: DesignSystem.colors.text.secondary,
     fontFamily: DesignSystem.typography.fontFamily.body,
-    fontSize: 10,
-    marginLeft: 2,
+    fontSize: DesignSystem.typography.fontSize.xs,
+    marginLeft: DesignSystem.spacing.xs,
   },
   name: {
     color: DesignSystem.colors.text.primary,
     fontFamily: DesignSystem.typography.fontFamily.headline,
-    fontSize: 16,
+    fontSize: DesignSystem.typography.fontSize.md,
     fontWeight: '600',
     lineHeight: 22,
     marginBottom: DesignSystem.spacing.xs,
@@ -459,27 +502,27 @@ const styles = StyleSheet.create({
   placeholderText: {
     color: DesignSystem.colors.text.tertiary,
     fontFamily: DesignSystem.typography.fontFamily.body,
-    fontSize: 12,
+    fontSize: DesignSystem.typography.fontSize.sm,
   },
   price: {
     color: DesignSystem.colors.terracotta[600],
     fontFamily: DesignSystem.typography.fontFamily.headline,
-    fontSize: 18,
+    fontSize: DesignSystem.typography.fontSize.lg,
     fontWeight: '700',
     marginBottom: DesignSystem.spacing.sm,
   },
   tag: {
     backgroundColor: DesignSystem.colors.warmNeutral[100],
     borderRadius: DesignSystem.borderRadius.sm,
-    marginBottom: 2,
-    marginRight: 4,
+    marginBottom: DesignSystem.spacing.xs,
+    marginRight: DesignSystem.spacing.xs,
     paddingHorizontal: DesignSystem.spacing.sm,
-    paddingVertical: 4,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   tagText: {
     color: DesignSystem.colors.text.secondary,
     fontFamily: DesignSystem.typography.fontFamily.body,
-    fontSize: 10,
+    fontSize: DesignSystem.typography.fontSize.xs,
     fontWeight: '500',
   },
   tagsContainer: {

@@ -6,12 +6,12 @@
  */
 
 // Export shared components
-export { default as DiscoverStats } from '../vision/shared/DiscoverStats';
 export { OutfitCarousel } from './OutfitCarousel';
 export { SectionHeader } from './SectionHeader';
 export { StudioHeader } from './StudioHeader';
 export { default as SwipeableCard } from './SwipeableCard';
 export { default as SwipeStack } from './SwipeStack';
+export { default as DiscoverStats } from '@/components/vision/shared/DiscoverStats';
 
 // Export standardized components
 export { default as StandardButton, type StandardButtonProps } from './StandardButton';

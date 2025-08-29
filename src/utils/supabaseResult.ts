@@ -1,7 +1,7 @@
 // Unified, type-safe Supabase result handling utilities
 import { PostgrestError, PostgrestSingleResponse } from '@supabase/supabase-js';
 
-import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { errorInDev, logInDev } from './consoleSuppress';
 
 export interface SupabaseOk<T> {
   ok: true;

@@ -2,6 +2,9 @@
 import { errorInDev, logInDev, warnInDev } from '../utils/consoleSuppress';
 import { AppError, ErrorSeverity } from '../utils/ErrorHandler';
 
+// Type declaration for __DEV__ global
+declare const __DEV__: boolean;
+
 /**
  * Error Report Interface
  */
@@ -385,12 +388,19 @@ export class ErrorReportingService {
     }
 
     // Check blacklisted errors
-    if (this.config.blacklistedErrors.includes(error.code || error.category)) {
+    const errorCode = error && typeof error.code !== 'undefined' ? String(error.code) : '';
+    const errorCategory =
+      error && typeof error.category !== 'undefined' ? String(error.category) : '';
+    const errorName =
+      error && typeof (error as Error).name !== 'undefined' ? String((error as Error).name) : '';
+    const errorIdentifier = errorCode || errorCategory || errorName || '';
+    if (this.config.blacklistedErrors.includes(errorIdentifier)) {
       return false;
     }
 
     // Don't report low severity errors in production
-    if (error.severity === ErrorSeverity.LOW && __DEV__ === false) {
+    const errorSeverity = error && typeof error.severity !== 'undefined' ? error.severity : null;
+    if (errorSeverity === ErrorSeverity.LOW && __DEV__ === false) {
       return false;
     }
 

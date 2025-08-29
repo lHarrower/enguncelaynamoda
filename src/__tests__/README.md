@@ -316,11 +316,11 @@ debug(); // Prints component tree
 
 // Debug specific elements
 const element = getByTestId('test-id');
-console.log(element.props);
+// Debug: element.props
 
 // Debug async operations
 await waitFor(() => {
-  console.log('Waiting for condition...');
+  // Debug: Waiting for condition...
   expect(condition).toBeTruthy();
 });
 ```

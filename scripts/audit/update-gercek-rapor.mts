@@ -22,11 +22,11 @@ function readText(p: string): string | null {
     const buf = fs.readFileSync(p);
     if (!buf || buf.length === 0) return '';
     // BOM detection
-    if (buf.length >= 2 && buf[0] === 0xFF && buf[1] === 0xFE) {
+    if (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0xfe) {
       // UTF-16 LE with BOM
       return buf.slice(2).toString('utf16le');
     }
-    if (buf.length >= 2 && buf[0] === 0xFE && buf[1] === 0xFF) {
+    if (buf.length >= 2 && buf[0] === 0xfe && buf[1] === 0xff) {
       // UTF-16 BE with BOM -> swap to LE then decode
       const swapped = Buffer.allocUnsafe(buf.length - 2);
       for (let i = 2, j = 0; i + 1 < buf.length; i += 2, j += 2) {
@@ -55,7 +55,6 @@ function findNumberInText(text: string, regex: RegExp): number | null {
   if (m && m[1]) {
     const n = Number(m[1]);
     return isNaN(n) ? null : n;
-    
   }
   return null;
 }
@@ -70,38 +69,38 @@ function clamp(n: any, d: number): number | null {
   return Number(n.toFixed(d));
 }
 
- function parseTsErrorCount(tsReportPath: string): number | null {
-   const txt = readText(tsReportPath);
-   if (!txt) return null;
-   // Strip ANSI color codes to avoid patterns like "\x1b[31merror TS..."
-   const clean = txt.replace(/\x1B\[[0-9;]*m/g, '');
-   // Debug snapshot
-   try {
-     const head = clean.slice(0, 200).replace(/\n/g, '\\n');
-     const hasErrorTS = /error\s+TS\d+:/i.test(clean);
-     const tsOnly = /TS\d+:/g;
-     const tsOnlyCount = (clean.match(tsOnly) || []).length;
-     // Remove noisy debug logs after verification
-     // console.log(`[DEBUG:TS] len=${clean.length} head='${head}' hasErrorTS=${hasErrorTS} tsOnlyCount=${tsOnlyCount}`);
-   } catch {}
-   // 1) Explicit summary line, e.g., "Found 38 errors"
-   const found = findNumberInText(clean, /Found\s+(\d+)\s+errors?/i);
-   if (found !== null) return found;
-   // 2) Robust line-by-line counting for typical tsc formats (after stripping ANSI)
-   const lineRegex = /error\s+TS\d+:/i;
-   let lineCount = 0;
-   const lines = clean.split(/\r?\n/);
-   for (const line of lines) {
-     if (lineRegex.test(line)) lineCount++;
-   }
-   // 3) Fallback: global match across the whole text
-   const globalMatches = clean.match(/error\s+TS\d+:/gi);
-   const globalCount = globalMatches ? globalMatches.length : 0;
-   // console.log(`[DEBUG:TS] lineCount=${lineCount} globalCount=${globalCount}`);
-   // Prefer the larger of the two to avoid undercount in odd encodings
-   const count = Math.max(lineCount, globalCount);
-   return count;
- }
+function parseTsErrorCount(tsReportPath: string): number | null {
+  const txt = readText(tsReportPath);
+  if (!txt) return null;
+  // Strip ANSI color codes to avoid patterns like "\x1b[31merror TS..."
+  const clean = txt.replace(/\x1B\[[0-9;]*m/g, '');
+  // Debug snapshot
+  try {
+    const head = clean.slice(0, 200).replace(/\n/g, '\\n');
+    const hasErrorTS = /error\s+TS\d+:/i.test(clean);
+    const tsOnly = /TS\d+:/g;
+    const tsOnlyCount = (clean.match(tsOnly) || []).length;
+    // Remove noisy debug logs after verification
+    // console.log(`[DEBUG:TS] len=${clean.length} head='${head}' hasErrorTS=${hasErrorTS} tsOnlyCount=${tsOnlyCount}`);
+  } catch {}
+  // 1) Explicit summary line, e.g., "Found 38 errors"
+  const found = findNumberInText(clean, /Found\s+(\d+)\s+errors?/i);
+  if (found !== null) return found;
+  // 2) Robust line-by-line counting for typical tsc formats (after stripping ANSI)
+  const lineRegex = /error\s+TS\d+:/i;
+  let lineCount = 0;
+  const lines = clean.split(/\r?\n/);
+  for (const line of lines) {
+    if (lineRegex.test(line)) lineCount++;
+  }
+  // 3) Fallback: global match across the whole text
+  const globalMatches = clean.match(/error\s+TS\d+:/gi);
+  const globalCount = globalMatches ? globalMatches.length : 0;
+  // console.log(`[DEBUG:TS] lineCount=${lineCount} globalCount=${globalCount}`);
+  // Prefer the larger of the two to avoid undercount in odd encodings
+  const count = Math.max(lineCount, globalCount);
+  return count;
+}
 
 function getPaths() {
   const root = process.cwd();
@@ -152,17 +151,20 @@ function deriveMetrics() {
   let eslintWarnings: number | null = null;
   if (eslint && typeof eslint === 'object') {
     if (Array.isArray(eslint)) {
-      let e = 0, w = 0;
+      let e = 0,
+        w = 0;
       for (const f of eslint) {
-        e += (f?.errorCount ?? 0);
-        w += (f?.warningCount ?? 0);
+        e += f?.errorCount ?? 0;
+        w += f?.warningCount ?? 0;
       }
-      eslintErrors = e; eslintWarnings = w;
+      eslintErrors = e;
+      eslintWarnings = w;
     } else if (Array.isArray((eslint as any).results)) {
-      let e = 0, w = 0;
+      let e = 0,
+        w = 0;
       for (const r of (eslint as any).results) {
-        e += (r?.errorCount ?? 0);
-        w += (r?.warningCount ?? 0);
+        e += r?.errorCount ?? 0;
+        w += r?.warningCount ?? 0;
       }
       // Some formats also have top-level counts
       eslintErrors = (eslint as any).errorCount ?? e;
@@ -193,20 +195,35 @@ function deriveMetrics() {
 
   // Perf samples (prefer perf.json, fallback to master-report.json)
   const perf = readJSON<any>(p.perfJson);
-  const perfSamples = (perf?.startup?.samples ?? master?.perf?.startup?.samples ?? 0);
+  const perfSamples = perf?.startup?.samples ?? master?.perf?.startup?.samples ?? 0;
 
   return {
-    totalTests, failedTests, passedTests, totalSuites,
-    coverageStatements, coverageBranches, coverageLines, coverageFunctions,
-    eslintErrors, eslintWarnings, tsErrors, perfSamples,
+    totalTests,
+    failedTests,
+    passedTests,
+    totalSuites,
+    coverageStatements,
+    coverageBranches,
+    coverageLines,
+    coverageFunctions,
+    eslintErrors,
+    eslintWarnings,
+    tsErrors,
+    perfSamples,
   };
 }
 
 function decideGoNoGo(m: ReturnType<typeof deriveMetrics>) {
   const reasons: string[] = [];
-  const coverageOk = (m.coverageStatements ?? 0) >= 85 && (m.coverageLines ?? 0) >= 85 && (m.coverageFunctions ?? 0) >= 80 && (m.coverageBranches ?? 0) >= 70;
+  const coverageOk =
+    (m.coverageStatements ?? 0) >= 85 &&
+    (m.coverageLines ?? 0) >= 85 &&
+    (m.coverageFunctions ?? 0) >= 80 &&
+    (m.coverageBranches ?? 0) >= 70;
   if (!coverageOk) {
-    reasons.push('Coverage eşikleri aşağıda (Statements>=85, Lines>=85, Functions>=80, Branches>=70)');
+    reasons.push(
+      'Coverage eşikleri aşağıda (Statements>=85, Lines>=85, Functions>=80, Branches>=70)',
+    );
   }
   if ((m.tsErrors ?? 0) > 0) {
     reasons.push(`${m.tsErrors} TypeScript hatası`);
@@ -236,12 +253,15 @@ function buildSummaryBlock() {
     lines.push(`Nedenler: ${decision.reasons.join(' | ')}`);
   }
   lines.push('');
-  lines.push('- Testler: ' + (
-    m.totalTests != null && m.passedTests != null && m.failedTests != null
-      ? `${m.passedTests}/${m.totalTests} PASS, Hatalı: ${m.failedTests} (Süit: ${m.totalSuites ?? 'N/A'})`
-      : 'N/A'
-  ));
-  lines.push(`- Coverage: Statements ${formatPct(m.coverageStatements)} | Lines ${formatPct(m.coverageLines)} | Functions ${formatPct(m.coverageFunctions)} | Branches ${formatPct(m.coverageBranches)}`);
+  lines.push(
+    '- Testler: ' +
+      (m.totalTests != null && m.passedTests != null && m.failedTests != null
+        ? `${m.passedTests}/${m.totalTests} PASS, Hatalı: ${m.failedTests} (Süit: ${m.totalSuites ?? 'N/A'})`
+        : 'N/A'),
+  );
+  lines.push(
+    `- Coverage: Statements ${formatPct(m.coverageStatements)} | Lines ${formatPct(m.coverageLines)} | Functions ${formatPct(m.coverageFunctions)} | Branches ${formatPct(m.coverageBranches)}`,
+  );
   lines.push(`- TypeScript Hataları: ${m.tsErrors ?? 'N/A'}`);
   lines.push(`- ESLint: Hata ${m.eslintErrors ?? 'N/A'}, Uyarı ${m.eslintWarnings ?? 'N/A'}`);
   lines.push(`- Performans Örnekleri: ${m.perfSamples ?? 0}`);

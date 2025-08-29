@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 
-import { DesignSystem } from '../../theme/DesignSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface VellumCanvasProps {
   children?: React.ReactNode;

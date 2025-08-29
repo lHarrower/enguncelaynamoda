@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { DesignSystem } from '@/theme/DesignSystem';
@@ -15,7 +15,7 @@ interface VisionStatsProps {
   totalLiked: number;
   totalPassed: number;
   streakDays: number;
-  style?: any;
+  style?: ViewStyle;
 }
 
 interface StatItemProps {

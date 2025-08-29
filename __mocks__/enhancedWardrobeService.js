@@ -11,10 +11,32 @@ const enhancedWardrobeService = {
   getWardrobeUtilizationStats: jest.fn(),
   updateItemConfidenceScore: jest.fn(),
   deleteClothingItem: jest.fn(),
+  updateItemName: jest.fn(),
 };
 
 // Default implementations
-enhancedWardrobeService.getUserWardrobe.mockResolvedValue([]);
+const defaultMockItems = [
+  {
+    id: 'sync-item-1',
+    name: 'Blue Summer Dress',
+    category: 'dresses',
+    colors: ['blue'],
+    brand: 'Zara',
+    price: 89.99,
+    purchaseDate: '2024-01-15',
+    lastWorn: null,
+    wearCount: 0,
+    rating: 0,
+    tags: ['summer', 'casual'],
+    imageUrl: 'https://example.com/blue-dress.jpg',
+    isAIGenerated: false,
+    confidenceScore: 0.95,
+    userId: 'local-user',
+    createdAt: '2024-01-15T10:00:00Z',
+    updatedAt: '2024-01-15T10:00:00Z',
+  },
+];
+
 enhancedWardrobeService.saveClothingItem.mockResolvedValue({ id: 'mock-item-id' });
 enhancedWardrobeService.trackItemUsage.mockResolvedValue();
 enhancedWardrobeService.getItemUsageStats.mockResolvedValue({
@@ -40,4 +62,7 @@ enhancedWardrobeService.getWardrobeUtilizationStats.mockResolvedValue({
 enhancedWardrobeService.updateItemConfidenceScore.mockResolvedValue();
 enhancedWardrobeService.deleteClothingItem.mockResolvedValue();
 
-module.exports = { enhancedWardrobeService };
+// Export the mock instance as a named export to match the original service
+module.exports = {
+  enhancedWardrobeService,
+};

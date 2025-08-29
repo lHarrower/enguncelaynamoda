@@ -160,50 +160,40 @@ const StandardInput = forwardRef<StandardInputRef, StandardInputProps>(
         ...styles[`container_${size}`],
       };
 
-      if (disabled) {
-        return { ...baseStyle, ...styles.containerDisabled };
-      }
-
-      if (error) {
-        return { ...baseStyle, ...styles.containerError };
-      }
-
-      if (focused) {
-        return { ...baseStyle, ...styles.containerFocused };
-      }
+      if (disabled) return { ...baseStyle, ...styles.containerDisabled };
+      if (error) return { ...baseStyle, ...styles.containerError };
+      if (focused) return { ...baseStyle, ...styles.containerFocused };
 
       return baseStyle;
     };
 
-    const getInputWrapperStyles = (): ViewStyle => {
-      const baseStyle = {
-        ...styles.inputWrapper,
-        ...styles[`inputWrapper_${variant}`],
-      };
+    const getInputWrapperStyles = (): ViewStyle => ({
+      ...styles.inputWrapper,
+      ...styles[`inputWrapper_${variant}`],
+    });
 
-      return baseStyle;
-    };
+    const getInputStyles = (): TextStyle => ({
+      ...styles.input,
+      ...styles[`input_${size}`],
+      ...(disabled && styles.inputDisabled),
+    });
 
-    const getInputStyles = (): TextStyle => {
-      const baseStyle = {
-        ...styles.input,
-        ...styles[`input_${size}`],
-        ...(disabled && styles.inputDisabled),
-      };
+    const getLabelStyles = (): TextStyle => ({
+      ...styles.label,
+      ...styles[`label_${size}`],
+      ...(disabled && styles.labelDisabled),
+      ...(error && styles.labelError),
+      ...(focused && styles.labelFocused),
+    });
 
-      return baseStyle;
-    };
-
-    const getLabelStyles = (): TextStyle => {
-      const baseStyle = {
-        ...styles.label,
-        ...styles[`label_${size}`],
-        ...(disabled && styles.labelDisabled),
-        ...(error && styles.labelError),
-        ...(focused && styles.labelFocused),
-      };
-
-      return baseStyle;
+    const getIconConfig = () => {
+      const iconSize = size === 'small' ? 16 : size === 'medium' ? 20 : 24;
+      const iconColor = disabled
+        ? DesignSystem.colors.text.disabled
+        : focused
+          ? DesignSystem.colors.sage[500]
+          : DesignSystem.colors.text.secondary;
+      return { iconSize, iconColor };
     };
 
     const animatedBorderColor = focusAnimation.interpolate({
@@ -211,12 +201,7 @@ const StandardInput = forwardRef<StandardInputRef, StandardInputProps>(
       outputRange: [DesignSystem.colors.border.primary, DesignSystem.colors.sage[500]],
     });
 
-    const iconSize = size === 'small' ? 16 : size === 'medium' ? 20 : 24;
-    const iconColor = disabled
-      ? DesignSystem.colors.text.disabled
-      : focused
-        ? DesignSystem.colors.sage[500]
-        : DesignSystem.colors.text.secondary;
+    const { iconSize, iconColor } = getIconConfig();
 
     return (
       <View style={[getContainerStyles(), containerStyle]} testID={testID}>

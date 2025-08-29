@@ -223,7 +223,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
             accessibilityLabel="Cancel"
             accessibilityHint="Tap to cancel and go back"
           >
-            <Ionicons name="close" size={24} color="#B8918F" />
+            <Ionicons name="close" size={24} color={DesignSystem.colors.terracotta[400]} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Item Details</Text>
           <View style={styles.headerSpacer} />
@@ -233,7 +233,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
         <View style={styles.imageContainer}>
           <Image source={{ uri: processedImageUri }} style={styles.processedImage} />
           <View style={styles.imageOverlay}>
-            <Ionicons name="checkmark-circle" size={24} color="#9AA493" />
+            <Ionicons name="checkmark-circle" size={24} color={DesignSystem.colors.sage[400]} />
             <Text style={styles.imageStatus}>Background Removed ✨</Text>
           </View>
         </View>
@@ -256,7 +256,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
               <Text style={[styles.dropdownText, !category && styles.placeholder]}>
                 {category || 'Select category'}
               </Text>
-              <Ionicons name="chevron-down" size={20} color="#B8918F" />
+              <Ionicons name="chevron-down" size={20} color={DesignSystem.colors.terracotta[400]} />
             </TouchableOpacity>
             {errors.category && <Text style={styles.errorText}>{errors.category}</Text>}
 
@@ -305,7 +305,11 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
                 <Text style={[styles.dropdownText, !subcategory && styles.placeholder]}>
                   {subcategory || 'Select subcategory (optional)'}
                 </Text>
-                <Ionicons name="chevron-down" size={20} color="#B8918F" />
+                <Ionicons
+                  name="chevron-down"
+                  size={20}
+                  color={DesignSystem.colors.terracotta[400]}
+                />
               </TouchableOpacity>
 
               {showSubcategoryDropdown && (
@@ -404,7 +408,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
               value={brand}
               onChangeText={setBrand}
               placeholder="e.g., Zara, H&M, Nike (optional)"
-              placeholderTextColor="#999999"
+              placeholderTextColor={DesignSystem.colors.text.secondary}
             />
           </View>
 
@@ -422,7 +426,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
               <Text style={[styles.dropdownText, !size && styles.placeholder]}>
                 {size || 'Select size (optional)'}
               </Text>
-              <Ionicons name="chevron-down" size={20} color="#B8918F" />
+              <Ionicons name="chevron-down" size={20} color={DesignSystem.colors.terracotta[400]} />
             </TouchableOpacity>
 
             {showSizeDropdown && (
@@ -466,7 +470,7 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
               value={notes}
               onChangeText={setNotes}
               placeholder="Any additional details... (optional)"
-              placeholderTextColor="#999999"
+              placeholderTextColor={DesignSystem.colors.text.secondary}
               multiline
               numberOfLines={3}
               textAlignVertical="top"
@@ -502,7 +506,13 @@ const ItemDetailsForm: React.FC<ItemDetailsFormProps> = ({
             }
             accessibilityState={{ disabled: !isFormValid }}
           >
-            <Ionicons name="checkmark" size={20} color={isFormValid ? '#FFFFFF' : '#CCCCCC'} />
+            <Ionicons
+              name="checkmark"
+              size={20}
+              color={
+                isFormValid ? DesignSystem.colors.text.inverse : DesignSystem.colors.neutral[400]
+              }
+            />
             <Text style={[styles.saveButtonText, !isFormValid && styles.saveButtonTextDisabled]}>
               Save Item
             </Text>
@@ -521,7 +531,7 @@ const styles = StyleSheet.create({
   },
   cancelActionButton: {
     alignItems: 'center',
-    borderColor: '#B8918F',
+    borderColor: DesignSystem.colors.terracotta[400],
     borderRadius: 12,
     borderWidth: 1,
     flex: 1,
@@ -529,7 +539,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   cancelActionButtonText: {
-    color: '#B8918F',
+    color: DesignSystem.colors.terracotta[400],
     fontSize: 16,
     fontWeight: '600',
   },
@@ -579,7 +589,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.background.elevated,
   },
   container: {
-    backgroundColor: '#F2EFE9',
+    backgroundColor: DesignSystem.colors.background.secondary,
     flex: 1,
   },
   dropdown: {
@@ -625,7 +635,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   errorText: {
-    color: '#FF6B6B',
+    color: DesignSystem.colors.error.main,
     fontSize: 12,
     marginTop: 4,
   },
@@ -634,10 +644,10 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   fieldError: {
-    borderColor: '#FF6B6B',
+    borderColor: DesignSystem.colors.error.main,
   },
   fieldLabel: {
-    color: '#7A6B56',
+    color: DesignSystem.colors.text.primary,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
@@ -647,7 +657,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: DesignSystem.colors.border.primary,
     borderBottomWidth: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -669,7 +679,7 @@ const styles = StyleSheet.create({
   },
   imageOverlay: {
     alignItems: 'center',
-    backgroundColor: 'rgba(242, 239, 233, 0.95)',
+    backgroundColor: DesignSystem.colors.background.secondary + 'F2',
     borderRadius: 20,
     bottom: 10,
     flexDirection: 'row',
@@ -678,7 +688,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   imageStatus: {
-    color: '#9AA493',
+    color: DesignSystem.colors.sage[400],
     fontSize: 12,
     fontWeight: '600',
     marginLeft: 6,
@@ -687,48 +697,48 @@ const styles = StyleSheet.create({
     color: DesignSystem.colors.neutral[500],
   },
   processedImage: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: DesignSystem.colors.background.primary,
     borderRadius: 12,
     height: screenWidth * 0.5,
     width: screenWidth * 0.4,
   },
   required: {
-    color: '#FF6B6B',
+    color: DesignSystem.colors.error.main,
   },
   saveButton: {
     alignItems: 'center',
-    backgroundColor: '#B8918F',
+    backgroundColor: DesignSystem.colors.terracotta[400],
     borderRadius: 12,
     elevation: 6,
     flex: 2,
     flexDirection: 'row',
     justifyContent: 'center',
     paddingVertical: 16,
-    shadowColor: '#B8918F',
+    shadowColor: DesignSystem.colors.terracotta[400],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
   saveButtonDisabled: {
-    backgroundColor: '#E0E0E0',
+    backgroundColor: DesignSystem.colors.neutral[300],
     elevation: 0,
     shadowOpacity: 0,
   },
   saveButtonText: {
-    color: '#FFFFFF',
+    color: DesignSystem.colors.text.inverse,
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 8,
   },
   saveButtonTextDisabled: {
-    color: '#CCCCCC',
+    color: DesignSystem.colors.neutral[400],
   },
   scrollContent: {
     paddingBottom: 100,
   },
   suggestedBadge: {
     alignItems: 'center',
-    backgroundColor: '#9AA493',
+    backgroundColor: DesignSystem.colors.sage[400],
     borderRadius: 8,
     height: 16,
     justifyContent: 'center',
@@ -738,7 +748,7 @@ const styles = StyleSheet.create({
     width: 16,
   },
   suggestedBadgeText: {
-    color: '#FFFFFF',
+    color: DesignSystem.colors.text.inverse,
     fontSize: 10,
     fontWeight: 'bold',
   },
@@ -747,11 +757,11 @@ const styles = StyleSheet.create({
     paddingTop: 14,
   },
   textInput: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E0E0E0',
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderColor: DesignSystem.colors.border.primary,
     borderRadius: 12,
     borderWidth: 1,
-    color: '#333333',
+    color: DesignSystem.colors.text.primary,
     fontSize: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,

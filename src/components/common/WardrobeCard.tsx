@@ -16,6 +16,7 @@ import {
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width } = Dimensions.get('window');
 
@@ -63,7 +64,7 @@ const WardrobeCard: React.FC<WardrobeCardProps> = ({
   autoFocus = false,
   reducedMotion = false,
 }) => {
-  const cardRef = useRef<TouchableOpacity>(null);
+  const cardRef = useRef<React.ElementRef<typeof TouchableOpacity>>(null);
   const { trigger } = useHapticFeedback();
 
   // Animation values
@@ -120,8 +121,8 @@ const WardrobeCard: React.FC<WardrobeCardProps> = ({
       parts.push(capitalizedColors.join(', '));
     }
     if (isFavorite) parts.push('Favorite item');
-    if ((item as any).tags && (item as any).tags.length > 0) {
-      parts.push(`Tags: ${(item as any).tags.join(', ')}`);
+    if (item.tags && item.tags.length > 0) {
+      parts.push(`Tags: ${item.tags.join(', ')}`);
     }
     return parts.join(', ');
   };
@@ -208,7 +209,7 @@ const WardrobeCard: React.FC<WardrobeCardProps> = ({
           <View style={styles.brandContainer}>
             <Text style={styles.brandText}>{brandName}</Text>
             <View style={styles.premiumBadge}>
-              <Ionicons name="diamond-outline" size={12} color="#8B5A3C" />
+              <Ionicons name="diamond-outline" size={12} color={DesignSystem.colors.primary[700]} />
             </View>
           </View>
           {onFavoriteToggle && (
@@ -229,7 +230,9 @@ const WardrobeCard: React.FC<WardrobeCardProps> = ({
               <Ionicons
                 name={isFavorite ? 'heart' : 'heart-outline'}
                 size={20}
-                color={isFavorite ? '#D4A574' : '#8B5A3C'}
+                color={
+                  isFavorite ? DesignSystem.colors.gold[500] : DesignSystem.colors.primary[700]
+                }
                 testID="favorite-icon"
               />
             </TouchableOpacity>
@@ -291,7 +294,7 @@ const WardrobeCard: React.FC<WardrobeCardProps> = ({
         {isSelected && (
           <View style={styles.selectionOverlay}>
             <View style={styles.selectionIndicator} testID="selection-indicator">
-              <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+              <Ionicons name="checkmark" size={16} color={DesignSystem.colors.text.inverse} />
             </View>
           </View>
         )}
@@ -313,22 +316,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   brandText: {
-    color: '#8B5A3C',
-    fontFamily: 'System',
-    fontSize: 12,
+    color: DesignSystem.colors.primary[700],
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.xs,
     fontWeight: '700',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
   card: {
     aspectRatio: 0.75,
-    backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(139, 90, 60, 0.1)',
-    borderRadius: 24,
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderColor: DesignSystem.colors.terracotta[500] + '1A',
+    borderRadius: DesignSystem.spacing.xl,
     borderWidth: 1,
     elevation: 8,
     overflow: 'hidden',
-    shadowColor: '#8B5A3C',
+    shadowColor: DesignSystem.colors.terracotta[500],
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 20,
@@ -339,62 +342,67 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   cardHeader: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 12,
+    minHeight: 32,
   },
   categoryBadge: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 12,
-    bottom: 8,
-    left: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: DesignSystem.colors.text.primary + 'B3',
+    borderRadius: DesignSystem.spacing.sm,
+    bottom: DesignSystem.spacing.xs,
+    left: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.xs,
+    paddingVertical: DesignSystem.spacing.xs,
     position: 'absolute',
   },
   categoryText: {
-    color: '#FFFFFF',
-    fontSize: 10,
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.sizes.xs,
     fontWeight: '600',
     letterSpacing: 0.5,
   },
   colorDot: {
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 6,
+    borderColor: DesignSystem.colors.background.elevated + 'CC',
+    borderRadius: DesignSystem.spacing.xs,
     borderWidth: 1,
-    height: 12,
-    width: 12,
+    height: DesignSystem.spacing.sm,
+    width: DesignSystem.spacing.sm,
   },
   colorsContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 4,
+    gap: DesignSystem.spacing.xs,
   },
   currencySymbol: {
-    color: '#8B5A3C',
-    fontSize: 12,
+    color: DesignSystem.colors.primary[700],
+    fontSize: DesignSystem.typography.sizes.xs,
     fontWeight: '500',
     opacity: 0.7,
   },
   favoriteButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 12,
-    padding: 6,
+    backgroundColor: DesignSystem.colors.background.elevated + 'E6',
+    borderRadius: DesignSystem.spacing.sm,
+    padding: DesignSystem.spacing.xs,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 32,
+    height: 32,
   },
   gradientBackground: {
     flex: 1,
-    padding: 16,
+    padding: DesignSystem.spacing.md,
   },
   image: {
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: DesignSystem.colors.background.elevated + '80',
     height: '100%',
     width: '100%',
   },
   imageContainer: {
-    borderRadius: 16,
+    borderRadius: DesignSystem.spacing.md,
     flex: 1,
-    marginBottom: 12,
+    marginBottom: DesignSystem.spacing.sm,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -403,38 +411,38 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   itemName: {
-    color: '#2D2D2D',
-    fontFamily: 'System',
-    fontSize: 14,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.sm,
     fontWeight: '600',
     lineHeight: 18,
-    marginBottom: 6,
+    marginBottom: DesignSystem.spacing.xs,
   },
   moreColors: {
-    color: '#8B5A3C',
-    fontSize: 10,
+    color: DesignSystem.colors.terracotta[500],
+    fontSize: DesignSystem.typography.sizes.xs,
     fontWeight: '500',
     marginLeft: 2,
   },
   premiumBadge: {
-    backgroundColor: 'rgba(139, 90, 60, 0.1)',
-    borderRadius: 8,
-    marginLeft: 6,
+    backgroundColor: DesignSystem.colors.terracotta[500] + '1A',
+    borderRadius: DesignSystem.spacing.xs,
+    marginLeft: DesignSystem.spacing.xs,
     padding: 2,
   },
   priceContainer: {
     alignItems: 'flex-end',
   },
   priceText: {
-    color: '#8B5A3C',
-    fontFamily: 'System',
-    fontSize: 16,
+    color: DesignSystem.colors.terracotta[500],
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.md,
     fontWeight: '700',
   },
   selectedCard: {
-    borderColor: '#D4A574',
+    borderColor: DesignSystem.colors.sage[400],
     borderWidth: 2,
-    shadowColor: '#D4A574',
+    shadowColor: DesignSystem.colors.sage[400],
     shadowOpacity: 0.25,
   },
   highContrastCard: {
@@ -442,13 +450,13 @@ const styles = StyleSheet.create({
     borderColor: '#000000',
   },
   selectionIndicator: {
-    backgroundColor: '#D4A574',
+    backgroundColor: DesignSystem.colors.sage[400],
     borderRadius: 20,
-    padding: 8,
+    padding: DesignSystem.spacing.xs,
   },
   selectionOverlay: {
     alignItems: 'center',
-    backgroundColor: 'rgba(212, 165, 116, 0.2)',
+    backgroundColor: DesignSystem.colors.sage[400] + '33',
     bottom: 0,
     justifyContent: 'center',
     left: 0,

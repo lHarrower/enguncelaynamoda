@@ -1,10 +1,25 @@
 // Supabase -> AppError mapping helper
 import { PostgrestError } from '@supabase/supabase-js';
 
-import { AppError, ErrorCategory, ErrorHandler, ErrorSeverity } from '@/utils/ErrorHandler';
-import { isSupabaseOk, SupabaseResult } from '@/utils/supabaseResult';
+import { AppError, ErrorCategory, ErrorHandler, ErrorSeverity } from './ErrorHandler';
+import { isSupabaseOk, SupabaseResult } from './supabaseResult';
 
-export interface MappedSupabaseError extends AppError {
+export interface ErrorContext {
+  timestamp: number;
+  platform: string;
+  [key: string]: unknown;
+}
+
+export interface MappedSupabaseError {
+  id: string;
+  code?: string;
+  message: string;
+  userMessage: string;
+  category: ErrorCategory;
+  severity: ErrorSeverity;
+  context: ErrorContext;
+  timestamp: number;
+  isRecoverable: boolean;
   original: PostgrestError | { message: string };
 }
 
@@ -84,10 +99,10 @@ export function mapSupabaseError(
       platform: context.platform || 'unknown',
       ...context,
     },
+    timestamp: Date.now(),
     isRecoverable: retryable,
-    reportable: severity !== ErrorSeverity.LOW,
-    originalError: error as unknown as Error,
-  } as MappedSupabaseError;
+    original: error,
+  };
 }
 
 // Convenience guard to enforce ok state or throw mapped AppError
@@ -99,23 +114,29 @@ export function ensureSupabaseOk<T>(
     return result.data;
   }
   const mapped = mapSupabaseError(result.error, meta);
+  // Create a proper AppError instance
+  const appError = new Error(mapped.message) as Error & AppError;
+  appError.id = mapped.id;
+  appError.code = mapped.code;
+  appError.message = mapped.message;
+  appError.userMessage = mapped.userMessage;
+  appError.category = mapped.category;
+  appError.severity = mapped.severity;
+  appError.context = mapped.context;
+  appError.timestamp = mapped.timestamp;
+  appError.isRecoverable = mapped.isRecoverable;
+  appError.retryable = mapped.isRecoverable;
+  appError.reportable = mapped.severity !== ErrorSeverity.LOW;
+
   // Best-effort logging/reporting
   try {
     const errorHandler = ErrorHandler.getInstance();
     if (errorHandler && typeof errorHandler.handleError === 'function') {
-      errorHandler.handleError(mapped);
+      errorHandler.handleError(appError);
     }
   } catch {
     // Silent fail for error handling
   }
-  // Create a proper AppError instance
-  const appError = new Error(mapped.message) as Error & AppError;
-  appError.code = mapped.code;
-  appError.severity = mapped.severity;
-  appError.category = mapped.category;
-  appError.context = mapped.context;
-  appError.timestamp = mapped.timestamp;
-  appError.isRecoverable = mapped.isRecoverable;
-  appError.userMessage = mapped.userMessage;
+
   throw appError;
 }

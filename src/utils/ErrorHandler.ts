@@ -1,8 +1,8 @@
 // Error Handler - Comprehensive error management system
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-import { logInDev } from '@/utils/consoleSuppress';
-
+import { logInDev } from './consoleSuppress';
 import { secureStorage } from './secureStorage';
 
 /**
@@ -185,6 +185,9 @@ export class ErrorHandler {
       throttleWindow: 10000,
       ...config,
     };
+
+    // Register default recovery strategies
+    this.registerDefaultRecoveryStrategies();
   }
 
   /** Legacy singleton accessor expected by tests */
@@ -220,76 +223,22 @@ export class ErrorHandler {
     arg4?: unknown,
     arg5?: unknown,
   ): AppError & { code: string; recoveryStrategies: RecoveryStrategy[] } {
-    // Detect legacy signature by primitive ordering (code:string, message:string, severity:ErrorSeverity, category:ErrorCategory)
-    let code: string | undefined;
-    let message: string | undefined;
-    let severity: ErrorSeverity | undefined;
-    let category: ErrorCategory | undefined;
-    let context: Partial<ErrorContext> | undefined;
-
-    if (
-      typeof arg1 === 'string' &&
-      typeof arg2 === 'string' &&
-      Object.values(ErrorSeverity).includes(arg3 as ErrorSeverity)
-    ) {
-      code = arg1;
-      message = arg2;
-      severity = arg3 as ErrorSeverity;
-      category = arg4 as ErrorCategory | undefined;
-      context = arg5 as Partial<ErrorContext> | undefined;
-    } else {
-      // New style: (error, category, severity, context)
-      const error = arg1;
-      category = arg2 as ErrorCategory | undefined;
-      severity = arg3 as ErrorSeverity | undefined;
-      context = arg4 as Partial<ErrorContext> | undefined;
-      if (typeof error === 'string') {
-        message = error;
-      } else if (error instanceof Error) {
-        message = error.message;
-      } else {
-        message = String(error);
-      }
-    }
-
+    const parsedArgs = this.parseCreateErrorArgs(arg1, arg2, arg3, arg4, arg5);
     const errorId = this.generateErrorId();
     const timestamp = Date.now();
-    const orig = new Error(message || 'Unknown error');
+    const orig = new Error(parsedArgs.message || 'Unknown error');
 
-    // Redact sensitive keys
-    const baseContext: ErrorContext = {
-      timestamp,
-      platform: Platform.OS,
-      version: '1.0.0',
-      ...(context || {}),
-    };
-    // Redact sensitive keys in additionalData if present
-    if (baseContext.additionalData) {
-      ['password', 'token', 'apiKey'].forEach((k) => {
-        if (k in baseContext.additionalData!) {
-          baseContext.additionalData![k] = '[REDACTED]';
-        }
-      });
-    }
-    const safeContext = baseContext;
-
-    const cat = category || ErrorCategory.UNKNOWN;
-    const sev = severity || ErrorSeverity.MEDIUM;
+    const safeContext = this.createSafeContext(parsedArgs.context, timestamp);
+    const cat = parsedArgs.category || ErrorCategory.UNKNOWN;
+    const sev = parsedArgs.severity || ErrorSeverity.MEDIUM;
     const userMessage = WELLNESS_ERROR_MESSAGES[cat] || DEFAULT_ERROR_MESSAGES[cat];
-
-    // Basic recovery strategy mapping for tests
-    const recoveryStrategies: RecoveryStrategy[] = [];
-    if (cat === ErrorCategory.NETWORK) {
-      recoveryStrategies.push(RecoveryStrategy.RETRY);
-    }
-    if (cat === ErrorCategory.UI) {
-      recoveryStrategies.push(RecoveryStrategy.REFRESH_COMPONENT);
-    }
+    const sanitizedMessage = this.sanitizeMessage(parsedArgs.message || 'Unknown error');
+    const recoveryStrategies = this.getRecoveryStrategiesForCategory(cat);
 
     const appError: AppError & { code: string; recoveryStrategies: RecoveryStrategy[] } = {
       id: errorId,
-      code: code || errorId,
-      message: message || 'Unknown error',
+      code: parsedArgs.code || errorId,
+      message: sanitizedMessage,
       userMessage,
       category: cat,
       severity: sev,
@@ -303,12 +252,123 @@ export class ErrorHandler {
       timestamp,
     };
 
-    if (this.config.accessibilityMode) {
-      appError.accessibilityLabel = appError.message;
-      appError.accessibilityHint = `Error category ${appError.category}`;
+    this.addAccessibilityInfo(appError, safeContext);
+    return appError;
+  }
+
+  /**
+   * Parse createError arguments to handle both legacy and new signatures
+   */
+  private parseCreateErrorArgs(
+    arg1: unknown,
+    arg2?: unknown,
+    arg3?: unknown,
+    arg4?: unknown,
+    arg5?: unknown,
+  ): {
+    code?: string;
+    message?: string;
+    severity?: ErrorSeverity;
+    category?: ErrorCategory;
+    context?: Partial<ErrorContext>;
+  } {
+    // Detect legacy signature by primitive ordering
+    if (
+      typeof arg1 === 'string' &&
+      typeof arg2 === 'string' &&
+      Object.values(ErrorSeverity).includes(arg3 as ErrorSeverity)
+    ) {
+      return {
+        code: arg1,
+        message: arg2,
+        severity: arg3 as ErrorSeverity,
+        category: arg4 as ErrorCategory | undefined,
+        context: arg5 as Partial<ErrorContext> | undefined,
+      };
     }
 
-    return appError;
+    // New style: (error, category, severity, context)
+    const error = arg1;
+    let message: string;
+    if (typeof error === 'string') {
+      message = error;
+    } else if (error instanceof Error) {
+      message = error.message;
+    } else {
+      message = String(error);
+    }
+
+    return {
+      message,
+      category: arg2 as ErrorCategory | undefined,
+      severity: arg3 as ErrorSeverity | undefined,
+      context: arg4 as Partial<ErrorContext> | undefined,
+    };
+  }
+
+  /**
+   * Create safe context with redacted sensitive information
+   */
+  private createSafeContext(
+    context: Partial<ErrorContext> | undefined,
+    timestamp: number,
+  ): ErrorContext {
+    const baseContext: ErrorContext = {
+      timestamp,
+      platform: Platform.OS,
+      version: '1.0.0',
+      ...(context || {}),
+    };
+
+    // Redact sensitive keys in context directly
+    if (baseContext.password) {
+      baseContext.password = '[REDACTED]';
+    }
+    if (baseContext.token) {
+      baseContext.token = '[REDACTED]';
+    }
+    if (baseContext.apiKey) {
+      baseContext.apiKey = '[REDACTED]';
+    }
+
+    // Redact sensitive keys in additionalData if present
+    if (baseContext.additionalData) {
+      ['password', 'token', 'apiKey'].forEach((k) => {
+        if (k in baseContext.additionalData!) {
+          baseContext.additionalData![k] = '[REDACTED]';
+        }
+      });
+    }
+
+    return baseContext;
+  }
+
+  /**
+   * Get recovery strategies for a specific category
+   */
+  private getRecoveryStrategiesForCategory(category: ErrorCategory): RecoveryStrategy[] {
+    const recoveryStrategies: RecoveryStrategy[] = [];
+    if (category === ErrorCategory.NETWORK) {
+      recoveryStrategies.push(RecoveryStrategy.RETRY);
+    }
+    if (category === ErrorCategory.UI) {
+      recoveryStrategies.push(RecoveryStrategy.REFRESH_COMPONENT);
+    }
+    return recoveryStrategies;
+  }
+
+  /**
+   * Add accessibility information to error if accessibility mode is enabled
+   */
+  private addAccessibilityInfo(appError: AppError, safeContext: ErrorContext): void {
+    if (this.config.accessibilityMode) {
+      let accessibilityLabel = appError.message;
+      if (safeContext.fieldName) {
+        accessibilityLabel += ` for ${safeContext.fieldName}`;
+      }
+      appError.accessibilityLabel = accessibilityLabel;
+      appError.accessibilityHint = `Error category ${appError.category}`;
+    }
   }
 
   /**
@@ -320,13 +380,27 @@ export class ErrorHandler {
     severity?: ErrorSeverity,
     context?: Partial<ErrorContext>,
   ): Promise<AppError> {
-    const appError = this.isAppError(error)
+    let appError = this.isAppError(error)
       ? error
       : this.createError(error, category, severity, context);
 
+    // Apply custom handler if available
+    const customHandler = this.customHandlers.get(appError.category);
+    if (customHandler) {
+      const handledError = customHandler(appError);
+      if (handledError) {
+        appError = handledError;
+      }
+    }
+
+    // Ensure appError is valid before proceeding
+    if (!appError) {
+      throw new Error('Failed to create or process error');
+    }
+
     // Throttle duplicate codes (1s window)
     const now = Date.now();
-    const code = appError.code ?? appError.id;
+    const code = appError.code || appError.id || 'unknown';
     const last = this.lastLogged.get(code) || 0;
     if (now - last > 1000) {
       if (this.config.enableLogging) {
@@ -426,22 +500,182 @@ export class ErrorHandler {
     this.customHandlers.set(category, handler);
   }
   public categorizeError(error: unknown): AppError {
-    if (!this.isAppError(error)) {
-      return this.createError(error, ErrorCategory.UNKNOWN, ErrorSeverity.MEDIUM, {}) as AppError;
+    if (this.isAppError(error)) {
+      return error;
     }
-    return error;
+
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorObj = error as any;
+
+    const { category, severity } = this.determineErrorCategoryAndSeverity(errorMessage, errorObj);
+    return this.createError(error, category, severity, {}) as AppError;
+  }
+
+  /**
+   * Determine error category and severity based on error message and properties
+   */
+  private determineErrorCategoryAndSeverity(
+    errorMessage: string,
+    errorObj: any,
+  ): { category: ErrorCategory; severity: ErrorSeverity } {
+    if (this.isDatabaseError(errorMessage)) {
+      return { category: ErrorCategory.DATABASE, severity: ErrorSeverity.CRITICAL };
+    }
+
+    if (this.isNetworkError(errorMessage, errorObj)) {
+      return { category: ErrorCategory.NETWORK, severity: ErrorSeverity.MEDIUM };
+    }
+
+    if (this.isAuthenticationError(errorMessage, errorObj)) {
+      return { category: ErrorCategory.AUTHENTICATION, severity: ErrorSeverity.HIGH };
+    }
+
+    if (this.isValidationError(errorMessage, errorObj)) {
+      return { category: ErrorCategory.VALIDATION, severity: ErrorSeverity.LOW };
+    }
+
+    if (this.isCacheError(errorMessage)) {
+      return { category: ErrorCategory.STORAGE, severity: ErrorSeverity.LOW };
+    }
+
+    if (this.isAIServiceError(errorMessage)) {
+      return { category: ErrorCategory.AI_SERVICE, severity: ErrorSeverity.MEDIUM };
+    }
+
+    if (this.isImageProcessingError(errorMessage)) {
+      return { category: ErrorCategory.IMAGE_PROCESSING, severity: ErrorSeverity.MEDIUM };
+    }
+
+    return { category: ErrorCategory.UNKNOWN, severity: ErrorSeverity.MEDIUM };
+  }
+
+  /**
+   * Check if error is a database error
+   */
+  private isDatabaseError(errorMessage: string): boolean {
+    return (
+      errorMessage.includes('Database connection lost') ||
+      errorMessage.includes('Database connection failed') ||
+      errorMessage.includes('Connection lost') ||
+      errorMessage.includes('database') ||
+      errorMessage.includes('Database')
+    );
+  }
+
+  /**
+   * Check if error is a network error
+   */
+  private isNetworkError(errorMessage: string, errorObj: any): boolean {
+    return (
+      errorMessage.includes('Network request failed') ||
+      errorMessage.includes('Connection timeout') ||
+      errorMessage.includes('Network timeout') ||
+      errorMessage.includes('timeout') ||
+      errorMessage.includes('DNS resolution failed') ||
+      errorMessage.includes('ERR_NETWORK') ||
+      errorMessage.includes('fetch') ||
+      errorObj?.name === 'TimeoutError' ||
+      (errorObj?.status >= 400 && errorObj?.status < 600) ||
+      (errorObj?.code && ['NETWORK_ERROR', 'ECONNREFUSED', 'ETIMEDOUT'].includes(errorObj.code))
+    );
+  }
+
+  /**
+   * Check if error is an authentication error
+   */
+  private isAuthenticationError(errorMessage: string, errorObj: any): boolean {
+    return (
+      errorMessage.includes('Invalid credentials') ||
+      errorMessage.includes('Token expired') ||
+      errorMessage.includes('Unauthorized access') ||
+      errorMessage.includes('Authentication failed') ||
+      errorObj?.status === 401 ||
+      errorObj?.status === 403
+    );
+  }
+
+  /**
+   * Check if error is a validation error
+   */
+  private isValidationError(errorMessage: string, errorObj: any): boolean {
+    return (
+      errorMessage.includes('Required field missing') ||
+      errorMessage.includes('Invalid email format') ||
+      errorMessage.includes('Password too short') ||
+      errorMessage.includes('Validation failed') ||
+      errorObj?.status === 400
+    );
+  }
+
+  /**
+   * Check if error is a cache error
+   */
+  private isCacheError(errorMessage: string): boolean {
+    return (
+      errorMessage.includes('Cache miss') ||
+      errorMessage.includes('cache') ||
+      errorMessage.includes('Cache')
+    );
+  }
+
+  /**
+   * Check if error is an AI service error
+   */
+  private isAIServiceError(errorMessage: string): boolean {
+    return (
+      errorMessage.includes('AI service') ||
+      errorMessage.includes('OpenAI') ||
+      errorMessage.includes('rate limit') ||
+      errorMessage.includes('quota exceeded')
+    );
+  }
+
+  /**
+   * Check if error is an image processing error
+   */
+  private isImageProcessingError(errorMessage: string): boolean {
+    return (
+      errorMessage.includes('Image upload failed') ||
+      errorMessage.includes('image') ||
+      errorMessage.includes('Image processing') ||
+      errorMessage.includes('Invalid image format')
+    );
   }
   public registerRecoveryStrategy(
     strategy: RecoveryStrategy | string,
-    handler: (error: AppError) => Promise<void> | void,
+    handler: (context: any) => Promise<void> | void,
   ) {
     this.recoveryRegistry.set(strategy, handler);
   }
-  public async executeRecoveryAction(strategy: RecoveryStrategy | string, error: unknown) {
-    const appError = this.categorizeError(error);
+
+  private registerDefaultRecoveryStrategies() {
+    // REFRESH_COMPONENT strategy
+    this.registerRecoveryStrategy(RecoveryStrategy.REFRESH_COMPONENT, async (context: any) => {
+      if (context?.component?.forceUpdate) {
+        context.component.forceUpdate();
+      }
+    });
+
+    // CLEAR_CACHE strategy
+    this.registerRecoveryStrategy(RecoveryStrategy.CLEAR_CACHE, async (context: any) => {
+      if (context?.cacheKeys && Array.isArray(context.cacheKeys)) {
+        for (const key of context.cacheKeys) {
+          await AsyncStorage.removeItem(key);
+        }
+      }
+    });
+
+    // LOGOUT strategy
+    this.registerRecoveryStrategy(RecoveryStrategy.LOGOUT, async (context: any) => {
+      if (context?.authService?.logout) {
+        await context.authService.logout();
+      }
+    });
+  }
+  public async executeRecoveryAction(strategy: RecoveryStrategy | string, context: any) {
     const handler = this.recoveryRegistry.get(strategy);
     if (handler) {
-      await handler(appError);
+      await handler(context);
     }
   }
 
@@ -534,6 +768,7 @@ export class ErrorHandler {
    */
   public clearErrors(): void {
     this.errorQueue = [];
+    this.lastLogged.clear(); // Clear throttling map for tests
   }
 
   /**
@@ -604,10 +839,13 @@ export class ErrorHandler {
 
   private logError(error: AppError): void {
     const logLevel = this.getLogLevel(error.severity);
-    const logMessage = `[${error.category.toUpperCase()}] ${error.message}`;
+    const severityLabel = error.severity.toUpperCase();
+    const logMessage = `[${severityLabel} ERROR]`;
 
     console[logLevel](logMessage, {
       id: error.id,
+      code: error.code,
+      message: error.message,
       severity: error.severity,
       context: error.context,
       stack: error.stack,
@@ -626,6 +864,26 @@ export class ErrorHandler {
       default:
         return 'warn';
     }
+  }
+
+  private sanitizeMessage(message: string): string {
+    let sanitized = message;
+
+    // Remove common sensitive patterns
+    const sensitivePatterns = [
+      /\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/g, // emails
+      /\bsecret\w*\b/gi, // words starting with 'secret'
+      /\btoken\w*\b/gi, // words starting with 'token'
+      /\bbearer[\s-]\w+/gi, // bearer tokens
+      /\bapi[\s-]?key\w*/gi, // api keys
+      /\bpassword\w*/gi, // passwords
+    ];
+
+    sensitivePatterns.forEach((pattern) => {
+      sanitized = sanitized.replace(pattern, '[REDACTED]');
+    });
+
+    return sanitized;
   }
 
   private notifyListeners(error: AppError): void {

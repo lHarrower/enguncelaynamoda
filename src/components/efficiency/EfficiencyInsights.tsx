@@ -436,24 +436,61 @@ export const EfficiencyInsights: React.FC<EfficiencyInsightsProps> = ({
     );
   };
 
-  const getBreakdownDescription = (category: string, score: number): string => {
-    const level =
-      score >= 80 ? 'excellent' : score >= 60 ? 'good' : score >= 40 ? 'fair' : 'needs improvement';
+  const getScoreLevel = (score: number): string => {
+    if (score >= 80) return 'excellent';
+    if (score >= 60) return 'good';
+    if (score >= 40) return 'fair';
+    return 'needs improvement';
+  };
 
-    switch (category) {
-      case 'utilization':
-        return `Your wardrobe utilization is ${level}. ${score >= 60 ? "You're making good use of your items." : 'Consider wearing neglected pieces more often.'}`;
-      case 'costEfficiency':
-        return `Your cost efficiency is ${level}. ${score >= 60 ? "You're getting good value from your purchases." : 'Focus on cost-per-wear optimization.'}`;
-      case 'sustainability':
-        return `Your sustainability practices are ${level}. ${score >= 60 ? "You're taking good care of your items." : 'Improve item care and longevity.'}`;
-      case 'versatility':
-        return `Your outfit versatility is ${level}. ${score >= 60 ? 'You create diverse outfit combinations.' : 'Experiment with new styling approaches.'}`;
-      case 'curation':
-        return `Your wardrobe curation is ${level}. ${score >= 60 ? 'You have a well-curated collection.' : 'Focus on quality over quantity.'}`;
-      default:
-        return `This category is performing at a ${level} level.`;
-    }
+  const getCategoryAdvice = (category: string, score: number): string => {
+    const isGoodScore = score >= 60;
+
+    const adviceMap: Record<string, { good: string; poor: string }> = {
+      utilization: {
+        good: "You're making good use of your items.",
+        poor: 'Consider wearing neglected pieces more often.',
+      },
+      costEfficiency: {
+        good: "You're getting good value from your purchases.",
+        poor: 'Focus on cost-per-wear optimization.',
+      },
+      sustainability: {
+        good: "You're taking good care of your items.",
+        poor: 'Improve item care and longevity.',
+      },
+      versatility: {
+        good: 'You create diverse outfit combinations.',
+        poor: 'Experiment with new styling approaches.',
+      },
+      curation: {
+        good: 'You have a well-curated collection.',
+        poor: 'Focus on quality over quantity.',
+      },
+    };
+
+    const advice = adviceMap[category];
+    return advice ? (isGoodScore ? advice.good : advice.poor) : '';
+  };
+
+  const getCategoryLabel = (category: string): string => {
+    const labelMap: Record<string, string> = {
+      utilization: 'wardrobe utilization',
+      costEfficiency: 'cost efficiency',
+      sustainability: 'sustainability practices',
+      versatility: 'outfit versatility',
+      curation: 'wardrobe curation',
+    };
+
+    return labelMap[category] || 'this category';
+  };
+
+  const getBreakdownDescription = (category: string, score: number): string => {
+    const level = getScoreLevel(score);
+    const categoryLabel = getCategoryLabel(category);
+    const advice = getCategoryAdvice(category, score);
+
+    return `Your ${categoryLabel} is ${level}. ${advice}`;
   };
 
   const renderTabContent = () => {

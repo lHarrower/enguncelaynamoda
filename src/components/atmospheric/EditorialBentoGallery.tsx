@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { ReactNode, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   Dimensions,
   Image,
@@ -69,7 +69,7 @@ const AnimatedEditorialItem: React.FC<AnimatedEditorialItemProps> = ({
   galleryAnimation,
   children,
 }) => {
-  const animatedStyle = useAnimatedStyle(() => {
+  const animatedStyle = useAnimatedStyle((): ViewStyle => {
     const delay = index * 0.1;
     const progress = Math.max(0, Math.min(1, galleryAnimation.value - delay));
 

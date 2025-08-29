@@ -5,16 +5,15 @@ import * as Application from 'expo-application';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
-import { warnInDev } from '@/utils/consoleSuppress';
-
 import { EngagementHistory, NotificationPreferences } from '../types/aynaMirror';
+import { warnInDev } from '../utils/consoleSuppress';
 import { safeParse } from '../utils/safeJSON';
 import { secureStorage } from '../utils/secureStorage';
 import { errorHandlingService } from './errorHandlingService';
 
 // Import jest for test environment
 // Mock notifications for test environment
-let globalMockNotifications: unknown;
+let globalMockNotifications: Record<string, unknown>;
 if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
   try {
     // Simple mock object without jest dependencies
@@ -64,9 +63,10 @@ interface MinimalNotificationContent {
   data?: Record<string, unknown>;
   sound?: string;
   /** Android only priority; kept optional and narrowed at runtime */
-  priority?: number;
+  priority?: string;
 }
 interface DateTrigger {
+  type: 'date';
   date: Date;
 }
 interface ScheduleRequest {
@@ -77,34 +77,44 @@ interface ScheduleRequest {
 // Lazy notifications module loader
 let _notifications: ExpoNotifications | null = null;
 let _notificationsConfigured = false;
-export async function loadNotifications(): Promise<ExpoNotifications | null> {
-  // In test environment, prefer returning the Jest-mocked module so tests can spy/override behavior
-  if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
-    try {
-      // Use require to ensure same singleton instance as tests
-
-      const mockedModule = require('expo-notifications');
-      const mocked = mockedModule && mockedModule.default ? mockedModule.default : mockedModule;
-      return mocked as ExpoNotifications;
-    } catch {
-      // Fallback to simple in-file mock when module import fails (rare in tests)
-      return globalMockNotifications as ExpoNotifications;
-    }
+/**
+ * Load mocked notifications module for test environment
+ */
+function loadTestNotifications(): ExpoNotifications {
+  try {
+    // Use require to ensure same singleton instance as tests
+    const mockedModule = require('expo-notifications');
+    const mocked = mockedModule && mockedModule.default ? mockedModule.default : mockedModule;
+    return mocked as ExpoNotifications;
+  } catch {
+    // Fallback to simple in-file mock when module import fails (rare in tests)
+    return globalMockNotifications as ExpoNotifications;
   }
+}
 
+/**
+ * Load notifications module for production environment
+ */
+async function loadProductionNotifications(): Promise<ExpoNotifications | null> {
   if (!_notifications) {
-    // Use dynamic import for all environments
     try {
       _notifications = (await import('expo-notifications')) as ExpoNotifications;
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       warnInDev('expo-notifications not available:', err);
-      return null; // Return null if notifications are not available
+      return null;
     }
   }
-  if (!_notificationsConfigured && _notifications) {
+  return _notifications;
+}
+
+/**
+ * Configure notification handler if not already configured
+ */
+function configureNotificationHandler(notifications: ExpoNotifications): void {
+  if (!_notificationsConfigured && notifications) {
     try {
-      _notifications.setNotificationHandler?.({
+      notifications.setNotificationHandler?.({
         handleNotification: async () => ({
           shouldShowAlert: true,
           shouldPlaySound: true,
@@ -118,7 +128,19 @@ export async function loadNotifications(): Promise<ExpoNotifications | null> {
     }
     _notificationsConfigured = true;
   }
-  return _notifications;
+}
+
+export async function loadNotifications(): Promise<ExpoNotifications | null> {
+  // In test environment, prefer returning the Jest-mocked module so tests can spy/override behavior
+  if (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID) {
+    return loadTestNotifications();
+  }
+
+  const notifications = await loadProductionNotifications();
+  if (notifications) {
+    configureNotificationHandler(notifications);
+  }
+  return notifications;
 }
 
 // Detect Expo Go (SDK 53+ removed remote push)
@@ -130,42 +152,74 @@ export async function getPushTokenSafely(retries = 3): Promise<string | null> {
     if (isExpoGo) {
       return null;
     }
+
     const Notifications = await loadNotifications();
     if (!Notifications) {
       return null;
     }
-    const settings = await Notifications.getPermissionsAsync();
-    let status = settings.status;
-    if (status !== 'granted') {
-      const req = await Notifications.requestPermissionsAsync();
-      status = req.status;
-    }
-    if (status !== 'granted') {
+
+    const hasPermission = await ensureNotificationPermissions(Notifications);
+    if (!hasPermission) {
       return null;
     }
-    let lastErr: unknown;
-    for (let attempt = 0; attempt < retries; attempt++) {
-      try {
-        if (!Notifications) {
-          throw new Error('Notifications not available');
-        }
-        const token = await Notifications.getExpoPushTokenAsync();
-        return token.data ?? null;
-      } catch (e) {
-        lastErr = e;
-        await new Promise((r) => setTimeout(r, (attempt + 1) * 400));
-      }
-    }
-    if (process.env.NODE_ENV !== 'production') {
-      const msg =
-        typeof lastErr === 'object' && lastErr && 'message' in lastErr
-          ? String((lastErr as { message?: unknown }).message)
-          : 'unknown error';
-      warnInDev('[notifications] push token acquisition failed after retries', msg);
-    }
-    return null;
+
+    return await retryGetPushToken(Notifications, retries);
   } catch {
     return null;
+  }
+}
+
+/**
+ * Ensure notification permissions are granted
+ */
+async function ensureNotificationPermissions(Notifications: ExpoNotifications): Promise<boolean> {
+  const settings = await Notifications.getPermissionsAsync();
+  let status = settings.status;
+
+  if (status !== 'granted') {
+    const req = await Notifications.requestPermissionsAsync();
+    status = req.status;
+  }
+
+  return status === 'granted';
+}
+
+/**
+ * Retry getting push token with exponential backoff
+ */
+async function retryGetPushToken(
+  Notifications: ExpoNotifications,
+  retries: number,
+): Promise<string | null> {
+  let lastErr: unknown;
+
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      if (!Notifications) {
+        throw new Error('Notifications not available');
+      }
+      const token = await Notifications.getExpoPushTokenAsync();
+      return token.data ?? null;
+    } catch (e) {
+      lastErr = e;
+      await new Promise((r) => setTimeout(r, (attempt + 1) * 400));
+    }
+  }
+
+  logPushTokenError(lastErr);
+  return null;
+}
+
+/**
+ * Log push token acquisition error in development
+ */
+function logPushTokenError(lastErr: unknown): void {
+  if (process.env.NODE_ENV !== 'production') {
+    const msg =
+      typeof lastErr === 'object' && lastErr && 'message' in lastErr
+        ? String((lastErr as { message?: unknown }).message)
+        : 'unknown error';
+    warnInDev('[notifications] push token acquisition failed after retries', msg);
   }
 }
 
@@ -303,11 +357,11 @@ class NotificationService {
           if (!Notifications) {
             throw new Error('Notifications not available');
           }
-          const maybePriority = (
-            Notifications as Partial<typeof Notifications> & {
-              AndroidNotificationPriority?: { HIGH?: number };
-            }
-          ).AndroidNotificationPriority?.HIGH;
+          const maybePriority =
+            'AndroidNotificationPriority' in Notifications
+              ? (Notifications as { AndroidNotificationPriority?: { HIGH?: unknown } })
+                  .AndroidNotificationPriority?.HIGH
+              : undefined;
           const scheduleReq: ScheduleRequest = {
             content: {
               title: 'Your AYNA Mirror is ready ✨',
@@ -319,13 +373,11 @@ class NotificationService {
                 url: 'aynamoda://ayna-mirror',
               },
               sound: 'default',
-              priority: typeof maybePriority === 'number' ? maybePriority : undefined,
+              priority: typeof maybePriority === 'number' ? String(maybePriority) : undefined,
             },
-            trigger: { date: nextNotificationTime },
+            trigger: { type: 'date' as const, date: nextNotificationTime },
           };
-          const notificationId = await Notifications.scheduleNotificationAsync(
-            scheduleReq as import('expo-notifications').NotificationRequestInput,
-          );
+          const notificationId = await Notifications.scheduleNotificationAsync(scheduleReq);
 
           // Store notification info for tracking
           await this.storeScheduledNotification({
@@ -398,11 +450,9 @@ class NotificationService {
           sound: 'default',
         },
         // schedule API supports date triggers and null for immediate
-        trigger: { date: promptTime },
+        trigger: { type: 'date' as const, date: promptTime },
       };
-      const notificationId = await Notifications.scheduleNotificationAsync(
-        req as import('expo-notifications').NotificationRequestInput,
-      );
+      const notificationId = await Notifications.scheduleNotificationAsync(req);
 
       await this.storeScheduledNotification({
         id: notificationId,
@@ -453,9 +503,7 @@ class NotificationService {
         },
         trigger: null, // Send immediately
       };
-      await Notifications.scheduleNotificationAsync(
-        req as import('expo-notifications').NotificationRequestInput,
-      );
+      await Notifications.scheduleNotificationAsync(req);
 
       // Re-engagement message sent
     } catch (error) {

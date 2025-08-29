@@ -3,6 +3,7 @@
 
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
+import type { ViewStyle } from 'react-native';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -14,19 +15,54 @@ import Animated, {
 
 import { DesignSystem } from '@/theme/DesignSystem';
 
-const { width, height } = Dimensions.get('window');
-
 interface AtmosphericBackgroundProps {
-  variant?: 'emerald' | 'sapphire' | 'ruby' | 'gold';
+  variant?: 'emerald' | 'sapphire' | 'ruby' | 'gold' | 'default';
   intensity?: 'subtle' | 'medium' | 'dramatic';
   children?: React.ReactNode;
 }
+
+const getGradientColors = (variant: AtmosphericBackgroundProps['variant']) => {
+  switch (variant) {
+    case 'emerald':
+      return {
+        primary: DesignSystem.colors.neutral[800],
+        secondary: DesignSystem.colors.neutral[600],
+        glow: DesignSystem.colors.neutral[400],
+      };
+    case 'sapphire':
+      return {
+        primary: DesignSystem.colors.neutral[900],
+        secondary: DesignSystem.colors.neutral[700],
+        glow: DesignSystem.colors.neutral[500],
+      };
+    case 'ruby':
+      return {
+        primary: DesignSystem.colors.primaryIndexed[800],
+        secondary: DesignSystem.colors.primaryIndexed[600],
+        glow: DesignSystem.colors.primaryIndexed[400],
+      };
+    case 'gold':
+      return {
+        primary: DesignSystem.colors.gold[700],
+        secondary: DesignSystem.colors.gold[500],
+        glow: DesignSystem.colors.gold[300],
+      };
+    default:
+      return {
+        primary: DesignSystem.colors.neutral[800],
+        secondary: DesignSystem.colors.neutral[600],
+        glow: DesignSystem.colors.neutral[400],
+      };
+  }
+};
 
 const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
   variant = 'emerald',
   intensity = 'subtle',
   children,
 }) => {
+  const { width, height } = Dimensions.get('window');
+
   // Animation values for the moving gradients
   const gradientPosition1 = useSharedValue(0);
   const gradientPosition2 = useSharedValue(0.3);
@@ -35,43 +71,39 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
   const opacity2 = useSharedValue(0.08);
   const opacity3 = useSharedValue(0.06);
 
-  // Get colors based on variant
-  const getGradientColors = () => {
-    switch (variant) {
-      case 'emerald':
-        return {
-          primary: DesignSystem.colors.sage[800],
-          secondary: DesignSystem.colors.sage[600],
-          glow: DesignSystem.colors.sage[400],
-        };
-      case 'sapphire':
-        return {
-          primary: DesignSystem.colors.sage[900],
-          secondary: DesignSystem.colors.sage[700],
-          glow: DesignSystem.colors.sage[500],
-        };
-      case 'ruby':
-        return {
-          primary: DesignSystem.colors.sage[800],
-          secondary: DesignSystem.colors.sage[600],
-          glow: DesignSystem.colors.sage[400],
-        };
-      case 'gold':
-        return {
-          primary: DesignSystem.colors.sage[700],
-          secondary: DesignSystem.colors.sage[500],
-          glow: DesignSystem.colors.sage[300],
-        };
-      default:
-        return {
-          primary: DesignSystem.colors.sage[800],
-          secondary: DesignSystem.colors.sage[600],
-          glow: DesignSystem.colors.sage[400],
-        };
-    }
-  };
+  // Animated styles for each gradient layer
+  const gradient1Style = useAnimatedStyle((): ViewStyle => {
+    return {
+      transform: [
+        { translateX: gradientPosition1.value * width },
+        { translateY: gradientPosition1.value * height * 0.3 },
+      ],
+      opacity: opacity1.value,
+    };
+  });
 
-  const colors = getGradientColors();
+  const gradient2Style = useAnimatedStyle((): ViewStyle => {
+    return {
+      transform: [
+        { translateX: gradientPosition2.value * width * 0.7 },
+        { translateY: gradientPosition2.value * height * 0.5 },
+      ],
+      opacity: opacity2.value,
+    };
+  });
+
+  const gradient3Style = useAnimatedStyle((): ViewStyle => {
+    return {
+      transform: [
+        { translateX: gradientPosition3.value * width * 0.5 },
+        { translateY: gradientPosition3.value * height * 0.7 },
+      ],
+      opacity: opacity3.value,
+    };
+  });
+
+  // Get colors based on variant
+  const colors = getGradientColors(variant);
 
   // Get intensity multipliers
   const getIntensityValues = () => {
@@ -189,35 +221,34 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
     opacity3,
   ]);
 
-  // Animated styles for each gradient layer
-  const gradient1Style = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: gradientPosition1.value * width },
-        { translateY: gradientPosition1.value * height * 0.3 },
-      ],
-      opacity: opacity1.value,
-    };
-  });
-
-  const gradient2Style = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: gradientPosition2.value * width * 0.7 },
-        { translateY: gradientPosition2.value * height * 0.5 },
-      ],
-      opacity: opacity2.value,
-    };
-  });
-
-  const gradient3Style = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: gradientPosition3.value * width * 0.5 },
-        { translateY: gradientPosition3.value * height * 0.7 },
-      ],
-      opacity: opacity3.value,
-    };
+  const styles = StyleSheet.create({
+    baseCanvas: {
+      backgroundColor: DesignSystem.colors.background.primary,
+      bottom: 0,
+      left: 0,
+      position: 'absolute',
+      right: 0,
+      top: 0,
+    },
+    container: {
+      flex: 1,
+      position: 'relative',
+    },
+    contentLayer: {
+      flex: 1,
+      zIndex: 10,
+    },
+    gradient: {
+      borderRadius: width,
+      flex: 1,
+    },
+    gradientLayer: {
+      height: height * 2,
+      left: -width * 0.5,
+      position: 'absolute',
+      top: -height * 0.5,
+      width: width * 2,
+    },
   });
 
   return (
@@ -258,35 +289,5 @@ const AtmosphericBackground: React.FC<AtmosphericBackgroundProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  baseCanvas: {
-    backgroundColor: DesignSystem.colors.background.primary,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-  },
-  container: {
-    flex: 1,
-    position: 'relative',
-  },
-  contentLayer: {
-    flex: 1,
-    zIndex: 10,
-  },
-  gradient: {
-    borderRadius: width,
-    flex: 1,
-  },
-  gradientLayer: {
-    height: height * 2,
-    left: -width * 0.5,
-    position: 'absolute',
-    top: -height * 0.5,
-    width: width * 2,
-  },
-});
 
 export default AtmosphericBackground;

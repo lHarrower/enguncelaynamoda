@@ -3,6 +3,7 @@
 
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
+import type { ViewStyle } from 'react-native';
 import { StyleSheet, Text } from 'react-native';
 import Animated, {
   interpolate,
@@ -185,7 +186,7 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
   }, [animation, delay, blur, breathe, opacity, scale, shimmer, translateY]);
 
   // Animated styles
-  const animatedStyle = useAnimatedStyle(() => {
+  const animatedStyle = useAnimatedStyle((): ViewStyle => {
     return {
       opacity: opacity.value,
       transform: [
@@ -196,7 +197,7 @@ const KineticTypography: React.FC<KineticTypographyProps> = ({
     };
   });
 
-  const shimmerStyle = useAnimatedStyle(() => {
+  const shimmerStyle = useAnimatedStyle((): ViewStyle => {
     return {
       opacity: interpolate(shimmer.value, [0, 1], [0, 0.8]),
     };

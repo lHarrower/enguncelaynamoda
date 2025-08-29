@@ -74,7 +74,9 @@ describe('AynaMirrorService', () => {
   const mockIntelligenceService = intelligenceService as jest.Mocked<typeof intelligenceService>;
   const mockWeatherService = weatherService as jest.Mocked<typeof weatherService>;
   const mockErrorHandlingService = errorHandlingService as jest.Mocked<typeof errorHandlingService>;
-  const mockEnhancedWardrobeService = enhancedWardrobeService as jest.Mocked<typeof enhancedWardrobeService>;
+  const mockEnhancedWardrobeService = enhancedWardrobeService as jest.Mocked<
+    typeof enhancedWardrobeService
+  >;
 
   const mockUserId = 'user123';
   const mockStyleProfile: StyleProfile = {
@@ -87,7 +89,7 @@ describe('AynaMirrorService', () => {
       casual: 0.9,
     },
     confidencePatterns: [],
-    lastUpdated: new Date()
+    lastUpdated: new Date(),
   };
 
   const mockWeatherContext: WeatherContext = {
@@ -109,7 +111,14 @@ describe('AynaMirrorService', () => {
       brand: 'Nike',
       imageUri: 'https://example.com/shirt.jpg',
       tags: ['casual'],
-      usageStats: { itemId: 'item1', totalWears: 0, lastWorn: null, averageRating: 0, complimentsReceived: 0, costPerWear: 0 },
+      usageStats: {
+        itemId: 'item1',
+        totalWears: 0,
+        lastWorn: null,
+        averageRating: 0,
+        complimentsReceived: 0,
+        costPerWear: 0,
+      },
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -122,7 +131,14 @@ describe('AynaMirrorService', () => {
       brand: 'Zara',
       imageUri: 'https://example.com/pants.jpg',
       tags: ['business'],
-      usageStats: { itemId: 'item2', totalWears: 0, lastWorn: null, averageRating: 0, complimentsReceived: 0, costPerWear: 0 },
+      usageStats: {
+        itemId: 'item2',
+        totalWears: 0,
+        lastWorn: null,
+        averageRating: 0,
+        complimentsReceived: 0,
+        costPerWear: 0,
+      },
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -150,56 +166,62 @@ describe('AynaMirrorService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup default mocks
     mockIntelligenceService.analyzeUserStyleProfile.mockResolvedValue(mockStyleProfile);
     mockWeatherService.getCurrentWeather.mockResolvedValue(mockWeatherContext);
     mockEnhancedWardrobeService.getUserWardrobe.mockResolvedValue(mockWardrobeItems);
-    (mockIntelligenceService.generateOutfitCombinations as jest.Mock).mockResolvedValue(mockOutfitRecommendations);
+    (mockIntelligenceService.generateOutfitCombinations as jest.Mock).mockResolvedValue(
+      mockOutfitRecommendations,
+    );
     mockErrorHandlingService.executeWithRetry.mockImplementation(async (fn) => await fn());
-    
+
     // Mock private methods that are called internally
-    jest.spyOn(AynaMirrorService as any, 'createOutfitRecommendationsWithFallback').mockImplementation(() => Promise.resolve(mockOutfitRecommendations));
-    jest.spyOn(AynaMirrorService as any, 'buildRecommendationContextWithFallback').mockResolvedValue({
-      weather: mockWeatherContext,
-      calendar: null,
-      preferences: mockStyleProfile
-    });
-    
+    jest
+      .spyOn(AynaMirrorService as any, 'createOutfitRecommendationsWithFallback')
+      .mockImplementation(() => Promise.resolve(mockOutfitRecommendations));
+    jest
+      .spyOn(AynaMirrorService as any, 'buildRecommendationContextWithFallback')
+      .mockResolvedValue({
+        weather: mockWeatherContext,
+        calendar: null,
+        preferences: mockStyleProfile,
+      });
+
     // Setup supabase mocks
     mockSelect = jest.fn();
     mockInsert = jest.fn();
     mockUpdate = jest.fn();
     mockEq = jest.fn();
     mockSingle = jest.fn();
-    
+
     mockSupabaseFrom.mockReturnValue({
       select: mockSelect,
       insert: mockInsert,
       update: mockUpdate,
     });
-    
+
     mockSelect.mockReturnValue({
       eq: mockEq,
       single: mockSingle,
     });
-    
+
     mockInsert.mockReturnValue({
       select: mockSelect,
       single: mockSingle,
     });
-    
+
     mockUpdate.mockReturnValue({
       eq: mockEq,
       select: mockSelect,
       single: mockSingle,
     });
-    
+
     mockEq.mockReturnValue({
       single: mockSingle,
       select: mockSelect,
     });
-    
+
     mockSingle.mockResolvedValue({
       data: null,
       error: null,
@@ -213,12 +235,14 @@ describe('AynaMirrorService', () => {
       expect(result).toBeDefined();
       expect(result.userId).toBe(mockUserId);
       expect(result.recommendations.length).toBeGreaterThanOrEqual(1);
-      expect(result.recommendations[0]).toEqual(expect.objectContaining({
-        id: expect.any(String),
-        confidenceScore: expect.any(Number)
-      }));
+      expect(result.recommendations[0]).toEqual(
+        expect.objectContaining({
+          id: expect.any(String),
+          confidenceScore: expect.any(Number),
+        }),
+      );
       expect(result.generatedAt).toBeInstanceOf(Date);
-      
+
       // In test environment, service calls may be optimized or use fallbacks
       // We verify the core functionality works without checking specific service calls
     });
@@ -245,7 +269,7 @@ describe('AynaMirrorService', () => {
 
     it('should handle AI service errors with fallback', async () => {
       (mockIntelligenceService.generateOutfitCombinations as jest.Mock).mockRejectedValueOnce(
-        new Error('AI service error')
+        new Error('AI service error'),
       );
       mockErrorHandlingService.handleAIServiceError.mockResolvedValueOnce([]);
 
@@ -260,33 +284,33 @@ describe('AynaMirrorService', () => {
   describe('service integration', () => {
     it('should integrate with weather service correctly', async () => {
       const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
-      
+
       // In test environment, weather service calls may use fallback mechanisms
       // so we verify the result is generated successfully
       expect(result).toBeDefined();
     });
 
     it('should integrate with wardrobe service correctly', async () => {
-       const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
-       
-       // In test environment, service calls may be optimized or use fallbacks
-       // We verify the core functionality works
-       expect(result).toBeDefined();
-       expect(result.recommendations).toBeDefined();
-       expect(Array.isArray(result.recommendations)).toBe(true);
-     });
+      const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
+
+      // In test environment, service calls may be optimized or use fallbacks
+      // We verify the core functionality works
+      expect(result).toBeDefined();
+      expect(result.recommendations).toBeDefined();
+      expect(Array.isArray(result.recommendations)).toBe(true);
+    });
   });
 
   describe('error handling', () => {
     it('should handle service errors gracefully', async () => {
-       mockWeatherService.getCurrentWeather.mockRejectedValueOnce(new Error('Service error'));
-       mockErrorHandlingService.handleWeatherServiceError.mockResolvedValueOnce(undefined as any);
+      mockWeatherService.getCurrentWeather.mockRejectedValueOnce(new Error('Service error'));
+      mockErrorHandlingService.handleWeatherServiceError.mockResolvedValueOnce(undefined as any);
 
-       const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
+      const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
 
-       expect(result).toBeDefined();
-       // Note: Error handling is internal, so we just verify the service completes
-     });
+      expect(result).toBeDefined();
+      // Note: Error handling is internal, so we just verify the service completes
+    });
 
     it('should handle invalid user ID', async () => {
       const result = await AynaMirrorService.generateDailyRecommendations('');
@@ -306,36 +330,36 @@ describe('AynaMirrorService', () => {
     });
 
     it('should handle empty wardrobe data', async () => {
-       mockEnhancedWardrobeService.getUserWardrobe.mockResolvedValueOnce([]);
+      mockEnhancedWardrobeService.getUserWardrobe.mockResolvedValueOnce([]);
 
-       const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
+      const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
 
-       expect(result).toBeDefined();
-       expect(Array.isArray(result.recommendations)).toBe(true);
-     });
+      expect(result).toBeDefined();
+      expect(Array.isArray(result.recommendations)).toBe(true);
+    });
   });
 
   describe('performance analysis', () => {
     it('should complete recommendation generation within reasonable time', async () => {
       const startTime = Date.now();
-      
+
       const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
-      
+
       const endTime = Date.now();
       const duration = endTime - startTime;
-      
+
       expect(result).toBeDefined();
       expect(duration).toBeLessThan(5000); // Should complete within 5 seconds
     });
 
     it('should handle concurrent requests', async () => {
-      const promises = Array(3).fill(null).map(() => 
-        AynaMirrorService.generateDailyRecommendations(mockUserId)
-      );
-      
+      const promises = Array(3)
+        .fill(null)
+        .map(() => AynaMirrorService.generateDailyRecommendations(mockUserId));
+
       const results = await Promise.all(promises);
-      
-      results.forEach(result => {
+
+      results.forEach((result) => {
         expect(result).toBeDefined();
         expect(result.userId).toBe(mockUserId);
       });
@@ -346,10 +370,10 @@ describe('AynaMirrorService', () => {
     it('should handle cache operations correctly', async () => {
       // First call should generate new recommendations
       const result1 = await AynaMirrorService.generateDailyRecommendations(mockUserId);
-      
+
       // Second call should potentially use cache
       const result2 = await AynaMirrorService.generateDailyRecommendations(mockUserId);
-      
+
       expect(result1).toBeDefined();
       expect(result2).toBeDefined();
       expect(result1.userId).toBe(result2.userId);
@@ -357,7 +381,7 @@ describe('AynaMirrorService', () => {
 
     it('should handle cache invalidation', async () => {
       const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
-      
+
       expect(result).toBeDefined();
       expect(result.generatedAt).toBeInstanceOf(Date);
     });

@@ -10,7 +10,9 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/lib/supa';
+import { errorInDev } from '@/utils/consoleSuppress';
+('../config/supabaseClient');
 
 export interface KVKKConsent {
   id: string;
@@ -135,8 +137,6 @@ class KVKKConsentService {
     this.consents.set(consentId, consent);
     await this.saveConsents();
     await this.syncToDatabase(consent);
-
-    console.log(`KVKK: Rıza verildi - ${consentType} (${purpose})`);
   }
 
   /**
@@ -155,8 +155,6 @@ class KVKKConsentService {
 
     await this.saveConsents();
     await this.syncWithdrawalToDatabase(userId, consentType);
-
-    console.log(`KVKK: Rıza geri çekildi - ${consentType}`);
   }
 
   /**
@@ -198,9 +196,36 @@ class KVKKConsentService {
   }
 
   /**
+   * KVKK ayarlarını getir
+   */
+  async getKVKKSettings(userId: string): Promise<KVKKSettings> {
+    return { ...this.settings };
+  }
+
+  /**
+   * KVKK ayarlarını güncelle
+   */
+  async updateKVKKSettings(userId: string, newSettings: Partial<KVKKSettings>): Promise<void> {
+    this.settings = { ...this.settings, ...newSettings };
+  }
+
+  /**
    * Kullanıcı verilerini dışa aktar (KVKK hakkı)
    */
-  async exportUserData(userId: string): Promise<any> {
+  async exportUserData(userId: string): Promise<{
+    userData: unknown;
+    consents: KVKKConsent[];
+    exportDate: string;
+    version: string;
+    rights: {
+      access: string;
+      rectification: string;
+      erasure: string;
+      restriction: string;
+      portability: string;
+      objection: string;
+    };
+  }> {
     try {
       const { data: userData, error } = await supabase
         .from('user_data_export')
@@ -227,7 +252,7 @@ class KVKKConsentService {
         },
       };
     } catch (error) {
-      console.error('KVKK: Veri dışa aktarma hatası:', error);
+      errorInDev('KVKK: Veri dışa aktarma hatası:', error);
       throw error;
     }
   }
@@ -251,10 +276,8 @@ class KVKKConsentService {
 
       userConsentIds.forEach((id) => this.consents.delete(id));
       await this.saveConsents();
-
-      console.log(`KVKK: Kullanıcı verileri silindi - ${userId}`);
     } catch (error) {
-      console.error('KVKK: Veri silme hatası:', error);
+      errorInDev('KVKK: Veri silme hatası:', error);
       throw error;
     }
   }
@@ -284,7 +307,7 @@ class KVKKConsentService {
 
       if (error) throw error;
     } catch (error) {
-      console.error('KVKK: Veri işleme loglama hatası:', error);
+      errorInDev('KVKK: Veri işleme loglama hatası:', error);
     }
   }
 
@@ -306,7 +329,7 @@ class KVKKConsentService {
 
     if (cleanupCount > 0) {
       await this.saveConsents();
-      console.log(`KVKK: ${cleanupCount} süresi dolan rıza temizlendi`);
+      // Cleanup completed silently
     }
   }
 
@@ -366,7 +389,7 @@ class KVKKConsentService {
       };
       await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
     } catch (error) {
-      console.error('KVKK: Yerel kaydetme hatası:', error);
+      errorInDev('KVKK: Yerel kaydetme hatası:', error);
     }
   }
 
@@ -382,7 +405,7 @@ class KVKKConsentService {
         this.settings = { ...this.settings, ...parsed.settings };
       }
     } catch (error) {
-      console.error('KVKK: Yerel yükleme hatası:', error);
+      errorInDev('KVKK: Yerel yükleme hatası:', error);
     }
   }
 
@@ -406,7 +429,7 @@ class KVKKConsentService {
 
       if (error) throw error;
     } catch (error) {
-      console.error('KVKK: Veritabanı senkronizasyon hatası:', error);
+      errorInDev('KVKK: Veritabanı senkronizasyon hatası:', error);
     }
   }
 
@@ -427,7 +450,7 @@ class KVKKConsentService {
 
       if (error) throw error;
     } catch (error) {
-      console.error('KVKK: Rıza geri çekme senkronizasyon hatası:', error);
+      errorInDev('KVKK: Rıza geri çekme senkronizasyon hatası:', error);
     }
   }
 }

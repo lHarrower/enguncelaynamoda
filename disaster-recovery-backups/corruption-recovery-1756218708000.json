@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-08-26T14:31:48.000Z",
+  "scenarios": [
+    {
+      "type": "missing_foreign_keys",
+      "description": "Orphaned outfit_recommendations without daily_recommendation_id",
+      "recovery": "Clean up orphaned records or restore from backup"
+    },
+    {
+      "type": "invalid_data_types",
+      "description": "Invalid JSON in user preferences or weather context",
+      "recovery": "Validate and fix JSON data or restore from backup"
+    },
+    {
+      "type": "constraint_violations",
+      "description": "Confidence scores outside valid range (0-5)",
+      "recovery": "Update invalid values to default or restore from backup"
+    },
+    {
+      "type": "missing_required_fields",
+      "description": "NULL values in NOT NULL columns",
+      "recovery": "Populate with default values or restore from backup"
+    }
+  ],
+  "generalSteps": [
+    "1. Identify corruption scope",
+    "2. Stop application traffic",
+    "3. Create emergency backup",
+    "4. Assess data integrity",
+    "5. Choose recovery method",
+    "6. Execute recovery",
+    "7. Validate data consistency",
+    "8. Resume application traffic"
+  ],
+  "tools": ["pg_dump for backup", "SQL queries for validation", "Custom scripts for data cleaning"]
+}

@@ -14,22 +14,22 @@ module.exports = {
     '!**/__tests__/**',
     '!**/__mocks__/**',
     '!**/node_modules/**',
-    '!**/coverage/**'
+    '!**/coverage/**',
   ],
   testRunner: 'jest',
   jest: {
     projectType: 'custom',
     configFile: 'jest.config.js',
-    enableFindRelatedTests: false
+    enableFindRelatedTests: false,
   },
   reporters: ['clear-text', 'progress', 'json'],
   jsonReporter: {
-    fileName: 'reports/mutation/mutation-report.json'
+    fileName: 'reports/mutation/mutation-report.json',
   },
   coverageAnalysis: 'off',
   timeoutMS: 120000,
   maxConcurrentTestRunners: 2,
   checkers: ['typescript'],
   tsconfigFile: 'tsconfig.json',
-  tempDirName: 'stryker-tmp'
+  tempDirName: 'stryker-tmp',
 };

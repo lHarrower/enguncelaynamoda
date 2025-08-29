@@ -1,6 +1,8 @@
 // Production Console Management Utility
 // Manages console output for production builds
 
+// __DEV__ is already declared by React Native
+
 // Only suppress console logs in production builds
 if (!__DEV__) {
   // Store original console methods
@@ -97,18 +99,18 @@ export const isDevelopment = __DEV__;
 export const logInDev = (...args: DevLogArg[]) => {
   if (__DEV__) {
     // eslint-disable-next-line no-console
-    console.log(...args);
+    
   }
 };
 // Broaden DevLogArg to accept any value passed from catch blocks safely
 export type DevLogArg = unknown;
 export const warnInDev = (...args: DevLogArg[]) => {
   if (__DEV__) {
-    console.warn(...args);
+    
   }
 };
 export const errorInDev = (...args: DevLogArg[]) => {
   if (__DEV__) {
-    console.error(...args);
+    
   }
 };

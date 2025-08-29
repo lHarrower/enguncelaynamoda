@@ -17,8 +17,8 @@ import {
   ShopYourClosetRecommendation,
 } from '@/services/antiConsumptionService';
 import { WardrobeItem } from '@/services/wardrobeService';
-
-import { errorInDev, logInDev } from '../../utils/consoleSuppress';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
 
 interface ShopYourClosetFirstProps {
   userId: string;
@@ -39,7 +39,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
 }) => {
   const theme = useSafeTheme();
   const { colors: themeColors } = theme;
-  const styles = createStyles(themeColors);
+  const styles = createStyles(DesignSystem.colors);
   const [recommendation, setRecommendation] = useState<ShopYourClosetRecommendation | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -148,8 +148,8 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
           />
           <Text style={styles.noItemsTitle}>No Similar Items Found</Text>
           <Text style={styles.noItemsText}>
-            You don&apos;t have similar items in your closet yet. This might be a good addition to your
-            wardrobe!
+            You don&apos;t have similar items in your closet yet. This might be a good addition to
+            your wardrobe!
           </Text>
         </View>
       </View>
@@ -223,9 +223,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
                         styles.colorDot,
                         {
                           backgroundColor:
-                            typeof color === 'string'
-                              ? color.toLowerCase()
-                              : themeColors.border,
+                            typeof color === 'string' ? color.toLowerCase() : themeColors.border,
                         },
                       ]}
                     />
@@ -266,14 +264,7 @@ export const ShopYourClosetFirst: React.FC<ShopYourClosetFirstProps> = ({
   );
 };
 
-const createStyles = (colors: {
-  background: { primary: string; secondary: string };
-  text: { primary: string; secondary: string };
-  semantic: { error: string; success: string };
-  primary: { [key: number]: string };
-  border: { primary: string };
-  neutral: { [key: number]: string };
-}) =>
+const createStyles = (colors: typeof DesignSystem.colors) =>
   StyleSheet.create({
     actionContainer: {
       padding: 20,

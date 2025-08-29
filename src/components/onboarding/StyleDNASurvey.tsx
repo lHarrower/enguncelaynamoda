@@ -3,7 +3,18 @@ const { useState, useRef } = React;
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Dimensions,
+  ImageSourcePropType,
+  ImageStyle,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -11,10 +22,9 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { DesignSystem } from '@/theme/DesignSystem';
 import { IoniconsName } from '@/types/icons';
 import { warnInDev } from '@/utils/consoleSuppress';
-
-import { DesignSystem } from '../../theme/DesignSystem';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -26,7 +36,7 @@ interface StyleDNAQuestion {
     text: string;
     value: string;
     color?: string;
-    image?: any;
+    image?: ImageSourcePropType;
   }>;
 }
 
@@ -261,7 +271,7 @@ const StyleDNASurvey: React.FC<StyleDNASurveyProps> = ({ onComplete, onSkip }) =
   );
 };
 
-const createStyles = (styleObj: Record<string, any>) => {
+const createStyles = (styleObj: Record<string, ViewStyle | TextStyle | ImageStyle>) => {
   try {
     return StyleSheet.create(styleObj);
   } catch (error) {

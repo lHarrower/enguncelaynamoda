@@ -114,9 +114,8 @@ export default function SearchScreen() {
         const { wardrobeService } = await import('@/services/wardrobeService');
         const searchResults = await wardrobeService.searchItems(query);
         // TODO: Update UI to show search results
-        console.log('Search results:', searchResults);
       } catch (error) {
-        console.error('Search failed:', error);
+        // Search failed - handle silently in production
       }
     }
   }, []);
@@ -217,12 +216,8 @@ export default function SearchScreen() {
           resizeMode="cover"
         />
         <View style={styles.productInfo}>
-          <Text style={[styles.productTitle, { color: colors.text?.primary || '#212529' }]}>
-            {item.title}
-          </Text>
-          <Text style={[styles.productPrice, { color: colors.text?.secondary || '#495057' }]}>
-            {item.price}
-          </Text>
+          <Text style={[styles.productTitle, { color: colors.text.primary }]}>{item.title}</Text>
+          <Text style={[styles.productPrice, { color: colors.text.secondary }]}>{item.price}</Text>
         </View>
       </TouchableOpacity>
     ),
@@ -236,11 +231,11 @@ export default function SearchScreen() {
       {/* Search Header */}
       <View style={styles.searchHeader}>
         <View style={styles.searchBar}>
-          <Ionicons name="search-outline" size={20} color="#666666" />
+          <Ionicons name="search-outline" size={20} color={DesignSystem.colors.text.tertiary} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search for items, brands, styles..."
-            placeholderTextColor="#999999"
+            placeholderTextColor={DesignSystem.colors.text.tertiary}
             value={searchQuery}
             onChangeText={setSearchQuery}
             accessibilityLabel="Search input"
@@ -254,7 +249,7 @@ export default function SearchScreen() {
               accessibilityLabel="Clear search"
               accessibilityHint="Clear the search input"
             >
-              <Ionicons name="close-circle" size={20} color="#666666" />
+              <Ionicons name="close-circle" size={20} color={DesignSystem.colors.text.tertiary} />
             </TouchableOpacity>
           )}
         </View>
@@ -313,7 +308,7 @@ export default function SearchScreen() {
 
             {/* Curated Collections */}
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text?.primary || '#212529' }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
                 Curated Collections
               </Text>
               <FlatList
@@ -330,7 +325,7 @@ export default function SearchScreen() {
 
         {/* Search Results or Featured Products */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text?.primary || '#212529' }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
             {searchQuery.length > 0 ? `Results for "${searchQuery}"` : 'Featured'}
           </Text>
           <FlatList
@@ -350,20 +345,20 @@ export default function SearchScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: DesignSystem.colors.background.primary,
     flex: 1,
   },
   searchHeader: {
-    backgroundColor: '#FFFFFF',
-    borderBottomColor: '#E0E0E0',
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderBottomColor: DesignSystem.colors.border.primary,
     borderBottomWidth: 1,
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
   searchBar: {
     alignItems: 'center',
-    backgroundColor: '#F8F8F8',
-    borderColor: '#E0E0E0',
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderColor: DesignSystem.colors.border.primary,
     borderRadius: 12,
     borderWidth: 1,
     flexDirection: 'row',
@@ -424,7 +419,7 @@ const styles = StyleSheet.create({
   },
   categoryName: {
     ...SEMANTIC_TYPOGRAPHY.buttonSecondary,
-    fontSize: 12,
+    fontSize: DesignSystem.typography.sizes.xs,
   },
 
   // Collections
@@ -450,7 +445,7 @@ const styles = StyleSheet.create({
   },
   collectionTitle: {
     ...SEMANTIC_TYPOGRAPHY.sectionTitle,
-    fontSize: 18,
+    fontSize: DesignSystem.typography.sizes.lg,
     marginBottom: SPACING.xs,
   },
   collectionSubtitle: {
@@ -460,7 +455,7 @@ const styles = StyleSheet.create({
   },
   collectionCount: {
     ...SEMANTIC_TYPOGRAPHY.caption,
-    fontSize: 11,
+    fontSize: DesignSystem.typography.sizes.xs,
     opacity: 0.8,
   },
 

@@ -1,8 +1,8 @@
 // Unit tests for WardrobeService
-import { WardrobeService } from '../../services/wardrobeService';
-import type { WardrobeItem } from '../../services/wardrobeService';
-import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
-import { createMockWardrobeItem, mockApiResponses } from '../utils/testUtils';
+import { WardrobeService } from '@/services/wardrobeService';
+import type { WardrobeItem } from '@/services/wardrobeService';
+import { WardrobeCategory, WardrobeColor } from '@/types/wardrobe';
+import { createMockWardrobeItem, mockApiResponses } from '@/__tests__/utils/testUtils';
 
 // Mock dependencies
 jest.mock('@react-native-async-storage/async-storage');
@@ -30,13 +30,13 @@ const mockQueryBuilder = {
   single: jest.fn(),
   maybeSingle: jest.fn(),
   mockResolvedValueOnce: jest.fn(),
-  mockRejectedValueOnce: jest.fn()
+  mockRejectedValueOnce: jest.fn(),
 };
 
 jest.mock('../../lib/supa', () => ({
   supabase: {
-    from: jest.fn(() => mockQueryBuilder)
-  }
+    from: jest.fn(() => mockQueryBuilder),
+  },
 }));
 
 const mockSupabase = require('../../lib/supa').supabase;
@@ -74,8 +74,10 @@ describe('Gardırop Servisi', () => {
 
     it('çevrimdışıyken önbelleğe alınmış öğeleri döndürmeli', async () => {
       const cachedItems = [mockItem];
-      (jest.requireMock('@react-native-async-storage/async-storage').getItem as unknown as jest.Mock)
-        .mockResolvedValueOnce(JSON.stringify(cachedItems));
+      (
+        jest.requireMock('@react-native-async-storage/async-storage')
+          .getItem as unknown as jest.Mock
+      ).mockResolvedValueOnce(JSON.stringify(cachedItems));
       mockQueryBuilder.select.mockRejectedValueOnce(new Error('Network error'));
 
       const result = await wardrobeService.getAllItems();
@@ -232,10 +234,7 @@ describe('Gardırop Servisi', () => {
       const result = await wardrobeService.getItemsByCategory(WardrobeCategory.DRESSES);
 
       expect(result).toEqual(filteredResults);
-      expect(mockQueryBuilder.eq).toHaveBeenCalledWith(
-        'category',
-        WardrobeCategory.DRESSES,
-      );
+      expect(mockQueryBuilder.eq).toHaveBeenCalledWith('category', WardrobeCategory.DRESSES);
     });
 
     it('renge göre filtrelemeli', async () => {
@@ -245,12 +244,10 @@ describe('Gardırop Servisi', () => {
         error: null,
       });
 
-      const result = await wardrobeService.getItemsByColor([WardrobeColor.BLUE]);
+      const result = await wardrobeService.getItemsByColor(WardrobeColor.BLUE);
 
       expect(result).toEqual(colorResults);
-      expect(mockQueryBuilder.contains).toHaveBeenCalledWith('colors', 
-        WardrobeColor.BLUE
-      );
+      expect(mockQueryBuilder.contains).toHaveBeenCalledWith('colors', [WardrobeColor.BLUE]);
     });
 
     it('etiketlere göre filtrelemeli', async () => {
@@ -435,7 +432,7 @@ describe('Gardırop Servisi', () => {
       mockQueryBuilder.select.mockResolvedValueOnce({
         data: [{ invalid: 'data' }],
         error: null,
-        });
+      });
 
       const result = await wardrobeService.getAllItems();
       expect(result).toEqual([]);

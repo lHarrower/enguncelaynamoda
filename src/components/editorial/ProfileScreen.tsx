@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 
-import { DesignSystem } from '../../theme/DesignSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 type IoniconsName = keyof typeof Ionicons.glyphMap;
 

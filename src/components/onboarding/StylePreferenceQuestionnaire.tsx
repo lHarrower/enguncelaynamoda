@@ -1,7 +1,16 @@
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  ImageStyle,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextStyle,
+  View,
+  ViewStyle,
+} from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -425,7 +434,7 @@ export default function StylePreferenceQuestionnaire({
 }
 
 // Safe StyleSheet create for testing
-const createStyles = (styles: Record<string, any>) => {
+const createStyles = (styles: Record<string, ViewStyle | TextStyle | ImageStyle>) => {
   try {
     return StyleSheet.create(styles);
   } catch {

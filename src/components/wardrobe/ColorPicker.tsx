@@ -1,8 +1,8 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 
-import { useHapticFeedback } from '../../hooks/useHapticFeedback';
-import { BORDER_RADIUS, SPACING, TYPOGRAPHY, UNIFIED_COLORS } from '../../theme/DesignSystem';
+import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 export interface ColorPickerProps {
   colors: string[];
@@ -15,18 +15,18 @@ export interface ColorPickerProps {
 }
 
 const DEFAULT_COLORS = [
-  '#FF6B6B', // Red
-  '#4ECDC4', // Teal
-  '#45B7D1', // Blue
-  '#96CEB4', // Green
-  '#FFEAA7', // Yellow
-  '#DDA0DD', // Plum
-  '#98D8C8', // Mint
-  '#F7DC6F', // Gold
-  '#BB8FCE', // Lavender
-  '#85C1E9', // Sky Blue
-  '#F8C471', // Orange
-  '#82E0AA', // Light Green
+  DesignSystem.colors.error[500], // Red
+  DesignSystem.colors.sage[400], // Teal
+  DesignSystem.colors.sage[500], // Blue
+  DesignSystem.colors.sage[300], // Green
+  DesignSystem.colors.terracotta[200], // Yellow
+  DesignSystem.colors.primary[300], // Plum
+  DesignSystem.colors.sage[200], // Mint
+  DesignSystem.colors.terracotta[300], // Gold
+  DesignSystem.colors.primary[200], // Lavender
+  DesignSystem.colors.sage[200], // Sky Blue
+  DesignSystem.colors.terracotta[400], // Orange
+  DesignSystem.colors.sage[100], // Light Green
 ];
 
 const ColorPicker: React.FC<ColorPickerProps> = ({
@@ -97,52 +97,52 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
 const styles = StyleSheet.create({
   checkmark: {
     alignItems: 'center',
-    backgroundColor: UNIFIED_COLORS.background.primary,
-    borderRadius: BORDER_RADIUS.full,
-    height: 20,
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderRadius: DesignSystem.radius.round,
+    height: DesignSystem.spacing.lg,
     justifyContent: 'center',
-    width: 20,
+    width: DesignSystem.spacing.lg,
   },
   checkmarkText: {
-    color: UNIFIED_COLORS.charcoal[800],
-    fontSize: 12,
-    fontWeight: TYPOGRAPHY.weights.bold,
+    color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.fontSize.sm,
+    fontWeight: DesignSystem.typography.fontWeight.bold,
   },
   colorButton: {
     alignItems: 'center',
-    borderColor: UNIFIED_COLORS.background.primary,
-    borderRadius: BORDER_RADIUS.full,
+    borderColor: DesignSystem.colors.background.primary,
+    borderRadius: DesignSystem.radius.round,
     borderWidth: 2,
     elevation: 3,
-    height: 40,
+    height: DesignSystem.spacing.xl,
     justifyContent: 'center',
-    shadowColor: UNIFIED_COLORS.charcoal[900],
+    shadowColor: DesignSystem.colors.text.primary,
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    width: 40,
+    width: DesignSystem.spacing.xl,
   },
   container: {
-    paddingVertical: SPACING.sm,
+    paddingVertical: DesignSystem.spacing.sm,
   },
   scrollContent: {
-    gap: SPACING.sm,
-    paddingHorizontal: SPACING.md,
+    gap: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
   },
   selectedColorButton: {
-    borderColor: UNIFIED_COLORS.charcoal[800],
+    borderColor: DesignSystem.colors.text.primary,
     borderWidth: 3,
     transform: [{ scale: 1.1 }],
   },
   title: {
-    color: UNIFIED_COLORS.charcoal[800],
-    fontSize: TYPOGRAPHY.fontSize.md,
-    fontWeight: TYPOGRAPHY.weights.semibold,
-    marginBottom: SPACING.sm,
-    paddingHorizontal: SPACING.md,
+    color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.fontSize.md,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    marginBottom: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.md,
   },
 });
 

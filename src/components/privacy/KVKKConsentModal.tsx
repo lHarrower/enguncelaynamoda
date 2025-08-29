@@ -21,14 +21,15 @@ import {
   View,
 } from 'react-native';
 
-import { useAuth } from '../../hooks/useAuth';
-import { useSafeTheme } from '../../hooks/useSafeTheme';
+import { useAuth } from '@/hooks/useAuth';
+import { useSafeTheme } from '@/hooks/useSafeTheme';
 import {
   ConsentType,
   DataProcessingPurpose,
   kvkkConsentService,
   LegalBasis,
-} from '../../services/kvkkConsentService';
+} from '@/services/kvkkConsentService';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface KVKKConsentModalProps {
   visible: boolean;
@@ -174,7 +175,7 @@ export const KVKKConsentModal: React.FC<KVKKConsentModalProps> = ({
       onConsentGranted?.(grantedConsents);
       onClose();
     } catch (error) {
-      console.error('KVKK rıza kaydetme hatası:', error);
+      errorInDev('KVKK rıza kaydetme hatası:', error);
       Alert.alert('Hata', 'Rızalar kaydedilirken bir hata oluştu.');
     } finally {
       setLoading(false);
@@ -285,9 +286,11 @@ export const KVKKConsentModal: React.FC<KVKKConsentModalProps> = ({
     >
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
-          <Text style={[styles.title, { color: theme.colors.text }]}>KVKK Rıza Yönetimi</Text>
+          <Text style={[styles.title, { color: theme.colors.textPrimary }]}>
+            KVKK Rıza Yönetimi
+          </Text>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Ionicons name="close" size={24} color={theme.colors.text} />
+            <Ionicons name="close" size={24} color={theme.colors.textPrimary} />
           </TouchableOpacity>
         </View>
 

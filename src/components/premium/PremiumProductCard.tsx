@@ -1,7 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -34,7 +42,7 @@ interface PremiumProductCardProps {
   onPress: () => void;
   onLike?: () => void;
   variant?: 'default' | 'featured' | 'compact';
-  style?: any;
+  style?: ViewStyle;
 }
 
 const PremiumProductCard: React.FC<PremiumProductCardProps> = ({

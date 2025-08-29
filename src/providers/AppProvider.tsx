@@ -67,8 +67,8 @@ export function AppProvider({ children }: AppProviderProps) {
         // Keep the splash screen visible while we fetch resources
         await SplashScreen.preventAutoHideAsync();
 
-        // Reduced delay for better performance
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Minimal delay for better startup performance
+        await new Promise((resolve) => setTimeout(resolve, 100));
       } catch (e) {
         // Warning suppressed
       } finally {

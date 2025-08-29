@@ -111,63 +111,79 @@ export function preloadComponent(importFn: () => Promise<{ default: ComponentTyp
 export const LazyComponents = {
   // Wardrobe components (heavy with image processing)
   WardrobeGrid: createLazyComponent(
-    () =>
-      import('../components/wardrobe/WardrobeGrid') as Promise<{ default: ComponentType<unknown> }>,
+    () => import('../components/wardrobe/WardrobeGrid'),
     'Loading wardrobe...',
   ),
 
   // Discovery components (AI-heavy)
   DiscoveryEngine: createLazyComponent(
-    () =>
-      import('../components/discovery/DiscoveryEngine') as Promise<{
-        default: ComponentType<unknown>;
-      }>,
+    () => import('../components/discovery/DiscoveryEngine'),
     'Loading discovery...',
   ),
 
   // Charts and analytics (heavy libraries)
   PieChartWrapper: createLazyComponent(
-    () => import('../components/charts/LineChart') as Promise<{ default: ComponentType<unknown> }>,
+    () => import('../components/charts/LineChart'),
     'Loading analytics...',
   ),
 
   // Auth components (can be lazy loaded after initial load)
   AuthContainer: createLazyComponent(
-    () =>
-      import('../components/auth/AuthContainer') as Promise<{ default: ComponentType<unknown> }>,
+    () => import('../components/auth/AuthContainer'),
     'Loading authentication...',
   ),
+
+  // Home screen components for better startup performance
+  PremiumBrandShowcase: createLazyComponent(
+    () => import('@/components/premium/PremiumBrandShowcase'),
+    'Loading brands...',
+  ),
+
+  ProductCardShowcase: createLazyComponent(
+    () => import('../components/home/ProductCardShowcase'),
+    'Loading products...',
+  ),
+};
+
+/**
+ * Heavy services for dynamic loading (bundle splitting)
+ */
+export const LazyServices = {
+  // AI Service (101KB) - Heavy AI processing
+  AynaMirrorService: () => import('../services/aynaMirrorService'),
+
+  // Intelligence Service (60KB) - AI recommendations
+  IntelligenceService: () => import('../services/intelligenceService'),
+
+  // Enhanced Wardrobe Service (45KB) - Complex wardrobe operations
+  EnhancedWardrobeService: () => import('../services/enhancedWardrobeService'),
+
+  // AI Service (heavy image processing)
+  AIService: () => import('../services/AIService'),
+
+  // Performance optimization service
+  PerformanceOptimizationService: () => import('../services/performanceOptimizationService'),
+
+  // Weather service for recommendations
+  WeatherService: () => import('../services/weatherService'),
 };
 
 /**
  * Lazy screens for route-based code splitting
  */
 export const LazyScreens = {
-  AddItem: createLazyScreen(
-    () => import('../screens/AddItemScreen') as Promise<{ default: ComponentType<unknown> }>,
-    'AddItem',
-  ),
+  AddItem: createLazyScreen(() => import('../screens/AddItemScreen'), 'AddItem'),
 
-  AynaMirror: createLazyScreen(
-    () => import('../screens/AynaMirrorScreen') as Promise<{ default: ComponentType<unknown> }>,
-    'AynaMirror',
-  ),
+  AynaMirror: createLazyScreen(() => import('../screens/AynaMirrorScreen'), 'AynaMirror'),
 
   AynaMirrorSettings: createLazyScreen(
-    () =>
-      import('../screens/AynaMirrorSettingsScreen') as Promise<{ default: ComponentType<unknown> }>,
+    () => import('../screens/AynaMirrorSettingsScreen'),
     'AynaMirrorSettings',
   ),
 
-  MainRitual: createLazyScreen(
-    () => import('../screens/MainRitualScreen') as Promise<{ default: ComponentType<unknown> }>,
-    'MainRitual',
-  ),
+  MainRitual: createLazyScreen(() => import('../screens/MainRitualScreen'), 'MainRitual'),
 
-  Wardrobe: createLazyScreen(
-    () => import('../screens/WardrobeScreen') as Promise<{ default: ComponentType<unknown> }>,
-    'Wardrobe',
-  ),
+  Wardrobe: createLazyScreen(() => import('../screens/WardrobeScreen'), 'Wardrobe'),
 };
 
 /**

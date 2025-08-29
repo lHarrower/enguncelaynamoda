@@ -5,8 +5,8 @@ import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { Alert } from 'react-native';
 
-import { supabase } from '../config/supabaseClient';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
+import { supabase } from '@/config/supabaseClient';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
 
 // Known application route names (extend as new screens are added)
 export type RouteName =

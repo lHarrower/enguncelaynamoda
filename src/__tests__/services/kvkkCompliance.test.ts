@@ -1,6 +1,6 @@
 /**
  * KVKK Compliance Service Tests
- * 
+ *
  * Bu test dosyası KVKK compliance checker'ın doğru çalıştığını doğrular:
  * - Veri işleme aktivitelerinin loglanması
  * - Compliance raporu oluşturma
@@ -17,7 +17,12 @@ import {
   KVKKComplianceReport,
   KVKKRiskAssessment,
 } from '../../utils/kvkkCompliance';
-import { ConsentType, DataProcessingPurpose, LegalBasis } from '../../services/kvkkConsentService';
+import {
+  ConsentType,
+  DataProcessingPurpose,
+  LegalBasis,
+  KVKKConsent,
+} from '../../services/kvkkConsentService';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -31,7 +36,7 @@ const mockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
 
 describe('KVKK Compliance Checker', () => {
   const testUserId = 'test-user-123';
-  
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockAsyncStorage.getItem.mockResolvedValue(null);
@@ -50,14 +55,14 @@ describe('KVKK Compliance Checker', () => {
         consentGiven: true,
         retentionPeriod: 365,
         thirdPartySharing: false,
-        location: 'Turkey'
+        location: 'Turkey',
       };
 
       await kvkkComplianceChecker.logDataProcessingActivity(activity);
 
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'kvkk_activity_log',
-        expect.stringContaining('AI outfit recommendation')
+        expect.stringContaining('AI outfit recommendation'),
       );
     });
 
@@ -72,7 +77,7 @@ describe('KVKK Compliance Checker', () => {
           dataTypes: ['profile_data'],
           timestamp: new Date().toISOString(),
           consentRequired: false,
-          consentGiven: false
+          consentGiven: false,
         },
         {
           id: '2',
@@ -83,8 +88,8 @@ describe('KVKK Compliance Checker', () => {
           dataTypes: ['other_data'],
           timestamp: new Date().toISOString(),
           consentRequired: true,
-          consentGiven: true
-        }
+          consentGiven: true,
+        },
       ];
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(mockLogs));
@@ -98,17 +103,29 @@ describe('KVKK Compliance Checker', () => {
 
   describe('Compliance Report Generation', () => {
     it('should generate comprehensive compliance report', async () => {
-      const mockConsents = [
+      const mockConsents: KVKKConsent[] = [
         {
+          id: 'consent-1',
+          userId: testUserId,
           consentType: ConsentType.AI_PROCESSING,
+          purpose: DataProcessingPurpose.AI_PROCESSING,
           granted: true,
-          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+          timestamp: new Date(),
+          version: '1.0',
+          legalBasis: LegalBasis.CONSENT,
+          expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
         },
         {
+          id: 'consent-2',
+          userId: testUserId,
           consentType: ConsentType.ANALYTICS,
+          purpose: DataProcessingPurpose.ANALYTICS_IMPROVEMENT,
           granted: false,
-          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-        }
+          timestamp: new Date(),
+          version: '1.0',
+          legalBasis: LegalBasis.CONSENT,
+          expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        },
       ];
 
       const mockActivities: DataProcessingActivity[] = [
@@ -121,8 +138,8 @@ describe('KVKK Compliance Checker', () => {
           dataTypes: ['style_preferences'],
           timestamp: new Date().toISOString(),
           consentRequired: true,
-          consentGiven: true
-        }
+          consentGiven: true,
+        },
       ];
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(mockActivities));
@@ -139,12 +156,18 @@ describe('KVKK Compliance Checker', () => {
     });
 
     it('should calculate correct compliance score', async () => {
-      const mockConsents = [
+      const mockConsents: KVKKConsent[] = [
         {
+          id: 'consent-3',
+          userId: testUserId,
           consentType: ConsentType.AI_PROCESSING,
+          purpose: DataProcessingPurpose.AI_PROCESSING,
           granted: true,
-          expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
-        }
+          timestamp: new Date(),
+          version: '1.0',
+          legalBasis: LegalBasis.CONSENT,
+          expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        },
       ];
 
       mockAsyncStorage.getItem.mockResolvedValue('[]'); // No activities
@@ -156,7 +179,7 @@ describe('KVKK Compliance Checker', () => {
     });
 
     it('should identify missing required consents', async () => {
-      const mockConsents: any[] = []; // No consents given
+      const mockConsents: KVKKConsent[] = []; // No consents given
 
       mockAsyncStorage.getItem.mockResolvedValue('[]');
 
@@ -181,8 +204,8 @@ describe('KVKK Compliance Checker', () => {
           timestamp: new Date().toISOString(),
           consentRequired: false,
           consentGiven: false,
-          thirdPartySharing: false
-        }
+          thirdPartySharing: false,
+        },
       ];
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(mockActivities));
@@ -206,8 +229,8 @@ describe('KVKK Compliance Checker', () => {
           timestamp: new Date().toISOString(),
           consentRequired: true,
           consentGiven: false, // Missing consent
-          thirdPartySharing: true
-        }
+          thirdPartySharing: true,
+        },
       ];
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(mockActivities));
@@ -223,7 +246,7 @@ describe('KVKK Compliance Checker', () => {
   describe('Data Retention Compliance', () => {
     it('should identify expired data for deletion', async () => {
       const expiredDate = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000); // 400 days ago
-      
+
       const mockActivities: DataProcessingActivity[] = [
         {
           id: '1',
@@ -235,8 +258,8 @@ describe('KVKK Compliance Checker', () => {
           timestamp: expiredDate.toISOString(),
           consentRequired: true,
           consentGiven: true,
-          retentionPeriod: 365 // 365 days retention
-        }
+          retentionPeriod: 365, // 365 days retention
+        },
       ];
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(mockActivities));
@@ -250,7 +273,7 @@ describe('KVKK Compliance Checker', () => {
 
     it('should warn about data expiring soon', async () => {
       const soonToExpireDate = new Date(Date.now() - 340 * 24 * 60 * 60 * 1000); // 340 days ago
-      
+
       const mockActivities: DataProcessingActivity[] = [
         {
           id: '1',
@@ -262,8 +285,8 @@ describe('KVKK Compliance Checker', () => {
           timestamp: soonToExpireDate.toISOString(),
           consentRequired: true,
           consentGiven: true,
-          retentionPeriod: 365 // Will expire in 25 days
-        }
+          retentionPeriod: 365, // Will expire in 25 days
+        },
       ];
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(mockActivities));
@@ -307,7 +330,7 @@ describe('KVKK Compliance Checker', () => {
         dataTypes: ['test_data'],
         timestamp: new Date().toISOString(),
         consentRequired: true,
-        consentGiven: true
+        consentGiven: true,
       }));
 
       mockAsyncStorage.getItem.mockResolvedValue(JSON.stringify(manyActivities));
@@ -319,7 +342,7 @@ describe('KVKK Compliance Checker', () => {
         legalBasis: LegalBasis.CONSENT,
         dataTypes: ['new_data'],
         consentRequired: true,
-        consentGiven: true
+        consentGiven: true,
       };
 
       await kvkkComplianceChecker.logDataProcessingActivity(newActivity);
@@ -327,12 +350,10 @@ describe('KVKK Compliance Checker', () => {
       // Verify that setItem was called with trimmed data (max 1000 items)
       expect(mockAsyncStorage.setItem).toHaveBeenCalledWith(
         'kvkk_activity_log',
-        expect.stringMatching(/^\[.*\]$/)
+        expect.stringMatching(/^\[.*\]$/),
       );
 
-      const savedData = JSON.parse(
-        (mockAsyncStorage.setItem as jest.Mock).mock.calls[0][1]
-      );
+      const savedData = JSON.parse((mockAsyncStorage.setItem as jest.Mock).mock.calls[0][1]);
       expect(savedData.length).toBeLessThanOrEqual(1000);
     });
   });

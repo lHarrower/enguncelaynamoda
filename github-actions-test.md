@@ -8,7 +8,7 @@ Bu dosya GitHub Actions CI/CD pipeline'ının çalışıp çalışmadığını t
 ## Beklenen Sonuçlar
 
 - ✅ ESLint kontrolü geçmeli
-- ✅ TypeScript kontrolü geçmeli  
+- ✅ TypeScript kontrolü geçmeli
 - ✅ Test süiti çalışmalı
 - ✅ Güvenlik taraması yapılmalı
 - ✅ Build işlemi başarılı olmalı

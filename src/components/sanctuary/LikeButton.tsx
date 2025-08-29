@@ -12,8 +12,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { errorInDev, logInDev } from '../../utils/consoleSuppress';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 

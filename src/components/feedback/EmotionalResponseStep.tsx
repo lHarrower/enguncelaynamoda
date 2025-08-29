@@ -2,8 +2,8 @@ import * as Haptics from 'expo-haptics';
 import React, { useEffect, useRef } from 'react';
 import { Animated, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { DesignSystem } from '../../theme/DesignSystem';
-import { EmotionalResponse, EmotionalState } from '../../types/aynaMirror';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { EmotionalResponse, EmotionalState } from '@/types/aynaMirror';
 
 interface EmotionalResponseStepProps {
   emotionalResponse: EmotionalResponse;

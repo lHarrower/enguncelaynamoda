@@ -55,7 +55,7 @@ export class WardrobeService {
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
   private readonly MAX_CACHE_SIZE = 50; // Maximum number of cached users
   private readonly CLEANUP_INTERVAL = 10 * 60 * 1000; // 10 minutes
-  private cleanupTimer: ReturnType<typeof setInterval> | null = null;
+  private cleanupTimer: ReturnType<typeof setInterval> | null = null; // OPERASYON DİSİPLİN: Memory leak önleme
   private isDestroyed = false;
 
   constructor() {
@@ -122,6 +122,7 @@ export class WardrobeService {
   }
 
   // Destroy service and cleanup resources
+  // OPERASYON DİSİPLİN: Memory leak önleme - tüm interval'ları temizle
   public destroy(): void {
     this.isDestroyed = true;
 
@@ -135,6 +136,14 @@ export class WardrobeService {
 
     // Clear related caches
     OptimizedQueries.clearCacheByPattern('wardrobe');
+  }
+
+  /**
+   * OPERASYON DİSİPLİN: Component unmount'ta çağrılması gereken cleanup metodu
+   * React component'lerde useEffect cleanup function'ında kullanılmalı
+   */
+  public cleanup(): void {
+    this.destroy();
   }
 
   // Get performance metrics for this service
@@ -161,56 +170,37 @@ export class WardrobeService {
     } catch (error) {
       logInDev(
         'Failed to optimize wardrobe database:',
-        error instanceof Error ? error.message : (String(error) as any),
+        error instanceof Error ? error.message : String(error),
       );
     }
   }
 
   private toDomain(record: WardrobeItemRecord | Record<string, unknown>): WardrobeItem {
     const r = record as Record<string, unknown>;
-    const rawColors = (r as { colors?: unknown }).colors;
-    const fallbackColor = (r as { color?: unknown }).color;
+
+    // Handle colors array or fallback to single color
+    const rawColors = r.colors || r.color_palette;
+    const fallbackColor = r.color;
     const colors: string[] = Array.isArray(rawColors)
       ? rawColors.filter((c): c is string => typeof c === 'string')
       : typeof fallbackColor === 'string'
         ? [fallbackColor]
         : [];
+
     return {
-      id: String((r as { id: unknown }).id),
-      name:
-        typeof (r as { name?: unknown }).name === 'string'
-          ? ((r as { name?: unknown }).name as string)
-          : undefined,
-      category:
-        typeof (r as { category?: unknown }).category === 'string'
-          ? ((r as { category?: unknown }).category as string)
-          : 'uncategorised',
+      id: String(r.id),
+      name: typeof r.name === 'string' ? r.name : undefined,
+      category: typeof r.category === 'string' ? r.category : 'uncategorised',
       colors,
       color: colors[0],
-      brand:
-        typeof (r as { brand?: unknown }).brand === 'string'
-          ? ((r as { brand?: unknown }).brand as string)
-          : undefined,
-      price:
-        typeof (r as { price?: unknown }).price === 'number'
-          ? ((r as { price?: unknown }).price as number)
-          : undefined,
-      isFavorite: Boolean(
-        (r as { is_favorite?: unknown; isFavorite?: unknown }).is_favorite ||
-          (r as { is_favorite?: unknown; isFavorite?: unknown }).isFavorite,
-      ),
-      tags: Array.isArray((r as { tags?: unknown }).tags)
-        ? ((r as { tags?: unknown }).tags as unknown[]).filter(
-            (t): t is string => typeof t === 'string',
-          )
+      brand: typeof r.brand === 'string' ? r.brand : undefined,
+      price: typeof r.price === 'number' ? r.price : undefined,
+      isFavorite: Boolean(r.is_favorite || r.isFavorite),
+      tags: Array.isArray(r.tags)
+        ? r.tags.filter((t): t is string => typeof t === 'string')
         : undefined,
-      created_at: ((): string | Date | undefined => {
-        const v = (r as { created_at?: unknown }).created_at;
-        if (typeof v === 'string' || v instanceof Date) {
-          return v;
-        }
-        return undefined;
-      })(),
+      created_at:
+        typeof r.created_at === 'string' || r.created_at instanceof Date ? r.created_at : undefined,
     };
   }
 
@@ -245,6 +235,28 @@ export class WardrobeService {
     }
 
     const cacheKey = `all_${userId || 'default'}`;
+    const cachedResult = this.getCachedItems(cacheKey);
+    if (cachedResult) {
+      return cachedResult;
+    }
+
+    try {
+      const normalised = await this.fetchItemsFromDatabase(userId);
+      await this.cacheItems(cacheKey, normalised);
+      return [...normalised];
+    } catch (e) {
+      const fallbackItems = await this.getFallbackItems();
+      if (fallbackItems) {
+        return fallbackItems;
+      }
+      throw e;
+    }
+  }
+
+  /**
+   * Get cached items if available and valid
+   */
+  private getCachedItems(cacheKey: string): WardrobeItem[] | null {
     if (this.isCacheValid(cacheKey)) {
       const cachedItems = this.cache.get(cacheKey);
       if (cachedItems) {
@@ -253,63 +265,86 @@ export class WardrobeService {
         return [...cachedItems]; // Return a copy to prevent mutations
       }
     }
+    return null;
+  }
 
-    try {
-      // Check database health before querying
-      const isHealthy = await ConnectionMonitor.checkHealth();
-      if (!isHealthy) {
-        logInDev('Database unhealthy, using cached data');
-        await secureStorage.initialize();
-        const cached = await secureStorage.getItem('wardrobe_cache');
-        if (cached) {
-          const parsed = safeParse<unknown>(cached, []);
-          if (Array.isArray(parsed)) {
-            return parsed
-              .filter((r): r is Record<string, unknown> => !!r && typeof r === 'object')
-              .map((r) => this.toDomain(r));
-          }
-        }
+  /**
+   * Fetch items from database with health check
+   */
+  private async fetchItemsFromDatabase(userId?: string): Promise<WardrobeItem[]> {
+    // Check database health before querying
+    const isHealthy = await ConnectionMonitor.checkHealth();
+    if (!isHealthy) {
+      const cachedItems = await this.getStoredCacheItems();
+      if (cachedItems) {
+        return cachedItems;
       }
-
-      let normalised: WardrobeItem[];
-      if (userId) {
-        // Use optimized query with performance monitoring for user-specific items
-        const items = await this.getItems();
-        normalised = items.slice(0, 1000); // Apply limit
-      } else {
-        // Fallback to direct query for all items (admin use case)
-        const { data, error } = await dbOptimizer.monitorQuery(
-          'getAllItems_global',
-          async () => await (supabase.from('wardrobe_items').select('*') as any),
-        );
-        if (error) {
-          throw error;
-        }
-        normalised = this.normaliseArray(data);
-      }
-
-      // Ensure we don't exceed cache size before adding
-      if (this.cache.size >= this.MAX_CACHE_SIZE && !this.cache.has(cacheKey)) {
-        this.cleanupExpiredCache();
-      }
-
-      this.cache.set(cacheKey, normalised);
-      this.lastFetchTime.set(cacheKey, Date.now());
-      await secureStorage.setItem('wardrobe_cache', JSON.stringify(normalised));
-      return [...normalised]; // Return a copy
-    } catch (e) {
-      const cached = await secureStorage.getItem('wardrobe_cache');
-      if (cached) {
-        const parsed = safeParse<unknown>(cached, []);
-        if (Array.isArray(parsed)) {
-          const items = parsed
-            .filter((r): r is Record<string, unknown> => !!r && typeof r === 'object')
-            .map((r) => this.toDomain(r));
-          return [...items]; // Return a copy
-        }
-      }
-      throw e;
     }
+
+    if (userId) {
+      // Use optimized query with performance monitoring for user-specific items
+      const items = await this.getItems();
+      return items.slice(0, 1000); // Apply limit
+    } else {
+      // Fallback to direct query for all items (admin use case)
+      const { data, error } = await dbOptimizer.monitorQuery(
+        'getAllItems_global',
+        async () => await supabase.from('wardrobe_items').select('*'),
+      );
+      if (error) {
+        throw error;
+      }
+      return this.normaliseArray(data);
+    }
+  }
+
+  /**
+   * Get items from stored cache
+   */
+  private async getStoredCacheItems(): Promise<WardrobeItem[] | null> {
+    logInDev('Database unhealthy, using cached data');
+    await secureStorage.initialize();
+    const cached = await secureStorage.getItem('wardrobe_cache');
+    if (cached) {
+      const parsed = safeParse<unknown>(cached, []);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .filter((r): r is Record<string, unknown> => !!r && typeof r === 'object')
+          .map((r) => this.toDomain(r));
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Cache items in memory and storage
+   */
+  private async cacheItems(cacheKey: string, items: WardrobeItem[]): Promise<void> {
+    // Ensure we don't exceed cache size before adding
+    if (this.cache.size >= this.MAX_CACHE_SIZE && !this.cache.has(cacheKey)) {
+      this.cleanupExpiredCache();
+    }
+
+    this.cache.set(cacheKey, items);
+    this.lastFetchTime.set(cacheKey, Date.now());
+    await secureStorage.setItem('wardrobe_cache', JSON.stringify(items));
+  }
+
+  /**
+   * Get fallback items from storage when database fails
+   */
+  private async getFallbackItems(): Promise<WardrobeItem[] | null> {
+    const cached = await secureStorage.getItem('wardrobe_cache');
+    if (cached) {
+      const parsed = safeParse<unknown>(cached, []);
+      if (Array.isArray(parsed)) {
+        const items = parsed
+          .filter((r): r is Record<string, unknown> => !!r && typeof r === 'object')
+          .map((r) => this.toDomain(r));
+        return [...items]; // Return a copy
+      }
+    }
+    return null;
   }
 
   /**
@@ -322,7 +357,7 @@ export class WardrobeService {
    * ```typescript
    * const item = await wardrobeService.getItemById('item-123');
    * if (item) {
-   *   console.log(item.name);
+   *   // Example: item.name
    * }
    * ```
    */
@@ -332,8 +367,7 @@ export class WardrobeService {
       'wardrobe_items',
       async () => {
         const res = await wrap(
-          async () =>
-            await (supabase.from('wardrobe_items').select('*').eq('id', id).single() as any),
+          async () => await supabase.from('wardrobe_items').select('*').eq('id', id).single(),
         );
         if (!isSupabaseOk(res)) {
           return null;
@@ -395,7 +429,7 @@ export class WardrobeService {
       record.colors = [record.color];
     }
     const res = await wrap(
-      async () => await (supabase.from('wardrobe_items').insert(record).select().single() as any),
+      async () => await supabase.from('wardrobe_items').insert(record).select().single(),
     );
     const data = ensureSupabaseOk(res, { action: 'addItem' }) as WardrobeItemRecord;
     this.cache.clear();
@@ -423,20 +457,20 @@ export class WardrobeService {
     if (userId) {
       query = query.eq('user_id', userId);
     }
-    const res = await wrap(async () => await (query.select().single() as any));
+    const res = await wrap(async () => await query.select().single());
     const data = ensureSupabaseOk(res, { action: 'updateItem' }) as WardrobeItemRecord;
     this.cache.clear();
     return this.toDomain(data);
   }
 
   async bulkUpdateItems(userId: string, items: WardrobeItem[]): Promise<void> {
-    await (supabase.from('wardrobe_items') as any).upsert(items);
+    await supabase.from('wardrobe_items').upsert(items);
     this.cache.clear();
   }
 
   async bulkUpdate(itemIds: string[], updates: Partial<WardrobeItem>): Promise<void> {
     const res = await wrap(
-      async () => await (supabase.from('wardrobe_items').update(updates) as any).in('id', itemIds),
+      async () => await supabase.from('wardrobe_items').update(updates).in('id', itemIds),
     );
     ensureSupabaseOk(res, { action: 'bulkUpdate' });
     this.cache.clear();
@@ -444,16 +478,14 @@ export class WardrobeService {
 
   async bulkDelete(itemIds: string[]): Promise<void> {
     const res = await wrap(
-      async () => await (supabase.from('wardrobe_items').delete() as any).in('id', itemIds),
+      async () => await supabase.from('wardrobe_items').delete().in('id', itemIds),
     );
     ensureSupabaseOk(res, { action: 'bulkDelete' });
     this.cache.clear();
   }
 
   async deleteItem(id: string): Promise<boolean> {
-    const res = await wrap(
-      async () => await (supabase.from('wardrobe_items').delete().eq('id', id) as any),
-    );
+    const res = await wrap(async () => await supabase.from('wardrobe_items').delete().eq('id', id));
     ensureSupabaseOk(res, { action: 'deleteItem' });
     this.cache.clear();
     return true;
@@ -474,14 +506,16 @@ export class WardrobeService {
     } else {
       // Fallback to direct query for global search
       const like = `%${queryText}%`;
-      const res = (await dbOptimizer.monitorQuery(
+      const res = await dbOptimizer.monitorQuery(
         'searchItems_global',
         async () =>
-          await (supabase.from('wardrobe_items').select('*') as any)
+          await supabase
+            .from('wardrobe_items')
+            .select('*')
             .or(`name.ilike.${like},brand.ilike.${like}`)
             .order('created_at', { ascending: false })
             .limit(50),
-      )) as any;
+      );
       if (res.error) {
         throw new Error(`Search items failed: ${res.error.message}`);
       }
@@ -492,8 +526,7 @@ export class WardrobeService {
 
   async getItemsByCategory(category: string): Promise<WardrobeItem[]> {
     const res = await wrap(
-      async () =>
-        await (supabase.from('wardrobe_items').select('*').eq('category', category) as any),
+      async () => await supabase.from('wardrobe_items').select('*').eq('category', category),
     );
     const data = ensureSupabaseOk(res, { action: 'getItemsByCategory' });
     return this.normaliseArray(data as unknown);
@@ -502,10 +535,10 @@ export class WardrobeService {
   async getItemsByColor(color: string): Promise<WardrobeItem[]> {
     // Using contains on colors array when supported; fallback to filtering client-side
     try {
-      const { data, error } = await (supabase.from('wardrobe_items').select('*') as any).contains(
-        'colors',
-        [color],
-      );
+      const { data, error } = await supabase
+        .from('wardrobe_items')
+        .select('*')
+        .contains('colors', [color]);
       if (error) {
         throw error;
       }
@@ -518,10 +551,10 @@ export class WardrobeService {
 
   async getItemsByTags(tags: string[]): Promise<WardrobeItem[]> {
     try {
-      const { data, error } = await (supabase.from('wardrobe_items').select('*') as any).overlaps(
-        'tags',
-        tags,
-      );
+      const { data, error } = await supabase
+        .from('wardrobe_items')
+        .select('*')
+        .overlaps('tags', tags);
       if (error) {
         throw error;
       }
@@ -534,10 +567,10 @@ export class WardrobeService {
 
   async getFavorites(): Promise<WardrobeItem[]> {
     try {
-      const { data, error } = await (supabase
+      const { data, error } = await supabase
         .from('wardrobe_items')
         .select('*')
-        .eq('is_favorite', true) as any);
+        .eq('is_favorite', true);
       if (error) {
         throw error;
       }
@@ -549,7 +582,9 @@ export class WardrobeService {
   }
 
   async getRecentlyAdded(limit = 10): Promise<WardrobeItem[]> {
-    const { data, error } = await (supabase.from('wardrobe_items').select('*') as any)
+    const { data, error } = await supabase
+      .from('wardrobe_items')
+      .select('*')
       .order('created_at', { ascending: false })
       .limit(limit);
     if (error) {

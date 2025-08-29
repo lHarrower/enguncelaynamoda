@@ -24,7 +24,7 @@ import {
   ORIGINAL_COLORS,
   ORIGINAL_SPACING,
   ORIGINAL_TYPOGRAPHY,
-} from '../auth/originalLoginStyles';
+} from '@/components/auth/originalLoginStyles';
 
 const { width: screenWidth } = Dimensions.get('window');
 

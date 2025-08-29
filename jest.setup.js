@@ -1,5 +1,8 @@
 // Jest setup file for AYNA Mirror tests
 
+// Setup jest-axe for accessibility testing
+import 'jest-axe/extend-expect';
+
 // Mock fetch globally
 global.fetch = jest.fn(() =>
   Promise.resolve({
@@ -7,7 +10,7 @@ global.fetch = jest.fn(() =>
     status: 200,
     json: () => Promise.resolve({}),
     text: () => Promise.resolve(''),
-  })
+  }),
 );
 
 // Mock loadNotifications function globally
@@ -369,7 +372,7 @@ global.mocks = {
   },
 };
 
-console.log('Global mocks initialized:', global.mocks);
+
 
 // Mock @react-native-async-storage/async-storage
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -420,7 +423,7 @@ jest.mock('react-native-gesture-handler', () => {
 jest.mock('react-native-safe-area-context', () => {
   const React = require('react');
   const { View } = require('react-native');
-  
+
   return {
     SafeAreaView: ({ children, ...props }) => React.createElement(View, props, children),
     SafeAreaProvider: ({ children }) => children,
@@ -434,7 +437,7 @@ jest.mock('react-native-safe-area-context', () => {
 jest.mock('@react-navigation/native', () => {
   const React = require('react');
   const { View } = require('react-native');
-  
+
   return {
     NavigationContainer: ({ children }) => React.createElement(View, {}, children),
     useNavigation: () => ({
@@ -605,13 +608,11 @@ jest.mock('@/hooks/useHapticFeedback', () => ({
   }),
 }));
 
-
-
 // Mock @react-navigation/stack
 jest.mock('@react-navigation/stack', () => {
   const React = require('react');
   const { View } = require('react-native');
-  
+
   return {
     createStackNavigator: () => ({
       Navigator: ({ children }) => React.createElement(View, {}, children),
@@ -642,7 +643,7 @@ jest.mock('@react-navigation/stack', () => {
 jest.mock('@react-navigation/bottom-tabs', () => {
   const React = require('react');
   const { View } = require('react-native');
-  
+
   return {
     createBottomTabNavigator: () => ({
       Navigator: ({ children }) => React.createElement(View, {}, children),

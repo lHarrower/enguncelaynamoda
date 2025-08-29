@@ -14,8 +14,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { DesignSystem } from '../../theme/DesignSystem';
-import { logInDev } from '../../utils/consoleSuppress';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev } from '@/utils/consoleSuppress';
+
 // Import artistry components
 import AtmosphericBackground from './AtmosphericBackground';
 import BentoGallery, { type BentoItem } from './BentoGallery';

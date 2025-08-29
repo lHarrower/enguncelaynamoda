@@ -10,7 +10,7 @@
  * - Fallback: { name: 'Home' } on any invalid condition
  * - All params URL-decoded
  */
-import { logger } from '../utils/logger';
+import { logger } from '@/utils/logger';
 
 export interface DeepLinkResult {
   name: string;

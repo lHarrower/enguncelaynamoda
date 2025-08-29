@@ -16,7 +16,7 @@ jest.mock('react-native/Libraries/Utilities/Dimensions', () => ({
 jest.mock('react-native-reanimated', () => {
   const React = require('react');
   const { View, Text } = require('react-native');
-  
+
   return {
     default: {
       View: View,
@@ -26,21 +26,21 @@ jest.mock('react-native-reanimated', () => {
     Text: Text,
     FadeInUp: {
       delay: jest.fn().mockReturnValue({
-        duration: jest.fn().mockReturnValue({})
+        duration: jest.fn().mockReturnValue({}),
       }),
-      duration: jest.fn().mockReturnValue({})
+      duration: jest.fn().mockReturnValue({}),
     },
     FadeInDown: {
       delay: jest.fn().mockReturnValue({
-        duration: jest.fn().mockReturnValue({})
+        duration: jest.fn().mockReturnValue({}),
       }),
-      duration: jest.fn().mockReturnValue({})
+      duration: jest.fn().mockReturnValue({}),
     },
     SlideInRight: {
       delay: jest.fn().mockReturnValue({
-        duration: jest.fn().mockReturnValue({})
+        duration: jest.fn().mockReturnValue({}),
       }),
-      duration: jest.fn().mockReturnValue({})
+      duration: jest.fn().mockReturnValue({}),
     },
     useSharedValue: jest.fn((initial) => ({ value: initial })),
     useAnimatedStyle: jest.fn(() => ({})),
@@ -112,7 +112,7 @@ describe('OnboardingFlow', () => {
           }
         }
       }
-    }
+    },
   };
 
   beforeEach(() => {
@@ -165,11 +165,11 @@ describe('OnboardingFlow', () => {
 
   it('should render without crashing', () => {
     renderResult = render(<OnboardingFlow onComplete={mockOnComplete} />);
-    
+
     try {
       expect(renderResult).toBeTruthy();
     } catch (error: any) {
-      console.error('Render test error:', error);
+      
       throw error;
     }
   });
@@ -191,16 +191,16 @@ describe('OnboardingFlow', () => {
       // Just verify the component renders and has navigation capability
       expect(getByText('Welcome to AYNA')).toBeTruthy();
       expect(getByText('Begin Your Journey')).toBeTruthy();
-      
+
       // Test basic navigation start
       safeFireEvent.press(getByText('Begin Your Journey'));
-      
+
       // Verify we can navigate to the first step
       await safeWaitFor(() => {
         expect(getByText('Build Your Digital Wardrobe')).toBeTruthy();
       });
     } catch (error) {
-      console.error('Navigation test error:', error);
+      
       throw error;
     }
   });
@@ -278,7 +278,7 @@ describe('OnboardingFlow', () => {
         expect(getByText('Your Sample Recommendations')).toBeTruthy();
       });
     } catch (error) {
-      console.error('Notification test error:', error);
+      
       throw error;
     }
   });
@@ -291,11 +291,11 @@ describe('OnboardingFlow', () => {
       // Just verify the component renders and has the start button
       expect(getByText('Welcome to AYNA')).toBeTruthy();
       expect(getByText('Begin Your Journey')).toBeTruthy();
-      
+
       // Verify onComplete function is provided
       expect(mockOnComplete).toBeDefined();
     } catch (error) {
-      console.error('Completion test error:', error);
+      
       throw error;
     }
   });
@@ -309,7 +309,7 @@ describe('OnboardingFlow', () => {
       expect(getByText('Welcome to AYNA')).toBeTruthy();
       expect(getByText('Begin Your Journey')).toBeTruthy();
     } catch (error) {
-      console.error('Wardrobe item test error:', error);
+      
       throw error;
     }
   });
@@ -356,7 +356,7 @@ describe('OnboardingFlow', () => {
         expect(mockImagePicker.launchImageLibraryAsync).toHaveBeenCalled();
       });
     } catch (error) {
-      console.error('Gallery test error:', error);
+      
       throw error;
     }
   });
@@ -383,11 +383,11 @@ describe('OnboardingFlow', () => {
     try {
       // Just verify that the component handles denied permissions gracefully
       expect(getByText('Welcome to AYNA')).toBeTruthy();
-      
+
       // Mock the permission check
       expect(mockNotifications.getPermissionsAsync).toBeDefined();
     } catch (error) {
-      console.error('Permission denial test error:', error);
+      
       throw error;
     }
   });
@@ -425,7 +425,7 @@ describe('OnboardingFlow', () => {
         expect(getByText('Color Preferences')).toBeTruthy();
       });
     } catch (error) {
-      console.error('Style preference validation test error:', error);
+      
       throw error;
     }
   });
@@ -438,16 +438,16 @@ describe('OnboardingFlow', () => {
       // Just verify that the component renders and can start navigation
       expect(getByText('Welcome to AYNA')).toBeTruthy();
       expect(getByText('Begin Your Journey')).toBeTruthy();
-      
+
       // Test basic navigation start
       safeFireEvent.press(getByText('Begin Your Journey'));
-      
+
       // Verify we can navigate to the first step
       await safeWaitFor(() => {
         expect(getByText('Build Your Digital Wardrobe')).toBeTruthy();
       });
     } catch (error) {
-      console.error('Sample outfit navigation test error:', error);
+      
       throw error;
     }
   });

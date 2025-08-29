@@ -12,6 +12,8 @@ import {
   View,
 } from 'react-native';
 
+import { DesignSystem } from '@/theme/DesignSystem';
+
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 interface ImagePreviewModalProps {
@@ -38,7 +40,7 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
       presentationStyle="fullScreen"
       statusBarTranslucent
     >
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+      <StatusBar barStyle="light-content" backgroundColor={DesignSystem.colors.background.dark} />
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -50,7 +52,7 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
             accessibilityLabel="Close preview"
             accessibilityHint="Tap to close the image preview modal"
           >
-            <Ionicons name="close" size={28} color="#FFFFFF" />
+            <Ionicons name="close" size={28} color={DesignSystem.colors.text.inverse} />
           </TouchableOpacity>
 
           <View style={styles.headerTitle}>
@@ -71,7 +73,7 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
           {isProcessing && (
             <View style={styles.processingOverlay}>
               <View style={styles.processingContent}>
-                <ActivityIndicator size="large" color="#FFFFFF" />
+                <ActivityIndicator size="large" color={DesignSystem.colors.text.inverse} />
                 <Text style={styles.processingText}>Processing your photo...</Text>
                 <Text style={styles.processingSubtext}>
                   Removing background and analyzing item details
@@ -94,7 +96,7 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
               accessibilityHint="Tap to retake the photo"
               accessibilityState={{ disabled: isProcessing }}
             >
-              <Ionicons name="camera-outline" size={24} color="#B8918F" />
+              <Ionicons name="camera-outline" size={24} color={DesignSystem.colors.primary[500]} />
               <Text style={[styles.actionButtonText, styles.retakeButtonText]}>Retake</Text>
             </TouchableOpacity>
 
@@ -115,9 +117,9 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
               accessibilityState={{ disabled: isProcessing }}
             >
               {isProcessing ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <ActivityIndicator size="small" color={DesignSystem.colors.text.inverse} />
               ) : (
-                <Ionicons name="checkmark" size={24} color="#FFFFFF" />
+                <Ionicons name="checkmark" size={24} color={DesignSystem.colors.text.inverse} />
               )}
               <Text style={[styles.actionButtonText, styles.confirmButtonText]}>
                 {isProcessing ? 'Processing...' : 'Look Perfect!'}
@@ -145,18 +147,18 @@ const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
 const styles = StyleSheet.create({
   actionButton: {
     alignItems: 'center',
-    borderRadius: 12,
+    borderRadius: DesignSystem.radius.sm,
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
-    marginHorizontal: 8,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    marginHorizontal: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.lg,
+    paddingVertical: DesignSystem.spacing.md,
   },
   actionButtonText: {
-    fontSize: 16,
+    fontSize: DesignSystem.typography.fontSize.md,
     fontWeight: 'bold',
-    marginLeft: 8,
+    marginLeft: DesignSystem.spacing.xs,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -168,18 +170,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   confirmButton: {
-    backgroundColor: '#B8918F',
+    backgroundColor: DesignSystem.colors.primary[500],
     elevation: 6,
-    shadowColor: '#B8918F',
+    shadowColor: DesignSystem.colors.primary[500],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
   confirmButtonText: {
-    color: '#FFFFFF',
+    color: DesignSystem.colors.text.inverse,
   },
   container: {
-    backgroundColor: '#000000',
+    backgroundColor: DesignSystem.colors.background.dark,
     flex: 1,
   },
   disabledButton: {
@@ -195,8 +197,8 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: 22,
+    backgroundColor: DesignSystem.colors.background.overlay,
+    borderRadius: DesignSystem.radius.lg,
     height: 44,
     justifyContent: 'center',
     width: 44,
@@ -215,8 +217,8 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   previewImage: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 16,
+    backgroundColor: DesignSystem.colors.neutral[800],
+    borderRadius: DesignSystem.radius.md,
     height: screenHeight * 0.5,
     width: screenWidth - 40,
   },
@@ -225,76 +227,76 @@ const styles = StyleSheet.create({
   },
   processingOverlay: {
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    borderRadius: 16,
+    backgroundColor: DesignSystem.colors.background.overlay,
+    borderRadius: DesignSystem.radius.md,
     bottom: 0,
     justifyContent: 'center',
     left: 0,
-    marginHorizontal: 20,
+    marginHorizontal: DesignSystem.spacing.lg,
     position: 'absolute',
     right: 0,
     top: 0,
   },
   processingSubtext: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    marginTop: 8,
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.fontSize.sm,
+    marginTop: DesignSystem.spacing.xs,
     opacity: 0.8,
-    paddingHorizontal: 40,
+    paddingHorizontal: DesignSystem.spacing.xl,
     textAlign: 'center',
   },
   processingText: {
-    color: '#FFFFFF',
-    fontSize: 18,
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.fontSize.lg,
     fontWeight: 'bold',
-    marginTop: 16,
+    marginTop: DesignSystem.spacing.md,
     textAlign: 'center',
   },
   retakeButton: {
-    backgroundColor: 'rgba(184, 145, 143, 0.15)',
-    borderColor: '#B8918F',
+    backgroundColor: DesignSystem.colors.primary[50],
+    borderColor: DesignSystem.colors.primary[500],
     borderWidth: 2,
   },
   retakeButtonText: {
-    color: '#B8918F',
+    color: DesignSystem.colors.primary[500],
   },
   subtitleText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    marginTop: 4,
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.fontSize.sm,
+    marginTop: DesignSystem.spacing.xs,
     opacity: 0.8,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowColor: DesignSystem.colors.background.overlay,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
   tipItem: {
-    color: '#FFFFFF',
-    fontSize: 14,
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.fontSize.sm,
     lineHeight: 20,
-    marginBottom: 6,
+    marginBottom: DesignSystem.spacing.xs,
     opacity: 0.8,
   },
   tipsContainer: {
-    backgroundColor: 'rgba(242, 239, 233, 0.1)',
-    borderColor: 'rgba(184, 145, 143, 0.3)',
-    borderRadius: 12,
+    backgroundColor: DesignSystem.colors.background.secondary,
+    borderColor: DesignSystem.colors.primary[200],
+    borderRadius: DesignSystem.radius.sm,
     borderWidth: 1,
-    padding: 16,
+    padding: DesignSystem.spacing.md,
   },
   tipsList: {
     marginLeft: 8,
   },
   tipsTitle: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.fontSize.md,
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginBottom: DesignSystem.spacing.sm,
   },
   titleText: {
-    color: '#FFFFFF',
-    fontSize: 18,
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.fontSize.lg,
     fontWeight: 'bold',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowColor: DesignSystem.colors.background.overlay,
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },

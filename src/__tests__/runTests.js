@@ -63,7 +63,7 @@ const testSuites = {
 
 // Utility functions
 function log(message, color = 'reset') {
-  console.log(`${colors[color]}${message}${colors.reset}`);
+  process.stdout.write(`${colors[color]}${message}${colors.reset}\n`);
 }
 
 function logHeader(message) {
@@ -190,7 +190,7 @@ function runTestSuite(suite, options = {}) {
 
     if (options.verbose) {
       log('Error details:', 'red');
-      console.error(error.stdout || error.message);
+      process.stderr.write(error.stdout || error.message);
     }
 
     return { success: false, duration, error };

@@ -16,8 +16,19 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { enhancedWardrobeService } from '../../src/services/enhancedWardrobeService';
-import { WardrobeItem } from '../../src/types/aynaMirror';
+import { DesignSystem } from '@/theme/DesignSystem';
+// Lazy load heavy services for better startup performance
+let enhancedWardrobeService: any = null;
+const getEnhancedWardrobeService = async () => {
+  if (!enhancedWardrobeService) {
+    const { enhancedWardrobeService: Service } = await import(
+      '../../src/services/enhancedWardrobeService'
+    );
+    enhancedWardrobeService = Service;
+  }
+  return enhancedWardrobeService;
+};
+import { WardrobeItem } from '@/types/aynaMirror';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2; // 2 columns with margins
@@ -49,19 +60,47 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
     const category = item.category?.toLowerCase() || '';
     switch (category) {
       case 'dresses':
-        return ['#FDF8F5', '#F5E8DD', '#EDD0B8'] as const;
+        return [
+          DesignSystem.colors.background.primary,
+          DesignSystem.colors.sage[50],
+          DesignSystem.colors.sage[100],
+        ] as const;
       case 'tops':
-        return ['#F5F8FD', '#DDE8F5', '#B8D0ED'] as const;
+        return [
+          DesignSystem.colors.background.primary,
+          DesignSystem.colors.sage[50],
+          DesignSystem.colors.sage[200],
+        ] as const;
       case 'bottoms':
-        return ['#F8F5FD', '#E8DDF5', '#D0B8ED'] as const;
+        return [
+          DesignSystem.colors.background.primary,
+          DesignSystem.colors.gold[50],
+          DesignSystem.colors.gold[100],
+        ] as const;
       case 'shoes':
-        return ['#FDF5F8', '#F5DDE8', '#EDB8D0'] as const;
+        return [
+          DesignSystem.colors.background.primary,
+          DesignSystem.colors.gold[50],
+          DesignSystem.colors.gold[200],
+        ] as const;
       case 'accessories':
-        return ['#F5FDF8', '#DDF5E8', '#B8EDD0'] as const;
+        return [
+          DesignSystem.colors.background.primary,
+          DesignSystem.colors.sage[100],
+          DesignSystem.colors.sage[200],
+        ] as const;
       case 'outerwear':
-        return ['#F8FDF5', '#E8F5DD', '#D0EDB8'] as const;
+        return [
+          DesignSystem.colors.background.primary,
+          DesignSystem.colors.gold[100],
+          DesignSystem.colors.gold[200],
+        ] as const;
       default:
-        return ['#FDFCFA', '#F5F3F0', '#EDEBE8'] as const;
+        return [
+          DesignSystem.colors.background.primary,
+          DesignSystem.colors.background.secondary,
+          DesignSystem.colors.background.tertiary,
+        ] as const;
     }
   }, [item.category]);
 
@@ -84,7 +123,7 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
           <View style={styles.brandSection}>
             <Text style={styles.brandText}>{brandName}</Text>
             <View style={styles.premiumBadge}>
-              <Ionicons name="diamond-outline" size={10} color="#B8860B" />
+              <Ionicons name="diamond-outline" size={10} color={DesignSystem.colors.gold[600]} />
             </View>
           </View>
 
@@ -97,7 +136,7 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
               <Ionicons
                 name={isFavorite ? 'heart' : 'heart-outline'}
                 size={18}
-                color={isFavorite ? '#D4A574' : '#8B5A3C'}
+                color={isFavorite ? DesignSystem.colors.gold[500] : DesignSystem.colors.sage[700]}
               />
             </TouchableOpacity>
           )}
@@ -189,10 +228,10 @@ export default function WardrobeScreen() {
   const loadWardrobeItems = useCallback(async () => {
     try {
       setLoading(true);
-      const items = await enhancedWardrobeService.getUserWardrobe('user-id');
+      const service = await getEnhancedWardrobeService();
+      const items = await service.getUserWardrobe('user-id');
       setWardrobeItems(items);
     } catch (error) {
-      console.error('Error loading wardrobe items:', error);
       Alert.alert('Error', 'Failed to load wardrobe items');
     } finally {
       setLoading(false);
@@ -257,7 +296,7 @@ export default function WardrobeScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#D4A574" />
+        <ActivityIndicator size="large" color={DesignSystem.colors.gold[500]} />
         <Text style={styles.loadingText}>Loading your wardrobe...</Text>
       </View>
     );
@@ -265,7 +304,14 @@ export default function WardrobeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient colors={['#FDFCFA', '#F8F6F2', '#F0EDE8']} style={styles.backgroundGradient}>
+      <LinearGradient
+        colors={[
+          DesignSystem.colors.background.primary,
+          DesignSystem.colors.background.secondary,
+          DesignSystem.colors.background.tertiary,
+        ]}
+        style={styles.backgroundGradient}
+      >
         {/* Premium Header */}
         <View style={styles.header}>
           <View>
@@ -297,13 +343,13 @@ export default function WardrobeScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={['#D4A574']}
-              tintColor="#D4A574"
+              colors={[DesignSystem.colors.gold[500]]}
+              tintColor={DesignSystem.colors.gold[500]}
             />
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons name="shirt-outline" size={64} color="#D4A574" />
+              <Ionicons name="shirt-outline" size={64} color={DesignSystem.colors.gold[500]} />
               <Text style={styles.emptyTitle}>Your wardrobe awaits</Text>
               <Text style={styles.emptySubtitle}>Add your first premium piece to get started</Text>
             </View>
@@ -316,11 +362,11 @@ export default function WardrobeScreen() {
 
 const styles = StyleSheet.create({
   addButton: {
-    backgroundColor: '#D4A574',
-    borderRadius: 20,
+    backgroundColor: DesignSystem.colors.gold[500],
+    borderRadius: DesignSystem.borderRadius.lg,
     elevation: 6,
-    padding: 12,
-    shadowColor: '#D4A574',
+    padding: DesignSystem.spacing.sm,
+    shadowColor: DesignSystem.colors.gold[500],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -329,7 +375,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   borderAccent: {
-    backgroundColor: '#D4A574',
+    backgroundColor: DesignSystem.colors.gold[500],
     height: 2,
     left: 0,
     opacity: 0.3,
@@ -342,10 +388,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   brandText: {
-    color: '#8B5A3C',
-    fontFamily: 'System',
-    fontSize: 11,
-    fontWeight: '700',
+    color: DesignSystem.colors.sage[700],
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.xs,
+    fontWeight: DesignSystem.typography.weights.bold,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
@@ -356,7 +402,7 @@ const styles = StyleSheet.create({
   },
   cardGradient: {
     flex: 1,
-    padding: 16,
+    padding: DesignSystem.spacing.md,
   },
   cardHeader: {
     alignItems: 'center',
@@ -365,27 +411,27 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   categoryBadge: {
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 12,
-    bottom: 8,
-    left: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: DesignSystem.colors.overlay.dark,
+    borderRadius: DesignSystem.borderRadius.md,
+    bottom: DesignSystem.spacing.xs,
+    left: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.xs,
+    paddingVertical: DesignSystem.spacing.xxs,
     position: 'absolute',
   },
   categoryText: {
-    color: '#FFFFFF',
-    fontSize: 9,
-    fontWeight: '600',
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.sizes.xxs,
+    fontWeight: DesignSystem.typography.weights.semiBold,
     letterSpacing: 0.5,
   },
   colorIndicator: {
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-    borderRadius: 6,
+    borderColor: DesignSystem.colors.border.light,
+    borderRadius: DesignSystem.borderRadius.sm,
     borderWidth: 1,
     elevation: 1,
     height: 12,
-    shadowColor: '#000',
+    shadowColor: DesignSystem.colors.shadow.primary,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 1,
@@ -398,13 +444,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   container: {
-    backgroundColor: '#FDFCFA',
+    backgroundColor: DesignSystem.colors.background.primary,
     flex: 1,
   },
   currencyText: {
-    color: '#8B5A3C',
-    fontSize: 11,
-    fontWeight: '500',
+    color: DesignSystem.colors.sage[700],
+    fontSize: DesignSystem.typography.sizes.xs,
+    fontWeight: DesignSystem.typography.weights.medium,
     opacity: 0.7,
   },
   detailsRow: {
@@ -419,31 +465,31 @@ const styles = StyleSheet.create({
     paddingVertical: 80,
   },
   emptySubtitle: {
-    color: '#8B5A3C',
-    fontSize: 14,
+    color: DesignSystem.colors.sage[700],
+    fontSize: DesignSystem.typography.sizes.sm,
     lineHeight: 20,
     textAlign: 'center',
   },
   emptyTitle: {
-    color: '#2D2D2D',
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 8,
-    marginTop: 16,
+    color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.sizes.lg,
+    fontWeight: DesignSystem.typography.weights.bold,
+    marginBottom: DesignSystem.spacing.xs,
+    marginTop: DesignSystem.spacing.md,
   },
   favoriteButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 12,
+    backgroundColor: DesignSystem.colors.overlay.light,
+    borderRadius: DesignSystem.borderRadius.md,
     elevation: 3,
-    padding: 6,
-    shadowColor: '#000',
+    padding: DesignSystem.spacing.xs,
+    shadowColor: DesignSystem.colors.shadow.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   gridContainer: {
-    paddingBottom: 24,
-    paddingHorizontal: 24,
+    paddingBottom: DesignSystem.spacing.xl,
+    paddingHorizontal: DesignSystem.spacing.xl,
   },
   gridRow: {
     justifyContent: 'space-between',
@@ -452,26 +498,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingVertical: DesignSystem.spacing.lg,
   },
   headerSubtitle: {
-    color: '#8B5A3C',
-    fontSize: 14,
-    fontWeight: '500',
-    marginTop: 4,
+    color: DesignSystem.colors.sage[700],
+    fontSize: DesignSystem.typography.sizes.sm,
+    fontWeight: DesignSystem.typography.weights.medium,
+    marginTop: DesignSystem.spacing.xxs,
   },
   headerTitle: {
-    color: '#2D2D2D',
-    fontFamily: 'System',
-    fontSize: 28,
-    fontWeight: '800',
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+    fontSize: DesignSystem.typography.sizes.xl,
+    fontWeight: DesignSystem.typography.weights.extraBold,
   },
   imageContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-    borderRadius: 16,
+    backgroundColor: DesignSystem.colors.overlay.light,
+    borderRadius: DesignSystem.borderRadius.lg,
     flex: 1,
-    marginBottom: 12,
+    marginBottom: DesignSystem.spacing.sm,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -484,47 +530,47 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   itemName: {
-    color: '#2D2D2D',
-    fontFamily: 'System',
-    fontSize: 13,
-    fontWeight: '600',
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.sm,
+    fontWeight: DesignSystem.typography.weights.semiBold,
     lineHeight: 17,
-    marginBottom: 6,
+    marginBottom: DesignSystem.spacing.xs,
   },
   loadingContainer: {
     alignItems: 'center',
-    backgroundColor: '#FDFCFA',
+    backgroundColor: DesignSystem.colors.background.primary,
     flex: 1,
     justifyContent: 'center',
   },
   loadingText: {
-    color: '#8B5A3C',
-    fontSize: 16,
-    fontWeight: '500',
-    marginTop: 16,
+    color: DesignSystem.colors.sage[700],
+    fontSize: DesignSystem.typography.sizes.md,
+    fontWeight: DesignSystem.typography.weights.medium,
+    marginTop: DesignSystem.spacing.md,
   },
   moreColors: {
-    color: '#8B5A3C',
-    fontSize: 9,
-    fontWeight: '500',
+    color: DesignSystem.colors.sage[700],
+    fontSize: DesignSystem.typography.sizes.xxs,
+    fontWeight: DesignSystem.typography.weights.medium,
     marginLeft: 2,
   },
   premiumBadge: {
-    backgroundColor: 'rgba(184, 134, 11, 0.15)',
-    borderRadius: 8,
-    marginLeft: 6,
+    backgroundColor: DesignSystem.colors.gold[100],
+    borderRadius: DesignSystem.borderRadius.sm,
+    marginLeft: DesignSystem.spacing.xs,
     padding: 2,
   },
   premiumCard: {
     aspectRatio: 0.75,
-    backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(139, 90, 60, 0.1)',
-    borderRadius: 24,
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderColor: DesignSystem.colors.border.light,
+    borderRadius: DesignSystem.borderRadius.xl,
     borderWidth: 1,
     elevation: 8,
-    marginBottom: 16,
+    marginBottom: DesignSystem.spacing.md,
     overflow: 'hidden',
-    shadowColor: '#8B5A3C',
+    shadowColor: DesignSystem.colors.shadow.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.15,
     shadowRadius: 20,
@@ -534,31 +580,31 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   priceText: {
-    color: '#8B5A3C',
-    fontFamily: 'System',
-    fontSize: 15,
-    fontWeight: '700',
+    color: DesignSystem.colors.sage[700],
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.md,
+    fontWeight: DesignSystem.typography.weights.bold,
   },
   selectedCard: {
-    borderColor: '#D4A574',
+    borderColor: DesignSystem.colors.gold[500],
     borderWidth: 2.5,
-    shadowColor: '#D4A574',
+    shadowColor: DesignSystem.colors.gold[500],
     shadowOpacity: 0.25,
     transform: [{ scale: 1.02 }],
   },
   selectionIndicator: {
-    backgroundColor: '#D4A574',
-    borderRadius: 20,
+    backgroundColor: DesignSystem.colors.gold[500],
+    borderRadius: DesignSystem.borderRadius.lg,
     elevation: 6,
-    padding: 8,
-    shadowColor: '#D4A574',
+    padding: DesignSystem.spacing.xs,
+    shadowColor: DesignSystem.colors.gold[500],
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
   selectionOverlay: {
     alignItems: 'center',
-    backgroundColor: 'rgba(212, 165, 116, 0.2)',
+    backgroundColor: DesignSystem.colors.gold[200] + '33',
     bottom: 0,
     justifyContent: 'center',
     left: 0,
@@ -567,31 +613,31 @@ const styles = StyleSheet.create({
     top: 0,
   },
   sizeText: {
-    color: '#8B5A3C',
-    fontSize: 9,
-    fontWeight: '500',
+    color: DesignSystem.colors.sage[700],
+    fontSize: DesignSystem.typography.sizes.xxs,
+    fontWeight: DesignSystem.typography.weights.medium,
   },
   tagsText: {
-    color: '#A67C52',
-    fontSize: 8,
+    color: DesignSystem.colors.sage[600],
+    fontSize: DesignSystem.typography.sizes.xxs,
     fontStyle: 'italic',
-    fontWeight: '400',
+    fontWeight: DesignSystem.typography.weights.normal,
   },
   usageBadge: {
     alignItems: 'center',
-    backgroundColor: 'rgba(212, 165, 116, 0.9)',
-    borderRadius: 10,
+    backgroundColor: DesignSystem.colors.gold[500] + 'E6',
+    borderRadius: DesignSystem.borderRadius.md,
     flexDirection: 'row',
     gap: 3,
-    paddingHorizontal: 6,
+    paddingHorizontal: DesignSystem.spacing.xs,
     paddingVertical: 3,
     position: 'absolute',
-    right: 8,
-    top: 8,
+    right: DesignSystem.spacing.xs,
+    top: DesignSystem.spacing.xs,
   },
   usageText: {
-    color: '#FFFFFF',
-    fontSize: 9,
-    fontWeight: '600',
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.sizes.xxs,
+    fontWeight: DesignSystem.typography.weights.semiBold,
   },
 });

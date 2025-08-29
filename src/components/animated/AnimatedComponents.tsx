@@ -20,8 +20,8 @@ import {
   useScaleAnimation,
   useSlideAnimation,
   useSpringAnimation,
-} from '../../hooks/useAnimation';
-import { AnimationSystem } from '../../theme/foundations/Animation';
+} from '@/hooks/useAnimation';
+import { AnimationSystem } from '@/theme/foundations/Animation';
 
 /**
  * Animated View with fade-in effect
@@ -641,4 +641,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export { AnimationSystem } from '../../theme/foundations/Animation';
+export { AnimationSystem } from '@/theme/foundations/Animation';

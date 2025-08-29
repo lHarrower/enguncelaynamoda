@@ -35,133 +35,252 @@ describe('Recommendation Accuracy - User Experience Tests', () => {
         {
           id: 'mock-outfit-1',
           items: [
-            { id: 'neglected-jacket', category: 'outerwear', colors: ['blue'], tags: ['casual', 'comfortable', 'waterproof'], usageStats: { totalWears: 2 } },
-            { id: 'favorite-dress', category: 'dresses', colors: ['black'], tags: ['versatile', 'classic'], usageStats: { totalWears: 15 } }
+            {
+              id: 'neglected-jacket',
+              category: 'outerwear',
+              colors: ['blue'],
+              tags: ['casual', 'comfortable', 'waterproof'],
+              usageStats: { totalWears: 2 },
+            },
+            {
+              id: 'favorite-dress',
+              category: 'dresses',
+              colors: ['black'],
+              tags: ['versatile', 'classic'],
+              usageStats: { totalWears: 15 },
+            },
           ],
           confidenceScore: 4.2,
           confidenceNote: 'Perfect for rediscovering neglected pieces in your wardrobe',
-          reasoning: 'Mock outfit for testing'
+          reasoning: 'Mock outfit for testing',
         },
         {
           id: 'mock-outfit-2',
           items: [
-            { id: 'forgotten-dress', category: 'dresses', colors: ['red'], tags: ['bold', 'trendy'], usageStats: { totalWears: 1 } },
-            { id: 'loved-jacket', category: 'outerwear', colors: ['navy'], tags: ['professional', 'smart', 'rain'], usageStats: { totalWears: 8 } }
+            {
+              id: 'forgotten-dress',
+              category: 'dresses',
+              colors: ['red'],
+              tags: ['bold', 'trendy'],
+              usageStats: { totalWears: 1 },
+            },
+            {
+              id: 'loved-jacket',
+              category: 'outerwear',
+              colors: ['navy'],
+              tags: ['professional', 'smart', 'rain'],
+              usageStats: { totalWears: 8 },
+            },
           ],
           confidenceScore: 3.8,
           confidenceNote: 'Time to rediscover this beautiful forgotten piece',
-          reasoning: 'Alternative mock outfit'
+          reasoning: 'Alternative mock outfit',
         },
         {
           id: 'mock-outfit-3',
           items: [
-            { id: 'summer-tank', category: 'tops', subcategory: 'tank-top', colors: ['white'], tags: ['summer', 'light', 'breathable'], usageStats: { totalWears: 3 } },
-            { id: 'cotton-shorts', category: 'bottoms', subcategory: 'shorts', colors: ['khaki'], tags: ['summer', 'casual', 'breathable'], usageStats: { totalWears: 12 } }
+            {
+              id: 'summer-tank',
+              category: 'tops',
+              subcategory: 'tank-top',
+              colors: ['white'],
+              tags: ['summer', 'light', 'breathable'],
+              usageStats: { totalWears: 3 },
+            },
+            {
+              id: 'cotton-shorts',
+              category: 'bottoms',
+              subcategory: 'shorts',
+              colors: ['khaki'],
+              tags: ['summer', 'casual', 'breathable'],
+              usageStats: { totalWears: 12 },
+            },
           ],
           confidenceScore: 4.5,
           confidenceNote: 'Perfect for hot weather comfort',
-          reasoning: 'Light summer outfit'
-        }
+          reasoning: 'Light summer outfit',
+        },
       ],
       weatherContext: { temperature: 20, condition: 'sunny' },
-      preferences: { style: 'casual' }
+      preferences: { style: 'casual' },
     });
 
-    (AynaMirrorService.generateDailyRecommendations as jest.Mock).mockImplementation(async (userId) => {
-      // Return different recommendations based on test context
-      const testName = expect.getState().currentTestName;
-      
-      if (testName?.includes('cold weather')) {
-        return {
-          recommendations: [
-            {
-              id: 'cold-outfit-1',
-              items: [
-                { id: 'winter-coat', category: 'outerwear', colors: ['black'], tags: ['warm', 'winter', 'waterproof'], usageStats: { totalWears: 5 } },
-                { id: 'wool-sweater', category: 'tops', subcategory: 'sweater', colors: ['grey'], tags: ['warm', 'cozy'], usageStats: { totalWears: 8 } }
-              ],
-              confidenceScore: 4.5,
-              confidenceNote: 'Perfect for cold weather',
-              reasoning: 'Warm winter outfit'
-            }
-          ],
-          weatherContext: { temperature: 5, condition: 'snowy' },
-          preferences: { style: 'casual' }
-        };
-      } else if (testName?.includes('hot weather')) {
-        return {
-          recommendations: [
-            {
-              id: 'hot-outfit-1',
-              items: [
-                { id: 'summer-tank', category: 'tops', subcategory: 'tank-top', colors: ['white'], tags: ['summer', 'light', 'breathable'], usageStats: { totalWears: 3 } },
-                { id: 'cotton-shorts', category: 'bottoms', subcategory: 'shorts', colors: ['khaki'], tags: ['summer', 'casual', 'breathable'], usageStats: { totalWears: 12 } }
-              ],
-              confidenceScore: 4.5,
-              confidenceNote: 'Perfect for hot weather comfort',
-              reasoning: 'Light summer outfit'
-            }
-          ],
-          weatherContext: { temperature: 32, condition: 'sunny' },
-          preferences: { style: 'casual' }
-        };
-      } else if (testName?.includes('rainy weather')) {
-        return {
-          recommendations: [
-            {
-              id: 'rainy-outfit-1',
-              items: [
-                { id: 'raincoat-1', category: 'outerwear', subcategory: 'raincoat', colors: ['yellow'], tags: ['waterproof', 'rain'], usageStats: { totalWears: 3 } },
-                { id: 'boots-3', category: 'shoes', subcategory: 'rain-boots', colors: ['green'], tags: ['waterproof', 'rain'], usageStats: { totalWears: 5 } }
-              ],
-              confidenceScore: 4.3,
-              confidenceNote: 'Perfect for staying dry',
-              reasoning: 'Waterproof rainy day outfit'
-            }
-          ],
-          weatherContext: { temperature: 18, condition: 'rainy' },
-          preferences: { style: 'casual' }
-        };
-      } else {
-        // Default mock for other tests
-        return {
-          recommendations: [
-            {
-              id: 'mock-outfit-1',
-              items: [
-                { id: 'neglected-jacket', category: 'outerwear', colors: ['blue'], tags: ['casual', 'comfortable', 'waterproof'], usageStats: { totalWears: 2 } },
-                { id: 'favorite-dress', category: 'dresses', colors: ['black'], tags: ['versatile', 'classic'], usageStats: { totalWears: 15 } }
-              ],
-              confidenceScore: 4.2,
-              confidenceNote: 'Perfect for rediscovering neglected pieces in your wardrobe',
-              reasoning: 'Mock outfit for testing'
-            },
-            {
-              id: 'mock-outfit-2',
-              items: [
-                { id: 'forgotten-dress', category: 'dresses', colors: ['red'], tags: ['bold', 'trendy'], usageStats: { totalWears: 1 } },
-                { id: 'loved-jacket', category: 'outerwear', colors: ['navy'], tags: ['professional', 'smart', 'rain'], usageStats: { totalWears: 8 } }
-              ],
-              confidenceScore: 3.8,
-              confidenceNote: 'Time to rediscover this beautiful forgotten piece',
-              reasoning: 'Alternative mock outfit'
-            },
-            {
-              id: 'mock-outfit-3',
-              items: [
-                { id: 'summer-tank', category: 'tops', subcategory: 'tank-top', colors: ['white'], tags: ['summer', 'light', 'breathable'], usageStats: { totalWears: 3 } },
-                { id: 'cotton-shorts', category: 'bottoms', subcategory: 'shorts', colors: ['khaki'], tags: ['summer', 'casual', 'breathable'], usageStats: { totalWears: 12 } }
-              ],
-              confidenceScore: 4.5,
-              confidenceNote: 'Perfect for hot weather comfort',
-              reasoning: 'Light summer outfit'
-            }
-          ],
-          weatherContext: { temperature: 20, condition: 'sunny' },
-          preferences: { style: 'casual' }
-        };
-      }
-    });
+    (AynaMirrorService.generateDailyRecommendations as jest.Mock).mockImplementation(
+      async (userId) => {
+        // Return different recommendations based on test context
+        const testName = expect.getState().currentTestName;
+
+        if (testName?.includes('cold weather')) {
+          return {
+            recommendations: [
+              {
+                id: 'cold-outfit-1',
+                items: [
+                  {
+                    id: 'winter-coat',
+                    category: 'outerwear',
+                    colors: ['black'],
+                    tags: ['warm', 'winter', 'waterproof'],
+                    usageStats: { totalWears: 5 },
+                  },
+                  {
+                    id: 'wool-sweater',
+                    category: 'tops',
+                    subcategory: 'sweater',
+                    colors: ['grey'],
+                    tags: ['warm', 'cozy'],
+                    usageStats: { totalWears: 8 },
+                  },
+                ],
+                confidenceScore: 4.5,
+                confidenceNote: 'Perfect for cold weather',
+                reasoning: 'Warm winter outfit',
+              },
+            ],
+            weatherContext: { temperature: 5, condition: 'snowy' },
+            preferences: { style: 'casual' },
+          };
+        } else if (testName?.includes('hot weather')) {
+          return {
+            recommendations: [
+              {
+                id: 'hot-outfit-1',
+                items: [
+                  {
+                    id: 'summer-tank',
+                    category: 'tops',
+                    subcategory: 'tank-top',
+                    colors: ['white'],
+                    tags: ['summer', 'light', 'breathable'],
+                    usageStats: { totalWears: 3 },
+                  },
+                  {
+                    id: 'cotton-shorts',
+                    category: 'bottoms',
+                    subcategory: 'shorts',
+                    colors: ['khaki'],
+                    tags: ['summer', 'casual', 'breathable'],
+                    usageStats: { totalWears: 12 },
+                  },
+                ],
+                confidenceScore: 4.5,
+                confidenceNote: 'Perfect for hot weather comfort',
+                reasoning: 'Light summer outfit',
+              },
+            ],
+            weatherContext: { temperature: 32, condition: 'sunny' },
+            preferences: { style: 'casual' },
+          };
+        } else if (testName?.includes('rainy weather')) {
+          return {
+            recommendations: [
+              {
+                id: 'rainy-outfit-1',
+                items: [
+                  {
+                    id: 'raincoat-1',
+                    category: 'outerwear',
+                    subcategory: 'raincoat',
+                    colors: ['yellow'],
+                    tags: ['waterproof', 'rain'],
+                    usageStats: { totalWears: 3 },
+                  },
+                  {
+                    id: 'boots-3',
+                    category: 'shoes',
+                    subcategory: 'rain-boots',
+                    colors: ['green'],
+                    tags: ['waterproof', 'rain'],
+                    usageStats: { totalWears: 5 },
+                  },
+                ],
+                confidenceScore: 4.3,
+                confidenceNote: 'Perfect for staying dry',
+                reasoning: 'Waterproof rainy day outfit',
+              },
+            ],
+            weatherContext: { temperature: 18, condition: 'rainy' },
+            preferences: { style: 'casual' },
+          };
+        } else {
+          // Default mock for other tests
+          return {
+            recommendations: [
+              {
+                id: 'mock-outfit-1',
+                items: [
+                  {
+                    id: 'neglected-jacket',
+                    category: 'outerwear',
+                    colors: ['blue'],
+                    tags: ['casual', 'comfortable', 'waterproof'],
+                    usageStats: { totalWears: 2 },
+                  },
+                  {
+                    id: 'favorite-dress',
+                    category: 'dresses',
+                    colors: ['black'],
+                    tags: ['versatile', 'classic'],
+                    usageStats: { totalWears: 15 },
+                  },
+                ],
+                confidenceScore: 4.2,
+                confidenceNote: 'Perfect for rediscovering neglected pieces in your wardrobe',
+                reasoning: 'Mock outfit for testing',
+              },
+              {
+                id: 'mock-outfit-2',
+                items: [
+                  {
+                    id: 'forgotten-dress',
+                    category: 'dresses',
+                    colors: ['red'],
+                    tags: ['bold', 'trendy'],
+                    usageStats: { totalWears: 1 },
+                  },
+                  {
+                    id: 'loved-jacket',
+                    category: 'outerwear',
+                    colors: ['navy'],
+                    tags: ['professional', 'smart', 'rain'],
+                    usageStats: { totalWears: 8 },
+                  },
+                ],
+                confidenceScore: 3.8,
+                confidenceNote: 'Time to rediscover this beautiful forgotten piece',
+                reasoning: 'Alternative mock outfit',
+              },
+              {
+                id: 'mock-outfit-3',
+                items: [
+                  {
+                    id: 'summer-tank',
+                    category: 'tops',
+                    subcategory: 'tank-top',
+                    colors: ['white'],
+                    tags: ['summer', 'light', 'breathable'],
+                    usageStats: { totalWears: 3 },
+                  },
+                  {
+                    id: 'cotton-shorts',
+                    category: 'bottoms',
+                    subcategory: 'shorts',
+                    colors: ['khaki'],
+                    tags: ['summer', 'casual', 'breathable'],
+                    usageStats: { totalWears: 12 },
+                  },
+                ],
+                confidenceScore: 4.5,
+                confidenceNote: 'Perfect for hot weather comfort',
+                reasoning: 'Light summer outfit',
+              },
+            ],
+            weatherContext: { temperature: 20, condition: 'sunny' },
+            preferences: { style: 'casual' },
+          };
+        }
+      },
+    );
   });
 
   afterEach(() => {

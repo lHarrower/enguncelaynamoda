@@ -32,15 +32,15 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
     it('should generate daily recommendations in under 1 second', async () => {
       // Mock aynaMirrorService to return immediately for performance testing
       const originalGenerateDailyRecommendations = aynaMirrorService.generateDailyRecommendations;
-      aynaMirrorService.generateDailyRecommendations = jest.fn().mockImplementation(() => 
+      aynaMirrorService.generateDailyRecommendations = jest.fn().mockImplementation(() =>
         Promise.resolve({
           recommendations: [
             { id: 'perf-rec-1', type: 'outfit', confidence: 0.9 },
             { id: 'perf-rec-2', type: 'outfit', confidence: 0.8 },
-            { id: 'perf-rec-3', type: 'outfit', confidence: 0.7 }
+            { id: 'perf-rec-3', type: 'outfit', confidence: 0.7 },
           ],
-          metadata: { generatedAt: mockDate, cacheHit: false }
-        })
+          metadata: { generatedAt: mockDate, cacheHit: false },
+        }),
       );
 
       // Measure performance
@@ -54,8 +54,8 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
       expect(recommendations).toBeDefined();
       expect(recommendations.recommendations).toHaveLength(3);
 
-      console.log(`Daily recommendations generated in ${duration.toFixed(2)}ms`);
       
+
       // Restore original method
       aynaMirrorService.generateDailyRecommendations = originalGenerateDailyRecommendations;
     }, 5000);
@@ -83,9 +83,9 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
 
       // Mock aynaMirrorService to return immediately for performance testing
       const originalProcessUserFeedback = aynaMirrorService.processUserFeedback;
-      aynaMirrorService.processUserFeedback = jest.fn().mockImplementation(() => 
-        Promise.resolve({ success: true, feedbackId: 'feedback-perf' })
-      );
+      aynaMirrorService.processUserFeedback = jest
+        .fn()
+        .mockImplementation(() => Promise.resolve({ success: true, feedbackId: 'feedback-perf' }));
 
       // Measure performance
       const startTime = performance.now();
@@ -95,8 +95,8 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
 
       // Performance assertions
       expect(duration).toBeLessThan(500); // Under 500ms
-      console.log(`Feedback processed in ${duration.toFixed(2)}ms`);
       
+
       // Restore original method
       aynaMirrorService.processUserFeedback = originalProcessUserFeedback;
     }, 5000);
@@ -104,15 +104,15 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
     it('should handle large wardrobes efficiently', async () => {
       // Mock aynaMirrorService to return immediately for large wardrobe testing
       const originalGenerateDailyRecommendations = aynaMirrorService.generateDailyRecommendations;
-      aynaMirrorService.generateDailyRecommendations = jest.fn().mockImplementation(() => 
+      aynaMirrorService.generateDailyRecommendations = jest.fn().mockImplementation(() =>
         Promise.resolve({
           recommendations: [
             { id: 'large-rec-1', type: 'outfit', confidence: 0.9 },
             { id: 'large-rec-2', type: 'outfit', confidence: 0.8 },
-            { id: 'large-rec-3', type: 'outfit', confidence: 0.7 }
+            { id: 'large-rec-3', type: 'outfit', confidence: 0.7 },
           ],
-          metadata: { generatedAt: mockDate, cacheHit: false }
-        })
+          metadata: { generatedAt: mockDate, cacheHit: false },
+        }),
       );
 
       // Measure performance with large dataset
@@ -124,8 +124,8 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
       // Should still be fast with large wardrobe
       expect(duration).toBeLessThan(2000); // Under 2 seconds even with 200 items
       expect(recommendations.recommendations).toHaveLength(3);
-      console.log(`Large wardrobe (200 items) processed in ${duration.toFixed(2)}ms`);
       
+
       // Restore original method
       aynaMirrorService.generateDailyRecommendations = originalGenerateDailyRecommendations;
     }, 5000);
@@ -183,7 +183,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
 
       expect(duration).toBeLessThan(300); // Under 300ms
       expect(styleProfile).toBeDefined();
-      console.log(`Style profile analysis completed in ${duration.toFixed(2)}ms`);
+      
     });
 
     it('should calculate outfit compatibility quickly', async () => {
@@ -203,7 +203,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
       expect(duration).toBeLessThan(100); // Under 100ms
       expect(compatibilityScore).toBeGreaterThanOrEqual(0);
       expect(compatibilityScore).toBeLessThanOrEqual(5);
-      console.log(`Outfit compatibility calculated in ${duration.toFixed(2)}ms`);
+      
     });
 
     it('should track item usage efficiently', async () => {
@@ -223,7 +223,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
       const duration = endTime - startTime;
 
       expect(duration).toBeLessThan(50); // Under 50ms
-      console.log(`Item usage tracked in ${duration.toFixed(2)}ms`);
+      
     });
   });
 
@@ -233,12 +233,14 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
 
       // Mock aynaMirrorService to return immediately for concurrent testing
       const originalGenerateDailyRecommendations = aynaMirrorService.generateDailyRecommendations;
-      aynaMirrorService.generateDailyRecommendations = jest.fn().mockImplementation((userId: string) => 
-        Promise.resolve({
-          recommendations: [{ id: `concurrent-rec-${userId}`, type: 'outfit', confidence: 0.9 }],
-          metadata: { generatedAt: mockDate, cacheHit: false }
-        })
-      );
+      aynaMirrorService.generateDailyRecommendations = jest
+        .fn()
+        .mockImplementation((userId: string) =>
+          Promise.resolve({
+            recommendations: [{ id: `concurrent-rec-${userId}`, type: 'outfit', confidence: 0.9 }],
+            metadata: { generatedAt: mockDate, cacheHit: false },
+          }),
+        );
 
       const startTime = performance.now();
 
@@ -258,45 +260,46 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
         expect(result).toBeDefined();
         expect(result.recommendations.length).toBeGreaterThan(0);
       });
-      
+
       // Restore original method
       aynaMirrorService.generateDailyRecommendations = originalGenerateDailyRecommendations;
 
-      console.log(`10 concurrent recommendations generated in ${duration.toFixed(2)}ms`);
+      
     }, 5000);
 
     it('should handle mixed operations concurrently', async () => {
       // Mock aynaMirrorService methods to return immediately
       const originalGenerateDailyRecommendations = aynaMirrorService.generateDailyRecommendations;
       const originalProcessUserFeedback = aynaMirrorService.processUserFeedback;
-      
+
       aynaMirrorService.generateDailyRecommendations = jest.fn().mockResolvedValue({
         recommendations: [{ id: 'rec-1', type: 'outfit', confidence: 0.9 }],
-        metadata: { generatedAt: mockDate, cacheHit: false }
+        metadata: { generatedAt: mockDate, cacheHit: false },
       });
-      
+
       aynaMirrorService.processUserFeedback = jest.fn().mockResolvedValue({
         success: true,
-        updatedProfile: { id: 'user-2', preferences: {} }
+        updatedProfile: { id: 'user-2', preferences: {} },
       });
-      
+
       // Mock other services
       const mockAnalyzeUserStyleProfile = jest.fn().mockResolvedValue({
-        profile: { id: 'user-3', style: 'casual' }
+        profile: { id: 'user-3', style: 'casual' },
       });
       const mockTrackItemUsage = jest.fn().mockResolvedValue({
-        success: true
+        success: true,
       });
       const mockScheduleDailyMirrorNotification = jest.fn().mockResolvedValue({
         success: true,
-        notificationId: 'notif-1'
+        notificationId: 'notif-1',
       });
-      
+
       // Apply mocks
       const originalAnalyzeUserStyleProfile = intelligenceService.analyzeUserStyleProfile;
       const originalTrackItemUsage = enhancedWardrobeService.trackItemUsage;
-      const originalScheduleDailyMirrorNotification = notificationService.scheduleDailyMirrorNotification;
-      
+      const originalScheduleDailyMirrorNotification =
+        notificationService.scheduleDailyMirrorNotification;
+
       intelligenceService.analyzeUserStyleProfile = mockAnalyzeUserStyleProfile;
       enhancedWardrobeService.trackItemUsage = mockTrackItemUsage;
       notificationService.scheduleDailyMirrorNotification = mockScheduleDailyMirrorNotification;
@@ -336,8 +339,8 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
 
       expect(duration).toBeLessThan(1500); // Under 1.5 seconds for mixed operations
       expect(operations).toHaveLength(5);
-      console.log(`Mixed concurrent operations completed in ${duration.toFixed(2)}ms`);
       
+
       // Restore original methods
       aynaMirrorService.generateDailyRecommendations = originalGenerateDailyRecommendations;
       aynaMirrorService.processUserFeedback = originalProcessUserFeedback;
@@ -351,10 +354,10 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
     it('should not leak memory during repeated operations', async () => {
       // Mock aynaMirrorService to return immediately and avoid memory issues
       const originalGenerateDailyRecommendations = aynaMirrorService.generateDailyRecommendations;
-      
+
       aynaMirrorService.generateDailyRecommendations = jest.fn().mockResolvedValue({
         recommendations: [{ id: 'rec-memory', type: 'outfit', confidence: 0.8 }],
-        metadata: { generatedAt: mockDate, cacheHit: false }
+        metadata: { generatedAt: mockDate, cacheHit: false },
       });
 
       // Measure initial memory usage (if available)
@@ -424,7 +427,7 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
       // Should handle timeout gracefully and still provide recommendations
       expect(recommendations).toBeDefined();
       expect(duration).toBeLessThan(100); // Should complete almost instantly with full mock
-      console.log(`Timeout scenario handled in ${duration.toFixed(2)}ms`);
+      
 
       // Restore original method
       aynaMirrorService.generateDailyRecommendations = originalMethod;
@@ -435,46 +438,48 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
     it('should optimize wardrobe queries for large datasets', async () => {
       // Track query count for performance validation
       let queryCount = 0;
-      
+
       // Mock the entire generateDailyRecommendations method to simulate optimized performance
       const originalMethod = aynaMirrorService.generateDailyRecommendations;
-      aynaMirrorService.generateDailyRecommendations = jest.fn().mockImplementation(async (userId) => {
-        // Simulate minimal database queries for large dataset optimization
-        queryCount = 3; // Simulating optimized query count
-        
-        return {
-          id: 'large-dataset-recommendation',
-          userId,
-          date: mockDate,
-          recommendations: [
-            {
-              id: 'large-dataset-rec-1',
-              items: [
-                { id: 'item-1', category: 'tops', color: 'blue', style: 'casual' },
-                { id: 'item-2', category: 'bottoms', color: 'black', style: 'casual' },
-              ],
-              confidenceNote: 'Optimized recommendation from large dataset',
-              quickActions: [
-                { type: 'wear', label: 'Wear', icon: 'wear' },
-                { type: 'save', label: 'Save', icon: 'save' },
-                { type: 'share', label: 'Share', icon: 'share' },
-              ],
-              confidenceScore: 0.9,
-              reasoning: ['Optimized for large dataset performance'],
-              isQuickOption: true,
-              createdAt: mockDate,
+      aynaMirrorService.generateDailyRecommendations = jest
+        .fn()
+        .mockImplementation(async (userId) => {
+          // Simulate minimal database queries for large dataset optimization
+          queryCount = 3; // Simulating optimized query count
+
+          return {
+            id: 'large-dataset-recommendation',
+            userId,
+            date: mockDate,
+            recommendations: [
+              {
+                id: 'large-dataset-rec-1',
+                items: [
+                  { id: 'item-1', category: 'tops', color: 'blue', style: 'casual' },
+                  { id: 'item-2', category: 'bottoms', color: 'black', style: 'casual' },
+                ],
+                confidenceNote: 'Optimized recommendation from large dataset',
+                quickActions: [
+                  { type: 'wear', label: 'Wear', icon: 'wear' },
+                  { type: 'save', label: 'Save', icon: 'save' },
+                  { type: 'share', label: 'Share', icon: 'share' },
+                ],
+                confidenceScore: 0.9,
+                reasoning: ['Optimized for large dataset performance'],
+                isQuickOption: true,
+                createdAt: mockDate,
+              },
+            ],
+            weatherContext: {
+              temperature: 22,
+              condition: 'sunny' as const,
+              humidity: 50,
+              location: 'Large Dataset Test',
+              timestamp: mockDate,
             },
-          ],
-          weatherContext: {
-            temperature: 22,
-            condition: 'sunny' as const,
-            humidity: 50,
-            location: 'Large Dataset Test',
-            timestamp: mockDate,
-          },
-          generatedAt: mockDate,
-        };
-      });
+            generatedAt: mockDate,
+          };
+        });
 
       const startTime = performance.now();
 
@@ -488,8 +493,8 @@ describe('Performance Benchmarks - AYNA Mirror System', () => {
       expect(recommendations).toBeDefined();
       expect(queryCount).toBeLessThan(5); // Should not make excessive queries
       expect(duration).toBeLessThan(100); // Should complete almost instantly with optimization
-      console.log(`Database queries executed: ${queryCount}`);
-      console.log(`Large dataset query optimized: ${duration.toFixed(2)}ms`);
+      
+      
 
       // Restore original method
       aynaMirrorService.generateDailyRecommendations = originalMethod;

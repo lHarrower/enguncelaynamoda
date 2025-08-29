@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   profileButton: {
-    padding: 4,
+    padding: DesignSystem.spacing.xs,
   },
   userName: {
     ...DesignSystem.typography.scale.hero,

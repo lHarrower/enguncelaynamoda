@@ -1,0 +1,20 @@
+{
+  "automated_checks": [
+    "Backup file integrity (checksums)",
+    "Backup completeness (all tables)",
+    "Backup consistency (foreign keys)",
+    "Backup accessibility (can be read)"
+  ],
+  "manual_checks": [
+    "Sample data restoration test",
+    "Schema validation",
+    "Performance impact assessment",
+    "Recovery time measurement"
+  ],
+  "schedule": {
+    "daily": "Automated integrity checks",
+    "weekly": "Sample restoration test",
+    "monthly": "Full recovery drill",
+    "quarterly": "Disaster recovery simulation"
+  }
+}

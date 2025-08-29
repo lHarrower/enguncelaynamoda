@@ -12,14 +12,12 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { warnInDev } from '../../utils/consoleSuppress';
-
 const { width, height } = Dimensions.get('window');
 
 interface StyleDNA {
   style_energy?: { value: string };
   color_palette?: { value: string };
-  [key: string]: any;
+  [key: string]: { value: string } | undefined;
 }
 
 interface OutfitItem {
@@ -119,9 +117,9 @@ export default function WelcomeGift({ styleDNA, onComplete, onOutfitSelect }: We
         {
           rotateY: `${interpolate(giftBoxAnim.value, [0, 1], [0, 180])}deg`,
         },
-      ] as any,
+      ],
       opacity: interpolate(giftBoxAnim.value, [0, 0.8, 1], [1, 1, 0]),
-    };
+    } as any;
   });
 
   const outfitsRevealStyle = useAnimatedStyle(() => {
@@ -206,8 +204,8 @@ export default function WelcomeGift({ styleDNA, onComplete, onOutfitSelect }: We
       <Text style={styles.welcomeTitle}>We are thrilled to know you!</Text>
 
       <Text style={styles.welcomeSubtitle}>
-        As a welcome gift, we&apos;ve prepared the first three combinations showcasing the potential of
-        your wardrobe, specially curated according to your unique Style DNA.
+        As a welcome gift, we&apos;ve prepared the first three combinations showcasing the potential
+        of your wardrobe, specially curated according to your unique Style DNA.
       </Text>
 
       <View style={styles.giftBoxContainer}>

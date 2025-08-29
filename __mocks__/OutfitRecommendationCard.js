@@ -7,8 +7,10 @@ const OutfitRecommendationCard = (props) => {
     View,
     { testID: 'outfit-recommendation-card' },
     React.createElement(Text, { testID: 'outfit-title' }, props.outfit?.title || 'Mock Outfit'),
-    props.isQuickOption && React.createElement(Text, { testID: 'quick-option-badge' }, 'Quick Option'),
-    props.confidenceScore && React.createElement(Text, { testID: 'confidence-score' }, `${props.confidenceScore}%`)
+    props.isQuickOption &&
+      React.createElement(Text, { testID: 'quick-option-badge' }, 'Quick Option'),
+    props.confidenceScore &&
+      React.createElement(Text, { testID: 'confidence-score' }, `${props.confidenceScore}%`),
   );
 };
 

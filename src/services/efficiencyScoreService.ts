@@ -1,10 +1,11 @@
-import { capOutlier, clamp01, metricsConfig } from '../config/metricsConfig';
-import { supabase } from '../config/supabaseClient';
-import { WardrobeItem } from '../types/aynaMirror';
-import { errorInDev } from '../utils/consoleSuppress';
-import { ErrorHandler } from '../utils/ErrorHandler';
-import { mapSupabaseError } from '../utils/supabaseErrorMapping';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
+import { capOutlier, clamp01, metricsConfig } from '@/config/metricsConfig';
+import { supabase } from '@/config/supabaseClient';
+import { WardrobeItem } from '@/types/aynaMirror';
+import { errorInDev } from '@/utils/consoleSuppress';
+import { ErrorHandler } from '@/utils/ErrorHandler';
+import { mapSupabaseError } from '@/utils/supabaseErrorMapping';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
+
 import { enhancedWardrobeService } from './enhancedWardrobeService';
 
 interface ScoreRecord {
@@ -342,7 +343,8 @@ class EfficiencyScoreService {
         throw error;
       }
 
-      if (!historicalScores || historicalScores.length < 2) {
+      const scoresArray = Array.isArray(historicalScores) ? historicalScores : [];
+      if (!historicalScores || scoresArray.length < 2) {
         return {
           monthlyChange: 0,
           yearlyChange: 0,
@@ -401,7 +403,9 @@ class EfficiencyScoreService {
         throw error;
       }
 
-      if (!allScores || allScores.length === 0) {
+      const scoresArray = Array.isArray(allScores) ? allScores : [];
+
+      if (!scoresArray || scoresArray.length === 0) {
         return {
           userPercentile: 50,
           categoryAverages: {
@@ -415,21 +419,27 @@ class EfficiencyScoreService {
       }
 
       const userOverallScore = this.calculateOverallScore(breakdown);
-      const betterScores = allScores.filter(
-        (score: ScoreRecord) => score.overall_score < userOverallScore,
+      const betterScores = scoresArray.filter(
+        (score: { overall_score: number }) => score.overall_score < userOverallScore,
       ).length;
-      const userPercentile = Math.round((betterScores / allScores.length) * 100);
+      const userPercentile = Math.round((betterScores / scoresArray.length) * 100);
 
       const categoryAverages = {
-        utilization: this.calculateAverage(allScores.map((s: ScoreRecord) => s.utilization_score)),
+        utilization: this.calculateAverage(
+          scoresArray.map((s: { utilization_score: number }) => s.utilization_score),
+        ),
         costEfficiency: this.calculateAverage(
-          allScores.map((s: ScoreRecord) => s.cost_efficiency_score),
+          scoresArray.map((s: { cost_efficiency_score: number }) => s.cost_efficiency_score),
         ),
         sustainability: this.calculateAverage(
-          allScores.map((s: ScoreRecord) => s.sustainability_score),
+          scoresArray.map((s: { sustainability_score: number }) => s.sustainability_score),
         ),
-        versatility: this.calculateAverage(allScores.map((s: ScoreRecord) => s.versatility_score)),
-        curation: this.calculateAverage(allScores.map((s: ScoreRecord) => s.curation_score)),
+        versatility: this.calculateAverage(
+          scoresArray.map((s: { versatility_score: number }) => s.versatility_score),
+        ),
+        curation: this.calculateAverage(
+          scoresArray.map((s: { curation_score: number }) => s.curation_score),
+        ),
       };
 
       return {
@@ -483,7 +493,12 @@ class EfficiencyScoreService {
         const mapped = mapSupabaseError(insRes.error, { action: 'storeEfficiencyScore' });
         try {
           // Log & report via unified handler (fire and forget)
-          void ErrorHandler.getInstance().handleError(mapped);
+          void ErrorHandler.getInstance().handleError(
+            mapped.message,
+            mapped.category,
+            mapped.severity,
+            mapped.context,
+          );
         } catch {}
         throw mapped;
       }
@@ -510,7 +525,7 @@ class EfficiencyScoreService {
       if (error) {
         throw error;
       }
-      return data || [];
+      return (Array.isArray(data) ? data : []) as EfficiencyGoal[];
     } catch (error) {
       errorInDev(
         '[EfficiencyScoreService] Failed to get efficiency goals:',
@@ -540,7 +555,7 @@ class EfficiencyScoreService {
       if (error) {
         throw error;
       }
-      return data;
+      return data as EfficiencyGoal;
     } catch (error) {
       errorInDev(
         '[EfficiencyScoreService] Failed to create efficiency goal:',
@@ -562,7 +577,8 @@ class EfficiencyScoreService {
       if (error) {
         throw error;
       }
-      return (data?.length || 0) / 7; // Average daily activity
+      const dataArray = Array.isArray(data) ? data : [];
+      return (dataArray.length || 0) / 7; // Average daily activity
     } catch (error) {
       errorInDev(
         '[EfficiencyScoreService] Failed to calculate recent activity:',

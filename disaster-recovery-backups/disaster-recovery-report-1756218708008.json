@@ -1,0 +1,230 @@
+{
+  "summary": {
+    "total_tests": 6,
+    "passed_tests": 6,
+    "success_rate": "100%",
+    "test_date": "2025-08-26T14:31:48.008Z"
+  },
+  "detailed_results": [
+    {
+      "timestamp": "2025-08-26T14:31:47.989Z",
+      "type": "start",
+      "message": "🚀 Starting Data Disaster Recovery Drill..."
+    },
+    {
+      "timestamp": "2025-08-26T14:31:47.997Z",
+      "type": "info",
+      "message": "============================================================"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:47.997Z",
+      "type": "test",
+      "message": "🔄 Testing Database Schema Backup..."
+    },
+    {
+      "timestamp": "2025-08-26T14:31:47.998Z",
+      "type": "info",
+      "message": "✅ Schema backup created: disaster-recovery-backups\\schema-backup-1756218707998.json"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:47.999Z",
+      "type": "info",
+      "message": "----------------------------------------"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:47.999Z",
+      "type": "test",
+      "message": "🔄 Testing Migration Rollback Procedures..."
+    },
+    {
+      "timestamp": "2025-08-26T14:31:47.999Z",
+      "type": "info",
+      "message": "✅ Rollback plan created for: create_user_profiles_table.sql"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.000Z",
+      "type": "info",
+      "message": "📋 Rollback steps documented in: disaster-recovery-backups\\rollback-plan-1756218707999.json"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.000Z",
+      "type": "info",
+      "message": "----------------------------------------"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.000Z",
+      "type": "test",
+      "message": "🔄 Testing Data Corruption Recovery..."
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.000Z",
+      "type": "info",
+      "message": "✅ Data corruption recovery plan created"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.001Z",
+      "type": "info",
+      "message": "📋 Recovery scenarios documented: 4"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.001Z",
+      "type": "info",
+      "message": "----------------------------------------"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.001Z",
+      "type": "test",
+      "message": "🔄 Testing User Data Export/Import (KVKK Compliance)..."
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.002Z",
+      "type": "info",
+      "message": "✅ User data export/import procedures validated"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.002Z",
+      "type": "info",
+      "message": "📊 Export includes 4 data categories"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.002Z",
+      "type": "info",
+      "message": "----------------------------------------"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.002Z",
+      "type": "test",
+      "message": "🔄 Testing Emergency Recovery Procedures..."
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.004Z",
+      "type": "info",
+      "message": "✅ Emergency recovery procedures documented"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.004Z",
+      "type": "info",
+      "message": "🚨 3 emergency scenarios covered"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.004Z",
+      "type": "info",
+      "message": "----------------------------------------"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.004Z",
+      "type": "test",
+      "message": "🔄 Testing Backup Verification Procedures..."
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.005Z",
+      "type": "info",
+      "message": "✅ Backup verification procedures established"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.005Z",
+      "type": "info",
+      "message": "📅 Verification schedule: 4 intervals"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.006Z",
+      "type": "info",
+      "message": "----------------------------------------"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.006Z",
+      "type": "info",
+      "message": "============================================================"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.006Z",
+      "type": "summary",
+      "message": "📊 FAZ 2.2: Veri Kıyameti Tatbikatı - SONUÇLAR"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.006Z",
+      "type": "info",
+      "message": "============================================================"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.006Z",
+      "type": "info",
+      "message": "✅ Başarılı Testler: 6/6"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.006Z",
+      "type": "info",
+      "message": "📁 Backup Klasörü: ./disaster-recovery-backups"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.006Z",
+      "type": "success",
+      "message": "🎉 Tüm disaster recovery testleri başarıyla tamamlandı!"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.006Z",
+      "type": "info",
+      "message": "\n🔍 Önemli Bulgular:"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.007Z",
+      "type": "info",
+      "message": "• Database schema backup prosedürleri test edildi"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.007Z",
+      "type": "info",
+      "message": "• Migration rollback planları oluşturuldu"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.007Z",
+      "type": "info",
+      "message": "• Data corruption recovery senaryoları belirlendi"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.007Z",
+      "type": "info",
+      "message": "• KVKK uyumlu user data export/import prosedürleri doğrulandı"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.007Z",
+      "type": "info",
+      "message": "• Emergency recovery prosedürleri dokümante edildi"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.007Z",
+      "type": "info",
+      "message": "• Backup verification süreçleri tanımlandı"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.007Z",
+      "type": "info",
+      "message": "\n💡 Öneriler:"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.007Z",
+      "type": "info",
+      "message": "• Automated backup verification sistemini kurun"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.007Z",
+      "type": "info",
+      "message": "• Quarterly disaster recovery drill'leri planlayın"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.007Z",
+      "type": "info",
+      "message": "• RTO/RPO metriklerini düzenli olarak gözden geçirin"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.008Z",
+      "type": "info",
+      "message": "• Emergency contact listesini güncel tutun"
+    },
+    {
+      "timestamp": "2025-08-26T14:31:48.008Z",
+      "type": "info",
+      "message": "• Backup retention policy'sini optimize edin"
+    }
+  ]
+}

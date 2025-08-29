@@ -1,9 +1,12 @@
 /**
  * Performance Monitoring Hook
- * Real-time performance tracking for React Native components
+ * Real-time performance tracking for React Native components and app startup
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { InteractionManager } from 'react-native';
+
+import { StartupMetrics, startupPerformanceService } from '@/services/startupPerformanceService';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface PerformanceMetrics {
   renderTime: number;
@@ -28,6 +31,19 @@ interface UsePerformanceMonitorReturn {
   endMeasurement: (label: string) => number;
   trackInteraction: (interactionName: string, callback: () => void) => void;
   getPerformanceReport: () => PerformanceReport;
+  // Startup performance monitoring
+  startupMetrics: StartupMetrics | null;
+  startupSummary: {
+    averageStartupTime: number;
+    bestStartupTime: number;
+    worstStartupTime: number;
+    trendDirection: 'improving' | 'degrading' | 'stable';
+    meetsTarget: boolean;
+  } | null;
+  refreshStartupMetrics: () => Promise<void>;
+  formatTime: (milliseconds: number) => string;
+  getStartupStatus: () => 'excellent' | 'good' | 'warning' | 'critical';
+  getOptimizationTips: () => string[];
 }
 
 interface PerformanceReport {
@@ -186,16 +202,22 @@ export function usePerformanceMonitor(
     componentMountTime: 0,
   });
 
+  // Startup performance state
+  const [startupMetrics, setStartupMetrics] = useState<StartupMetrics | null>(null);
+  const [startupSummary, setStartupSummary] = useState<{
+    averageStartupTime: number;
+    bestStartupTime: number;
+    worstStartupTime: number;
+    trendDirection: 'improving' | 'degrading' | 'stable';
+    meetsTarget: boolean;
+  } | null>(null);
+
   // Track component mount time
   useEffect(() => {
     const mountTime = performance.now() - mountTimeRef.current;
     setMetrics((prev) => ({ ...prev, componentMountTime: mountTime }));
 
-    if (mountTime > 100) {
-      console.warn(
-        `[Performance] Slow component mount: ${componentName} took ${mountTime.toFixed(2)}ms`,
-      );
-    }
+    // Component mount time tracked
   }, [componentName]);
 
   // Track render performance
@@ -291,11 +313,7 @@ export function usePerformanceMonitor(
             return newMetrics;
           });
 
-          if (interactionTime > 100) {
-            console.warn(
-              `[Performance] Slow interaction: ${componentName}:${interactionName} took ${interactionTime.toFixed(2)}ms`,
-            );
-          }
+          // Interaction time tracked
         });
       };
 
@@ -308,12 +326,123 @@ export function usePerformanceMonitor(
     return globalPerformanceStore.getReport();
   }, []);
 
+  // Startup performance monitoring functions
+  const loadStartupMetrics = useCallback(async () => {
+    try {
+      const currentMetrics = startupPerformanceService.getCurrentMetrics();
+      const summary = await startupPerformanceService.getPerformanceSummary(10);
+
+      setStartupMetrics(currentMetrics);
+      setStartupSummary(summary);
+    } catch (error) {
+      errorInDev('Failed to load startup metrics:', error);
+    }
+  }, []);
+
+  const refreshStartupMetrics = useCallback(async () => {
+    await loadStartupMetrics();
+  }, [loadStartupMetrics]);
+
+  const formatTime = useCallback((milliseconds: number): string => {
+    if (milliseconds < 1000) {
+      return `${milliseconds}ms`;
+    }
+    return `${(milliseconds / 1000).toFixed(2)}s`;
+  }, []);
+
+  const getStartupStatus = useCallback((): 'excellent' | 'good' | 'warning' | 'critical' => {
+    if (!startupSummary) {
+      return 'warning';
+    }
+
+    const { averageStartupTime } = startupSummary;
+
+    if (averageStartupTime <= 1500) {
+      return 'excellent';
+    } else if (averageStartupTime <= 2000) {
+      return 'good';
+    } else if (averageStartupTime <= 2500) {
+      return 'warning';
+    } else {
+      return 'critical';
+    }
+  }, [startupSummary]);
+
+  const getOptimizationTips = useCallback((): string[] => {
+    const tips: string[] = [];
+
+    if (!startupMetrics || !startupSummary) {
+      return ['Enable performance monitoring to get optimization tips'];
+    }
+
+    const status = getStartupStatus();
+
+    switch (status) {
+      case 'critical':
+        tips.push('🚨 Critical: Startup time exceeds 2.5s target');
+        tips.push('Consider implementing more aggressive lazy loading');
+        tips.push('Review and optimize heavy synchronous operations');
+        break;
+
+      case 'warning':
+        tips.push('⚠️ Warning: Approaching 2.5s startup time limit');
+        tips.push('Monitor performance trends closely');
+        break;
+
+      case 'good':
+        tips.push('✅ Good: Performance within acceptable range');
+        tips.push('Continue monitoring for regressions');
+        break;
+
+      case 'excellent':
+        tips.push('🎉 Excellent: Outstanding startup performance!');
+        tips.push('Consider sharing optimization techniques with team');
+        break;
+    }
+
+    if (startupMetrics.criticalFontsLoadTime > 500) {
+      tips.push('📝 Font loading is slow - consider reducing font variants');
+    }
+
+    if (startupMetrics.bundleLoadTime > 1000) {
+      tips.push('📦 Bundle size is large - implement more code splitting');
+    }
+
+    if (startupMetrics.jsExecutionTime > 800) {
+      tips.push('⚡ JS execution is slow - optimize synchronous operations');
+    }
+
+    if (startupMetrics.firstScreenRenderTime > 1500) {
+      tips.push('🎨 First render is slow - simplify initial screen complexity');
+    }
+
+    if (startupSummary.trendDirection === 'degrading') {
+      tips.push('📉 Performance is degrading - investigate recent changes');
+    } else if (startupSummary.trendDirection === 'improving') {
+      tips.push('📈 Performance is improving - great work!');
+    }
+
+    return tips;
+  }, [startupMetrics, startupSummary, getStartupStatus]);
+
+  // Load startup metrics on mount
+  useEffect(() => {
+    loadStartupMetrics();
+  }, [loadStartupMetrics]);
+
   return {
     metrics,
     startMeasurement,
     endMeasurement,
     trackInteraction,
     getPerformanceReport,
+    // Startup performance monitoring
+    startupMetrics,
+    startupSummary,
+    refreshStartupMetrics,
+    formatTime,
+    getStartupStatus,
+    getOptimizationTips,
   };
 }
 
@@ -335,28 +464,28 @@ export const PerformanceMonitor = {
    * Log performance report to console
    */
   logReport: (): void => {
-    const report = globalPerformanceStore.getReport();
-    console.group('🚀 Performance Report');
-    console.log('Average Render Time:', `${report.averageRenderTime.toFixed(2)}ms`);
-    console.log('Average Interaction Time:', `${report.averageInteractionTime.toFixed(2)}ms`);
-    console.log('Total Frame Drops:', report.totalFrameDrops);
-    console.log('Peak Memory Usage:', `${(report.peakMemoryUsage / 1024 / 1024).toFixed(2)}MB`);
+    // Performance report logging disabled in production
+    if (__DEV__) {
+      const report = globalPerformanceStore.getReport();
+      console.group('🚀 Performance Report');
+      // Performance metrics logged internally
 
-    if (report.slowestOperations.length > 0) {
-      console.group('Slowest Operations:');
-      report.slowestOperations.forEach((op) => {
-        console.log(`${op.name}: ${op.duration.toFixed(2)}ms`);
-      });
+      if (report.slowestOperations.length > 0) {
+        console.group('Slowest Operations:');
+        report.slowestOperations.forEach((op) => {
+          // Operation timing logged internally
+        });
+        console.groupEnd();
+      }
+
+      if (report.recommendations.length > 0) {
+        console.group('Recommendations:');
+        // Recommendations available in report object
+        console.groupEnd();
+      }
+
       console.groupEnd();
     }
-
-    if (report.recommendations.length > 0) {
-      console.group('Recommendations:');
-      report.recommendations.forEach((rec) => console.log(`• ${rec}`));
-      console.groupEnd();
-    }
-
-    console.groupEnd();
   },
 
   /**

@@ -344,7 +344,7 @@ export const ArtistryShowcase: React.FC = () => {
               { color: DesignSystem.colors.text.tertiary },
             ]}
           >
-            "Where technology meets artistry, confidence blooms"
+            &ldquo;Where technology meets artistry, confidence blooms&rdquo;
           </Text>
         </View>
       </ScrollView>

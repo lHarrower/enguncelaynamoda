@@ -6,9 +6,9 @@ import { WardrobeCard } from '@/components/common/WardrobeCard';
 // AddItemScreen component is not yet implemented
 import { WardrobeScreen } from '@/screens/WardrobeScreen';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { renderWithProviders, createMockWardrobeItem } from '../utils/testUtils';
+import { renderWithProviders, createMockWardrobeItem } from '@/__tests__/utils/testUtils';
 import { WardrobeCategory, WardrobeColor } from '@/types/wardrobe';
-import { mocks } from '../mocks';
+import { mocks } from '@/__tests__/mocks';
 
 // Mock WardrobeService
 jest.mock('@/services/wardrobeService', () => ({
@@ -467,13 +467,11 @@ describe('Erişilebilirlik Testleri', () => {
           transform: expect.any(Array),
         }),
       );
-      
+
       // Or if transform exists, it should not contain scale
       if (card.props.style && card.props.style.transform) {
         expect(card.props.style.transform).not.toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({ scale: expect.any(Object) }),
-          ]),
+          expect.arrayContaining([expect.objectContaining({ scale: expect.any(Object) })]),
         );
       }
     });
@@ -542,11 +540,9 @@ describe('Erişilebilirlik Testleri', () => {
 
       // Check if style array contains high contrast styles
       const styleArray = Array.isArray(card.props.style) ? card.props.style : [card.props.style];
-      const hasHighContrastStyle = styleArray.some(style => 
-        style && 
-        typeof style === 'object' && 
-        'borderWidth' in style && 
-        'borderColor' in style
+      const hasHighContrastStyle = styleArray.some(
+        (style) =>
+          style && typeof style === 'object' && 'borderWidth' in style && 'borderColor' in style,
       );
       expect(hasHighContrastStyle).toBe(true);
     });

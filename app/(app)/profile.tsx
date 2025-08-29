@@ -24,10 +24,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import StandardButton from '@/components/shared/StandardButton';
 import { useAuth } from '@/context/AuthContext';
 import { useI18n } from '@/context/I18nContext';
-import { AynamodaColors } from '@/theme/AynamodaColors';
 import { DesignSystem } from '@/theme/DesignSystem';
+import { useOptimizedCallback } from '@/utils/performanceUtils';
 
-import { useOptimizedCallback } from '../../src/utils/performanceUtils';
 import {
   getResponsivePadding,
   isTablet,
@@ -80,15 +79,18 @@ const ProfileOption = memo(
             <LinearGradient
               colors={
                 danger
-                  ? ['rgba(198, 40, 40, 0.1)', 'rgba(198, 40, 40, 0.05)']
-                  : [AynamodaColors.background.secondary, AynamodaColors.background.card]
+                  ? [DesignSystem.colors.error[100], DesignSystem.colors.error[50]]
+                  : [
+                      DesignSystem.colors.background.secondary,
+                      DesignSystem.colors.background.elevated,
+                    ]
               }
               style={[styles.optionIcon, danger && styles.optionIconDanger]}
             >
               <Ionicons
                 name={icon}
                 size={18}
-                color={danger ? DesignSystem.colors.error[500] : AynamodaColors.text.secondary}
+                color={danger ? DesignSystem.colors.error[500] : DesignSystem.colors.text.secondary}
               />
             </LinearGradient>
             <View style={styles.optionText}>
@@ -97,7 +99,7 @@ const ProfileOption = memo(
             </View>
           </View>
           {showArrow && (
-            <Ionicons name="chevron-forward" size={16} color={AynamodaColors.text.tertiary} />
+            <Ionicons name="chevron-forward" size={16} color={DesignSystem.colors.text.tertiary} />
           )}
         </TouchableOpacity>
       </Animated.View>
@@ -108,7 +110,7 @@ const ProfileOption = memo(
 const ProfileCard = memo(
   ({ children, style }: { children: React.ReactNode; style?: ViewStyle }) => (
     <LinearGradient
-      colors={[AynamodaColors.background.card, AynamodaColors.background.secondary]}
+      colors={[DesignSystem.colors.background.elevated, DesignSystem.colors.background.secondary]}
       style={[styles.profileCard, style]}
     >
       {children}
@@ -148,7 +150,7 @@ function ProfileScreen() {
     try {
       await signOut();
     } catch (error) {
-      console.error('Error during sign out from profile screen:', error);
+      // Sign out error handled silently in production
     }
   }, [signOut]);
 
@@ -159,7 +161,7 @@ function ProfileScreen() {
   const renderFloatingHeader = () => (
     <Animated.View style={[styles.floatingHeader, headerAnimatedStyle]}>
       <LinearGradient
-        colors={[AynamodaColors.background.primary, AynamodaColors.background.secondary]}
+        colors={[DesignSystem.colors.background.primary, DesignSystem.colors.background.secondary]}
         style={styles.floatingHeaderGradient}
       >
         <View style={styles.headerContent}>
@@ -176,13 +178,16 @@ function ProfileScreen() {
             }
           >
             <LinearGradient
-              colors={[AynamodaColors.background.secondary, AynamodaColors.background.card]}
+              colors={[
+                DesignSystem.colors.background.secondary,
+                DesignSystem.colors.background.card,
+              ]}
               style={styles.headerButtonGradient}
             >
               <Ionicons
                 name={isEditing ? 'checkmark' : 'pencil'}
                 size={18}
-                color={AynamodaColors.primary.terracotta}
+                color={DesignSystem.colors.primary[500]}
               />
             </LinearGradient>
           </TouchableOpacity>
@@ -215,7 +220,7 @@ function ProfileScreen() {
       </View>
 
       <LinearGradient
-        colors={[AynamodaColors.background.secondary, AynamodaColors.background.card]}
+        colors={[DesignSystem.colors.background.secondary, DesignSystem.colors.background.card]}
         style={styles.statsRow}
       >
         <View style={styles.statItem}>
@@ -238,7 +243,7 @@ function ProfileScreen() {
 
   return (
     <LinearGradient
-      colors={[AynamodaColors.background.primary, AynamodaColors.background.secondary]}
+      colors={[DesignSystem.colors.background.primary, DesignSystem.colors.background.secondary]}
       style={styles.container}
     >
       <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
@@ -390,8 +395,8 @@ const createResponsiveStyles = () => {
 
   return StyleSheet.create({
     avatar: {
-      backgroundColor: AynamodaColors.background.secondary,
-      borderColor: AynamodaColors.border.primary,
+      backgroundColor: DesignSystem.colors.background.secondary,
+      borderColor: DesignSystem.colors.border.primary,
       borderRadius: 60,
       borderWidth: 3,
       height: 120,
@@ -403,8 +408,8 @@ const createResponsiveStyles = () => {
     },
     avatarEditButton: {
       alignItems: 'center',
-      backgroundColor: AynamodaColors.primary.terracotta,
-      borderColor: AynamodaColors.background.primary,
+      backgroundColor: DesignSystem.colors.primary[500],
+      borderColor: DesignSystem.colors.background.primary,
       borderRadius: 18,
       borderWidth: 3,
       bottom: 0,
@@ -413,7 +418,7 @@ const createResponsiveStyles = () => {
       justifyContent: 'center',
       position: 'absolute',
       right: 0,
-      shadowColor: '#000',
+      shadowColor: DesignSystem.colors.shadow.primary,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
@@ -427,12 +432,12 @@ const createResponsiveStyles = () => {
       flex: 1,
     },
     divider: {
-      backgroundColor: AynamodaColors.border.primary,
+      backgroundColor: DesignSystem.colors.border.primary,
       height: 1,
       marginLeft: 20 + 44 + 16,
     },
     floatingHeader: {
-      borderBottomColor: AynamodaColors.border.primary,
+      borderBottomColor: DesignSystem.colors.border.primary,
       borderBottomWidth: 1,
       left: 0,
       position: 'absolute',
@@ -444,7 +449,7 @@ const createResponsiveStyles = () => {
       width: '100%',
     },
     headerButton: {
-      borderColor: AynamodaColors.border.primary,
+      borderColor: DesignSystem.colors.border.primary,
       borderRadius: 20,
       borderWidth: 1,
       height: 40,
@@ -467,7 +472,7 @@ const createResponsiveStyles = () => {
       paddingTop: responsiveSpacing(60),
     },
     headerTitle: {
-      color: AynamodaColors.text.primary,
+      color: DesignSystem.colors.text.primary,
       fontFamily: DesignSystem.typography.fontFamily.primary,
       fontSize: responsiveFontSize(DesignSystem.typography.scale.h2.fontSize || 24),
       fontWeight: '400',
@@ -482,7 +487,7 @@ const createResponsiveStyles = () => {
     },
     optionIcon: {
       alignItems: 'center',
-      borderColor: AynamodaColors.border.primary,
+      borderColor: DesignSystem.colors.border.primary,
       borderRadius: 16,
       borderWidth: 1,
       height: 44,
@@ -491,8 +496,8 @@ const createResponsiveStyles = () => {
       width: 44,
     },
     optionIconDanger: {
-      backgroundColor: 'rgba(198, 40, 40, 0.1)',
-      borderColor: 'rgba(198, 40, 40, 0.2)',
+      backgroundColor: DesignSystem.colors.error[100],
+      borderColor: DesignSystem.colors.error[200],
     },
     optionLeft: {
       alignItems: 'center',
@@ -501,14 +506,14 @@ const createResponsiveStyles = () => {
     },
     optionSubtitle: {
       ...DesignSystem.typography.caption,
-      color: AynamodaColors.text.tertiary,
+      color: DesignSystem.colors.text.tertiary,
     },
     optionText: {
       flex: 1,
     },
     optionTitle: {
       ...DesignSystem.typography.body1,
-      color: AynamodaColors.text.primary,
+      color: DesignSystem.colors.text.primary,
       fontWeight: '400',
       marginBottom: 2,
     },
@@ -516,7 +521,7 @@ const createResponsiveStyles = () => {
       color: DesignSystem.colors.error[500],
     },
     profileCard: {
-      borderColor: AynamodaColors.border.primary,
+      borderColor: DesignSystem.colors.border.primary,
       borderRadius: 16,
       borderWidth: 1,
       overflow: 'hidden',
@@ -539,7 +544,7 @@ const createResponsiveStyles = () => {
     },
     sectionTitle: {
       ...DesignSystem.typography.overline,
-      color: AynamodaColors.text.tertiary,
+      color: DesignSystem.colors.text.tertiary,
       marginBottom: DesignSystem.spacing.md,
       paddingLeft: DesignSystem.spacing.xs,
     },
@@ -548,7 +553,7 @@ const createResponsiveStyles = () => {
       paddingHorizontal: isTabletDevice ? padding.horizontal * 1.5 : DesignSystem.spacing.lg,
     },
     statDivider: {
-      backgroundColor: AynamodaColors.border.primary,
+      backgroundColor: DesignSystem.colors.border.primary,
       height: 40,
       marginHorizontal: 20,
       width: 1,
@@ -559,19 +564,19 @@ const createResponsiveStyles = () => {
     },
     statLabel: {
       ...DesignSystem.typography.caption.medium,
-      color: AynamodaColors.text.tertiary,
+      color: DesignSystem.colors.text.tertiary,
       letterSpacing: 0.8,
       textTransform: 'uppercase',
     },
     statValue: {
       ...DesignSystem.typography.scale.h2,
-      color: AynamodaColors.text.primary,
+      color: DesignSystem.colors.text.primary,
       fontWeight: '300',
       marginBottom: DesignSystem.spacing.xs,
     },
     statsRow: {
       alignItems: 'center',
-      borderColor: AynamodaColors.border.primary,
+      borderColor: DesignSystem.colors.border.primary,
       borderRadius: 16,
       borderWidth: 1,
       flexDirection: 'row',
@@ -583,19 +588,19 @@ const createResponsiveStyles = () => {
     },
     userLocation: {
       ...DesignSystem.typography.caption.medium,
-      color: AynamodaColors.text.tertiary,
+      color: DesignSystem.colors.text.tertiary,
       letterSpacing: 1,
       textTransform: 'uppercase',
     },
     userName: {
       ...DesignSystem.typography.scale.h1,
-      color: AynamodaColors.text.primary,
+      color: DesignSystem.colors.text.primary,
       fontWeight: '400',
       marginBottom: DesignSystem.spacing.xs,
     },
     userTitle: {
       ...DesignSystem.typography.body1,
-      color: AynamodaColors.text.secondary,
+      color: DesignSystem.colors.text.secondary,
       marginBottom: DesignSystem.spacing.xs,
     },
   });

@@ -79,9 +79,14 @@ jest.mock('react-native', () => {
 jest.mock('@react-navigation/native', () => {
   const React = require('react');
   return {
-    NavigationContainer: React.forwardRef(({ children, ...props }: any, ref: any) => {
-      return React.createElement('View', { ref, ...props }, children);
-    }),
+    NavigationContainer: React.forwardRef(
+      (
+        { children, ...props }: { children?: React.ReactNode; [key: string]: unknown },
+        ref: React.Ref<unknown>,
+      ) => {
+        return React.createElement('View', { ref, ...props }, children);
+      },
+    ),
     useNavigation: () => ({
       navigate: jest.fn(),
       goBack: jest.fn(),
@@ -420,7 +425,7 @@ afterEach(() => {
 
 // Global error handler for unhandled promise rejections
 process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled Rejection:', reason);
+  process.stderr.write(`Unhandled Rejection: ${reason}\n`);
 });
 
 // Export test utilities

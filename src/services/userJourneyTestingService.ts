@@ -1,7 +1,8 @@
 // User Journey Testing Service - End-to-End Experience Validation
 // Tests complete user flows, data consistency, and feature integration
 
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
+
 import { navigationIntegrationService } from './navigationIntegrationService';
 import { performanceOptimizationService } from './performanceOptimizationService';
 import { styleDNAService, UploadedPhoto } from './styleDNAService';

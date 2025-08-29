@@ -16,7 +16,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { DesignSystem } from '../../theme/DesignSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width } = Dimensions.get('window');
 

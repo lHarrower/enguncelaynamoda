@@ -16,8 +16,7 @@ import {
   TURKISH_TEXT,
   VALIDATION_MESSAGES,
 } from '@/components/auth/originalLoginStyles';
-
-import { errorInDev } from '../../utils/consoleSuppress';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 export interface OriginalLoginFormProps {
   /** Callback when login is attempted */

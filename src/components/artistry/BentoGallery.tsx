@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
+import type { ViewStyle } from 'react-native';
 import {
   Dimensions,
   Image,
@@ -68,7 +69,7 @@ const AnimatedBentoItem: React.FC<AnimatedBentoItemProps> = ({
   galleryAnimation,
   children,
 }) => {
-  const animatedStyle = useAnimatedStyle(() => {
+  const animatedStyle = useAnimatedStyle((): ViewStyle => {
     const delay = index * 0.1; // Stagger effect based on index
     const progress = Math.max(0, Math.min(1, galleryAnimation.value - delay));
 

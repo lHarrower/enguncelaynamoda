@@ -21,14 +21,15 @@ import {
   View,
 } from 'react-native';
 
-import { useAuth } from '../../hooks/useAuth';
-import { useSafeTheme } from '../../hooks/useSafeTheme';
+import { useAuth } from '@/hooks/useAuth';
+import { useSafeTheme } from '@/hooks/useSafeTheme';
 import {
   ConsentType,
   DataProcessingPurpose,
   kvkkConsentService,
   LegalBasis,
-} from '../../services/kvkkConsentService';
+} from '@/services/kvkkConsentService';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface KVKKBannerProps {
   onAccept?: () => void;
@@ -80,7 +81,7 @@ export const KVKKBanner: React.FC<KVKKBannerProps> = ({ onAccept, onReject, onCu
         setVisible(true);
       }
     } catch (error) {
-      console.error('KVKK banner görünürlük kontrolü hatası:', error);
+      errorInDev('KVKK banner görünürlük kontrolü hatası:', error);
     }
   };
 
@@ -137,7 +138,7 @@ export const KVKKBanner: React.FC<KVKKBannerProps> = ({ onAccept, onReject, onCu
       await hideBanner();
       onAccept?.();
     } catch (error) {
-      console.error('KVKK rıza verme hatası:', error);
+      errorInDev('KVKK rıza verme hatası:', error);
     } finally {
       setLoading(false);
     }
@@ -160,7 +161,7 @@ export const KVKKBanner: React.FC<KVKKBannerProps> = ({ onAccept, onReject, onCu
       await hideBanner();
       onReject?.();
     } catch (error) {
-      console.error('KVKK rıza reddetme hatası:', error);
+      errorInDev('KVKK rıza reddetme hatası:', error);
     } finally {
       setLoading(false);
     }

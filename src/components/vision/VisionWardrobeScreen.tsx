@@ -567,7 +567,7 @@ const styles = StyleSheet.create({
 
   headerButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: DesignSystem.colors.background.elevated + '4D',
     borderRadius: 22,
     height: 44,
     justifyContent: 'center',

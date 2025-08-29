@@ -4,9 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
+import { SPACING } from '@/constants/AppConstants';
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { SPACING } from '../constants/AppConstants';
 
 interface FloatingActionButtonProps {
   onPress: () => void;

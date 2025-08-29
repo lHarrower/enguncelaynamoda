@@ -26,25 +26,26 @@ describe('Confidence Note Quality - User Experience Tests', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Mock generateConfidenceNote to return a proper confidence note
-    mockAynaMirrorService.generateConfidenceNote = jest.fn().mockImplementation(
-      (outfit: any, userHistory: any, style?: string) => {
+    mockAynaMirrorService.generateConfidenceNote = jest
+      .fn()
+      .mockImplementation((outfit: any, userHistory: any, style?: string) => {
         const outfitId = outfit?.id || 'default';
-        
+
         // Return different notes based on test scenarios
         if (outfitId.includes('accessibility')) {
           return 'You look amazing today! This outfit perfectly captures your style.';
         }
-        
+
         if (outfitId.includes('inclusivity')) {
           return 'You look beautiful and confident today. This outfit showcases your amazing personal style.';
         }
-        
+
         if (outfitId.includes('cultural')) {
           return 'You look amazing today. This outfit perfectly captures your style. You are confident and ready.';
         }
-        
+
         if (outfitId.includes('consistency-test')) {
           const index = parseInt(outfitId.split('-').pop() || '0');
           const variations = [
@@ -52,37 +53,39 @@ describe('Confidence Note Quality - User Experience Tests', () => {
             'You are absolutely stunning! This look showcases your incredible fashion sense.',
             'You look fantastic today! This ensemble reflects your wonderful personal style.',
             'You are radiating confidence! This outfit highlights your amazing taste.',
-            'You look beautiful today! This combination perfectly expresses your style.'
+            'You look beautiful today! This combination perfectly expresses your style.',
           ];
           return variations[index] || variations[0];
         }
-        
+
         if (outfitId.includes('color-description')) {
           return 'You look amazing today! This rich and elegant color combination is absolutely stunning. You are confident and ready.';
         }
-        
+
         if (outfitId.includes('style-')) {
           const styleType = outfitId.split('style-')[1];
           return `You look amazing today! This ${styleType} style shines through beautifully. You are confident and ready.`;
         }
-        
+
         // Handle previous feedback scenarios
         if (userHistory?.previousFeedback?.length > 0) {
           return 'You look amazing today! This outfit perfectly captures your style. Last time you wore something similar, you received wonderful compliments. You are confident and ready.';
         }
-        
+
         // Handle neglected items
         if (outfit?.items?.some((item: any) => item?.usageStats?.lastWorn)) {
           return 'You look amazing today! Time to rediscover this forgotten gem in your wardrobe. You are confident and ready.';
         }
-        
+
         const baseNote = 'You look amazing today! This outfit perfectly captures your style.';
-        const styleNote = style === 'witty' ? ' Ready to turn heads!' : 
-                         style === 'poetic' ? ' Like a work of art come to life, you embody grace and intention.' :
-                         ' You are confident and ready for anything.';
+        const styleNote =
+          style === 'witty'
+            ? ' Ready to turn heads!'
+            : style === 'poetic'
+              ? ' Like a work of art come to life, you embody grace and intention.'
+              : ' You are confident and ready for anything.';
         return baseNote + styleNote;
-      }
-    );
+      });
   });
 
   describe('Confidence Note Content Quality', () => {
@@ -130,7 +133,7 @@ describe('Confidence Note Quality - User Experience Tests', () => {
       const confidenceNote = aynaMirrorService.generateConfidenceNote(
         mockOutfit as any,
         mockUserHistory as any,
-        'encouraging'
+        'encouraging',
       );
 
       // Quality checks
@@ -190,7 +193,7 @@ describe('Confidence Note Quality - User Experience Tests', () => {
       const confidenceNote = aynaMirrorService.generateConfidenceNote(
         mockOutfit as any,
         mockUserHistory as any,
-        'encouraging'
+        'encouraging',
       );
 
       // Should reference previous success
@@ -223,7 +226,7 @@ describe('Confidence Note Quality - User Experience Tests', () => {
       const confidenceNote = aynaMirrorService.generateConfidenceNote(
         mockOutfit as any,
         { userId: mockUserId } as any,
-        'encouraging'
+        'encouraging',
       );
 
       // Should encourage rediscovery
@@ -260,7 +263,7 @@ describe('Confidence Note Quality - User Experience Tests', () => {
         const confidenceNote = aynaMirrorService.generateConfidenceNote(
           mockOutfit as any,
           mockUserHistory as any,
-          style
+          style,
         );
 
         expect(confidenceNote).toBeTruthy();
@@ -292,7 +295,7 @@ describe('Confidence Note Quality - User Experience Tests', () => {
       const confidenceNote = aynaMirrorService.generateConfidenceNote(
         mockOutfit as any,
         { userId: mockUserId } as any,
-        'encouraging'
+        'encouraging',
       );
 
       // Accessibility checks
@@ -318,7 +321,7 @@ describe('Confidence Note Quality - User Experience Tests', () => {
       const confidenceNote = aynaMirrorService.generateConfidenceNote(
         mockOutfit as any,
         { userId: mockUserId } as any,
-        'encouraging'
+        'encouraging',
       );
 
       // Should describe the visual appeal in accessible terms
@@ -356,7 +359,7 @@ describe('Confidence Note Quality - User Experience Tests', () => {
         const confidenceNote = aynaMirrorService.generateConfidenceNote(
           scenario.outfit as any,
           { userId: mockUserId } as any,
-          'encouraging'
+          'encouraging',
         );
 
         // Higher confidence scores should generate more enthusiastic notes
@@ -385,7 +388,11 @@ describe('Confidence Note Quality - User Experience Tests', () => {
       }));
 
       const confidenceNotes = testOutfits.map((outfit) =>
-        aynaMirrorService.generateConfidenceNote(outfit as any, { userId: mockUserId } as any, 'encouraging'),
+        aynaMirrorService.generateConfidenceNote(
+          outfit as any,
+          { userId: mockUserId } as any,
+          'encouraging',
+        ),
       );
 
       // All notes should maintain consistent brand voice
@@ -417,7 +424,7 @@ describe('Confidence Note Quality - User Experience Tests', () => {
       const confidenceNote = aynaMirrorService.generateConfidenceNote(
         mockOutfit as any,
         { userId: mockUserId } as any,
-        'encouraging'
+        'encouraging',
       );
 
       // Should avoid cultural assumptions
@@ -470,7 +477,7 @@ describe('Confidence Note Quality - User Experience Tests', () => {
             userId: mockUserId,
             stylePreferences: { preferredStyles: [preference.style] },
           } as any,
-          'encouraging'
+          'encouraging',
         );
 
         expect(confidenceNote).toBeTruthy();

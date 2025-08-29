@@ -62,6 +62,7 @@ interface ComponentValidationResult {
 class DesignSystemValidationService {
   private validationResults: Map<string, ValidationResult> = new Map();
   private performanceMetrics: PerformanceMetrics | null = null;
+  private validationInterval: NodeJS.Timeout | null = null; // OPERASYON DİSİPLİN: Memory leak önleme
 
   /**
    * Run comprehensive design system validation
@@ -706,14 +707,38 @@ class DesignSystemValidationService {
 
   /**
    * Run continuous validation monitoring
+   * OPERASYON DİSİPLİN: Memory leak önleme ile güvenli interval yönetimi
    */
   startContinuousValidation(intervalMs: number = 30000): void {
-    setInterval(() => {
+    // Önceki interval'ı temizle
+    this.stopContinuousValidation();
+
+    this.validationInterval = setInterval(() => {
       const result: ValidationResult = this.validateDesignSystem();
       if (!result.isValid) {
         errorInDev('Design System Validation Failed:', result.issues);
       }
     }, intervalMs);
+  }
+
+  /**
+   * Stop continuous validation monitoring
+   * OPERASYON DİSİPLİN: Memory leak önleme - interval temizleme
+   */
+  stopContinuousValidation(): void {
+    if (this.validationInterval) {
+      clearInterval(this.validationInterval);
+      this.validationInterval = null;
+    }
+  }
+
+  /**
+   * Cleanup method - OPERASYON DİSİPLİN: Component unmount'ta çağrılmalı
+   */
+  cleanup(): void {
+    this.stopContinuousValidation();
+    this.validationResults.clear();
+    this.performanceMetrics = null;
   }
 }
 

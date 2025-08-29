@@ -8,8 +8,8 @@ import {
   WeatherContext,
   ItemCategory,
 } from '../src/types/aynaMirror';
-import { EnhancedWardrobeService } from '../src/services/enhancedWardrobeService';
-import { AynaMirrorService } from '../src/services/aynaMirrorService';
+import { EnhancedWardrobeService } from '@/services/enhancedWardrobeService';
+import { AynaMirrorService } from '@/services/aynaMirrorService';
 
 describe('AYNA Mirror Veri Modelleri', () => {
   describe('WardrobeItem Arayüzü', () => {

@@ -3,10 +3,10 @@
 
 import * as Location from 'expo-location';
 
-import { WeatherCondition, WeatherContext } from '../types/aynaMirror';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
-import { safeParse } from '../utils/safeJSON';
-import { secureStorage } from '../utils/secureStorage';
+import { WeatherCondition, WeatherContext } from '@/types/aynaMirror';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { safeParse } from '@/utils/safeJSON';
+import { secureStorage } from '@/utils/secureStorage';
 
 // Minimal OpenWeather typed shapes (only fields we access)
 interface OpenWeatherCurrent {
@@ -628,65 +628,105 @@ export class WeatherService {
     tags: string[],
     temperature: number,
   ): number {
-    let score = 0;
-
-    // Temperature ranges and appropriate clothing
     if (temperature < 32) {
-      // Freezing
-      if (category === 'outerwear' || tags.includes('winter') || tags.includes('warm')) {
-        score += 0.3;
-      }
-      if (tags.includes('light') || tags.includes('summer')) {
-        score -= 0.3;
-      }
-      if (tags.includes('shorts') || tags.includes('sleeveless')) {
-        score -= 0.3;
-      }
+      return this.calculateFreezingScore(category, tags);
     } else if (temperature < 50) {
-      // Cold
-      if (category === 'outerwear' || tags.includes('warm') || tags.includes('long-sleeve')) {
-        score += 0.2;
-      }
-      if (tags.includes('light') || tags.includes('sleeveless')) {
-        score -= 0.2;
-      }
-      if (tags.includes('shorts')) {
-        score -= 0.2;
-      }
-      if (tags.includes('summer')) {
-        score -= 0.1;
-      }
+      return this.calculateColdScore(category, tags);
     } else if (temperature < 65) {
-      // Cool
-      if (tags.includes('light-layer') || tags.includes('cardigan')) {
-        score += 0.1;
-      }
-      if (tags.includes('heavy') || tags.includes('winter')) {
-        score -= 0.1;
-      }
+      return this.calculateCoolScore(tags);
     } else if (temperature < 75) {
-      // Mild
-      // Most items are appropriate
-      score += 0.1;
+      return this.calculateMildScore();
     } else if (temperature < 85) {
-      // Warm
-      // Favor truly light/breathable items a bit more and penalize heavy/outerwear more strongly
-      if (tags.includes('light') || tags.includes('breathable') || tags.includes('summer')) {
-        score += 0.25;
-      }
-      if (category === 'outerwear' || tags.includes('heavy') || tags.includes('long-sleeve')) {
-        score -= 0.25;
-      }
+      return this.calculateWarmScore(category, tags);
     } else {
-      // Hot
-      if (tags.includes('light') || tags.includes('breathable') || tags.includes('sleeveless')) {
-        score += 0.3;
-      }
-      if (category === 'outerwear' || tags.includes('heavy') || tags.includes('long-sleeve')) {
-        score -= 0.35;
-      }
+      return this.calculateHotScore(category, tags);
     }
+  }
 
+  /**
+   * Calculate score for freezing temperatures (< 32°F)
+   */
+  private static calculateFreezingScore(category: string, tags: string[]): number {
+    let score = 0;
+    if (category === 'outerwear' || tags.includes('winter') || tags.includes('warm')) {
+      score += 0.3;
+    }
+    if (tags.includes('light') || tags.includes('summer')) {
+      score -= 0.3;
+    }
+    if (tags.includes('shorts') || tags.includes('sleeveless')) {
+      score -= 0.3;
+    }
+    return score;
+  }
+
+  /**
+   * Calculate score for cold temperatures (32-50°F)
+   */
+  private static calculateColdScore(category: string, tags: string[]): number {
+    let score = 0;
+    if (category === 'outerwear' || tags.includes('warm') || tags.includes('long-sleeve')) {
+      score += 0.2;
+    }
+    if (tags.includes('light') || tags.includes('sleeveless')) {
+      score -= 0.2;
+    }
+    if (tags.includes('shorts')) {
+      score -= 0.2;
+    }
+    if (tags.includes('summer')) {
+      score -= 0.1;
+    }
+    return score;
+  }
+
+  /**
+   * Calculate score for cool temperatures (50-65°F)
+   */
+  private static calculateCoolScore(tags: string[]): number {
+    let score = 0;
+    if (tags.includes('light-layer') || tags.includes('cardigan')) {
+      score += 0.1;
+    }
+    if (tags.includes('heavy') || tags.includes('winter')) {
+      score -= 0.1;
+    }
+    return score;
+  }
+
+  /**
+   * Calculate score for mild temperatures (65-75°F)
+   */
+  private static calculateMildScore(): number {
+    // Most items are appropriate
+    return 0.1;
+  }
+
+  /**
+   * Calculate score for warm temperatures (75-85°F)
+   */
+  private static calculateWarmScore(category: string, tags: string[]): number {
+    let score = 0;
+    if (tags.includes('light') || tags.includes('breathable') || tags.includes('summer')) {
+      score += 0.25;
+    }
+    if (category === 'outerwear' || tags.includes('heavy') || tags.includes('long-sleeve')) {
+      score -= 0.25;
+    }
+    return score;
+  }
+
+  /**
+   * Calculate score for hot temperatures (> 85°F)
+   */
+  private static calculateHotScore(category: string, tags: string[]): number {
+    let score = 0;
+    if (tags.includes('light') || tags.includes('breathable') || tags.includes('sleeveless')) {
+      score += 0.3;
+    }
+    if (category === 'outerwear' || tags.includes('heavy') || tags.includes('long-sleeve')) {
+      score -= 0.35;
+    }
     return score;
   }
 
@@ -698,69 +738,103 @@ export class WeatherService {
     tags: string[],
     condition: WeatherCondition,
   ): number {
-    let score = 0;
-
     switch (condition) {
       case 'rainy':
-        if (tags.includes('waterproof') || tags.includes('water-resistant')) {
-          score += 0.2;
-        }
-        if (tags.includes('suede') || tags.includes('delicate')) {
-          score -= 0.2;
-        }
-        if (category === 'shoes' && !tags.includes('waterproof')) {
-          score -= 0.1;
-        }
-        break;
-
+        return this.calculateRainyConditionScore(category, tags);
       case 'snowy':
-        if (tags.includes('waterproof') || tags.includes('winter') || tags.includes('warm')) {
-          score += 0.2;
-        }
-        if (tags.includes('light') || tags.includes('delicate')) {
-          score -= 0.2;
-        }
-        if (category === 'shoes' && !tags.includes('waterproof')) {
-          score -= 0.3;
-        }
-        break;
-
+        return this.calculateSnowyConditionScore(category, tags);
       case 'windy':
-        if (tags.includes('fitted') || tags.includes('structured')) {
-          score += 0.1;
-        }
-        if (tags.includes('flowy') || tags.includes('loose')) {
-          score -= 0.1;
-        }
-        if (category === 'accessories' && tags.includes('hat')) {
-          score -= 0.1;
-        }
-        break;
-
+        return this.calculateWindyConditionScore(category, tags);
       case 'sunny':
-        if (
-          tags.includes('sun-protection') ||
-          tags.includes('light-color') ||
-          tags.includes('breathable') ||
-          tags.includes('light')
-        ) {
-          score += 0.1;
-        }
-        if (tags.includes('dark') && category === 'tops') {
-          score -= 0.05;
-        }
-        break;
-
+        return this.calculateSunnyConditionScore(category, tags);
       case 'stormy':
-        if (tags.includes('waterproof') || category === 'outerwear') {
-          score += 0.2;
-        }
-        if (tags.includes('delicate') || tags.includes('formal')) {
-          score -= 0.2;
-        }
-        break;
+        return this.calculateStormyConditionScore(category, tags);
+      default:
+        return 0;
     }
+  }
 
+  /**
+   * Calculate score for rainy weather conditions
+   */
+  private static calculateRainyConditionScore(category: string, tags: string[]): number {
+    let score = 0;
+    if (tags.includes('waterproof') || tags.includes('water-resistant')) {
+      score += 0.2;
+    }
+    if (tags.includes('suede') || tags.includes('delicate')) {
+      score -= 0.2;
+    }
+    if (category === 'shoes' && !tags.includes('waterproof')) {
+      score -= 0.1;
+    }
+    return score;
+  }
+
+  /**
+   * Calculate score for snowy weather conditions
+   */
+  private static calculateSnowyConditionScore(category: string, tags: string[]): number {
+    let score = 0;
+    if (tags.includes('waterproof') || tags.includes('winter') || tags.includes('warm')) {
+      score += 0.2;
+    }
+    if (tags.includes('light') || tags.includes('delicate')) {
+      score -= 0.2;
+    }
+    if (category === 'shoes' && !tags.includes('waterproof')) {
+      score -= 0.3;
+    }
+    return score;
+  }
+
+  /**
+   * Calculate score for windy weather conditions
+   */
+  private static calculateWindyConditionScore(category: string, tags: string[]): number {
+    let score = 0;
+    if (tags.includes('fitted') || tags.includes('structured')) {
+      score += 0.1;
+    }
+    if (tags.includes('flowy') || tags.includes('loose')) {
+      score -= 0.1;
+    }
+    if (category === 'accessories' && tags.includes('hat')) {
+      score -= 0.1;
+    }
+    return score;
+  }
+
+  /**
+   * Calculate score for sunny weather conditions
+   */
+  private static calculateSunnyConditionScore(category: string, tags: string[]): number {
+    let score = 0;
+    if (
+      tags.includes('sun-protection') ||
+      tags.includes('light-color') ||
+      tags.includes('breathable') ||
+      tags.includes('light')
+    ) {
+      score += 0.1;
+    }
+    if (tags.includes('dark') && category === 'tops') {
+      score -= 0.05;
+    }
+    return score;
+  }
+
+  /**
+   * Calculate score for stormy weather conditions
+   */
+  private static calculateStormyConditionScore(category: string, tags: string[]): number {
+    let score = 0;
+    if (tags.includes('waterproof') || category === 'outerwear') {
+      score += 0.2;
+    }
+    if (tags.includes('delicate') || tags.includes('formal')) {
+      score -= 0.2;
+    }
     return score;
   }
 

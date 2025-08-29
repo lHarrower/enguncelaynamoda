@@ -10,8 +10,7 @@
 import { Dimensions, ViewStyle } from 'react-native';
 
 import { BORDER_RADIUS, ELEVATION, SPACING, UNIFIED_COLORS } from '@/theme/tokens';
-
-import { logInDev } from '../../utils/consoleSuppress';
+import { logInDev } from '@/utils/consoleSuppress';
 
 const { width: screenWidth } = Dimensions.get('window');
 const GRID_PADDING = SPACING.md;

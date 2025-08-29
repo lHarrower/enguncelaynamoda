@@ -26,7 +26,7 @@ class DeadCodeCleaner {
       error: '\x1b[31m',
       reset: '\x1b[0m',
     };
-    console.log(`${colors[type]}${message}${colors.reset}`);
+    
   }
 
   async analyzeUnusedExports() {
@@ -229,9 +229,9 @@ export * as HomeComponents from '@/components/home';
   }
 
   printReport() {
-    console.log('\n' + '='.repeat(60));
+    
     this.log('📊 DEAD CODE CLEANUP REPORT', 'info');
-    console.log('='.repeat(60));
+    
 
     if (this.filesToClean.length === 0) {
       this.log('🎉 No significant dead code found!', 'success');
@@ -241,29 +241,29 @@ export * as HomeComponents from '@/components/home';
     this.log(`📁 Files processed: ${this.filesToClean.length}`, 'info');
 
     this.filesToClean.forEach((file, index) => {
-      console.log(`\n${index + 1}. ${file.filePath}`);
-      console.log(`   Unused exports: ${file.exports.length}`);
+      
+      
 
       // Show first few unused exports
       file.exports.slice(0, 3).forEach((exp) => {
-        console.log(`     - Line ${exp.line}: ${exp.name}`);
+        
       });
 
       if (file.exports.length > 3) {
-        console.log(`     ... and ${file.exports.length - 3} more`);
+        
       }
     });
 
-    console.log('\n' + '='.repeat(60));
+    
     this.log('📋 CLEANUP ACTIONS TAKEN:', 'info');
-    console.log('✅ Cleaned components index file');
-    console.log('✅ Cleaned constants files');
-    console.log('✅ Cleaned metrics configuration');
-    console.log('\n📋 NEXT STEPS:');
-    console.log('1. Test the application to ensure functionality is preserved');
-    console.log('2. Run tests: npm test');
-    console.log('3. Check for any import errors');
-    console.log('4. Commit the changes if everything works correctly');
+    
+    
+    
+    
+    
+    
+    
+    
   }
 
   async cleanup() {
@@ -279,7 +279,7 @@ if (require.main === module) {
   const cleaner = new DeadCodeCleaner();
 
   cleaner.cleanup().catch((error) => {
-    console.error('Cleanup failed:', error);
+    
     process.exitCode = 1;
   });
 }

@@ -3,6 +3,7 @@
 
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect } from 'react';
+import type { ViewStyle } from 'react-native';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -181,7 +182,7 @@ const LivingAtmosphere: React.FC<LivingAtmosphereProps> = ({
   ]);
 
   // Animated styles for each gradient layer
-  const gradient1Style = useAnimatedStyle(() => {
+  const gradient1Style = useAnimatedStyle((): ViewStyle => {
     return {
       transform: [
         { translateX: gradient1Position.value * width },
@@ -192,7 +193,7 @@ const LivingAtmosphere: React.FC<LivingAtmosphereProps> = ({
     };
   });
 
-  const gradient2Style = useAnimatedStyle(() => {
+  const gradient2Style = useAnimatedStyle((): ViewStyle => {
     return {
       transform: [
         { translateX: gradient2Position.value * width * 0.8 },
@@ -203,7 +204,7 @@ const LivingAtmosphere: React.FC<LivingAtmosphereProps> = ({
     };
   });
 
-  const gradient3Style = useAnimatedStyle(() => {
+  const gradient3Style = useAnimatedStyle((): ViewStyle => {
     return {
       transform: [
         { translateX: gradient3Position.value * width * 0.6 },

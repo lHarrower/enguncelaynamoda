@@ -40,12 +40,12 @@ async function smokeOpenRouter() {
   if (error) {
     try {
       const body = await error.context.json();
-      console.error('[OpenRouter] error body:', body);
+      
     } catch {}
     throw error;
   }
   const content = data?.choices?.[0]?.message?.content;
-  console.log('[OpenRouter] content:', content);
+  
 }
 
 async function smokeVision() {
@@ -70,12 +70,12 @@ async function smokeVision() {
   if (error) {
     try {
       const body = await error.context.json();
-      console.error('[OpenAI Vision] error body:', body);
+      
     } catch {}
     throw error;
   }
   const content = data?.choices?.[0]?.message?.content;
-  console.log('[OpenAI Vision] content:', content);
+  
 }
 
 async function main() {
@@ -88,7 +88,7 @@ async function main() {
     }
     process.exit(0);
   } catch (e) {
-    console.error('Smoke test failed:', e);
+    
     process.exit(2);
   }
 }

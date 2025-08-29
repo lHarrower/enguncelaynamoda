@@ -117,7 +117,7 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             try {
               const perfSummaryPath = path.join('audit', 'out', 'perf', 'perf-summary.json');
               if (fs.existsSync(perfSummaryPath)) {

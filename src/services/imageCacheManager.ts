@@ -6,9 +6,9 @@
 import { Platform } from 'react-native';
 import RNFS from 'react-native-fs';
 
-import { PerformanceOptimizationService } from '../services/performanceOptimizationService';
-import { errorInDev, logInDev, warnInDev } from '../utils/consoleSuppress';
-import { secureStorage } from '../utils/secureStorage';
+import { PerformanceOptimizationService } from '@/services/performanceOptimizationService';
+import { errorInDev, logInDev, warnInDev } from '@/utils/consoleSuppress';
+import { secureStorage } from '@/utils/secureStorage';
 
 interface CacheEntry {
   /** Original image URL */
@@ -82,6 +82,7 @@ class ImageCacheManager {
   private cacheDir: string;
   private isInitialized = false;
   private cleanupInProgress = false;
+  private cleanupTimer: ReturnType<typeof setInterval> | null = null; // OPERASYON DİSİPLİN: Memory leak önleme
 
   private constructor() {
     this.config = {
@@ -478,8 +479,13 @@ class ImageCacheManager {
   }
 
   private scheduleCleanup(): void {
+    // OPERASYON DİSİPLİN: Memory leak önleme - önceki timer'ı temizle
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+    }
+
     // Schedule cleanup every 6 hours
-    setInterval(
+    this.cleanupTimer = setInterval(
       () => {
         if (this.shouldCleanup()) {
           this.cleanup();
@@ -487,6 +493,27 @@ class ImageCacheManager {
       },
       6 * 60 * 60 * 1000,
     );
+  }
+
+  /**
+   * OPERASYON DİSİPLİN: Memory leak önleme - cleanup timer'ını durdur
+   */
+  private stopCleanupTimer(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
+    }
+  }
+
+  /**
+   * OPERASYON DİSİPLİN: Component unmount'ta çağrılması gereken cleanup metodu
+   * React component'lerde useEffect cleanup function'ında kullanılmalı
+   */
+  public destroy(): void {
+    this.stopCleanupTimer();
+    this.cache.clear();
+    this.isInitialized = false;
+    this.cleanupInProgress = false;
   }
 
   private recalculateStats(): void {

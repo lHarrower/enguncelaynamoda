@@ -1,4 +1,10 @@
-import deepLinkAPI, { parseDeepLink, processDeepLinkParams, DeepLinkResult, DeepLinkInput, DeepLinkNormalized } from '@/services/deepLinkService';
+import deepLinkAPI, {
+  parseDeepLink,
+  processDeepLinkParams,
+  DeepLinkResult,
+  DeepLinkInput,
+  DeepLinkNormalized,
+} from '@/services/deepLinkService';
 import { logger } from '@/utils/logger';
 
 // Mock logger
@@ -20,7 +26,7 @@ describe('DeepLinkService', () => {
     it('should parse valid item deep link with id', () => {
       const url = 'aynamoda://item?id=123';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         name: 'Item',
         params: { id: '123' },
@@ -36,7 +42,7 @@ describe('DeepLinkService', () => {
     it('should parse valid home deep link', () => {
       const url = 'aynamoda://home';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         name: 'Home',
         __valid: true,
@@ -51,7 +57,7 @@ describe('DeepLinkService', () => {
     it('should parse valid settings deep link', () => {
       const url = 'aynamoda://settings';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         name: 'Settings',
         __valid: true,
@@ -61,7 +67,7 @@ describe('DeepLinkService', () => {
     it('should parse valid promo deep link', () => {
       const url = 'aynamoda://promo';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         name: 'Promo',
         __valid: true,
@@ -71,7 +77,7 @@ describe('DeepLinkService', () => {
     it('should handle case-insensitive scheme', () => {
       const url = 'AYNAMODA://home';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         name: 'Home',
         __valid: true,
@@ -81,12 +87,12 @@ describe('DeepLinkService', () => {
     it('should handle URL decoding in params', () => {
       const url = 'aynamoda://item?id=test%20item&category=shirt%26pants';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({
         name: 'Item',
-        params: { 
+        params: {
           id: 'test item',
-          category: 'shirt&pants'
+          category: 'shirt&pants',
         },
         __valid: true,
       });
@@ -95,7 +101,7 @@ describe('DeepLinkService', () => {
     it('should fallback to Home for invalid scheme', () => {
       const url = 'invalid://item?id=123';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({ name: 'Home' });
       expect(mockLogger.warn).toHaveBeenCalledWith('deep_link_invalid', {
         url,
@@ -106,7 +112,7 @@ describe('DeepLinkService', () => {
     it('should fallback to Home for invalid host', () => {
       const url = 'aynamoda://invalid';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({ name: 'Home' });
       expect(mockLogger.warn).toHaveBeenCalled();
     });
@@ -114,7 +120,7 @@ describe('DeepLinkService', () => {
     it('should fallback to Home for item without required id param', () => {
       const url = 'aynamoda://item';
       const result = parseDeepLink(url);
-      
+
       expect(result).toEqual({ name: 'Home' });
       expect(mockLogger.warn).toHaveBeenCalled();
     });
@@ -128,7 +134,7 @@ describe('DeepLinkService', () => {
     it('should handle malformed query params gracefully', () => {
       const url = 'aynamoda://item?id=123&malformed=%ZZ';
       const result = parseDeepLink(url);
-      
+
       expect(result.name).toBe('Item');
       expect(result.params?.id).toBe('123');
     });
@@ -203,18 +209,18 @@ describe('DeepLinkService', () => {
         feedback: 'great item',
         outfit: 'outfit123',
         item: 'item456',
-        extra: 'value'
+        extra: 'value',
       };
-      
+
       const result = processDeepLinkParams(input);
-      
+
       expect(result).toEqual({
         feedback: 'great item',
         outfitId: 'outfit123',
         itemId: 'item456',
-        extras: { extra: 'value' }
+        extras: { extra: 'value' },
       });
-      
+
       expect(mockLogger.info).toHaveBeenCalledWith('deep_link_params_processed', {
         hasFeedback: true,
         hasOutfitId: true,
@@ -226,15 +232,15 @@ describe('DeepLinkService', () => {
       const input: DeepLinkInput = {
         feedback: 'great%20item',
         outfit: 'outfit%26test',
-        item: 'item%20456'
+        item: 'item%20456',
       };
-      
+
       const result = processDeepLinkParams(input);
-      
+
       expect(result).toEqual({
         feedback: 'great item',
         outfitId: 'outfit&test',
-        itemId: 'item 456'
+        itemId: 'item 456',
       });
     });
 
@@ -242,29 +248,29 @@ describe('DeepLinkService', () => {
       const input: DeepLinkInput = {
         feedback: '  great item  ',
         outfit: '\toutfit123\n',
-        item: ' item456 '
+        item: ' item456 ',
       };
-      
+
       const result = processDeepLinkParams(input);
-      
+
       expect(result).toEqual({
         feedback: 'great item',
         outfitId: 'outfit123',
-        itemId: 'item456'
+        itemId: 'item456',
       });
     });
 
     it('should handle malformed URL encoding gracefully', () => {
       const input: DeepLinkInput = {
         feedback: 'great%ZZitem', // invalid encoding
-        outfit: 'outfit123'
+        outfit: 'outfit123',
       };
-      
+
       const result = processDeepLinkParams(input);
-      
+
       expect(result).toEqual({
         feedback: 'great%ZZitem', // falls back to original
-        outfitId: 'outfit123'
+        outfitId: 'outfit123',
       });
     });
 
@@ -272,13 +278,13 @@ describe('DeepLinkService', () => {
       const input: DeepLinkInput = {
         feedback: '   ',
         outfit: 'outfit123',
-        item: ''
+        item: '',
       };
-      
+
       const result = processDeepLinkParams(input);
-      
+
       expect(result).toEqual({
-        outfitId: 'outfit123'
+        outfitId: 'outfit123',
       });
     });
 
@@ -292,9 +298,9 @@ describe('DeepLinkService', () => {
       const input: DeepLinkInput = {
         feedback: '',
         outfit: '   ',
-        item: ''
+        item: '',
       };
-      
+
       const result = processDeepLinkParams(input);
       expect(result).toEqual({});
     });
@@ -303,13 +309,13 @@ describe('DeepLinkService', () => {
       const input = {
         feedback: 123, // not a string
         outfit: 'outfit123',
-        item: null
+        item: null,
       } as any;
-      
+
       const result = processDeepLinkParams(input);
-      
+
       expect(result).toEqual({
-        outfitId: 'outfit123'
+        outfitId: 'outfit123',
       });
     });
 
@@ -318,18 +324,18 @@ describe('DeepLinkService', () => {
         outfit: 'outfit123',
         customField: 'value',
         anotherField: 42,
-        boolField: true
+        boolField: true,
       };
-      
+
       const result = processDeepLinkParams(input);
-      
+
       expect(result).toEqual({
         outfitId: 'outfit123',
         extras: {
           customField: 'value',
           anotherField: 42,
-          boolField: true
-        }
+          boolField: true,
+        },
       });
     });
   });

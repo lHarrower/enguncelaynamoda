@@ -63,8 +63,13 @@ const SettingsRow = ({
         <Switch
           value={value}
           onValueChange={onValueChange}
-          trackColor={{ false: '#E8DEF2', true: DesignSystem.colors.accent.gold }}
-          thumbColor={value ? DesignSystem.colors.text.primary : '#f4f3f4'}
+          trackColor={{
+            false: DesignSystem.colors.neutral[200],
+            true: DesignSystem.colors.accent.gold,
+          }}
+          thumbColor={
+            value ? DesignSystem.colors.text.primary : DesignSystem.colors.background.primary
+          }
           accessibilityLabel={`${label} toggle`}
           accessibilityHint={`Double tap to ${value ? 'disable' : 'enable'} ${label}`}
         />
@@ -231,7 +236,7 @@ const styles = StyleSheet.create({
   },
   menuIconContainer: {
     alignItems: 'center',
-    backgroundColor: '#F7F2FA',
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 22,
     height: 44,
     justifyContent: 'center',
@@ -254,7 +259,7 @@ const styles = StyleSheet.create({
     ...DesignSystem.typography.body.large,
     color: DesignSystem.colors.text.primary,
     fontFamily: DesignSystem.typography.fontFamily.body,
-    fontSize: 16,
+    fontSize: DesignSystem.typography.sizes.md,
   },
   menuItemTextContainer: {
     flex: 1,
@@ -266,13 +271,13 @@ const styles = StyleSheet.create({
     ...DesignSystem.typography.body.small,
     color: DesignSystem.colors.text.secondary,
     fontFamily: DesignSystem.typography.fontFamily.body,
-    fontSize: 12,
+    fontSize: DesignSystem.typography.sizes.xs,
     marginBottom: 12,
     paddingLeft: 12,
     textTransform: 'uppercase',
   },
   separator: {
-    backgroundColor: '#E8DEF2',
+    backgroundColor: DesignSystem.colors.border.primary,
     height: 1,
     marginLeft: 76,
   },

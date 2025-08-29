@@ -1,7 +1,7 @@
 // Unit tests for AIService
-import { AIService } from '../../services/AIService';
-import { WardrobeCategory, WardrobeColor } from '../../types/wardrobe';
-import { createMockWardrobeItem } from '../utils/testUtils';
+import { AIService } from '@/services/AIService';
+import { WardrobeCategory, WardrobeColor } from '@/types/wardrobe';
+import { createMockWardrobeItem } from '@/__tests__/utils/testUtils';
 
 // Mock dependencies
 jest.mock('../../config/openai', () => ({
@@ -125,9 +125,7 @@ describe('AIService', () => {
     });
 
     it('should handle API errors gracefully', async () => {
-      getMockOpenAI().chat.completions.create.mockRejectedValueOnce(
-        new Error('API Error'),
-      );
+      getMockOpenAI().chat.completions.create.mockRejectedValueOnce(new Error('API Error'));
 
       await expect(aiService.analyzeImage(mockImageUri)).rejects.toThrow('API Error');
     });
@@ -161,7 +159,7 @@ describe('AIService', () => {
         JSON.stringify({
           data: mockResponse,
           timestamp: Date.now(),
-        })
+        }),
       );
       const result2 = await aiService.analyzeImage(mockImageUri);
       expect(result2).toEqual(mockResponse);
@@ -185,17 +183,18 @@ describe('AIService', () => {
         occasion: 'casual',
         confidence: 0.9,
       });
-      expect(result.styleNotes).toEqual(['Consider adding accessories', 'Great color coordination']);
+      expect(result.styleNotes).toEqual([
+        'Consider adding accessories',
+        'Great color coordination',
+      ]);
     });
 
     it('should handle different weather conditions', async () => {
-      const mockItems = [
-        { id: '1', name: 'Summer Dress', category: 'dresses' },
-      ];
+      const mockItems = [{ id: '1', name: 'Summer Dress', category: 'dresses' }];
 
-      const result = await aiService.generateOutfitSuggestions(mockItems, { 
-        occasion: 'casual', 
-        weather: 'sunny' 
+      const result = await aiService.generateOutfitSuggestions(mockItems, {
+        occasion: 'casual',
+        weather: 'sunny',
       });
 
       expect(result.outfits[0].weatherSuitability).toBe('sunny');
@@ -274,26 +273,26 @@ describe('AIService', () => {
 
   describe('caching mechanism', () => {
     it('should use cached results when available', async () => {
-       const cachedAnalysis = {
-         confidence: 0.8,
-         detectedItems: ['cached-item'],
-         suggestedTags: ['cached'],
-         colorAnalysis: { dominantColors: ['cached-color'], colorHarmony: 'cached' },
-         styleAnalysis: { style: 'cached', formality: 'cached', season: ['cached'] },
-       };
+      const cachedAnalysis = {
+        confidence: 0.8,
+        detectedItems: ['cached-item'],
+        suggestedTags: ['cached'],
+        colorAnalysis: { dominantColors: ['cached-color'], colorHarmony: 'cached' },
+        styleAnalysis: { style: 'cached', formality: 'cached', season: ['cached'] },
+      };
 
-       getMockSecureStorage().getItem.mockResolvedValueOnce(
-         JSON.stringify({
-           data: cachedAnalysis,
-           timestamp: Date.now()
-         }),
-       );
+      getMockSecureStorage().getItem.mockResolvedValueOnce(
+        JSON.stringify({
+          data: cachedAnalysis,
+          timestamp: Date.now(),
+        }),
+      );
 
-       const result = await aiService.analyzeImage(mockImageUri);
+      const result = await aiService.analyzeImage(mockImageUri);
 
-       expect(result).toEqual(cachedAnalysis);
-        expect(getMockOpenAI().chat.completions.create).not.toHaveBeenCalled();
-      });
+      expect(result).toEqual(cachedAnalysis);
+      expect(getMockOpenAI().chat.completions.create).not.toHaveBeenCalled();
+    });
   });
 
   describe('performance optimization', () => {

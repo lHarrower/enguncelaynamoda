@@ -1,8 +1,11 @@
 import { Platform } from 'react-native';
-import notificationService, { getPushTokenSafely, loadNotifications } from '../../src/services/notificationService';
-import { secureStorage } from '../../src/utils/secureStorage';
-import { errorHandlingService } from '../../src/services/errorHandlingService';
-import { NotificationPreferences, EngagementHistory } from '../../src/types/aynaMirror';
+import notificationService, {
+  getPushTokenSafely,
+  loadNotifications,
+} from '../../src/services/notificationService';
+import { secureStorage } from '@/utils/secureStorage';
+import { errorHandlingService } from '@/services/errorHandlingService';
+import { NotificationPreferences, EngagementHistory } from '@/types/aynaMirror';
 
 // Mock dependencies
 jest.mock('expo-notifications', () => ({
@@ -50,7 +53,7 @@ describe('NotificationService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     notificationService.resetForTesting();
-    
+
     mockSecureStorage.initialize.mockResolvedValue();
     mockSecureStorage.getItem.mockResolvedValue(null);
     mockSecureStorage.setItem.mockResolvedValue();
@@ -62,8 +65,12 @@ describe('NotificationService', () => {
     it('should initialize successfully with granted permissions', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
-        (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockResolvedValue({ data: 'test-token' });
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'granted',
+        });
+        (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockResolvedValue({
+          data: 'test-token',
+        });
         (mockNotifications.setNotificationChannelAsync as jest.Mock).mockResolvedValue({});
       }
 
@@ -74,9 +81,15 @@ describe('NotificationService', () => {
     it('should handle permission request when not granted initially', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'denied' });
-        (mockNotifications.requestPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
-        (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockResolvedValue({ data: 'test-token' });
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'denied',
+        });
+        (mockNotifications.requestPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'granted',
+        });
+        (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockResolvedValue({
+          data: 'test-token',
+        });
       }
 
       const result = await notificationService.initialize();
@@ -86,8 +99,12 @@ describe('NotificationService', () => {
     it('should return false when permissions are denied', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'denied' });
-        (mockNotifications.requestPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'denied' });
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'denied',
+        });
+        (mockNotifications.requestPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'denied',
+        });
       }
 
       const result = await notificationService.initialize();
@@ -98,14 +115,25 @@ describe('NotificationService', () => {
       (Platform as any).OS = 'android';
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'granted',
+        });
         (mockNotifications.setNotificationChannelAsync as jest.Mock).mockResolvedValue({});
       }
 
       await notificationService.initialize();
-      expect(mockNotifications?.setNotificationChannelAsync).toHaveBeenCalledWith('ayna-mirror', expect.any(Object));
-      expect(mockNotifications?.setNotificationChannelAsync).toHaveBeenCalledWith('feedback', expect.any(Object));
-      expect(mockNotifications?.setNotificationChannelAsync).toHaveBeenCalledWith('re-engagement', expect.any(Object));
+      expect(mockNotifications?.setNotificationChannelAsync).toHaveBeenCalledWith(
+        'ayna-mirror',
+        expect.any(Object),
+      );
+      expect(mockNotifications?.setNotificationChannelAsync).toHaveBeenCalledWith(
+        'feedback',
+        expect.any(Object),
+      );
+      expect(mockNotifications?.setNotificationChannelAsync).toHaveBeenCalledWith(
+        're-engagement',
+        expect.any(Object),
+      );
     });
   });
 
@@ -121,8 +149,12 @@ describe('NotificationService', () => {
     it('should schedule daily mirror notification successfully', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
-        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue('notification-id-123');
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'granted',
+        });
+        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue(
+          'notification-id-123',
+        );
       }
 
       await notificationService.initialize();
@@ -134,15 +166,19 @@ describe('NotificationService', () => {
             title: 'Your AYNA Mirror is ready ✨',
             body: '3 confidence-building outfits await you. Start your day feeling ready for anything.',
           }),
-        })
+        }),
       );
     });
 
     it('should handle scheduling errors with retry mechanism', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
-        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockRejectedValue(new Error('Scheduling failed'));
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'granted',
+        });
+        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockRejectedValue(
+          new Error('Scheduling failed'),
+        );
       }
 
       mockErrorHandlingService.executeWithRetry.mockRejectedValue(new Error('Retry failed'));
@@ -150,7 +186,7 @@ describe('NotificationService', () => {
 
       await notificationService.initialize();
       await expect(
-        notificationService.scheduleDailyMirrorNotification('user123', mockPreferences)
+        notificationService.scheduleDailyMirrorNotification('user123', mockPreferences),
       ).rejects.toThrow('Retry failed');
 
       expect(mockErrorHandlingService.handleNotificationError).toHaveBeenCalled();
@@ -161,8 +197,12 @@ describe('NotificationService', () => {
     it('should schedule feedback prompt with correct delay', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
-        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue('feedback-id-123');
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'granted',
+        });
+        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue(
+          'feedback-id-123',
+        );
       }
 
       await notificationService.initialize();
@@ -177,19 +217,21 @@ describe('NotificationService', () => {
               outfitId: 'outfit456',
             }),
           }),
-        })
+        }),
       );
     });
 
     it('should handle feedback prompt scheduling errors', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockRejectedValue(new Error('Failed to schedule'));
+        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockRejectedValue(
+          new Error('Failed to schedule'),
+        );
       }
 
       await notificationService.initialize();
       await expect(
-        notificationService.scheduleFeedbackPrompt('user123', 'outfit456')
+        notificationService.scheduleFeedbackPrompt('user123', 'outfit456'),
       ).rejects.toThrow('Failed to schedule');
     });
   });
@@ -198,8 +240,12 @@ describe('NotificationService', () => {
     it('should send re-engagement message for 2 days inactive', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
-        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue();
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'granted',
+        });
+        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue(
+          'notification-id',
+        );
       }
 
       await notificationService.initialize();
@@ -212,14 +258,16 @@ describe('NotificationService', () => {
             body: 'Ready to feel confident again? Your personalized outfits are waiting.',
           }),
           trigger: null,
-        })
+        }),
       );
     });
 
     it('should send different message for 5 days inactive', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue();
+        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue(
+          'notification-id',
+        );
       }
 
       await notificationService.initialize();
@@ -230,14 +278,16 @@ describe('NotificationService', () => {
           content: expect.objectContaining({
             title: 'Time to rediscover your style 🌟',
           }),
-        })
+        }),
       );
     });
 
     it('should send different message for 10 days inactive', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue();
+        (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue(
+          'notification-id',
+        );
       }
 
       await notificationService.initialize();
@@ -248,7 +298,7 @@ describe('NotificationService', () => {
           content: expect.objectContaining({
             title: 'Your confidence ritual awaits 💫',
           }),
-        })
+        }),
       );
     });
   });
@@ -310,7 +360,7 @@ describe('NotificationService', () => {
         totalDaysActive: 0,
         streakDays: 0,
         averageRating: 0,
-        lastActiveDate: new Date()
+        lastActiveDate: new Date(),
       };
 
       const result = notificationService.optimizeNotificationTiming('user123', engagementHistory);
@@ -322,7 +372,9 @@ describe('NotificationService', () => {
     it('should reschedule notifications with new timezone', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'granted',
+        });
         (mockNotifications.scheduleNotificationAsync as jest.Mock).mockResolvedValue('new-id');
       }
 
@@ -338,23 +390,29 @@ describe('NotificationService', () => {
     it('should cancel all scheduled notifications for user', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.cancelScheduledNotificationAsync as jest.Mock).mockResolvedValue();
+        (mockNotifications.cancelScheduledNotificationAsync as jest.Mock).mockResolvedValue(
+          undefined,
+        );
       }
 
-      mockSecureStorage.getItem.mockResolvedValue(JSON.stringify([
-        {
-          id: 'notification-1',
-          userId: 'user123',
-          type: 'daily_mirror',
-          scheduledTime: new Date(),
-          timezone: 'UTC',
-          payload: { type: 'daily_mirror', userId: 'user123' },
-        },
-      ]));
+      mockSecureStorage.getItem.mockResolvedValue(
+        JSON.stringify([
+          {
+            id: 'notification-1',
+            userId: 'user123',
+            type: 'daily_mirror',
+            scheduledTime: new Date(),
+            timezone: 'UTC',
+            payload: { type: 'daily_mirror', userId: 'user123' },
+          },
+        ]),
+      );
 
       await notificationService.cancelScheduledNotifications('user123');
 
-      expect(mockNotifications?.cancelScheduledNotificationAsync).toHaveBeenCalledWith('notification-1');
+      expect(mockNotifications?.cancelScheduledNotificationAsync).toHaveBeenCalledWith(
+        'notification-1',
+      );
       expect(mockSecureStorage.removeItem).toHaveBeenCalledWith('notifications_user123');
     });
   });
@@ -363,7 +421,9 @@ describe('NotificationService', () => {
     it('should return true when permissions are granted', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'granted',
+        });
       }
 
       const result = await notificationService.areNotificationsEnabled();
@@ -373,7 +433,9 @@ describe('NotificationService', () => {
     it('should return false when permissions are denied', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'denied' });
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'denied',
+        });
       }
 
       const result = await notificationService.areNotificationsEnabled();
@@ -395,8 +457,12 @@ describe('NotificationService', () => {
     it('should return notification token after initialization', async () => {
       const mockNotifications = await loadNotifications();
       if (mockNotifications) {
-        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
-        (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockResolvedValue({ data: 'test-token-123' });
+        (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({
+          status: 'granted',
+        });
+        (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockResolvedValue({
+          data: 'test-token-123',
+        });
       }
 
       await notificationService.initialize();
@@ -417,9 +483,11 @@ describe('getPushTokenSafely', () => {
     const mockNotifications = await loadNotifications();
     if (mockNotifications) {
       (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
-      (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockResolvedValue({ data: 'test-token-123' });
+      (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockResolvedValue({
+        data: 'test-token-123',
+      });
     }
-    
+
     const token = await getPushTokenSafely();
     expect(token).toBe('test-token-123');
   });
@@ -429,7 +497,9 @@ describe('getPushTokenSafely', () => {
     if (mockNotifications) {
       (mockNotifications.getPermissionsAsync as jest.Mock).mockResolvedValue({ status: 'granted' });
       (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockClear();
-      (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockRejectedValue(new Error('Network error'));
+      (mockNotifications.getExpoPushTokenAsync as jest.Mock).mockRejectedValue(
+        new Error('Network error'),
+      );
     }
 
     const token = await getPushTokenSafely(2);

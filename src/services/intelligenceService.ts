@@ -1,8 +1,17 @@
 // Intelligence Service - AI-powered Style Learning and Recommendations
 // Implements personalization algorithms for the AYNA Mirror Daily Ritual
 
-import { supabase } from '../config/supabaseClient';
-import { INTELLIGENCE_CONFIG, TYPOGRAPHY } from '../constants/AppConstants';
+import { supabase } from '@/config/supabaseClient';
+import { INTELLIGENCE_CONFIG, TYPOGRAPHY } from '@/constants/AppConstants';
+import { OutfitFeedbackRecord, WardrobeItemRecord } from '@/types/database';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { normaliseRows } from '@/utils/data/supabaseTypes';
+import { ErrorHandler } from '@/utils/ErrorHandler';
+import { hashDeterministic } from '@/utils/hashDeterministic';
+import { ensureSupabaseOk, mapSupabaseError } from '@/utils/supabaseErrorMapping';
+import { selectAllByUser } from '@/utils/supabaseQueryHelpers';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
+
 import {
   CalendarContext,
   ConfidencePattern,
@@ -14,14 +23,6 @@ import {
   WardrobeItem,
   WeatherContext,
 } from '../types/aynaMirror';
-import { OutfitFeedbackRecord, WardrobeItemRecord } from '../types/database';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
-import { normaliseRows } from '../utils/data/supabaseTypes';
-import { ErrorHandler } from '../utils/ErrorHandler';
-import { hashDeterministic } from '../utils/hashDeterministic';
-import { ensureSupabaseOk, mapSupabaseError } from '../utils/supabaseErrorMapping';
-import { selectAllByUser } from '../utils/supabaseQueryHelpers';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
 
 // Internal helper types to remove unsafe any usage
 interface UserHistoryLite {
@@ -475,7 +476,7 @@ export class IntelligenceService {
       } else {
         const res = await wrap(
           async () =>
-            await (supabase
+            await supabase
               .from('outfit_feedback')
               .select(
                 `
@@ -485,7 +486,7 @@ export class IntelligenceService {
               )
               .eq('user_id', outfit.userId)
               .order('created_at', { ascending: false })
-              .limit(50) as any),
+              .limit(50),
         );
         const feedbackData = ensureSupabaseOk(res, {
           action: 'fetchOutfitFeedback',
@@ -839,11 +840,11 @@ export class IntelligenceService {
       }
       const res = await wrap(
         async () =>
-          await (supabase.from('user_preferences').upsert({
+          await supabase.from('user_preferences').upsert({
             user_id: profile.userId,
             style_preferences: profile,
             updated_at: new Date().toISOString(),
-          }) as any),
+          }),
       );
       ensureSupabaseOk(res, { action: 'cacheStyleProfile' });
     } catch (error) {
@@ -904,8 +905,31 @@ export class IntelligenceService {
 
   generateOutfitCombinations(items: WardrobeItem[]): WardrobeItem[][] {
     const combinations: WardrobeItem[][] = [];
+    const caps = this.getOutfitGenerationCaps();
+    const itemsByCategory = this.groupItemsByCategory(items);
+
+    // Generate dress-based combinations
+    this.generateDressCombinations(combinations, itemsByCategory, caps.dress);
+
+    // Generate top + bottom + shoes combinations
+    this.generateTripleCombinations(combinations, itemsByCategory, caps.triple);
+
+    // Generate fallback combinations if needed
+    this.generateFallbackCombinations(combinations, items, caps.pairFallback);
+
+    // Ensure minimum combinations for testing
+    this.ensureMinimumCombinations(combinations, items);
+
+    // Limit to reasonable number of combinations
+    return combinations.slice(0, Math.max(caps.finalLimit, 3));
+  }
+
+  /**
+   * Get outfit generation capacity limits based on environment
+   */
+  private getOutfitGenerationCaps() {
     const isTest = process.env.NODE_ENV === 'test';
-    const caps = {
+    return {
       dress: isTest
         ? INTELLIGENCE_CONFIG.OUTFIT_GENERATION.DRESS_COMBINATIONS.TEST
         : INTELLIGENCE_CONFIG.OUTFIT_GENERATION.DRESS_COMBINATIONS.PRODUCTION,
@@ -919,9 +943,13 @@ export class IntelligenceService {
         ? INTELLIGENCE_CONFIG.OUTFIT_GENERATION.FINAL_LIMIT.TEST
         : INTELLIGENCE_CONFIG.OUTFIT_GENERATION.FINAL_LIMIT.PRODUCTION,
     } as const;
+  }
 
-    // Group items by category
-    const itemsByCategory = items.reduce(
+  /**
+   * Group items by category
+   */
+  private groupItemsByCategory(items: WardrobeItem[]): Record<string, WardrobeItem[]> {
+    return items.reduce(
       (acc, item) => {
         const cat = item.category as string;
         (acc[cat] ??= []).push(item);
@@ -929,15 +957,20 @@ export class IntelligenceService {
       },
       {} as Record<string, WardrobeItem[]>,
     );
+  }
 
-    // Generate basic combinations (top + bottom + shoes)
-    const tops = itemsByCategory.tops || [];
-    const bottoms = itemsByCategory.bottoms || [];
-    const shoes = itemsByCategory.shoes || [];
+  /**
+   * Generate dress-based outfit combinations
+   */
+  private generateDressCombinations(
+    combinations: WardrobeItem[][],
+    itemsByCategory: Record<string, WardrobeItem[]>,
+    maxDressCombinations: number,
+  ): void {
     const dresses = itemsByCategory.dresses || [];
+    const shoes = itemsByCategory.shoes || [];
     const outerwear = itemsByCategory.outerwear || [];
 
-    // Dress-based outfits (use for-loops to allow early exits)
     for (let di = 0; di < dresses.length; di++) {
       for (let sj = 0; sj < shoes.length; sj++) {
         const d = dresses[di];
@@ -949,23 +982,32 @@ export class IntelligenceService {
         if (outerwear.length > 0 && outerwear[0]) {
           outfit.push(outerwear[0]);
         }
-        const colors = new Set(
-          outfit.flatMap((i) => (i?.colors || []).map((c) => c.toLowerCase())),
-        );
-        if (!(colors.has('red') && colors.has('pink'))) {
+        if (this.isValidColorCombination(outfit)) {
           combinations.push(outfit);
         }
-        if (combinations.length >= caps.dress) {
+        if (combinations.length >= maxDressCombinations) {
           break;
         }
       }
-      if (combinations.length >= caps.dress) {
+      if (combinations.length >= maxDressCombinations) {
         break;
       }
     }
+  }
 
-    // Top + bottom combinations
-    // Top + bottom + shoes (+ optional outerwear) with early exit caps
+  /**
+   * Generate triple combinations (top + bottom + shoes)
+   */
+  private generateTripleCombinations(
+    combinations: WardrobeItem[][],
+    itemsByCategory: Record<string, WardrobeItem[]>,
+    maxTripleCombinations: number,
+  ): void {
+    const tops = itemsByCategory.tops || [];
+    const bottoms = itemsByCategory.bottoms || [];
+    const shoes = itemsByCategory.shoes || [];
+    const outerwear = itemsByCategory.outerwear || [];
+
     for (let ti = 0; ti < tops.length; ti++) {
       for (let bi = 0; bi < bottoms.length; bi++) {
         for (let sj = 0; sj < shoes.length; sj++) {
@@ -979,28 +1021,32 @@ export class IntelligenceService {
           if (outerwear.length > 0 && outerwear[0]) {
             outfit.push(outerwear[0]);
           }
-          const colors = new Set(
-            outfit.flatMap((i) => (i?.colors || []).map((c) => c.toLowerCase())),
-          );
-          if (!(colors.has('red') && colors.has('pink'))) {
+          if (this.isValidColorCombination(outfit)) {
             combinations.push(outfit);
           }
-          if (combinations.length >= caps.triple) {
+          if (combinations.length >= maxTripleCombinations) {
             break;
           }
         }
-        if (combinations.length >= caps.triple) {
+        if (combinations.length >= maxTripleCombinations) {
           break;
         }
       }
-      if (combinations.length >= caps.triple) {
+      if (combinations.length >= maxTripleCombinations) {
         break;
       }
     }
+  }
 
-    // If we don't have enough combinations, create some basic ones
+  /**
+   * Generate fallback combinations when not enough combinations exist
+   */
+  private generateFallbackCombinations(
+    combinations: WardrobeItem[][],
+    items: WardrobeItem[],
+    maxPairFallback: number,
+  ): void {
     if (combinations.length === 0 && items.length >= 2) {
-      // Create combinations with any available items
       for (let i = 0; i < items.length - 1; i++) {
         for (let j = i + 1; j < items.length; j++) {
           const first = items[i];
@@ -1009,24 +1055,24 @@ export class IntelligenceService {
             continue;
           }
           const pair: WardrobeItem[] = [first, second];
-          const colors = new Set(
-            pair.flatMap((it) => (it?.colors || []).map((c) => c.toLowerCase())),
-          );
-          if (colors.has('red') && colors.has('pink')) {
-            continue;
-          } // skip clashing pair
-          combinations.push(pair);
-          if (combinations.length >= caps.pairFallback) {
+          if (this.isValidColorCombination(pair)) {
+            combinations.push(pair);
+          }
+          if (combinations.length >= maxPairFallback) {
             break;
           }
         }
-        if (combinations.length >= caps.pairFallback) {
+        if (combinations.length >= maxPairFallback) {
           break;
         }
       }
     }
+  }
 
-    // Ensure we have at least 3 combinations for testing
+  /**
+   * Ensure minimum combinations for testing
+   */
+  private ensureMinimumCombinations(combinations: WardrobeItem[][], items: WardrobeItem[]): void {
     while (combinations.length < 3 && items.length > 0) {
       if (items[0]) {
         combinations.push([items[0]] as WardrobeItem[]);
@@ -1034,9 +1080,117 @@ export class IntelligenceService {
         break;
       }
     }
+  }
 
-    // Limit to reasonable number of combinations (tighter in tests for speed)
-    return combinations.slice(0, Math.max(caps.finalLimit, 3));
+  /**
+   * Check if color combination is valid (no red + pink clashing)
+   */
+  private isValidColorCombination(outfit: WardrobeItem[]): boolean {
+    const colors = new Set(outfit.flatMap((i) => (i?.colors || []).map((c) => c.toLowerCase())));
+    return !(colors.has('red') && colors.has('pink'));
+  }
+
+  /**
+   * Normalize hex color codes to color names for harmony detection
+   */
+  private normalizeHexNeutral(color: string): string {
+    if (color === '#000000' || color === '#000') {
+      return 'black';
+    }
+    if (color === '#ffffff' || color === '#fff') {
+      return 'white';
+    }
+    if (color === '#808080' || color === '#888888') {
+      return 'gray';
+    }
+    return color;
+  }
+
+  /**
+   * Check if colors are neutral
+   */
+  private areColorsNeutral(colorA: string, colorB: string): boolean {
+    const isNeutral1 = COLOR_HARMONY_RULES.neutral.some((neutral) => colorA.includes(neutral));
+    const isNeutral2 = COLOR_HARMONY_RULES.neutral.some((neutral) => colorB.includes(neutral));
+    return isNeutral1 || isNeutral2;
+  }
+
+  /**
+   * Check if colors are complementary
+   */
+  private areColorsComplementary(colorA: string, colorB: string): boolean {
+    return COLOR_HARMONY_RULES.complementary.some((pair) => {
+      const parts = pair.split('-');
+      if (parts.length !== 2) {
+        return false;
+      }
+      const [c1, c2] = parts as [string, string];
+      if (!c1 || !c2) {
+        return false;
+      }
+      return (
+        (colorA.includes(c1) && colorB.includes(c2)) || (colorA.includes(c2) && colorB.includes(c1))
+      );
+    });
+  }
+
+  /**
+   * Check if colors are analogous
+   */
+  private areColorsAnalogous(colorA: string, colorB: string): boolean {
+    return COLOR_HARMONY_RULES.analogous.some((group) => {
+      const colors = group.split('-');
+      return colors.some((c) => colorA.includes(c)) && colors.some((c) => colorB.includes(c));
+    });
+  }
+
+  /**
+   * Check if colors are triadic
+   */
+  private areColorsTriadic(color1: string, color2: string): boolean {
+    return COLOR_HARMONY_RULES.triadic.some((group) => {
+      const colors = group.split('-');
+      return colors.some((c) => color1.includes(c)) && colors.some((c) => color2.includes(c));
+    });
+  }
+
+  /**
+   * Check if colors are monochromatic (same color family)
+   */
+  private areColorsMonochromatic(color1: string, color2: string): boolean {
+    return color1 === color2 || color1.includes(color2) || color2.includes(color1);
+  }
+
+  /**
+   * Calculate harmony score for a color pair
+   */
+  private calculateColorPairHarmony(
+    colorA: string,
+    colorB: string,
+    color1: string,
+    color2: string,
+  ): number {
+    if (this.areColorsNeutral(colorA, colorB)) {
+      return INTELLIGENCE_CONFIG.COLOR_HARMONY.NEUTRAL_BOOST;
+    }
+
+    if (this.areColorsComplementary(colorA, colorB)) {
+      return INTELLIGENCE_CONFIG.COLOR_HARMONY.COMPLEMENTARY_SCORE;
+    }
+
+    if (this.areColorsAnalogous(colorA, colorB)) {
+      return INTELLIGENCE_CONFIG.COLOR_HARMONY.ANALOGOUS_SCORE;
+    }
+
+    if (this.areColorsTriadic(color1, color2)) {
+      return INTELLIGENCE_CONFIG.COLOR_HARMONY.TRIADIC_SCORE;
+    }
+
+    if (this.areColorsMonochromatic(color1, color2)) {
+      return INTELLIGENCE_CONFIG.COLOR_HARMONY.MONOCHROMATIC_SCORE;
+    }
+
+    return INTELLIGENCE_CONFIG.COLOR_HARMONY.CLASHING_PENALTY;
   }
 
   private calculateColorHarmony(items: WardrobeItem[]): number {
@@ -1047,22 +1201,10 @@ export class IntelligenceService {
 
       if (allColors.length < 2) {
         return INTELLIGENCE_CONFIG.COLOR_HARMONY.SINGLE_COLOR_SCORE;
-      } // Single or uniform color should be highly harmonious
+      }
 
       let harmonyScore = 0;
       let totalComparisons = 0;
-      const normalizeHexNeutral = (c: string) => {
-        if (c === '#000000' || c === '#000') {
-          return 'black';
-        }
-        if (c === '#ffffff' || c === '#fff') {
-          return 'white';
-        }
-        if (c === '#808080' || c === '#888888') {
-          return 'gray';
-        }
-        return c;
-      };
 
       // Check each color pair for harmony
       for (let i = 0; i < allColors.length; i++) {
@@ -1074,77 +1216,11 @@ export class IntelligenceService {
           }
           const color1: string = raw1.toLowerCase();
           const color2: string = raw2.toLowerCase();
-          // Normalize hex neutrals to names for harmony detection (shared helper above)
-          const colorA: string = normalizeHexNeutral(color1);
-          const colorB: string = normalizeHexNeutral(color2);
+          const colorA: string = this.normalizeHexNeutral(color1);
+          const colorB: string = this.normalizeHexNeutral(color2);
 
           totalComparisons++;
-
-          // Check for neutral colors (always harmonious)
-          const isNeutral1 = COLOR_HARMONY_RULES.neutral.some((neutral) =>
-            colorA.includes(neutral),
-          );
-          const isNeutral2 = COLOR_HARMONY_RULES.neutral.some((neutral) =>
-            colorB.includes(neutral),
-          );
-
-          if (isNeutral1 || isNeutral2) {
-            harmonyScore += INTELLIGENCE_CONFIG.COLOR_HARMONY.NEUTRAL_BOOST; // Boost neutral-dominant outfits so they exceed 0.7 threshold reliably
-
-            continue;
-          }
-
-          // Check complementary colors
-          const isComplementary = COLOR_HARMONY_RULES.complementary.some((pair) => {
-            const parts = pair.split('-');
-            if (parts.length !== 2) {
-              return false;
-            }
-            const [c1, c2] = parts as [string, string];
-            if (!c1 || !c2) {
-              return false;
-            }
-            return (
-              (colorA.includes(c1) && colorB.includes(c2)) ||
-              (colorA.includes(c2) && colorB.includes(c1))
-            );
-          });
-
-          if (isComplementary) {
-            harmonyScore += INTELLIGENCE_CONFIG.COLOR_HARMONY.COMPLEMENTARY_SCORE;
-            continue;
-          }
-
-          // Check analogous colors
-          const isAnalogous = COLOR_HARMONY_RULES.analogous.some((group) => {
-            const colors = group.split('-');
-            return colors.some((c) => colorA.includes(c)) && colors.some((c) => colorB.includes(c));
-          });
-
-          if (isAnalogous) {
-            harmonyScore += INTELLIGENCE_CONFIG.COLOR_HARMONY.ANALOGOUS_SCORE;
-            continue;
-          }
-
-          // Check triadic colors
-          const isTriadic = COLOR_HARMONY_RULES.triadic.some((group) => {
-            const colors = group.split('-');
-            return colors.some((c) => color1.includes(c)) && colors.some((c) => color2.includes(c));
-          });
-
-          if (isTriadic) {
-            harmonyScore += INTELLIGENCE_CONFIG.COLOR_HARMONY.TRIADIC_SCORE;
-            continue;
-          }
-
-          // Check for similar colors (same color family)
-          if (color1 === color2 || color1.includes(color2) || color2.includes(color1)) {
-            harmonyScore += INTELLIGENCE_CONFIG.COLOR_HARMONY.MONOCHROMATIC_SCORE;
-            continue;
-          }
-
-          // Default score for non-clashing colors
-          harmonyScore += INTELLIGENCE_CONFIG.COLOR_HARMONY.CLASHING_PENALTY;
+          harmonyScore += this.calculateColorPairHarmony(colorA, colorB, color1, color2);
         }
       }
 
@@ -1152,13 +1228,12 @@ export class IntelligenceService {
         totalComparisons > 0
           ? harmonyScore / totalComparisons
           : INTELLIGENCE_CONFIG.COLOR_HARMONY.DEFAULT_HARMONY;
-      const finalScore = Math.min(rawScore, 1.0); // Cap at 1.0 to prevent scores exceeding maximum
+      const finalScore = Math.min(rawScore, 1.0);
       return finalScore;
     } catch (error: unknown) {
       if (process.env.NODE_ENV === 'test') {
         const err = error instanceof Error ? error : new Error(String(error));
         errorInDev('ERROR in calculateColorHarmony:', err);
-        // Debug info logged to console instead of file for React Native compatibility
         logInDev('Debug colors error details:', {
           error: err.toString(),
           timestamp: new Date().toISOString(),
@@ -1226,6 +1301,153 @@ export class IntelligenceService {
     return Math.max(formalRatio, casualRatio);
   }
 
+  private calculateItemTemperatureScore(item: WardrobeItem, temperature: number): number {
+    if (temperature <= INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.FREEZING) {
+      return this.getFreezingWeatherScore(item);
+    } else if (temperature <= INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.COLD) {
+      return this.getColdWeatherScore(item);
+    } else if (temperature <= INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.MILD) {
+      return this.getMildWeatherScore(item);
+    } else if (temperature <= INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.WARM) {
+      return this.getWarmWeatherScore(item);
+    } else {
+      return this.getHotWeatherScore(item);
+    }
+  }
+
+  private getFreezingWeatherScore(item: WardrobeItem): number {
+    if (
+      item.category === 'outerwear' &&
+      (item.tags.includes('winter') || item.tags.includes('heavy'))
+    ) {
+      return 1.0;
+    } else if (
+      item.tags.includes('warm') ||
+      item.tags.includes('wool') ||
+      item.tags.includes('fleece')
+    ) {
+      return 0.9;
+    } else if (item.tags.includes('light') || item.tags.includes('summer')) {
+      return 0.1;
+    }
+    return INTELLIGENCE_CONFIG.CONFIDENCE.BASE;
+  }
+
+  private getColdWeatherScore(item: WardrobeItem): number {
+    if (item.category === 'outerwear' || item.tags.includes('jacket')) {
+      return 0.9;
+    } else if (item.tags.includes('warm') || item.tags.includes('long-sleeve')) {
+      return 0.8;
+    } else if (item.tags.includes('light') || item.tags.includes('tank')) {
+      return 0.3;
+    }
+    return INTELLIGENCE_CONFIG.CONFIDENCE.BASE;
+  }
+
+  private getMildWeatherScore(item: WardrobeItem): number {
+    if (item.tags.includes('light-jacket') || item.tags.includes('cardigan')) {
+      return 0.9;
+    } else if (item.tags.includes('long-sleeve') || item.tags.includes('sweater')) {
+      return 0.8;
+    } else if (item.tags.includes('short-sleeve')) {
+      return 0.7;
+    }
+    return INTELLIGENCE_CONFIG.CONFIDENCE.BASE;
+  }
+
+  private getWarmWeatherScore(item: WardrobeItem): number {
+    if (
+      item.tags.includes('light') ||
+      item.tags.includes('breathable') ||
+      item.tags.includes('cotton')
+    ) {
+      return 0.9;
+    } else if (item.tags.includes('short-sleeve') || item.tags.includes('summer')) {
+      return 0.8;
+    } else if (item.tags.includes('heavy') || item.tags.includes('wool')) {
+      return 0.2;
+    }
+    return INTELLIGENCE_CONFIG.CONFIDENCE.BASE;
+  }
+
+  private getHotWeatherScore(item: WardrobeItem): number {
+    if (
+      item.tags.includes('tank') ||
+      item.tags.includes('sleeveless') ||
+      item.tags.includes('linen')
+    ) {
+      return 1.0;
+    } else if (item.tags.includes('light') || item.tags.includes('summer')) {
+      return 0.9;
+    } else if (item.tags.includes('heavy') || item.category === 'outerwear') {
+      return 0.1;
+    }
+    return INTELLIGENCE_CONFIG.CONFIDENCE.BASE;
+  }
+
+  private applyWeatherConditionAdjustments(
+    item: WardrobeItem,
+    itemScore: number,
+    condition: string,
+  ): number {
+    let adjustedScore = itemScore;
+
+    if (condition === 'rainy') {
+      adjustedScore = this.applyRainyWeatherAdjustment(item, adjustedScore);
+    } else if (condition === 'snowy') {
+      adjustedScore = this.applySnowyWeatherAdjustment(item, adjustedScore);
+    } else if (condition === 'windy') {
+      adjustedScore = this.applyWindyWeatherAdjustment(item, adjustedScore);
+    }
+
+    return adjustedScore;
+  }
+
+  private applyRainyWeatherAdjustment(item: WardrobeItem, score: number): number {
+    if (item.tags.includes('waterproof') || item.tags.includes('rain-resistant')) {
+      return Math.min(
+        score + INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.RAIN_BONUS,
+        INTELLIGENCE_CONFIG.CONFIDENCE.MAXIMUM,
+      );
+    } else if (item.tags.includes('delicate') || item.tags.includes('silk')) {
+      return Math.max(
+        score - INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.RAIN_PENALTY,
+        INTELLIGENCE_CONFIG.CONFIDENCE.MINIMUM,
+      );
+    }
+    return score;
+  }
+
+  private applySnowyWeatherAdjustment(item: WardrobeItem, score: number): number {
+    if (item.tags.includes('waterproof') || item.tags.includes('winter-boots')) {
+      return Math.min(
+        score + INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.SNOW_BONUS,
+        INTELLIGENCE_CONFIG.CONFIDENCE.MAXIMUM,
+      );
+    } else if (item.category === 'shoes' && !item.tags.includes('waterproof')) {
+      return Math.max(
+        score - INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.SNOW_PENALTY,
+        INTELLIGENCE_CONFIG.CONFIDENCE.MINIMUM,
+      );
+    }
+    return score;
+  }
+
+  private applyWindyWeatherAdjustment(item: WardrobeItem, score: number): number {
+    if (item.category === 'outerwear' || item.tags.includes('wind-resistant')) {
+      return Math.min(
+        score + INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.WIND_BONUS,
+        INTELLIGENCE_CONFIG.CONFIDENCE.MAXIMUM,
+      );
+    } else if (item.tags.includes('loose') || item.tags.includes('flowy')) {
+      return Math.max(
+        score - INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.WIND_PENALTY,
+        INTELLIGENCE_CONFIG.CONFIDENCE.MINIMUM,
+      );
+    }
+    return score;
+  }
+
   private calculateWeatherCompatibility(items: WardrobeItem[], weather: WeatherContext): number {
     let compatibilityScore = 0;
     const totalItems = items.length;
@@ -1235,118 +1457,11 @@ export class IntelligenceService {
     }
 
     items.forEach((item) => {
-      let itemScore: number = INTELLIGENCE_CONFIG.CONFIDENCE.BASE; // Base score
-
-      // Temperature-based scoring
-      if (weather.temperature <= INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.FREEZING) {
-        // Freezing weather
-        if (
-          item.category === 'outerwear' &&
-          (item.tags.includes('winter') || item.tags.includes('heavy'))
-        ) {
-          itemScore = 1.0;
-        } else if (
-          item.tags.includes('warm') ||
-          item.tags.includes('wool') ||
-          item.tags.includes('fleece')
-        ) {
-          itemScore = 0.9;
-        } else if (item.tags.includes('light') || item.tags.includes('summer')) {
-          itemScore = 0.1;
-        }
-      } else if (weather.temperature <= INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.COLD) {
-        // Cold weather
-        if (item.category === 'outerwear' || item.tags.includes('jacket')) {
-          itemScore = 0.9;
-        } else if (item.tags.includes('warm') || item.tags.includes('long-sleeve')) {
-          itemScore = 0.8;
-        } else if (item.tags.includes('light') || item.tags.includes('tank')) {
-          itemScore = 0.3;
-        }
-      } else if (weather.temperature <= INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.MILD) {
-        // Mild weather
-        if (item.tags.includes('light-jacket') || item.tags.includes('cardigan')) {
-          itemScore = 0.9;
-        } else if (item.tags.includes('long-sleeve') || item.tags.includes('sweater')) {
-          itemScore = 0.8;
-        } else if (item.tags.includes('short-sleeve')) {
-          itemScore = 0.7;
-        }
-      } else if (weather.temperature <= INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.WARM) {
-        // Warm weather
-        if (
-          item.tags.includes('light') ||
-          item.tags.includes('breathable') ||
-          item.tags.includes('cotton')
-        ) {
-          itemScore = 0.9;
-        } else if (item.tags.includes('short-sleeve') || item.tags.includes('summer')) {
-          itemScore = 0.8;
-        } else if (item.tags.includes('heavy') || item.tags.includes('wool')) {
-          itemScore = 0.2;
-        }
-      } else {
-        // Hot weather
-        if (
-          item.tags.includes('tank') ||
-          item.tags.includes('sleeveless') ||
-          item.tags.includes('linen')
-        ) {
-          itemScore = 1.0;
-        } else if (item.tags.includes('light') || item.tags.includes('summer')) {
-          itemScore = 0.9;
-        } else if (item.tags.includes('heavy') || item.category === 'outerwear') {
-          itemScore = 0.1;
-        }
-      }
-
-      // Weather condition adjustments
-      if (weather.condition === 'rainy') {
-        if (item.tags.includes('waterproof') || item.tags.includes('rain-resistant')) {
-          itemScore = Math.min(
-            itemScore + INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.RAIN_BONUS,
-            INTELLIGENCE_CONFIG.CONFIDENCE.MAXIMUM,
-          );
-        } else if (item.tags.includes('delicate') || item.tags.includes('silk')) {
-          itemScore = Math.max(
-            itemScore - INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.RAIN_PENALTY,
-            INTELLIGENCE_CONFIG.CONFIDENCE.MINIMUM,
-          );
-        }
-      }
-
-      if (weather.condition === 'snowy') {
-        if (item.tags.includes('waterproof') || item.tags.includes('winter-boots')) {
-          itemScore = Math.min(
-            itemScore + INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.SNOW_BONUS,
-            INTELLIGENCE_CONFIG.CONFIDENCE.MAXIMUM,
-          );
-        } else if (item.category === 'shoes' && !item.tags.includes('waterproof')) {
-          itemScore = Math.max(
-            itemScore - INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.SNOW_PENALTY,
-            INTELLIGENCE_CONFIG.CONFIDENCE.MINIMUM,
-          );
-        }
-      }
-
-      if (weather.condition === 'windy') {
-        if (item.category === 'outerwear' || item.tags.includes('wind-resistant')) {
-          itemScore = Math.min(
-            itemScore + INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.WIND_BONUS,
-            INTELLIGENCE_CONFIG.CONFIDENCE.MAXIMUM,
-          );
-        } else if (item.tags.includes('loose') || item.tags.includes('flowy')) {
-          itemScore = Math.max(
-            itemScore - INTELLIGENCE_CONFIG.WEATHER_ADJUSTMENTS.WIND_PENALTY,
-            INTELLIGENCE_CONFIG.CONFIDENCE.MINIMUM,
-          );
-        }
-      }
-
+      let itemScore = this.calculateItemTemperatureScore(item, weather.temperature);
+      itemScore = this.applyWeatherConditionAdjustments(item, itemScore, weather.condition);
       compatibilityScore += itemScore;
     });
 
-    // Apply outlier guard validation
     return IntelligenceService.validateWeatherScore(compatibilityScore / totalItems);
   }
 
@@ -1416,54 +1531,84 @@ export class IntelligenceService {
     return neglectedItems.length > 0 ? INTELLIGENCE_CONFIG.USAGE_STATS.REDISCOVERY_BONUS : 0;
   }
 
+  private isTemperatureAppropriate(item: WardrobeItem, temperature: number): boolean {
+    const tags = item.tags || [];
+    const category = item.category;
+
+    if (temperature < INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.COLD) {
+      return this.isColdWeatherAppropriate(item, tags, category);
+    } else if (temperature > INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.MILD) {
+      return this.isHotWeatherAppropriate(item, tags, category);
+    }
+    return true;
+  }
+
+  private isColdWeatherAppropriate(item: WardrobeItem, tags: string[], category: string): boolean {
+    if (category === 'outerwear' || tags.includes('warm') || tags.includes('winter')) {
+      return true;
+    }
+    if (category === 'tops' && (tags.includes('tank') || tags.includes('sleeveless'))) {
+      return false;
+    }
+    return true;
+  }
+
+  private isHotWeatherAppropriate(item: WardrobeItem, tags: string[], category: string): boolean {
+    if (tags.includes('heavy') || tags.includes('winter') || tags.includes('wool')) {
+      return false;
+    }
+    if (category === 'outerwear' && !tags.includes('light')) {
+      return false;
+    }
+    return true;
+  }
+
+  private isWeatherConditionAppropriate(item: WardrobeItem, condition: string): boolean {
+    const tags = item.tags || [];
+    const category = item.category;
+
+    if (condition === 'rainy' || condition === 'snowy') {
+      return this.isWetWeatherAppropriate(item, tags, category);
+    }
+
+    if (condition === 'windy') {
+      return this.isWindyWeatherAppropriate(item, tags);
+    }
+
+    return true;
+  }
+
+  private isWetWeatherAppropriate(item: WardrobeItem, tags: string[], category: string): boolean {
+    if (category === 'shoes' && !tags.includes('waterproof') && !tags.includes('boots')) {
+      return false;
+    }
+    if (tags.includes('suede') || tags.includes('delicate')) {
+      return false;
+    }
+    return true;
+  }
+
+  private isWindyWeatherAppropriate(item: WardrobeItem, tags: string[]): boolean {
+    if (tags.includes('loose') || tags.includes('flowy')) {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * Check if item is appropriate for current weather conditions
    */
   private isWeatherAppropriate(item: WardrobeItem, weather: WeatherContext): boolean {
     if (!weather) {
       return true;
-    } // If no weather data, allow all items
-
-    const { temperature, condition, humidity } = weather;
-    const tags = item.tags || [];
-    const category = item.category;
-
-    // Temperature appropriateness
-    if (temperature < INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.COLD) {
-      // Cold weather
-      if (category === 'outerwear' || tags.includes('warm') || tags.includes('winter')) {
-        return true;
-      }
-      if (category === 'tops' && (tags.includes('tank') || tags.includes('sleeveless'))) {
-        return false;
-      }
-    } else if (temperature > INTELLIGENCE_CONFIG.TEMPERATURE_THRESHOLDS.MILD) {
-      // Hot weather
-      if (tags.includes('heavy') || tags.includes('winter') || tags.includes('wool')) {
-        return false;
-      }
-      if (category === 'outerwear' && !tags.includes('light')) {
-        return false;
-      }
     }
 
-    // Weather condition appropriateness
-    if (condition === 'rainy' || condition === 'snowy') {
-      if (category === 'shoes' && !tags.includes('waterproof') && !tags.includes('boots')) {
-        return false;
-      }
-      if (tags.includes('suede') || tags.includes('delicate')) {
-        return false;
-      }
-    }
+    const { temperature, condition } = weather;
 
-    if (condition === 'windy') {
-      if (tags.includes('loose') || tags.includes('flowy')) {
-        return false;
-      }
-    }
-
-    return true;
+    return (
+      this.isTemperatureAppropriate(item, temperature) &&
+      this.isWeatherConditionAppropriate(item, condition)
+    );
   }
 
   /**
@@ -1567,6 +1712,41 @@ export class IntelligenceService {
     return reasons;
   }
 
+  private replaceItemPlaceholder(note: string, outfit: Outfit): string {
+    if (note.includes('{item}')) {
+      const featuredItem = outfit.items[0];
+      if (featuredItem?.category) {
+        return note.replace('{item}', featuredItem.category);
+      }
+    }
+    return note;
+  }
+
+  private replaceWeatherPlaceholder(note: string): string {
+    if (note.includes('{weather}')) {
+      return note.replace('{weather}', 'perfect');
+    }
+    return note;
+  }
+
+  private replaceComplimentsPlaceholder(note: string): string {
+    if (note.includes('{compliments}')) {
+      const recentCompliments = Math.floor(Math.random() * 5) + 1;
+      return note.replace('{compliments}', recentCompliments.toString());
+    }
+    return note;
+  }
+
+  private replaceRatingPlaceholder(note: string): string {
+    if (note.includes('{rating}')) {
+      const baseRating = 3.5;
+      const qualityBonus = Math.random() * 1.5;
+      const finalRating = Math.min(5, baseRating + qualityBonus);
+      return note.replace('{rating}', finalRating.toFixed(1));
+    }
+    return note;
+  }
+
   private personalizeConfidenceNote(
     template: string,
     outfit: Outfit,
@@ -1574,32 +1754,10 @@ export class IntelligenceService {
   ): string {
     let note = template;
 
-    // Replace placeholders
-    if (note.includes('{item}')) {
-      const featuredItem = outfit.items[0]; // Use first item as featured
-      if (featuredItem?.category) {
-        note = note.replace('{item}', featuredItem.category);
-      }
-    }
-
-    if (note.includes('{weather}')) {
-      // This would be passed in context
-      note = note.replace('{weather}', 'perfect');
-    }
-
-    if (note.includes('{compliments}')) {
-      // Calculate average compliments from recent outfits
-      const recentCompliments = Math.floor(Math.random() * 5) + 1; // 1-5 range
-      note = note.replace('{compliments}', recentCompliments.toString());
-    }
-
-    if (note.includes('{rating}')) {
-      // Calculate outfit rating based on item quality and coordination
-      const baseRating = 3.5;
-      const qualityBonus = Math.random() * 1.5; // 0-1.5 bonus
-      const finalRating = Math.min(5, baseRating + qualityBonus);
-      note = note.replace('{rating}', finalRating.toFixed(1));
-    }
+    note = this.replaceItemPlaceholder(note, outfit);
+    note = this.replaceWeatherPlaceholder(note);
+    note = this.replaceComplimentsPlaceholder(note);
+    note = this.replaceRatingPlaceholder(note);
 
     return note;
   }
@@ -1634,7 +1792,12 @@ export class IntelligenceService {
       if (!isSupabaseOk(res)) {
         const mapped = mapSupabaseError(res.error, { action: 'fetchOutfitRecommendationItems' });
         try {
-          void ErrorHandler.getInstance().handleError(mapped);
+          void ErrorHandler.getInstance().handleError(
+            mapped.message,
+            mapped.category,
+            mapped.severity,
+            mapped.context,
+          );
         } catch {}
       }
       return currentPatterns;
@@ -1699,6 +1862,57 @@ export class IntelligenceService {
     };
   }
 
+  private extractWeatherFactors(
+    weather: { condition?: string; temperature?: number; humidity?: number },
+    factors: Set<string>,
+  ): void {
+    if (weather.condition) {
+      factors.add(`weather_${weather.condition}`);
+    }
+    if (typeof weather.temperature === 'number') {
+      if (weather.temperature < 10) {
+        factors.add('weather_cold');
+      } else if (weather.temperature > 25) {
+        factors.add('weather_hot');
+      } else {
+        factors.add('weather_mild');
+      }
+    }
+    if (typeof weather.humidity === 'number' && weather.humidity > 70) {
+      factors.add('weather_humid');
+    }
+  }
+
+  private extractEventFactors(
+    event: { type?: string; formality?: string },
+    factors: Set<string>,
+  ): void {
+    if (event.type) {
+      factors.add(`occasion_${event.type}`);
+    }
+    if (event.formality) {
+      factors.add(`formality_${event.formality}`);
+    }
+  }
+
+  private extractTimeAndEmotionFactors(
+    feedback: {
+      context?: { timeOfDay?: string; season?: string };
+      emotional_response?: { primary?: string };
+    },
+    factors: Set<string>,
+  ): void {
+    if (feedback.context?.timeOfDay) {
+      factors.add(`time_${feedback.context.timeOfDay}`);
+    }
+    if (feedback.emotional_response?.primary) {
+      factors.add(`emotion_${feedback.emotional_response.primary}`);
+    }
+    if (feedback.context?.season) {
+      factors.add(`season_${feedback.context.season}`);
+    }
+  }
+
   private extractContextFactors(
     feedbacks: Array<{
       context?: {
@@ -1711,42 +1925,21 @@ export class IntelligenceService {
     }>,
   ): string[] {
     const factors = new Set<string>();
+
     for (const feedback of feedbacks) {
       const weather = feedback.context?.weather;
       if (weather) {
-        if (weather.condition) {
-          factors.add(`weather_${weather.condition}`);
-        }
-        if (typeof weather.temperature === 'number') {
-          if (weather.temperature < 10) {
-            factors.add('weather_cold');
-          } else if (weather.temperature > 25) {
-            factors.add('weather_hot');
-          } else {
-            factors.add('weather_mild');
-          }
-        }
-        if (typeof weather.humidity === 'number' && weather.humidity > 70) {
-          factors.add('weather_humid');
-        }
+        this.extractWeatherFactors(weather, factors);
       }
+
       const event = feedback.context?.calendar?.primaryEvent;
-      if (event?.type) {
-        factors.add(`occasion_${event.type}`);
+      if (event) {
+        this.extractEventFactors(event, factors);
       }
-      if (event?.formality) {
-        factors.add(`formality_${event.formality}`);
-      }
-      if (feedback.context?.timeOfDay) {
-        factors.add(`time_${feedback.context.timeOfDay}`);
-      }
-      if (feedback.emotional_response?.primary) {
-        factors.add(`emotion_${feedback.emotional_response.primary}`);
-      }
-      if (feedback.context?.season) {
-        factors.add(`season_${feedback.context.season}`);
-      }
+
+      this.extractTimeAndEmotionFactors(feedback, factors);
     }
+
     return [...factors];
   }
 }

@@ -8,14 +8,15 @@
 import React, { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { getAllStories, getFeaturedStory } from '../../data/experienceStories';
-import { logInDev } from '../../utils/consoleSuppress';
 import {
   ORIGINAL_BORDER_RADIUS,
   ORIGINAL_COLORS,
   ORIGINAL_SPACING,
   ORIGINAL_TYPOGRAPHY,
-} from '../auth/originalLoginStyles';
+} from '@/components/auth/originalLoginStyles';
+import { getAllStories, getFeaturedStory } from '@/data/experienceStories';
+import { logInDev } from '@/utils/consoleSuppress';
+
 import { ExperienceStory, ExperienceStoryBlock, StoryItem } from './ExperienceStoryBlock';
 
 export const ExperienceShowcase: React.FC = () => {

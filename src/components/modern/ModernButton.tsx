@@ -20,7 +20,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { ModernDesignSystem } from '../../theme/ModernDesignSystem';
+import { ModernDesignSystem } from '@/theme/ModernDesignSystem';
 
 interface ModernButtonProps {
   title: string;

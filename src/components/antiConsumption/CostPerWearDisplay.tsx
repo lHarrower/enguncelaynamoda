@@ -5,8 +5,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeTheme } from '@/hooks/useSafeTheme';
 import { antiConsumptionService, CostPerWearData } from '@/services/antiConsumptionService';
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { errorInDev } from '../../utils/consoleSuppress';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface CostPerWearDisplayProps {
   itemId: string;
@@ -23,7 +22,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
 }) => {
   const theme = useSafeTheme();
   const { colors } = theme;
-  const styles = createStyles(colors);
+  const styles = createStyles(DesignSystem.colors);
   const [costData, setCostData] = useState<CostPerWearData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -191,11 +190,7 @@ export const CostPerWearDisplay: React.FC<CostPerWearDisplayProps> = ({
   );
 };
 
-const createStyles = (colors: {
-  background: { secondary: string };
-  text: { primary: string; secondary: string };
-  semantic: { error: string; warning: string; success: string };
-}) =>
+const createStyles = (colors: typeof DesignSystem.colors) =>
   StyleSheet.create({
     actionHint: {
       alignItems: 'center',

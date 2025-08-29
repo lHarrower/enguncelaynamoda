@@ -9,9 +9,9 @@ import React, {
 } from 'react';
 import { AccessibilityInfo, AppState, AppStateStatus } from 'react-native';
 
+import hapticService, { HapticIntensity, HapticType } from '@/services/HapticService';
 import { errorInDev, logInDev } from '@/utils/consoleSuppress';
 
-import hapticService, { HapticIntensity, HapticType } from '../services/HapticService';
 import { AnimationContext } from './AnimationProvider';
 
 /**

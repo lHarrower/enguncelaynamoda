@@ -11,7 +11,7 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { DesignSystem } from '../../theme/DesignSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface AuraButtonProps {
   title: string;

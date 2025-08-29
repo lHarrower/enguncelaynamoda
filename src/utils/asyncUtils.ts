@@ -12,4 +12,4 @@ export function fireAndForget<T>(promise: Promise<T>, label?: string): undefined
   });
 }
 
-import { warnInDev } from '@/utils/consoleSuppress';
+import { warnInDev } from './consoleSuppress';

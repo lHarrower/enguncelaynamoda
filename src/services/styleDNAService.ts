@@ -1,17 +1,18 @@
 // Style DNA Service - AI-powered Style Pattern Recognition
 // Analyzes uploaded photos to generate personalized style profiles
 
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
+// import { ErrorHandler } from '../utils/ErrorHandler';
+// import { intelligenceService } from './intelligenceService';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { ensureSupabaseOk } from '@/utils/supabaseErrorMapping';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
+
 import {
   CloudinaryUploadResult,
   isCloudinaryResult,
   // CloudinaryColorEntry,
 } from '../types/external/cloudinary';
-// import { ErrorHandler } from '../utils/ErrorHandler';
-// import { intelligenceService } from './intelligenceService';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
-import { ensureSupabaseOk } from '../utils/supabaseErrorMapping';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
 
 export interface UploadedPhoto {
   id: string;
@@ -538,7 +539,7 @@ export class StyleDNAService {
     try {
       const res = await wrap(
         async () =>
-          await (supabase as any).from('style_dna_profiles').upsert({
+          await supabase.from('style_dna_profiles').upsert({
             user_id: styleDNA.userId,
             visual_analysis: styleDNA.visualAnalysis,
             style_personality: styleDNA.stylePersonality,
@@ -706,7 +707,7 @@ export class StyleDNAService {
     try {
       const res = await wrap(
         async () =>
-          await (supabase as any)
+          await supabase
             .from('style_dna_profiles')
             .select(
               'user_id, visual_analysis, style_personality, color_palette, style_preferences, recommendations, confidence, created_at',

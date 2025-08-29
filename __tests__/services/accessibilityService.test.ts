@@ -3,7 +3,7 @@
  * Validates WCAG 2.1 AA compliance functionality
  */
 
-import AccessibilityService from '../../src/services/accessibilityService';
+import AccessibilityService from '@/services/accessibilityService';
 import { AccessibilityInfo } from 'react-native';
 
 // Mock React Native AccessibilityInfo
@@ -33,25 +33,25 @@ describe('AccessibilityService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    
+
     // Reset singleton instance
     (AccessibilityService as any).instance = null;
-    
+
     // Create new instance for each test
     accessibilityService = AccessibilityService.getInstance();
-    
+
     // Setup default mocks
     (AccessibilityInfo.isScreenReaderEnabled as jest.Mock).mockResolvedValue(false);
     (AccessibilityInfo.isReduceMotionEnabled as jest.Mock).mockResolvedValue(false);
-    
+
     // Wait for async initialization
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
   });
 
   describe('WCAG Compliance Validation', () => {
     it('should validate WCAG 2.1 AA compliance', () => {
       const result = accessibilityService.validateWCAGCompliance();
-      
+
       expect(result).toHaveProperty('level', 'AA');
       expect(result).toHaveProperty('passed');
       expect(result).toHaveProperty('score');
@@ -65,14 +65,14 @@ describe('AccessibilityService', () => {
 
     it('should return score between 0 and 100', () => {
       const result = accessibilityService.validateWCAGCompliance();
-      
+
       expect(result.score).toBeGreaterThanOrEqual(0);
       expect(result.score).toBeLessThanOrEqual(100);
     });
 
     it('should pass when score is 80 or above', () => {
       const result = accessibilityService.validateWCAGCompliance();
-      
+
       if (result.score >= 80) {
         expect(result.passed).toBe(true);
       } else {
@@ -82,8 +82,8 @@ describe('AccessibilityService', () => {
 
     it('should include proper issue structure', () => {
       const result = accessibilityService.validateWCAGCompliance();
-      
-      result.issues.forEach(issue => {
+
+      result.issues.forEach((issue) => {
         expect(issue).toHaveProperty('severity');
         expect(issue).toHaveProperty('guideline');
         expect(issue).toHaveProperty('criterion');
@@ -102,11 +102,11 @@ describe('AccessibilityService', () => {
     it('should calculate contrast ratio correctly', () => {
       // Test known contrast ratios
       const service = accessibilityService as any;
-      
+
       // Black on white should have high contrast
       const blackWhiteRatio = service.calculateContrastRatio('#000000', '#FFFFFF');
       expect(blackWhiteRatio).toBeCloseTo(21, 0); // Perfect contrast
-      
+
       // Same colors should have ratio of 1
       const sameColorRatio = service.calculateContrastRatio('#FF0000', '#FF0000');
       expect(sameColorRatio).toBeCloseTo(1, 0);
@@ -114,20 +114,20 @@ describe('AccessibilityService', () => {
 
     it('should validate hex to RGB conversion', () => {
       const service = accessibilityService as any;
-      
+
       const whiteRgb = service.hexToRgb('#FFFFFF');
       expect(whiteRgb).toEqual({ r: 255, g: 255, b: 255 });
-      
+
       const blackRgb = service.hexToRgb('#000000');
       expect(blackRgb).toEqual({ r: 0, g: 0, b: 0 });
-      
+
       const redRgb = service.hexToRgb('#FF0000');
       expect(redRgb).toEqual({ r: 255, g: 0, b: 0 });
-      
+
       // Test without # prefix
       const blueRgb = service.hexToRgb('0000FF');
       expect(blueRgb).toEqual({ r: 0, g: 0, b: 255 });
-      
+
       // Test invalid hex
       const invalidRgb = service.hexToRgb('invalid');
       expect(invalidRgb).toBeNull();
@@ -135,15 +135,15 @@ describe('AccessibilityService', () => {
 
     it('should calculate luminance correctly', () => {
       const service = accessibilityService as any;
-      
+
       // White should have luminance close to 1
       const whiteLuminance = service.getLuminance('#FFFFFF');
       expect(whiteLuminance).toBeCloseTo(1, 1);
-      
+
       // Black should have luminance close to 0
       const blackLuminance = service.getLuminance('#000000');
       expect(blackLuminance).toBeCloseTo(0, 2);
-      
+
       // Gray should be in between
       const grayLuminance = service.getLuminance('#808080');
       expect(grayLuminance).toBeGreaterThan(0);
@@ -154,17 +154,17 @@ describe('AccessibilityService', () => {
       const result = accessibilityService.validateWCAGCompliance();
       const service = accessibilityService as any;
       const contrastResults = service.validateColorContrast();
-      
+
       contrastResults.forEach((result: any) => {
         expect(typeof result.passesAA).toBe('boolean');
         expect(typeof result.passesAAA).toBe('boolean');
         expect(result.ratio).toBeGreaterThan(0);
-        
+
         // AAA should be stricter than AA
         if (result.passesAAA) {
           expect(result.passesAA).toBe(true);
         }
-        
+
         // Check thresholds
         if (result.ratio >= 4.5) {
           expect(result.passesAA).toBe(true);
@@ -179,10 +179,10 @@ describe('AccessibilityService', () => {
   describe('Screen Reader Support', () => {
     it('should detect screen reader state', async () => {
       (AccessibilityInfo.isScreenReaderEnabled as jest.Mock).mockResolvedValue(true);
-      
+
       // Wait for initialization
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
       expect(AccessibilityInfo.isScreenReaderEnabled).toHaveBeenCalled();
     });
 
@@ -192,38 +192,38 @@ describe('AccessibilityService', () => {
         hint: 'Tap to perform action',
         role: 'button',
         state: { selected: true },
-        actions: [{ name: 'activate', label: 'Activate' }]
+        actions: [{ name: 'activate', label: 'Activate' }],
       });
-      
+
       expect(props).toEqual({
         accessible: true,
         accessibilityLabel: 'Test Button',
         accessibilityHint: 'Tap to perform action',
         accessibilityRole: 'button',
         accessibilityState: { selected: true },
-        accessibilityActions: [{ name: 'activate', label: 'Activate' }]
+        accessibilityActions: [{ name: 'activate', label: 'Activate' }],
       });
     });
 
     it('should handle minimal accessible props', () => {
       const props = accessibilityService.getAccessibleProps({
-        label: 'Simple Label'
+        label: 'Simple Label',
       });
-      
+
       expect(props).toEqual({
         accessible: true,
         accessibilityLabel: 'Simple Label',
         accessibilityHint: undefined,
         accessibilityRole: undefined,
         accessibilityState: undefined,
-        accessibilityActions: undefined
+        accessibilityActions: undefined,
       });
     });
 
     it('should announce messages for accessibility', () => {
       const message = 'Test announcement';
       accessibilityService.announceForAccessibility(message);
-      
+
       expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith(message);
     });
   });
@@ -248,7 +248,7 @@ describe('AccessibilityService', () => {
   describe('Accessibility Report Generation', () => {
     it('should generate comprehensive accessibility report', () => {
       const report = accessibilityService.generateAccessibilityReport();
-      
+
       expect(typeof report).toBe('string');
       expect(report).toContain('WCAG 2.1 AA Accessibility Report');
       expect(report).toContain('Compliance Score:');
@@ -262,14 +262,14 @@ describe('AccessibilityService', () => {
     it('should include issues in report when present', () => {
       const report = accessibilityService.generateAccessibilityReport();
       const result = accessibilityService.validateWCAGCompliance();
-      
+
       if (result.issues.length > 0) {
         expect(report).toContain('Issues Found');
-        
-        const criticalIssues = result.issues.filter(i => i.severity === 'critical');
-        const majorIssues = result.issues.filter(i => i.severity === 'major');
-        const minorIssues = result.issues.filter(i => i.severity === 'minor');
-        
+
+        const criticalIssues = result.issues.filter((i) => i.severity === 'critical');
+        const majorIssues = result.issues.filter((i) => i.severity === 'major');
+        const minorIssues = result.issues.filter((i) => i.severity === 'minor');
+
         if (criticalIssues.length > 0) {
           expect(report).toContain('🚨 Critical Issues');
         }
@@ -285,10 +285,10 @@ describe('AccessibilityService', () => {
     it('should include recommendations in report', () => {
       const report = accessibilityService.generateAccessibilityReport();
       const result = accessibilityService.validateWCAGCompliance();
-      
+
       if (result.recommendations.length > 0) {
         expect(report).toContain('Recommendations');
-        result.recommendations.forEach(rec => {
+        result.recommendations.forEach((rec) => {
           expect(report).toContain(rec);
         });
       }
@@ -297,7 +297,7 @@ describe('AccessibilityService', () => {
     it('should show proper status indicators', () => {
       const report = accessibilityService.generateAccessibilityReport();
       const result = accessibilityService.validateWCAGCompliance();
-      
+
       if (result.passed) {
         expect(report).toContain('✅ PASSED');
       } else {
@@ -309,19 +309,21 @@ describe('AccessibilityService', () => {
   describe('Edge Cases and Error Handling', () => {
     it('should handle invalid color inputs gracefully', () => {
       const service = accessibilityService as any;
-      
+
       const invalidRatio = service.calculateContrastRatio('invalid', '#FFFFFF');
       expect(typeof invalidRatio).toBe('number');
       expect(invalidRatio).toBeGreaterThan(0);
-      
+
       const anotherInvalidRatio = service.calculateContrastRatio('#FFFFFF', 'also-invalid');
       expect(typeof anotherInvalidRatio).toBe('number');
       expect(anotherInvalidRatio).toBeGreaterThan(0);
     });
 
     it('should handle accessibility info errors gracefully', async () => {
-      (AccessibilityInfo.isScreenReaderEnabled as jest.Mock).mockRejectedValue(new Error('Test error'));
-      
+      (AccessibilityInfo.isScreenReaderEnabled as jest.Mock).mockRejectedValue(
+        new Error('Test error'),
+      );
+
       // Should not throw
       expect(() => {
         const newService = require('../../src/services/accessibilityService').default;
@@ -331,7 +333,7 @@ describe('AccessibilityService', () => {
     it('should provide fallback values when validation fails', () => {
       // This tests the error handling in the validation methods
       const result = accessibilityService.validateWCAGCompliance();
-      
+
       // Should still return a valid result structure even if some validations fail
       expect(result).toHaveProperty('level');
       expect(result).toHaveProperty('passed');
@@ -345,7 +347,7 @@ describe('AccessibilityService', () => {
     it('should return the same instance', () => {
       const instance1 = require('../../src/services/accessibilityService').default;
       const instance2 = require('../../src/services/accessibilityService').default;
-      
+
       expect(instance1).toBe(instance2);
     });
   });

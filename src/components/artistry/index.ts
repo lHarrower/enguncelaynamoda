@@ -16,4 +16,4 @@ export {
 } from './KineticTypography';
 
 // Re-export the theme for convenience
-export { DesignSystem } from '../../theme/DesignSystem';
+export { DesignSystem } from '@/theme/DesignSystem';

@@ -2,7 +2,7 @@
 
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 import { DesignSystem } from '@/theme/DesignSystem';
 
@@ -12,7 +12,7 @@ interface SectionHeaderProps {
   actionText?: string;
   onActionPress?: () => void;
   showArrow?: boolean;
-  style?: any;
+  style?: ViewStyle;
 }
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({

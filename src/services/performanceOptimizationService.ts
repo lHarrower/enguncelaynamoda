@@ -1,18 +1,19 @@
 // Performance Optimization Service - AYNA Mirror Daily Ritual
 // Implements caching, background processing, and performance monitoring
 
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
+import { fireAndForget } from '@/utils/asyncUtils';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { isObject, safeParse } from '@/utils/safeJSON';
+import { secureStorage } from '@/utils/secureStorage';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
+
 import {
   DailyRecommendations,
   OutfitFeedback,
   UsageStats,
   WardrobeItem,
 } from '../types/aynaMirror';
-import { fireAndForget } from '../utils/asyncUtils';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
-import { isObject, safeParse } from '../utils/safeJSON';
-import { secureStorage } from '../utils/secureStorage';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
 
 // NOTE: Intentionally avoid static import of AynaMirrorService to break circular dependency:
 // aynaMirrorService -> performanceOptimizationService -> aynaMirrorService.
@@ -63,6 +64,9 @@ interface PerformanceMetrics {
 // ============================================================================
 
 export class PerformanceOptimizationService {
+  // OPERASYON DİSİPLİN: Memory leak önleme için timer referansları
+  private static cleanupTimer: ReturnType<typeof setInterval> | null = null;
+  private static initialCleanupTimer: ReturnType<typeof setTimeout> | null = null;
   private static feedbackProcessingQueue: OutfitFeedback[] = [];
   private static isProcessingFeedback = false;
   private static performanceMetrics: PerformanceMetrics = {
@@ -1153,11 +1157,15 @@ export class PerformanceOptimizationService {
 
   /**
    * Schedule periodic cleanup
+   * OPERASYON DİSİPLİN: Memory leak önleme ile güvenli timer yönetimi
    */
   private static schedulePeriodicCleanup(): void {
+    // Önceki timer'ları temizle
+    this.stopPeriodicCleanup();
+
     // Run cleanup every 24 hours
     if (process.env.NODE_ENV !== 'test') {
-      setInterval(
+      this.cleanupTimer = setInterval(
         () => {
           void this.performCleanup();
         },
@@ -1165,7 +1173,7 @@ export class PerformanceOptimizationService {
       );
 
       // Run initial cleanup after 5 minutes
-      setTimeout(
+      this.initialCleanupTimer = setTimeout(
         () => {
           void this.performCleanup();
         },
@@ -1175,11 +1183,29 @@ export class PerformanceOptimizationService {
   }
 
   /**
+   * OPERASYON DİSİPLİN: Memory leak önleme - tüm timer'ları durdur
+   */
+  private static stopPeriodicCleanup(): void {
+    if (this.cleanupTimer) {
+      clearInterval(this.cleanupTimer);
+      this.cleanupTimer = null;
+    }
+    if (this.initialCleanupTimer) {
+      clearTimeout(this.initialCleanupTimer);
+      this.initialCleanupTimer = null;
+    }
+  }
+
+  /**
    * Shutdown performance optimization service
+   * OPERASYON DİSİPLİN: Memory leak önleme - tüm timer'ları temizle
    */
   static async shutdown(): Promise<void> {
     try {
       logInDev('[PerformanceService] Shutting down performance optimization service');
+
+      // OPERASYON DİSİPLİN: Timer'ları durdur
+      this.stopPeriodicCleanup();
 
       // Process any remaining feedback in queue
       if (this.feedbackProcessingQueue.length > 0) {
@@ -1196,6 +1222,14 @@ export class PerformanceOptimizationService {
         error instanceof Error ? error : String(error),
       );
     }
+  }
+
+  /**
+   * OPERASYON DİSİPLİN: Component unmount'ta çağrılması gereken cleanup metodu
+   * React component'lerde useEffect cleanup function'ında kullanılmalı
+   */
+  static cleanup(): void {
+    void this.shutdown();
   }
 }
 

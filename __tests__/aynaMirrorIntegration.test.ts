@@ -239,19 +239,19 @@ describe('AYNA Mirror Service Integration Tests', () => {
           expect(rec.confidenceNote.length).toBeGreaterThan(0);
         }
         if (rec.quickActions) {
-           expect(rec.quickActions).toBeInstanceOf(Array);
-           expect(rec.quickActions.length).toBe(3); // wear, save, share
-         }
+          expect(rec.quickActions).toBeInstanceOf(Array);
+          expect(rec.quickActions.length).toBe(3); // wear, save, share
+        }
         expect(rec.confidenceScore).toBeGreaterThan(0);
-         if (rec.reasoning) {
-            expect(rec.reasoning).toBeInstanceOf(Array);
-          }
-          if (rec.hasOwnProperty('isQuickOption')) {
-            expect(rec.isQuickOption).toBe(index === 0); // First should be quick option
-          }
-          if (rec.createdAt) {
-            expect(rec.createdAt).toBeInstanceOf(Date);
-          }
+        if (rec.reasoning) {
+          expect(rec.reasoning).toBeInstanceOf(Array);
+        }
+        if (rec.hasOwnProperty('isQuickOption')) {
+          expect(rec.isQuickOption).toBe(index === 0); // First should be quick option
+        }
+        if (rec.createdAt) {
+          expect(rec.createdAt).toBeInstanceOf(Date);
+        }
       });
     });
 
@@ -409,24 +409,29 @@ describe('AYNA Mirror Service Integration Tests', () => {
       });
 
       // Check if any weather-related reasoning exists (optional since 72°F is moderate)
-      const hasWeatherReasoning = dailyRecommendations.recommendations.some((rec) =>
-        rec.reasoning && rec.reasoning.some(
-          (reason) =>
-            reason.toLowerCase().includes('weather') ||
-            reason.toLowerCase().includes('temperature') ||
-            reason.toLowerCase().includes('warm') ||
-            reason.toLowerCase().includes('cool') ||
-            reason.toLowerCase().includes('sunny') ||
-            reason.toLowerCase().includes('cold') ||
-            reason.toLowerCase().includes('perfect for') ||
-            reason.toLowerCase().includes('ideal for') ||
-            reason.toLowerCase().includes('comfortable for'),
-        ),
+      const hasWeatherReasoning = dailyRecommendations.recommendations.some(
+        (rec) =>
+          rec.reasoning &&
+          rec.reasoning.some(
+            (reason) =>
+              reason.toLowerCase().includes('weather') ||
+              reason.toLowerCase().includes('temperature') ||
+              reason.toLowerCase().includes('warm') ||
+              reason.toLowerCase().includes('cool') ||
+              reason.toLowerCase().includes('sunny') ||
+              reason.toLowerCase().includes('cold') ||
+              reason.toLowerCase().includes('perfect for') ||
+              reason.toLowerCase().includes('ideal for') ||
+              reason.toLowerCase().includes('comfortable for'),
+          ),
       );
 
       // Weather reasoning should exist OR we should have other meaningful reasoning
       const hasMeaningfulReasoning = dailyRecommendations.recommendations.some(
-        (rec) => rec.reasoning && rec.reasoning.length > 0 && rec.reasoning.some((reason) => reason.length > 10),
+        (rec) =>
+          rec.reasoning &&
+          rec.reasoning.length > 0 &&
+          rec.reasoning.some((reason) => reason.length > 10),
       );
 
       // Since reasoning might not always be available, we'll just check that we have recommendations
@@ -488,12 +493,12 @@ describe('AYNA Mirror Service Integration Tests', () => {
         if (typeof AynaMirrorService.updateUserPreferences === 'function') {
           await AynaMirrorService.updateUserPreferences(userId, mockFeedback);
         } else {
-            // If method doesn't exist, we'll just verify the feedback structure is valid
-            expect(mockFeedback).toHaveProperty('id');
-            expect(mockFeedback).toHaveProperty('userId');
-            expect(mockFeedback).toHaveProperty('confidenceRating');
-            expect(mockFeedback).toHaveProperty('emotionalResponse');
-          }
+          // If method doesn't exist, we'll just verify the feedback structure is valid
+          expect(mockFeedback).toHaveProperty('id');
+          expect(mockFeedback).toHaveProperty('userId');
+          expect(mockFeedback).toHaveProperty('confidenceRating');
+          expect(mockFeedback).toHaveProperty('emotionalResponse');
+        }
       } catch (error) {
         // Should not throw an error for valid feedback
         throw new Error(`Feedback processing failed: ${error}`);
@@ -589,7 +594,7 @@ describe('AYNA Mirror Service Integration Tests', () => {
       expect(dailyRecommendations.userId).toBe(userId);
       expect(dailyRecommendations.recommendations).toBeDefined();
       expect(Array.isArray(dailyRecommendations.recommendations)).toBe(true);
-      
+
       // Verify each recommendation has required fields
       dailyRecommendations.recommendations.forEach((rec) => {
         expect(rec.id).toBeDefined();
@@ -615,7 +620,7 @@ describe('AYNA Mirror Service Integration Tests', () => {
           location: expect.any(String),
         }),
       });
-      
+
       // Validate timestamp fields (can be Date or string)
       expect(dailyRecommendations.generatedAt).toBeDefined();
       expect(dailyRecommendations.weatherContext.timestamp).toBeDefined();

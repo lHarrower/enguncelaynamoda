@@ -19,7 +19,7 @@ function bump(version: string) {
 
 const versionMatch = content.match(/version:\s*['\"](\d+\.\d+\.\d+)['\"]/);
 if (!versionMatch) {
-  console.error('Could not find version in app.config.ts');
+  
   process.exit(1);
 }
 const current = versionMatch[1];
@@ -34,4 +34,4 @@ if (rtMatch) {
 }
 
 fs.writeFileSync(CONFIG, content);
-console.log(JSON.stringify({ previous: current, next }, null, 2));
+

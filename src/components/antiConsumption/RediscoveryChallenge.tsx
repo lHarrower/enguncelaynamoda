@@ -9,8 +9,6 @@ import {
 } from '@/services/antiConsumptionService';
 import { WardrobeItem } from '@/services/wardrobeService';
 import { DesignSystem } from '@/theme/DesignSystem';
-import { ORGANIC_PALETTE } from '@/theme/UnifiedTheme';
-import { UNIFIED_COLORS } from '@/theme/DesignSystem';
 import { logger } from '@/utils/logger';
 
 interface RediscoveryChallengeProps {
@@ -288,9 +286,7 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
                           styles.colorDot,
                           {
                             backgroundColor:
-                              typeof color === 'string'
-                                ? color.toLowerCase()
-                                : themeColors.border,
+                              typeof color === 'string' ? color.toLowerCase() : themeColors.border,
                           },
                           isWorn && styles.colorDotWorn,
                         ]}
@@ -312,8 +308,8 @@ export const RediscoveryChallenge: React.FC<RediscoveryChallengeProps> = ({
       {!isCompleted && challenge.progress > 0 && (
         <View style={styles.encouragementContainer}>
           <Text style={styles.encouragementText}>
-            Great progress! You&apos;re rediscovering the gems in your closet. Keep going to unlock your
-            reward!
+            Great progress! You&apos;re rediscovering the gems in your closet. Keep going to unlock
+            your reward!
           </Text>
         </View>
       )}

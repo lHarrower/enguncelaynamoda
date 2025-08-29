@@ -23,9 +23,11 @@ import {
   View,
 } from 'react-native';
 
-import { useAuth } from '../../hooks/useAuth';
-import { useSafeTheme } from '../../hooks/useSafeTheme';
-import { ConsentType, KVKKConsent, kvkkConsentService } from '../../services/kvkkConsentService';
+import { useAuth } from '@/hooks/useAuth';
+import { useSafeTheme } from '@/hooks/useSafeTheme';
+import { ConsentType, KVKKConsent, kvkkConsentService } from '@/services/kvkkConsentService';
+import { errorInDev } from '@/utils/consoleSuppress';
+
 import { KVKKConsentModal } from './KVKKConsentModal';
 
 interface ConsentDisplayItem {
@@ -111,7 +113,7 @@ export const KVKKSettingsScreen: React.FC = () => {
       const userConsents = await kvkkConsentService.getConsentHistory(user.id);
       setConsents(userConsents);
     } catch (error) {
-      console.error('KVKK rızaları yüklenirken hata:', error);
+      errorInDev('KVKK rızaları yüklenirken hata:', error);
       Alert.alert('Hata', 'Rıza bilgileri yüklenirken bir hata oluştu.');
     } finally {
       setLoading(false);
@@ -153,7 +155,7 @@ export const KVKKSettingsScreen: React.FC = () => {
 
       await loadConsents();
     } catch (error) {
-      console.error('Rıza güncellenirken hata:', error);
+      errorInDev('Rıza güncellenirken hata:', error);
       Alert.alert('Hata', 'Rıza güncellenirken bir hata oluştu.');
     } finally {
       setProcessingAction(null);
@@ -182,7 +184,7 @@ export const KVKKSettingsScreen: React.FC = () => {
                 [{ text: 'Tamam' }],
               );
             } catch (error) {
-              console.error('Veri dışa aktarma hatası:', error);
+              errorInDev('Veri dışa aktarma hatası:', error);
               Alert.alert('Hata', 'Veri dışa aktarılırken bir hata oluştu.');
             } finally {
               setProcessingAction(null);
@@ -215,7 +217,7 @@ export const KVKKSettingsScreen: React.FC = () => {
                 [{ text: 'Tamam' }],
               );
             } catch (error) {
-              console.error('Veri silme hatası:', error);
+              errorInDev('Veri silme hatası:', error);
               Alert.alert('Hata', 'Veri silme talebi oluşturulurken bir hata oluştu.');
             } finally {
               setProcessingAction(null);
@@ -319,14 +321,16 @@ export const KVKKSettingsScreen: React.FC = () => {
         onPress={handleDataDeletion}
         disabled={processingAction === 'delete'}
       >
-        <Ionicons name="trash" size={20} color="#FF6B6B" />
+        <Ionicons name="trash" size={20} color={theme.colors.error || '#FF6B6B'} />
         <View style={styles.dataRightInfo}>
           <Text style={[styles.dataRightTitle, { color: theme.colors.text }]}>Verilerimi Sil</Text>
           <Text style={[styles.dataRightDescription, { color: theme.colors.textSecondary }]}>
             Tüm kişisel verilerinizi kalıcı olarak silin
           </Text>
         </View>
-        {processingAction === 'delete' && <ActivityIndicator size="small" color="#FF6B6B" />}
+        {processingAction === 'delete' && (
+          <ActivityIndicator size="small" color={theme.colors.error || '#FF6B6B'} />
+        )}
       </TouchableOpacity>
     </View>
   );

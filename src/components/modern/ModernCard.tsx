@@ -12,7 +12,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { ModernDesignSystem } from '../../theme/ModernDesignSystem';
+import { ModernDesignSystem } from '@/theme/ModernDesignSystem';
 
 interface ModernCardProps {
   children: React.ReactNode;

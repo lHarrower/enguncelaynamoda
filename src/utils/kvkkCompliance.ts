@@ -10,7 +10,14 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { ConsentType, DataProcessingPurpose, LegalBasis } from '../services/kvkkConsentService';
+import {
+  ConsentType,
+  DataProcessingPurpose,
+  KVKKConsent,
+  LegalBasis,
+} from '@/services/kvkkConsentService';
+
+import { errorInDev } from './consoleSuppress';
 
 // KVKK Compliance Levels
 export enum ComplianceLevel {
@@ -67,6 +74,22 @@ export interface KVKKRiskAssessment {
   dueDate: string;
 }
 
+// Consent Compliance Analysis Result
+interface ConsentComplianceResult {
+  required: ConsentType[];
+  granted: ConsentType[];
+  missing: ConsentType[];
+  expired: ConsentType[];
+}
+
+// Data Processing Compliance Analysis Result
+interface DataProcessingComplianceResult {
+  totalActivities: number;
+  compliantActivities: number;
+  nonCompliantActivities: number;
+  issues: string[];
+}
+
 class KVKKComplianceChecker {
   private static instance: KVKKComplianceChecker;
   private readonly STORAGE_KEY = 'kvkk_compliance_data';
@@ -110,7 +133,7 @@ class KVKKComplianceChecker {
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
-      console.error('Veri işleme aktivitesi loglanamadı:', error);
+      errorInDev('Veri işleme aktivitesi loglanamadı:', error);
     }
   }
 
@@ -126,13 +149,16 @@ class KVKKComplianceChecker {
 
       return logs;
     } catch (error) {
-      console.error('Aktivite logları alınamadı:', error);
+      errorInDev('Aktivite logları alınamadı:', error);
       return [];
     }
   }
 
   // KVKK compliance raporu oluştur
-  async generateComplianceReport(userId: string, consents: any[]): Promise<KVKKComplianceReport> {
+  async generateComplianceReport(
+    userId: string,
+    consents: KVKKConsent[],
+  ): Promise<KVKKComplianceReport> {
     try {
       const activities = await this.getActivityLogs(userId);
       const consentCompliance = this.analyzeConsentCompliance(consents);
@@ -161,7 +187,7 @@ class KVKKComplianceChecker {
 
       return report;
     } catch (error) {
-      console.error('Compliance raporu oluşturulamadı:', error);
+      errorInDev('Compliance raporu oluşturulamadı:', error);
       throw error;
     }
   }
@@ -257,7 +283,7 @@ class KVKKComplianceChecker {
   // Audit trail'e kayıt ekle
   private async addToAuditTrail(entry: {
     action: string;
-    details: any;
+    details: Record<string, unknown>;
     timestamp: string;
   }): Promise<void> {
     try {
@@ -274,21 +300,21 @@ class KVKKComplianceChecker {
 
       await AsyncStorage.setItem(this.AUDIT_TRAIL_KEY, JSON.stringify(trimmedTrail));
     } catch (error) {
-      console.error('Audit trail güncellenemedi:', error);
+      errorInDev('Audit trail güncellenemedi:', error);
     }
   }
 
   // Rıza compliance analizi
-  private analyzeConsentCompliance(consents: any[]) {
+  private analyzeConsentCompliance(consents: KVKKConsent[]) {
     const requiredConsents = [ConsentType.AI_PROCESSING]; // Zorunlu rızalar
     const allConsentTypes = Object.values(ConsentType);
 
     const granted = consents
-      .filter((c) => c.granted && new Date(c.expiresAt) > new Date())
+      .filter((c) => c.granted && (!c.expiryDate || new Date(c.expiryDate) > new Date()))
       .map((c) => c.consentType);
 
     const expired = consents
-      .filter((c) => c.granted && new Date(c.expiresAt) <= new Date())
+      .filter((c) => c.granted && c.expiryDate && new Date(c.expiryDate) <= new Date())
       .map((c) => c.consentType);
 
     const missing = requiredConsents.filter((required) => !granted.includes(required));
@@ -326,7 +352,10 @@ class KVKKComplianceChecker {
   }
 
   // Genel skor hesaplama
-  private calculateOverallScore(consentCompliance: any, dataProcessingCompliance: any): number {
+  private calculateOverallScore(
+    consentCompliance: ConsentComplianceResult,
+    dataProcessingCompliance: DataProcessingComplianceResult,
+  ): number {
     // Consent score: 0 if any required consent is missing, otherwise 50
     const consentScore = consentCompliance.missing.length === 0 ? 50 : 0;
 
@@ -351,7 +380,10 @@ class KVKKComplianceChecker {
   }
 
   // Öneriler oluşturma
-  private generateRecommendations(consentCompliance: any, dataProcessingCompliance: any): string[] {
+  private generateRecommendations(
+    consentCompliance: ConsentComplianceResult,
+    dataProcessingCompliance: DataProcessingComplianceResult,
+  ): string[] {
     const recommendations: string[] = [];
 
     if (consentCompliance.missing.length > 0) {
@@ -405,7 +437,7 @@ class KVKKComplianceChecker {
       const key = `${this.STORAGE_KEY}_${report.userId}`;
       await AsyncStorage.setItem(key, JSON.stringify(report));
     } catch (error) {
-      console.error('Compliance raporu kaydedilemedi:', error);
+      errorInDev('Compliance raporu kaydedilemedi:', error);
     }
   }
 
@@ -423,7 +455,7 @@ export const logDataProcessing = (activity: Omit<DataProcessingActivity, 'id' | 
   return kvkkComplianceChecker.logDataProcessingActivity(activity);
 };
 
-export const generateComplianceReport = (userId: string, consents: any[]) => {
+export const generateComplianceReport = (userId: string, consents: KVKKConsent[]) => {
   return kvkkComplianceChecker.generateComplianceReport(userId, consents);
 };
 

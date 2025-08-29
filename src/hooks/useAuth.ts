@@ -1,4 +1,5 @@
 // Authentication Hook
+import type { Session } from '@supabase/supabase-js';
 import { useCallback, useEffect, useState } from 'react';
 
 import { logInDev, warnInDev } from '@/utils/consoleSuppress';

@@ -75,7 +75,7 @@ const onboardingService = {
   bootstrapIntelligenceService: jest.fn().mockImplementation(async (userId, preferences) => {
     mockSupabase.from('user_preferences').upsert({
       user_id: userId,
-      ...preferences
+      ...preferences,
     });
   }),
 };

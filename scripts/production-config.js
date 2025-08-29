@@ -65,7 +65,7 @@ class ProductionConfigChecker {
    * Main execution function
    */
   async run() {
-    console.log('🔍 AYNAMODA Production Configuration Checker\n');
+    
 
     this.checkEnvironmentFiles();
     this.scanForPlaceholders();
@@ -77,7 +77,7 @@ class ProductionConfigChecker {
    * Check environment configuration files
    */
   checkEnvironmentFiles() {
-    console.log('📋 Checking environment configuration...');
+    
 
     const envFile = path.join(PROJECT_ROOT, '.env');
     const envExampleFile = path.join(PROJECT_ROOT, '.env.example');
@@ -160,7 +160,7 @@ class ProductionConfigChecker {
    * Scan codebase for placeholder patterns
    */
   scanForPlaceholders() {
-    console.log('🔎 Scanning codebase for placeholders...');
+    
 
     this.scanDirectory(PROJECT_ROOT);
   }
@@ -235,7 +235,7 @@ class ProductionConfigChecker {
    * Check critical configuration files
    */
   checkCriticalConfigurations() {
-    console.log('⚙️  Checking critical configurations...');
+    
 
     CRITICAL_FILES.forEach((file) => {
       const filePath = path.join(PROJECT_ROOT, file);
@@ -341,71 +341,71 @@ class ProductionConfigChecker {
    * Generate and display report
    */
   generateReport() {
-    console.log('\n📊 Production Configuration Report\n');
+    
 
     // Critical issues
     const criticalIssues = this.issues.filter((issue) => issue.severity === 'critical');
     if (criticalIssues.length > 0) {
-      console.log('🚨 CRITICAL ISSUES (Must fix before production):');
+      
       criticalIssues.forEach((issue) => {
-        console.log(`   ❌ ${issue.file}${issue.line ? `:${issue.line}` : ''} - ${issue.message}`);
+        
       });
-      console.log('');
+      
     }
 
     // High priority issues
     const highIssues = this.issues.filter((issue) => issue.severity === 'high');
     if (highIssues.length > 0) {
-      console.log('⚠️  HIGH PRIORITY ISSUES:');
+      
       highIssues.forEach((issue) => {
-        console.log(`   🔸 ${issue.file}${issue.line ? `:${issue.line}` : ''} - ${issue.message}`);
+        
       });
-      console.log('');
+      
     }
 
     // Medium priority issues
     const mediumIssues = this.issues.filter((issue) => issue.severity === 'medium');
     if (mediumIssues.length > 0) {
-      console.log('📋 MEDIUM PRIORITY ISSUES:');
+      
       mediumIssues.forEach((issue) => {
-        console.log(`   🔹 ${issue.file}${issue.line ? `:${issue.line}` : ''} - ${issue.message}`);
+        
       });
-      console.log('');
+      
     }
 
     // Warnings
     if (this.warnings.length > 0) {
-      console.log('⚡ WARNINGS:');
+      
       this.warnings.forEach((warning) => {
         console.log(
           `   💡 ${warning.file || 'General'}${warning.line ? `:${warning.line}` : ''} - ${warning.message}`,
         );
       });
-      console.log('');
+      
     }
 
     // Suggestions
     if (this.suggestions.length > 0) {
-      console.log('💡 SUGGESTIONS:');
+      
       this.suggestions.forEach((suggestion) => {
-        console.log(`   ✨ ${suggestion.message}`);
+        
       });
-      console.log('');
+      
     }
 
     // Summary
     const totalIssues = this.issues.length;
     const totalWarnings = this.warnings.length;
 
-    console.log('📈 SUMMARY:');
+    
     console.log(
       `   Issues: ${totalIssues} (${criticalIssues.length} critical, ${highIssues.length} high, ${mediumIssues.length} medium)`,
     );
-    console.log(`   Warnings: ${totalWarnings}`);
-    console.log(`   Suggestions: ${this.suggestions.length}`);
+    
+    
 
     if (criticalIssues.length === 0 && highIssues.length === 0) {
-      console.log('\n✅ Ready for production deployment!');
+      
     } else {
       console.log(
         '\n❌ Not ready for production. Please address critical and high priority issues.',
@@ -413,15 +413,15 @@ class ProductionConfigChecker {
     }
 
     // Next steps
-    console.log('\n🚀 NEXT STEPS:');
-    console.log('   1. Copy .env.production.template to .env');
-    console.log('   2. Fill in all required environment variables');
-    console.log('   3. Configure Supabase project and get real API keys');
-    console.log('   4. Set up Google OAuth credentials');
-    console.log('   5. Configure Cloudinary for image uploads');
-    console.log('   6. Set up Sentry for error monitoring');
-    console.log('   7. Run this script again to verify configuration');
-    console.log('   8. Test production build: npm run build');
+    
+    
+    
+    
+    
+    
+    
+    
+    
   }
 }
 

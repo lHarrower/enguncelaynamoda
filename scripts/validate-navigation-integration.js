@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔍 Validating AYNA Mirror Navigation Integration...\n');
+
 
 const validations = [
   {
@@ -84,7 +84,7 @@ validations.forEach((validation) => {
     const filePath = path.join(process.cwd(), validation.path);
 
     if (!fs.existsSync(filePath)) {
-      console.log(`❌ ${validation.name}: File not found - ${validation.path}`);
+      
       allPassed = false;
       return;
     }
@@ -92,18 +92,18 @@ validations.forEach((validation) => {
     const content = fs.readFileSync(filePath, 'utf8');
 
     if (validation.check(content)) {
-      console.log(`✅ ${validation.name}: Integration verified`);
+      
     } else {
-      console.log(`❌ ${validation.name}: Integration check failed`);
+      
       allPassed = false;
     }
   } catch (error) {
-    console.log(`❌ ${validation.name}: Error checking file - ${error.message}`);
+    
     allPassed = false;
   }
 });
 
-console.log('\n📋 Additional Integration Checks:\n');
+
 
 // Check if AYNA Mirror screens exist
 const screenChecks = ['screens/AynaMirrorScreen.tsx', 'screens/AynaMirrorSettingsScreen.tsx'];
@@ -111,9 +111,9 @@ const screenChecks = ['screens/AynaMirrorScreen.tsx', 'screens/AynaMirrorSetting
 screenChecks.forEach((screenPath) => {
   const filePath = path.join(process.cwd(), screenPath);
   if (fs.existsSync(filePath)) {
-    console.log(`✅ Screen Component: ${screenPath} exists`);
+    
   } else {
-    console.log(`❌ Screen Component: ${screenPath} missing`);
+    
     allPassed = false;
   }
 });
@@ -129,18 +129,18 @@ contextChecks.forEach((context) => {
   if (fs.existsSync(filePath)) {
     const content = fs.readFileSync(filePath, 'utf8');
     if (content.includes('createContext') && content.includes('Provider')) {
-      console.log(`✅ Context Integration: ${context.name} properly structured`);
+      
     } else {
-      console.log(`❌ Context Integration: ${context.name} missing Provider pattern`);
+      
       allPassed = false;
     }
   } else {
-    console.log(`❌ Context Integration: ${context.path} not found`);
+    
     allPassed = false;
   }
 });
 
-console.log('\n🔗 Deep Linking Validation:\n');
+
 
 // Validate deep linking configuration
 try {
@@ -149,25 +149,25 @@ try {
 
   const linking = appConfig.expo.linking;
   if (linking && linking.prefixes && linking.config) {
-    console.log(`✅ Deep Linking: Prefixes configured - ${linking.prefixes.join(', ')}`);
+    
 
     const screens = linking.config.screens;
     if (screens['ayna-mirror'] || screens['(app)']?.screens?.['ayna-mirror']) {
-      console.log('✅ Deep Linking: AYNA Mirror routes configured');
+      
     } else {
-      console.log('❌ Deep Linking: AYNA Mirror routes missing');
+      
       allPassed = false;
     }
   } else {
-    console.log('❌ Deep Linking: Configuration incomplete');
+    
     allPassed = false;
   }
 } catch (error) {
-  console.log(`❌ Deep Linking: Configuration error - ${error.message}`);
+  
   allPassed = false;
 }
 
-console.log('\n🧪 Test Coverage Validation:\n');
+
 
 // Check if integration tests exist
 const testFiles = [
@@ -178,28 +178,28 @@ const testFiles = [
 testFiles.forEach((testFile) => {
   const filePath = path.join(process.cwd(), testFile);
   if (fs.existsSync(filePath)) {
-    console.log(`✅ Integration Test: ${testFile} exists`);
+    
   } else {
-    console.log(`❌ Integration Test: ${testFile} missing`);
+    
     allPassed = false;
   }
 });
 
-console.log('\n' + '='.repeat(60));
+
 
 if (allPassed) {
-  console.log('🎉 AYNA Mirror Navigation Integration: ALL CHECKS PASSED!');
-  console.log('\n✨ Integration Summary:');
-  console.log('   • AYNA Mirror added to tab navigation');
-  console.log('   • Authentication integration verified');
-  console.log('   • Theme context integration confirmed');
-  console.log('   • Deep linking configuration complete');
-  console.log('   • Notification handler integrated');
-  console.log('   • Integration tests created');
-  console.log('\n🚀 Ready for user testing!');
+  
+  
+  
+  
+  
+  
+  
+  
+  
   process.exit(0);
 } else {
-  console.log('❌ AYNA Mirror Navigation Integration: SOME CHECKS FAILED');
-  console.log('\n🔧 Please review the failed checks above and fix any issues.');
+  
+  
   process.exit(1);
 }

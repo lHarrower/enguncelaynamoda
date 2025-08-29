@@ -677,9 +677,41 @@ export const GLASSMORPHISM = {
 export const DesignSystem = {
   colors: {
     ...UNIFIED_COLORS,
-    // Explicitly ensure primary is available (fix for TypeError)
-    primary: UNIFIED_COLORS.sage[500], // Use sage color scale value
-    // Primary indexed scale for components that expect indexed access
+    // Direct color values for components that expect strings
+    primary: '#5C8A5C', // Direct string value for compatibility
+    background: UNIFIED_COLORS.background, // Background object with primary, secondary, etc.
+    textSecondary: '#5A4D3F', // Direct string value
+    textPrimary: '#2D2A26', // Direct string value
+    textTertiary: '#7A6B5A', // Direct string value
+    textInverse: '#FFFFFF', // Direct string value
+    textAccent: '#C08A6B', // Direct string value
+    textDisabled: '#B8ADA0', // Direct string value
+    textPlaceholder: '#9A8B7A', // Direct string value
+    textMuted: '#7A6B5A', // Direct string value
+
+    // Background aliases
+    backgroundPrimary: UNIFIED_COLORS.background.primary,
+    backgroundSecondary: UNIFIED_COLORS.background.secondary,
+    backgroundTertiary: UNIFIED_COLORS.background.tertiary,
+    backgroundElevated: UNIFIED_COLORS.background.elevated,
+
+    // Border aliases
+    borderPrimary: UNIFIED_COLORS.border.primary,
+    borderSecondary: UNIFIED_COLORS.border.secondary,
+
+    // Status color aliases
+    errorLight: UNIFIED_COLORS.error[100],
+    errorContrast: UNIFIED_COLORS.text.inverse,
+    primaryLight: UNIFIED_COLORS.primary[100],
+
+    // Gradient arrays for LinearGradient components
+    gradientPrimary: ['#5C8A5C', '#4A7A4A'] as const,
+    gradientSecondary: ['#C08A6B', '#A67152'] as const,
+    gradientNeutral: ['#F8F6F4', '#F5F3F1'] as const,
+    gradientWarm: ['#D4AF37', '#B8993F'] as const,
+    gradientCool: ['#5C8A5C', '#3A5F3A'] as const,
+
+    // Keep color scales for advanced usage
     primaryIndexed: UNIFIED_COLORS.sage, // Use sage color scale as primary indexed
     // Provide common palette aliases used throughout UI
     success: {

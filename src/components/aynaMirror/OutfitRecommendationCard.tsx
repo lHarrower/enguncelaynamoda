@@ -6,6 +6,7 @@ import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useMemo, useState } from 'react';
+import type { ViewStyle } from 'react-native';
 import {
   AccessibilityInfo,
   Image,
@@ -227,7 +228,7 @@ export const OutfitRecommendationCard: React.FC<OutfitRecommendationCardProps> =
     }, [primaryItem]);
 
     // Animated styles
-    const animatedCardStyle = useAnimatedStyle(() => {
+    const animatedCardStyle = useAnimatedStyle((): ViewStyle => {
       if (reduceMotion) {
         return {
           opacity: opacity.value,

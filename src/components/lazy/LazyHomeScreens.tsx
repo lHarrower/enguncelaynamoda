@@ -1,12 +1,12 @@
 import React from 'react';
 
-import ArtistryHomeScreen from '../artistry/ArtistryHomeScreen';
-import { EditorialHomeScreen } from '../editorial/EditorialHomeScreen';
+import ArtistryHomeScreen from '@/components/artistry/ArtistryHomeScreen';
+import { EditorialHomeScreen } from '@/components/editorial/EditorialHomeScreen';
 // Import home screen components
-import PremiumHomeScreen from '../premium/PremiumHomeScreen';
-import StudioHomeScreen from '../studio/StudioHomeScreen';
-import UltraPremiumHomeScreen from '../ultra/UltraPremiumHomeScreen';
-import { VisionHomeScreen, VisionWardrobeScreen } from '../vision';
+import PremiumHomeScreen from '@/components/premium/PremiumHomeScreen';
+import StudioHomeScreen from '@/components/studio/StudioHomeScreen';
+import UltraPremiumHomeScreen from '@/components/ultra/UltraPremiumHomeScreen';
+import { VisionHomeScreen, VisionWardrobeScreen } from '@/components/vision';
 
 // Wrapper components
 export const LazyPremiumHomeScreen: React.FC = () => {

@@ -3,12 +3,14 @@
 ## Mevcut Durum
 
 ### ✅ Var Olan Özellikler
+
 - **Dil Seçimi**: `NamingPreferences.tsx`'de 5 dil seçeneği (EN, ES, FR, DE, IT)
 - **Dil Tercihi Saklama**: `preferredLanguage` alanı veritabanında saklanıyor
 - **AI İsimlendirme Dil Desteği**: AI servisinde dil tercihi kullanılıyor
 - **Temel Tarih Formatları**: `toLocaleDateString()` kullanımı
 
 ### ❌ Eksik Olan Özellikler
+
 - **Çeviri Framework'ü**: expo-localization ve i18n-js kurulu değil
 - **Çeviri Dosyaları**: Dil dosyaları mevcut değil
 - **UI Metinleri**: Tüm UI metinleri hardcoded İngilizce
@@ -19,6 +21,7 @@
 ## Teknik Analiz
 
 ### Mevcut Dil Altyapısı
+
 ```typescript
 // NamingPreferences.tsx
 const LANGUAGE_OPTIONS = [
@@ -37,6 +40,7 @@ export interface NamingPreferences {
 ```
 
 ### Hardcoded Metinler (Örnekler)
+
 - "Descriptive", "Creative", "Minimal" (NamingPreferences.tsx)
 - "Language", "Brand Focused" (UI etiketleri)
 - "My Favorite Blue Sneakers" (örnek metinler)
@@ -48,6 +52,7 @@ export interface NamingPreferences {
 ### Faz 1: Temel Altyapı (1-2 hafta)
 
 #### 1.1 Paket Kurulumları
+
 ```bash
 npx expo install expo-localization
 npm install i18n-js
@@ -55,6 +60,7 @@ npm install @types/i18n-js --save-dev
 ```
 
 #### 1.2 Dizin Yapısı
+
 ```
 src/
 ├── locales/
@@ -71,6 +77,7 @@ src/
 ```
 
 #### 1.3 i18n Konfigürasyonu
+
 ```typescript
 // src/utils/i18n.ts
 import { I18n } from 'i18n-js';
@@ -94,6 +101,7 @@ export default i18n;
 ### Faz 2: Çeviri Dosyaları (2-3 hafta)
 
 #### 2.1 Ana Kategoriler
+
 - **UI Elementleri**: Butonlar, etiketler, başlıklar
 - **Navigasyon**: Tab isimleri, screen başlıkları
 - **Form Alanları**: Input placeholder'ları, validasyon mesajları
@@ -102,6 +110,7 @@ export default i18n;
 - **AI İsimlendirme**: Stil şablonları ve örnekler
 
 #### 2.2 Örnek Çeviri Dosyası (en.json)
+
 ```json
 {
   "common": {
@@ -141,6 +150,7 @@ export default i18n;
 ### Faz 3: Hook ve Context (1 hafta)
 
 #### 3.1 Translation Hook
+
 ```typescript
 // src/hooks/useTranslation.ts
 import { useCallback, useEffect, useState } from 'react';
@@ -151,9 +161,12 @@ export const useTranslation = () => {
   const { user } = useAuth();
   const [locale, setLocale] = useState(i18n.locale);
 
-  const t = useCallback((key: string, options?: any) => {
-    return i18n.t(key, options);
-  }, [locale]);
+  const t = useCallback(
+    (key: string, options?: any) => {
+      return i18n.t(key, options);
+    },
+    [locale],
+  );
 
   const changeLanguage = useCallback(async (newLocale: string) => {
     i18n.locale = newLocale;
@@ -168,6 +181,7 @@ export const useTranslation = () => {
 ### Faz 4: Component Güncellemeleri (2-3 hafta)
 
 #### 4.1 Öncelikli Componentler
+
 1. **NamingPreferences.tsx** - Dil seçimi ve stil seçenekleri
 2. **Navigation** - Tab bar ve screen başlıkları
 3. **WardrobeScreen** - Kategori isimleri
@@ -175,6 +189,7 @@ export const useTranslation = () => {
 5. **Form Components** - Input etiketleri
 
 #### 4.2 Örnek Güncelleme
+
 ```typescript
 // Önce
 <Text>Descriptive</Text>
@@ -187,6 +202,7 @@ const { t } = useTranslation();
 ### Faz 5: Gelişmiş Özellikler (1-2 hafta)
 
 #### 5.1 Pluralization
+
 ```json
 {
   "items": {
@@ -198,6 +214,7 @@ const { t } = useTranslation();
 ```
 
 #### 5.2 Date/Number Formatting
+
 ```typescript
 const formatDate = (date: Date) => {
   return date.toLocaleDateString(i18n.locale);
@@ -206,7 +223,7 @@ const formatDate = (date: Date) => {
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat(i18n.locale, {
     style: 'currency',
-    currency: 'USD'
+    currency: 'USD',
   }).format(amount);
 };
 ```
@@ -214,11 +231,13 @@ const formatCurrency = (amount: number) => {
 ## Çeviri Stratejisi
 
 ### Öncelik Sırası
+
 1. **Yüksek Öncelik**: Ana navigasyon, temel UI elementleri
 2. **Orta Öncelik**: Form alanları, kategori isimleri
 3. **Düşük Öncelik**: Açıklama metinleri, örnekler
 
 ### Çeviri Kaynakları
+
 - **İngilizce**: Mevcut (kaynak dil)
 - **İspanyolca**: Profesyonel çeviri gerekli
 - **Fransızca**: Profesyonel çeviri gerekli
@@ -228,6 +247,7 @@ const formatCurrency = (amount: number) => {
 ## Test Stratejisi
 
 ### Unit Tests
+
 ```typescript
 describe('i18n', () => {
   it('should return correct translation', () => {
@@ -243,6 +263,7 @@ describe('i18n', () => {
 ```
 
 ### Manual Testing
+
 - Her dilde UI kontrolü
 - Dil değiştirme fonksiyonalitesi
 - Metin uzunluğu kontrolü (özellikle Almanca)
@@ -251,22 +272,26 @@ describe('i18n', () => {
 ## Performans Considerations
 
 ### Bundle Size
+
 - Lazy loading ile sadece aktif dil yüklensin
 - Çeviri dosyalarını minimize et
 - Tree shaking ile kullanılmayan çevirileri çıkar
 
 ### Memory Usage
+
 - Çeviri cache'i optimize et
 - Büyük çeviri dosyalarını böl
 
 ## Maintenance Plan
 
 ### Çeviri Güncellemeleri
+
 - Yeni özellikler için çeviri checklist
 - Çeviri dosyalarının versiyon kontrolü
 - Missing translation detection
 
 ### Automation
+
 - CI/CD'de eksik çeviri kontrolü
 - Çeviri dosyası format validation
 - Automated translation suggestions
@@ -274,6 +299,7 @@ describe('i18n', () => {
 ## Tahmini Süre ve Kaynak
 
 ### Toplam Süre: 7-11 hafta
+
 - Faz 1: 1-2 hafta (Altyapı)
 - Faz 2: 2-3 hafta (Çeviri dosyaları)
 - Faz 3: 1 hafta (Hook/Context)
@@ -281,6 +307,7 @@ describe('i18n', () => {
 - Faz 5: 1-2 hafta (Gelişmiş özellikler)
 
 ### Kaynak İhtiyacı
+
 - **Developer**: 1 full-time
 - **Translator**: 4 dil için profesyonel çeviri
 - **QA**: Her dil için test
@@ -288,11 +315,13 @@ describe('i18n', () => {
 ## Risk Analizi
 
 ### Yüksek Risk
+
 - **Metin Uzunluğu**: Almanca metinler UI'ı bozabilir
 - **Çeviri Kalitesi**: Kötü çeviri UX'i olumsuz etkiler
 - **Performance**: Büyük çeviri dosyaları yavaşlık yaratabilir
 
 ### Düşük Risk
+
 - **Technical Implementation**: Expo ve React Native iyi destekliyor
 - **Maintenance**: Established patterns mevcut
 

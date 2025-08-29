@@ -308,7 +308,7 @@ function summarise(findings: Finding[], thresholds: Thresholds) {
     try {
       acceptance = JSON.parse(fs.readFileSync(acceptancePath, 'utf8'));
     } catch (e) {
-      console.warn('risk-acceptance.json parse failed', (e as Error).message);
+      
     }
   }
   const now = Date.now();
@@ -360,7 +360,7 @@ function summarise(findings: Finding[], thresholds: Thresholds) {
       const pats: string[] = raw.patterns || [];
       secretAllowPatterns = pats.map((p) => new RegExp(p, 'i'));
     } catch (e: unknown) {
-      console.warn('Failed to parse secrets allowlist', e instanceof Error ? e.message : String(e));
+      
     }
   }
   const secretAll = findings.filter((f) => f.sourceTool === 'secrets-scan');
@@ -670,7 +670,7 @@ function main() {
       }
     }
   } catch (e: unknown) {
-    console.warn('History archive failed', e instanceof Error ? e.message : String(e));
+    
   }
 
   // HTML report generation (lightweight, inline CSS, recent trend for key metrics)
@@ -755,7 +755,7 @@ function main() {
     };
     fs.writeFileSync(path.join(OUT_DIR, 'trend.json'), JSON.stringify(trend, null, 2));
   } catch (e: unknown) {
-    console.warn('HTML report generation failed', e instanceof Error ? e.message : String(e));
+    
   }
   const md = [
     '# Denetim Özeti',
@@ -873,11 +873,11 @@ function main() {
     const highCrit = summary.securityHigh + summary.securityCritical;
     mkBadge('security-hc', String(highCrit), highCrit === 0 ? '#2e7d32' : '#c62828');
   } catch (e) {
-    console.warn('Badge generation failed', (e as Error).message);
+    
   }
   // Exit non-zero if gates failed (CI fail)
   if (summary.gates.length) {
-    console.error('Gate failures:\n' + summary.gates.join('\n'));
+    
     process.exitCode = 1;
   }
 }

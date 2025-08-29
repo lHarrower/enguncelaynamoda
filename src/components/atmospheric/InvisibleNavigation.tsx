@@ -6,6 +6,7 @@ import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
+import type { ViewStyle } from 'react-native';
 import { Dimensions, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -82,14 +83,14 @@ const InvisibleNavigation: React.FC<InvisibleNavigationProps> = ({ items, curren
   };
 
   // Animated styles
-  const overlayStyle = useAnimatedStyle(() => {
+  const overlayStyle = useAnimatedStyle((): ViewStyle => {
     return {
       opacity: overlayOpacity.value,
       transform: [{ scale: overlayScale.value }],
     };
   });
 
-  const triggerStyle = useAnimatedStyle(() => {
+  const triggerStyle = useAnimatedStyle((): ViewStyle => {
     return {
       transform: [{ rotate: `${triggerRotation.value}deg` }, { scale: triggerScale.value }],
     };

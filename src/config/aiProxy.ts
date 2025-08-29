@@ -4,7 +4,7 @@ import { supabase } from '@/config/supabaseClient';
 
 type ChatMessage = {
   role: 'system' | 'user' | 'assistant' | 'tool';
-  content: unknown;
+  content: string | Array<{ type: string; text?: string; image_url?: { url: string } }>;
 };
 
 export interface ChatCompletionParams {

@@ -1,8 +1,8 @@
 import { I18n } from 'i18n-js';
 
 // Import translation files
-import en from '../locales/en.json';
-import tr from '../locales/tr.json';
+import en from '@/locales/en.json';
+import tr from '@/locales/tr.json';
 
 // Create i18n instance
 const i18n = new I18n({
@@ -28,8 +28,13 @@ export const setLocale = (locale: string) => {
   i18n.locale = locale;
 };
 
+// I18n options type
+interface I18nOptions {
+  [key: string]: string | number | boolean;
+}
+
 // Helper function to translate with fallback
-export const t = (key: string, options?: any) => {
+export const t = (key: string, options?: I18nOptions) => {
   return i18n.t(key, options);
 };
 

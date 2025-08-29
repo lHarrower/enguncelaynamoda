@@ -1,7 +1,11 @@
 // Global ambient declarations & legacy compatibility shims
 
 // PermissionStatus legacy literals
-declare type PermissionStatus = 'granted' | 'denied' | 'undetermined' | (string & NonNullable<unknown>);
+declare type PermissionStatus =
+  | 'granted'
+  | 'denied'
+  | 'undetermined'
+  | (string & NonNullable<unknown>);
 
 // TypeError constructor accepting optional message (some tests call with message)
 interface TypeErrorConstructor {
@@ -35,8 +39,10 @@ interface SupabaseFluentQuery {
 }
 
 declare global {
-  // Allow any jest mock shaped object to satisfy the chain expectation in TS
+  // React Native development flag
+  const __DEV__: boolean;
 
+  // Allow any jest mock shaped object to satisfy the chain expectation in TS
   namespace jest {
     interface Matchers<R> {
       // placeholder to avoid empty block

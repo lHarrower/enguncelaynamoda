@@ -24,7 +24,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { DesignSystem } from '../../theme/DesignSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width, height } = Dimensions.get('window');
 

@@ -38,12 +38,14 @@ import {
 } from '@/types/aynaMirror';
 
 const mockIntelligenceService = intelligenceService as jest.Mocked<typeof intelligenceService>;
-const mockEnhancedWardrobeService = enhancedWardrobeService as jest.Mocked<typeof enhancedWardrobeService>;
+const mockEnhancedWardrobeService = enhancedWardrobeService as jest.Mocked<
+  typeof enhancedWardrobeService
+>;
 
 describe('AynaMirrorService', () => {
   const mockUserId = 'test-user-123';
   const mockDate = new Date('2024-01-15T06:00:00Z');
-  
+
   const mockWardrobeItems: WardrobeItem[] = [
     {
       id: 'item-1',
@@ -125,13 +127,13 @@ describe('AynaMirrorService', () => {
     humidity: 60,
     windSpeed: 10,
     location: 'Test City',
-    timestamp: mockDate
+    timestamp: mockDate,
   };
 
   const mockStyleContext = {
     occasion: 'casual',
     timeOfDay: 'morning',
-    season: 'spring'
+    season: 'spring',
   };
 
   const mockRecommendation: OutfitRecommendation = {
@@ -148,10 +150,10 @@ describe('AynaMirrorService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Setup default mocks
     mockEnhancedWardrobeService.getUserWardrobe.mockResolvedValue(mockWardrobeItems);
-    
+
     // Mock Supabase responses
     mockSupabase.from = jest.fn().mockReturnValue({
       select: jest.fn().mockReturnValue({
@@ -204,7 +206,7 @@ describe('AynaMirrorService', () => {
         generatedAt: mockDate,
         recommendations: mockRecommendations,
         weatherContext: mockWeatherContext,
-        styleContext: mockStyleContext
+        styleContext: mockStyleContext,
       };
       jest.spyOn(AynaMirrorService, 'generateDailyRecommendations').mockResolvedValue(mockResult);
 
@@ -219,7 +221,7 @@ describe('AynaMirrorService', () => {
 
     it('should handle empty wardrobe gracefully', async () => {
       mockEnhancedWardrobeService.getUserWardrobe.mockResolvedValue([]);
-      
+
       // Mock the generateDailyRecommendations method
       const mockResult = {
         id: 'daily-rec-1',
@@ -228,7 +230,7 @@ describe('AynaMirrorService', () => {
         generatedAt: mockDate,
         recommendations: [],
         weatherContext: mockWeatherContext,
-        styleContext: mockStyleContext
+        styleContext: mockStyleContext,
       };
       jest.spyOn(AynaMirrorService, 'generateDailyRecommendations').mockResolvedValue(mockResult);
 
@@ -248,7 +250,7 @@ describe('AynaMirrorService', () => {
         generatedAt: mockDate,
         recommendations: [mockRecommendation],
         weatherContext: mockWeatherContext,
-        styleContext: mockStyleContext
+        styleContext: mockStyleContext,
       };
       jest.spyOn(AynaMirrorService, 'generateDailyRecommendations').mockResolvedValue(mockResult);
 
@@ -299,18 +301,18 @@ describe('AynaMirrorService', () => {
         generatedAt: mockDate,
         recommendations: [],
         weatherContext: mockWeatherContext,
-        styleContext: mockStyleContext
+        styleContext: mockStyleContext,
       };
       jest.spyOn(AynaMirrorService, 'generateDailyRecommendations').mockResolvedValue(mockResult);
 
       const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
 
       // Should filter out red/pink combinations
-      const hasRedPinkCombo = result.recommendations.some(rec => {
-        const colors = rec.items.flatMap(item => item.colors);
+      const hasRedPinkCombo = result.recommendations.some((rec) => {
+        const colors = rec.items.flatMap((item) => item.colors);
         return colors.includes('red') && colors.includes('pink');
       });
-      
+
       expect(hasRedPinkCombo).toBe(false);
     });
   });
@@ -360,7 +362,9 @@ describe('AynaMirrorService', () => {
         },
       };
 
-      await expect(AynaMirrorService.processUserFeedback(feedbackWithSocial)).resolves.not.toThrow();
+      await expect(
+        AynaMirrorService.processUserFeedback(feedbackWithSocial),
+      ).resolves.not.toThrow();
     });
 
     it('should handle low confidence ratings', async () => {
@@ -375,11 +379,15 @@ describe('AynaMirrorService', () => {
         },
       };
 
-      await expect(AynaMirrorService.processUserFeedback(lowConfidenceFeedback)).resolves.not.toThrow();
+      await expect(
+        AynaMirrorService.processUserFeedback(lowConfidenceFeedback),
+      ).resolves.not.toThrow();
     });
 
     it('should handle feedback processing errors gracefully', async () => {
-      mockIntelligenceService.updateStylePreferences.mockRejectedValue(new Error('Service unavailable'));
+      mockIntelligenceService.updateStylePreferences.mockRejectedValue(
+        new Error('Service unavailable'),
+      );
 
       // Should not throw even if intelligence service fails
       await expect(AynaMirrorService.processUserFeedback(mockFeedback)).resolves.not.toThrow();
@@ -400,7 +408,9 @@ describe('AynaMirrorService', () => {
       // Mock the processUserFeedback method
       jest.spyOn(AynaMirrorService, 'processUserFeedback').mockResolvedValue(undefined);
 
-      await expect(AynaMirrorService.processUserFeedback(feedbackWithPatterns)).resolves.not.toThrow();
+      await expect(
+        AynaMirrorService.processUserFeedback(feedbackWithPatterns),
+      ).resolves.not.toThrow();
     });
   });
 
@@ -424,22 +434,34 @@ describe('AynaMirrorService', () => {
     };
 
     it('should generate encouraging confidence note', async () => {
-      const confidenceNote = AynaMirrorService.generateConfidenceNote(mockOutfit, mockContext, 'encouraging');
+      const confidenceNote = AynaMirrorService.generateConfidenceNote(
+        mockOutfit,
+        mockContext,
+        'encouraging',
+      );
 
       expect(confidenceNote).toBeTruthy();
       expect(typeof confidenceNote).toBe('string');
       expect(confidenceNote.length).toBeGreaterThan(10);
-      
+
       // Should contain encouraging elements
-      const hasPositiveWords = /amazing|confident|perfect|great|beautiful|stunning|ready/i.test(confidenceNote);
-      const hasEmoji = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]/u.test(confidenceNote);
+      const hasPositiveWords = /amazing|confident|perfect|great|beautiful|stunning|ready/i.test(
+        confidenceNote,
+      );
+      const hasEmoji = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]/u.test(
+        confidenceNote,
+      );
       const hasPersonalTouch = /you|your/i.test(confidenceNote);
-      
+
       expect(hasPositiveWords || hasEmoji || hasPersonalTouch).toBe(true);
     });
 
     it('should generate witty confidence note', async () => {
-      const confidenceNote = AynaMirrorService.generateConfidenceNote(mockOutfit, mockContext, 'witty');
+      const confidenceNote = AynaMirrorService.generateConfidenceNote(
+        mockOutfit,
+        mockContext,
+        'witty',
+      );
 
       expect(confidenceNote).toBeTruthy();
       expect(typeof confidenceNote).toBe('string');
@@ -447,7 +469,11 @@ describe('AynaMirrorService', () => {
     });
 
     it('should generate poetic confidence note', async () => {
-      const confidenceNote = AynaMirrorService.generateConfidenceNote(mockOutfit, mockContext, 'poetic');
+      const confidenceNote = AynaMirrorService.generateConfidenceNote(
+        mockOutfit,
+        mockContext,
+        'poetic',
+      );
 
       expect(confidenceNote).toBeTruthy();
       expect(typeof confidenceNote).toBe('string');
@@ -455,14 +481,20 @@ describe('AynaMirrorService', () => {
     });
 
     it('should fallback to encouraging style when invalid style provided', async () => {
-      const confidenceNote = AynaMirrorService.generateConfidenceNote(mockOutfit, mockContext, 'invalid-style' as any);
+      const confidenceNote = AynaMirrorService.generateConfidenceNote(
+        mockOutfit,
+        mockContext,
+        'invalid-style' as any,
+      );
 
       expect(confidenceNote).toBeTruthy();
       expect(typeof confidenceNote).toBe('string');
     });
 
     it('should use AI-generated confidence note when available', async () => {
-      mockIntelligenceService.generateConfidenceNote.mockReturnValue('AI-generated confidence note! ✨');
+      mockIntelligenceService.generateConfidenceNote.mockReturnValue(
+        'AI-generated confidence note! ✨',
+      );
 
       const confidenceNote = AynaMirrorService.generateConfidenceNote(mockOutfit, mockContext);
 
@@ -490,7 +522,9 @@ describe('AynaMirrorService', () => {
     });
 
     it('should handle service unavailability gracefully', async () => {
-      mockEnhancedWardrobeService.getUserWardrobe.mockRejectedValue(new Error('Service unavailable'));
+      mockEnhancedWardrobeService.getUserWardrobe.mockRejectedValue(
+        new Error('Service unavailable'),
+      );
 
       const result = await AynaMirrorService.generateDailyRecommendations(mockUserId);
       expect(result).toBeDefined();
@@ -508,44 +542,46 @@ describe('AynaMirrorService', () => {
         generatedAt: mockDate,
         recommendations: [mockRecommendation],
         weatherContext: mockWeatherContext,
-        styleContext: mockStyleContext
+        styleContext: mockStyleContext,
       };
       jest.spyOn(AynaMirrorService, 'generateDailyRecommendations').mockResolvedValue(mockResult);
 
-      const promises = Array(5).fill(null).map(() => 
-        AynaMirrorService.generateDailyRecommendations(mockUserId)
-      );
+      const promises = Array(5)
+        .fill(null)
+        .map(() => AynaMirrorService.generateDailyRecommendations(mockUserId));
 
       const results = await Promise.all(promises);
-      
+
       expect(results).toHaveLength(5);
-      results.forEach(result => {
+      results.forEach((result) => {
         expect(result).toBeDefined();
         expect(result.recommendations).toBeDefined();
       });
     });
 
     it('should handle large wardrobe efficiently', async () => {
-      const largeWardrobe: WardrobeItem[] = Array(100).fill(null).map((_, index) => ({
-        ...mockWardrobeItems[0],
-        id: `item-${index}`,
-        name: `Item ${index}`,
-        imageUri: `image-${index}.jpg`,
-        category: 'tops' as ItemCategory,
-        colors: ['blue'],
-        userId: mockUserId,
-        tags: ['test'],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        usageStats: {
-          itemId: `item-${index}`,
-          totalWears: 1,
-          lastWorn: new Date(),
-          averageRating: 4.0,
-          complimentsReceived: 0,
-          costPerWear: 10,
-        },
-      }));
+      const largeWardrobe: WardrobeItem[] = Array(100)
+        .fill(null)
+        .map((_, index) => ({
+          ...mockWardrobeItems[0],
+          id: `item-${index}`,
+          name: `Item ${index}`,
+          imageUri: `image-${index}.jpg`,
+          category: 'tops' as ItemCategory,
+          colors: ['blue'],
+          userId: mockUserId,
+          tags: ['test'],
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          usageStats: {
+            itemId: `item-${index}`,
+            totalWears: 1,
+            lastWorn: new Date(),
+            averageRating: 4.0,
+            complimentsReceived: 0,
+            costPerWear: 10,
+          },
+        }));
 
       mockEnhancedWardrobeService.getUserWardrobe.mockResolvedValue(largeWardrobe);
 

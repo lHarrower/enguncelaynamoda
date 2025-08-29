@@ -14,8 +14,8 @@ jest.mock('expo-haptics', () => ({
   ImpactFeedbackStyle: {
     Light: 'light',
     Medium: 'medium',
-    Heavy: 'heavy'
-  }
+    Heavy: 'heavy',
+  },
 }));
 
 // Mock expo modules for OutfitRecommendationCard
@@ -374,7 +374,7 @@ describe('OutfitRecommendationCard', () => {
       const quickActionButton = getByTestId('quick-action-button');
       const saveButton = getByTestId('save-button');
       const shareButton = getByTestId('share-button');
-      
+
       expect(mainCard).toBeTruthy();
       expect(quickActionButton).toBeTruthy();
       expect(saveButton).toBeTruthy();

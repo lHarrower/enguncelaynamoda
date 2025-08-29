@@ -12,8 +12,8 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { DesignSystem } from '../../theme/DesignSystem';
-import { AnimatedWrapper } from '../common/AnimatedWrapper';
+import { AnimatedWrapper } from '@/components/common/AnimatedWrapper';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -117,7 +117,9 @@ const PremiumTabBar: React.FC<PremiumTabBarProps> = ({
 
     return (
       <View style={styles.tabContent}>
-        <AnimatedWrapper style={[styles.iconContainer, isActive && styles.activeIconContainer] as any}>
+        <AnimatedWrapper
+          style={[styles.iconContainer, isActive && styles.activeIconContainer] as any}
+        >
           <Ionicons name={iconName} size={variant === 'minimal' ? 22 : 24} color={iconColor} />
           {tab.badge && tab.badge > 0 && (
             <View style={styles.badge}>

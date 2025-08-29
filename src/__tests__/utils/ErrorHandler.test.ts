@@ -1,3 +1,25 @@
+// Mock dependencies first
+jest.doMock('@react-native-async-storage/async-storage', () => ({
+  default: {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
+    getAllKeys: jest.fn(),
+    multiGet: jest.fn(),
+    multiSet: jest.fn(),
+    multiRemove: jest.fn(),
+  },
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+  getAllKeys: jest.fn(),
+  multiGet: jest.fn(),
+  multiSet: jest.fn(),
+  multiRemove: jest.fn(),
+}));
+
 // Unit tests for ErrorHandler
 import {
   ErrorHandler,
@@ -6,11 +28,9 @@ import {
   ErrorCategory,
   RecoveryStrategy,
 } from '../../utils/ErrorHandler';
-import { createMockError } from '../utils/testUtils';
-import { mocks } from '../mocks';
-
-// Mock dependencies
-jest.mock('@react-native-async-storage/async-storage', () => mocks.asyncStorage);
+import { createMockError } from '@/__tests__/utils/testUtils';
+import { mocks } from '@/__tests__/mocks';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 jest.mock('../../services/ErrorReporting', () => ({
   ErrorReportingService: {
     getInstance: jest.fn(() => ({
@@ -38,6 +58,8 @@ describe('Hata İşleyici', () => {
 
   beforeEach(() => {
     errorHandler = ErrorHandler.getInstance();
+    errorHandler.clearErrors(); // Clear error queue before each test
+    errorHandler.updateConfig({ accessibilityMode: true });
     mockConsoleError = jest.spyOn(console, 'error').mockImplementation();
     mockConsoleWarn = jest.spyOn(console, 'warn').mockImplementation();
     jest.clearAllMocks();
@@ -186,7 +208,7 @@ describe('Hata İşleyici', () => {
 
       await errorHandler.handleError(error);
 
-      expect(mocks.asyncStorage.setItem).toHaveBeenCalledWith(
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
         'error_logs',
         expect.stringContaining(String(error.code)),
       );
@@ -262,8 +284,8 @@ describe('Hata İşleyici', () => {
         cacheKeys: ['wardrobe_cache', 'user_cache'],
       });
 
-      expect(mocks.asyncStorage.removeItem).toHaveBeenCalledWith('wardrobe_cache');
-      expect(mocks.asyncStorage.removeItem).toHaveBeenCalledWith('user_cache');
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith('wardrobe_cache');
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith('user_cache');
     });
 
     it('çıkış kurtarmasını yürütmeli', async () => {

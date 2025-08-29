@@ -3,14 +3,13 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { errorInDev, warnInDev } from '../../utils/consoleSuppress';
+import { errorInDev, warnInDev } from '@/utils/consoleSuppress';
 import errorHandler, {
   AppError,
   ErrorCategory,
   ErrorSeverity,
   RecoveryAction,
-} from '../../utils/ErrorHandler';
+} from '@/utils/ErrorHandler';
 
 /**
  * Error boundary state

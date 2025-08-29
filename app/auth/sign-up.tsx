@@ -135,13 +135,13 @@ const SignUpScreen = () => {
                 <Ionicons
                   name="person-outline"
                   size={22}
-                  color="#6E7191"
+                  color={DesignSystem.colors.text.tertiary}
                   style={styles.inputIcon}
                 />
                 <TextInput
                   style={styles.input}
                   placeholder="Ad"
-                  placeholderTextColor="#6E7191"
+                  placeholderTextColor={DesignSystem.colors.text.tertiary}
                   value={firstName}
                   onChangeText={setFirstName}
                   autoCapitalize="words"
@@ -168,7 +168,12 @@ const SignUpScreen = () => {
               </View>
 
               <View style={styles.inputContainer}>
-                <Ionicons name="mail-outline" size={22} color="#6E7191" style={styles.inputIcon} />
+                <Ionicons
+                  name="mail-outline"
+                  size={22}
+                  color={DesignSystem.colors.text.tertiary}
+                  style={styles.inputIcon}
+                />
                 <TextInput
                   style={styles.input}
                   placeholder="E-posta"
@@ -204,7 +209,7 @@ const SignUpScreen = () => {
                   <Ionicons
                     name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                     size={22}
-                    color="#6E7191"
+                    color={DesignSystem.colors.text.tertiary}
                   />
                 </TouchableOpacity>
               </View>
@@ -244,7 +249,7 @@ const SignUpScreen = () => {
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <ActivityIndicator color="#FFFFFF" />
+                  <ActivityIndicator color={DesignSystem.colors.text.inverse} />
                 ) : (
                   <Text style={styles.signUpButtonText}>KAYIT OL</Text>
                 )}
@@ -261,9 +266,9 @@ const SignUpScreen = () => {
                   disabled={isGoogleLoading || isAppleLoading}
                 >
                   {isGoogleLoading ? (
-                    <ActivityIndicator color="#DB4437" />
+                    <ActivityIndicator color={DesignSystem.colors.error[500]} />
                   ) : (
-                    <Ionicons name="logo-google" size={24} color="#DB4437" />
+                    <Ionicons name="logo-google" size={24} color={DesignSystem.colors.error[500]} />
                   )}
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -272,9 +277,13 @@ const SignUpScreen = () => {
                   disabled={isGoogleLoading || isAppleLoading}
                 >
                   {isAppleLoading ? (
-                    <ActivityIndicator color="#000000" />
+                    <ActivityIndicator color={DesignSystem.colors.text.primary} />
                   ) : (
-                    <Ionicons name="logo-apple" size={28} color="#000000" />
+                    <Ionicons
+                      name="logo-apple"
+                      size={28}
+                      color={DesignSystem.colors.text.primary}
+                    />
                   )}
                 </TouchableOpacity>
               </View>
@@ -301,9 +310,9 @@ const SignUpScreen = () => {
 
 const styles = StyleSheet.create({
   appName: {
-    color: '#14142B',
-    fontFamily: 'PlayfairDisplay_700Bold',
-    fontSize: 48,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+    fontSize: DesignSystem.typography.sizes.xxxl,
     letterSpacing: 2,
   },
   background: {
@@ -312,7 +321,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   circle1: {
-    backgroundColor: 'rgba(233, 213, 255, 0.4)',
+    backgroundColor: DesignSystem.colors.overlay.light,
     borderRadius: width * 0.8,
     height: width * 1.6,
     left: -width * 0.3,
@@ -321,7 +330,7 @@ const styles = StyleSheet.create({
     width: width * 1.6,
   },
   circle2: {
-    backgroundColor: 'rgba(255, 224, 230, 0.4)',
+    backgroundColor: DesignSystem.colors.overlay.light,
     borderRadius: width * 0.6,
     bottom: -width * 0.6,
     height: width * 1.2,
@@ -330,7 +339,7 @@ const styles = StyleSheet.create({
     width: width * 1.2,
   },
   circle3: {
-    backgroundColor: 'rgba(212, 230, 255, 0.4)',
+    backgroundColor: DesignSystem.colors.overlay.light,
     borderRadius: width * 0.5,
     bottom: width * 0.05,
     height: width,
@@ -340,7 +349,7 @@ const styles = StyleSheet.create({
     width: width,
   },
   container: {
-    backgroundColor: '#F7F7F7',
+    backgroundColor: DesignSystem.colors.background.secondary,
     flex: 1,
   },
   contentContainer: {
@@ -362,15 +371,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   input: {
-    color: '#14142B',
+    color: DesignSystem.colors.text.primary,
     flex: 1,
-    fontFamily: 'Inter_500Medium',
-    fontSize: 16,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.md,
     height: '100%',
   },
   inputContainer: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: DesignSystem.colors.background.elevated,
     borderRadius: 12,
     flexDirection: 'row',
     height: 56,
@@ -393,24 +402,24 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   signInLink: {
-    color: '#14142B',
-    fontFamily: 'Inter_700Bold',
-    fontSize: 16,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.md,
   },
   signInText: {
-    color: '#4E4B66',
-    fontFamily: 'Inter_400Regular',
-    fontSize: 16,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.md,
   },
   signUpButton: {
     alignItems: 'center',
-    backgroundColor: '#000',
+    backgroundColor: DesignSystem.colors.text.primary,
     borderRadius: 12,
     elevation: 5,
     height: 56,
     justifyContent: 'center',
     marginTop: 10,
-    shadowColor: '#000',
+    shadowColor: DesignSystem.colors.shadow.primary,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -419,20 +428,20 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
   },
   signUpButtonText: {
-    color: '#FFFFFF',
-    fontFamily: 'Inter_700Bold',
-    fontSize: 16,
+    color: DesignSystem.colors.text.inverse,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.md,
     letterSpacing: 1,
   },
   socialButton: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: DesignSystem.colors.background.primary,
     borderRadius: 32,
     elevation: 3,
     height: 64,
     justifyContent: 'center',
     marginHorizontal: 16,
-    shadowColor: '#000',
+    shadowColor: DesignSystem.colors.shadow.primary,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -451,22 +460,22 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   socialLoginText: {
-    color: '#6E7191',
-    fontFamily: 'Inter_500Medium',
-    fontSize: 14,
+    color: DesignSystem.colors.text.tertiary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.sm,
     marginBottom: 20,
   },
   tagline: {
-    color: '#6E7191',
-    fontFamily: 'Inter_400Regular',
-    fontSize: 15,
+    color: DesignSystem.colors.text.tertiary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.sm,
     marginTop: 8,
     textAlign: 'center',
   },
   welcomeText: {
-    color: '#4E4B66',
-    fontFamily: 'PlayfairDisplay_400Regular',
-    fontSize: 22,
+    color: DesignSystem.colors.text.secondary,
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+    fontSize: DesignSystem.typography.sizes.lg,
     marginTop: 12,
     textAlign: 'center',
   },

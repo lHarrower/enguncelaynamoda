@@ -69,7 +69,8 @@ const config: ExpoConfig = {
       {
         organization: process.env.SENTRY_ORG || 'aynamoda-org',
         project: process.env.SENTRY_PROJECT || 'aynamoda',
-        authToken: process.env.SENTRY_AUTH_TOKEN,
+        // authToken should be set via SENTRY_AUTH_TOKEN environment variable
+        // for security reasons - removed from config to avoid exposure
       },
     ],
   ],

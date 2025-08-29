@@ -1,4 +1,4 @@
-﻿import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0?target=deno&dts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0?target=deno&dts';
 // P0 Edge Security: add zod schema validation, request timeout, correlation IDs & structured logging
 import { z } from 'https://esm.sh/zod@3.23.8';
 
@@ -137,7 +137,7 @@ Deno.serve(async (req: Request) => {
 
     const cdnUrl = upJson.secure_url as string | undefined;
 
-    // ---- MOCK ANALYSIS (örnek)
+    // ---- MOCK ANALYSIS (�rnek)
     const analysis = {
       mainCategory: 'tops',
       subCategory: 't-shirt',
@@ -175,7 +175,7 @@ Deno.serve(async (req: Request) => {
     });
   } catch (e) {
     const msg = (e as Error)?.message ?? String(e);
-    console.error(JSON.stringify({ level: 'error', requestId, stage: 'unhandled', error: msg }));
+    
     return json(500, { ok: false, requestId, stage: 'unhandled', message: msg });
   }
 });

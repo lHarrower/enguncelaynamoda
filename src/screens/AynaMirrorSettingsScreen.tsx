@@ -1,6 +1,6 @@
 // AYNA Mirror Settings Screen - User Preferences Management
 import { Ionicons } from '@expo/vector-icons';
-import React, { ComponentType, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Alert,
   Platform,
@@ -16,21 +16,18 @@ import {
 interface DateTimePickerProps {
   value: Date;
   mode?: 'date' | 'time' | 'datetime';
-  display?: 'default' | 'spinner' | 'compact';
+  display?: 'default' | 'spinner' | 'calendar' | 'clock';
   is24Hour?: boolean;
-  onChange: (
-    event: { type: string; nativeEvent: { timestamp: number } },
-    selectedDate?: Date,
-  ) => void;
+  onChange: (event: any, selectedDate?: Date) => void;
   minimumDate?: Date;
   maximumDate?: Date;
 }
 
 // DateTimePicker will be loaded dynamically
-let DateTimePicker: any = null;
+let DateTimePicker: React.ComponentType<DateTimePickerProps> | null = null;
 
 // Function to load DateTimePicker dynamically
-const loadDateTimePicker = async (): Promise<any> => {
+const loadDateTimePicker = async (): Promise<React.ComponentType<DateTimePickerProps>> => {
   if (DateTimePicker) {
     return DateTimePicker;
   }
@@ -44,11 +41,11 @@ const loadDateTimePicker = async (): Promise<any> => {
     return null;
   }
 };
-import { useAuth } from '../context/AuthContext';
-import { userPreferencesService } from '../services/userPreferencesService';
-import { DesignSystem } from '../theme/DesignSystem';
-import { ConfidenceNoteStyle, PrivacySettings } from '../types/aynaMirror';
-import { errorInDev } from '../utils/consoleSuppress';
+import { useAuth } from '@/context/AuthContext';
+import { userPreferencesService } from '@/services/userPreferencesService';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { ConfidenceNoteStyle, PrivacySettings } from '@/types/aynaMirror';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface NavigationProp {
   goBack: () => void;
@@ -78,7 +75,8 @@ export default function AynaMirrorSettingsScreen({ navigation }: SettingsScreenP
 
   // UI states
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [dateTimePickerComponent, setDateTimePickerComponent] = useState<any>(null);
+  const [dateTimePickerComponent, setDateTimePickerComponent] =
+    useState<React.ComponentType<DateTimePickerProps> | null>(null);
 
   useEffect(() => {
     loadUserPreferences();

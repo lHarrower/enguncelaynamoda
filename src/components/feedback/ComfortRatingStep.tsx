@@ -4,9 +4,8 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { DesignSystem } from '@/theme/DesignSystem';
+import { ComfortRating } from '@/types/aynaMirror';
 import { IoniconsName } from '@/types/icons';
-
-import { ComfortRating } from '../../types/aynaMirror';
 
 interface ComfortRatingStepProps {
   comfort: ComfortRating;

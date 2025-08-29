@@ -9,21 +9,30 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AynamodaColors } from '@/theme/AynamodaColors';
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { PremiumBrandShowcase } from '../../src/components/premium';
-import { ProductCardShowcase } from '../../src/components/product';
+import { LazyComponents } from '@/utils/dynamicImports';
+const { PremiumBrandShowcase, ProductCardShowcase } = LazyComponents;
+import { startupPerformanceService } from '@/services/startupPerformanceService';
 import {
   getResponsivePadding,
   isTablet,
   responsiveFontSize,
   responsiveSpacing,
-} from '../../src/utils/responsiveUtils';
+} from '@/utils/responsiveUtils';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 const HomeScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+
+  // Mark startup complete when home screen is fully loaded
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      startupPerformanceService.markStartupComplete();
+    }, 50); // Minimal delay for faster startup
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Memoized product data for better performance
   const FEATURED_PRODUCTS = useMemo(
@@ -139,7 +148,7 @@ const HomeScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <LinearGradient colors={AynamodaColors.gradients.cream} style={styles.gradient}>
+      <LinearGradient colors={DesignSystem.colors.gradientNeutral} style={styles.gradient}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -421,7 +430,7 @@ const createResponsiveStyles = () => {
     },
     sectionTitle: {
       color: AynamodaColors.text.primary,
-      fontFamily: DesignSystem.typography.fonts.body,
+      fontFamily: DesignSystem.typography.fontFamily.body,
       fontSize: responsiveFontSize(24),
       fontWeight: '700',
       marginBottom: DesignSystem.spacing.lg,
@@ -461,7 +470,7 @@ const createResponsiveStyles = () => {
     },
     actionText: {
       color: AynamodaColors.text.inverse,
-      fontFamily: DesignSystem.typography.fonts.body,
+      fontFamily: DesignSystem.typography.fontFamily.body,
       fontSize: responsiveFontSize(16),
       fontWeight: '600',
       marginLeft: responsiveSpacing(8),

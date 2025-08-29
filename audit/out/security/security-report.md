@@ -6,7 +6,8 @@
 
 ## 📊 Özet
 
-✅ **GENEL DURUM: TEMİZ**  
+✅ **GENEL DURUM: TEMİZ**
+
 - Hiç güvenlik açığı tespit edilmedi
 - Tüm bağımlılıklar güvenli
 - Kritik güvenlik kontrolleri başarılı
@@ -38,12 +39,12 @@
 
 ### Güvenlik Araçları Durumu
 
-| Araç | Durum | Sonuç |
-|-------|-------|-------|
-| npm audit | ✅ Aktif | Temiz |
-| gitleaks | ⚠️ Kurulu değil | Atlandı |
-| osv-scanner | ⚠️ Kurulu değil | Atlandı |
-| cyclonedx-npm | ⚠️ Hata | SBOM oluşturulamadı |
+| Araç          | Durum           | Sonuç               |
+| ------------- | --------------- | ------------------- |
+| npm audit     | ✅ Aktif        | Temiz               |
+| gitleaks      | ⚠️ Kurulu değil | Atlandı             |
+| osv-scanner   | ⚠️ Kurulu değil | Atlandı             |
+| cyclonedx-npm | ⚠️ Hata         | SBOM oluşturulamadı |
 
 ## 🛡️ Güvenlik Kontrolleri
 
@@ -62,10 +63,11 @@
 ### ⚠️ İyileştirme Önerileri
 
 1. **Eksik Güvenlik Araçları**
+
    ```powershell
    # Gitleaks kurulumu
    choco install gitleaks
-   
+
    # OSV Scanner kurulumu
    npm install -g @google/osv-scanner
    ```
@@ -84,16 +86,19 @@
 ## 🎯 Sonuç ve Öneriler
 
 ### ✅ Güçlü Yanlar
+
 - Hiç güvenlik açığı yok
 - Düzenli npm audit kontrolü
 - Güvenli bağımlılık yönetimi
 
 ### 🔧 İyileştirme Alanları
+
 1. Eksik güvenlik araçlarını kur
 2. SBOM oluşturma sürecini düzelt
 3. Otomatik güvenlik taraması pipeline'ı kur
 
 ### 📋 Aksiyon Planı
+
 1. **Kısa Vadeli (1 hafta)**
    - Gitleaks ve OSV Scanner kurulumu
    - SBOM oluşturma hatası düzeltme

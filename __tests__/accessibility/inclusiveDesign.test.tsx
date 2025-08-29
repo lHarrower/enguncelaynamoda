@@ -9,15 +9,22 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { jest } from '@jest/globals';
 
 // Mock components to avoid rendering issues
-const MockOutfitRecommendationCard = ({ recommendation, onAction, reduceMotion, ...props }: any) => {
+const MockOutfitRecommendationCard = ({
+  recommendation,
+  onAction,
+  reduceMotion,
+  ...props
+}: any) => {
   const title = recommendation?.title || 'Mock Outfit';
   const confidenceNote = recommendation?.confidenceNote || 'Perfect for today!';
-  const hasTraditionalItem = recommendation?.items?.some((item: any) => item.category === 'traditional');
+  const hasTraditionalItem = recommendation?.items?.some(
+    (item: any) => item.category === 'traditional',
+  );
   const isQuickOption = recommendation?.isQuickOption;
-  
+
   return (
-    <View 
-      testID="outfit-recommendation-card" 
+    <View
+      testID="outfit-recommendation-card"
       accessibilityLabel={`Outfit recommendation: ${title}`}
       accessibilityRole="button"
       {...props}
@@ -25,37 +32,42 @@ const MockOutfitRecommendationCard = ({ recommendation, onAction, reduceMotion, 
       <Text>{title}</Text>
       <Text>{confidenceNote}</Text>
       {/* Add specific text content for tests */}
-      {hasTraditionalItem && <Text testID="traditional-note">Traditional outfit looks beautiful on you</Text>}
+      {hasTraditionalItem && (
+        <Text testID="traditional-note">Traditional outfit looks beautiful on you</Text>
+      )}
       {isQuickOption && <Text testID="quick-option-indicator">Quick Option</Text>}
       {recommendation?.items?.map((item: any) => (
-        <Text 
+        <Text
           key={item.id}
           accessibilityLabel={`${item.colors?.join(' ')} ${item.category} from ${item.brand}`}
         >
           {item.colors?.join(' ')} {item.category}
         </Text>
       ))}
-      <TouchableOpacity 
-         testID="wear-button"
-         accessibilityRole="button"
-         accessibilityLabel="Wear this outfit"
-         onPress={() => onAction && onAction('wear', recommendation)}
-         style={{ minHeight: 44, minWidth: 44 }}
-         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-       >
-         <Text>Wear This</Text>
-       </TouchableOpacity>
-       <TouchableOpacity 
-         testID="save-button"
-         accessibilityRole="button"
-         accessibilityLabel="Save outfit for later"
-         onPress={() => onAction && onAction('save', recommendation)}
-         style={{ minHeight: 44, minWidth: 44 }}
-         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-       >
-         <Text>Save for Later</Text>
-       </TouchableOpacity>
-      <View testID="outfit-card-animation" style={reduceMotion ? { opacity: 1 } : { transform: [{ scale: 1 }], opacity: 1 }} />
+      <TouchableOpacity
+        testID="wear-button"
+        accessibilityRole="button"
+        accessibilityLabel="Wear this outfit"
+        onPress={() => onAction && onAction('wear', recommendation)}
+        style={{ minHeight: 44, minWidth: 44 }}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Text>Wear This</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        testID="save-button"
+        accessibilityRole="button"
+        accessibilityLabel="Save outfit for later"
+        onPress={() => onAction && onAction('save', recommendation)}
+        style={{ minHeight: 44, minWidth: 44 }}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Text>Save for Later</Text>
+      </TouchableOpacity>
+      <View
+        testID="outfit-card-animation"
+        style={reduceMotion ? { opacity: 1 } : { transform: [{ scale: 1 }], opacity: 1 }}
+      />
     </View>
   );
 };
@@ -64,58 +76,50 @@ const MockConfidenceRatingStep = ({ rating, currentRating, onRatingChange, ...pr
   const activeRating = currentRating || rating || 0;
   return (
     <View testID="confidence-rating" accessible={true} {...props}>
-      <Text accessibilityLabel={`Confidence rating: ${activeRating} out of 5`}>Rating: {activeRating}</Text>
-      <View 
-         testID="rating-slider" 
-         accessibilityRole="adjustable"
-         accessibilityLabel="Rate your confidence in this outfit"
-         accessibilityValue={{ min: 1, max: 5, now: activeRating }}
-         accessible={true}
-         accessibilityActions={[
-           { name: 'increment', label: 'Increase rating' },
-           { name: 'decrement', label: 'Decrease rating' }
-         ]}
-       />
+      <Text accessibilityLabel={`Confidence rating: ${activeRating} out of 5`}>
+        Rating: {activeRating}
+      </Text>
+      <View
+        testID="rating-slider"
+        accessibilityRole="adjustable"
+        accessibilityLabel="Rate your confidence in this outfit"
+        accessibilityValue={{ min: 1, max: 5, now: activeRating }}
+        accessible={true}
+        accessibilityActions={[
+          { name: 'increment', label: 'Increase rating' },
+          { name: 'decrement', label: 'Decrease rating' },
+        ]}
+      />
       {[1, 2, 3, 4, 5].map((star) => (
-         <TouchableOpacity
-           key={star}
-           testID={`rating-star-${star}`}
-           accessibilityRole="button"
-           accessibilityLabel={`${star} out of 5 stars${star === activeRating ? ', selected' : ''}`}
-           accessible={true}
-           onPress={() => onRatingChange?.(star)}
-         >
-           <Text>{star <= activeRating ? '★' : '☆'}</Text>
-         </TouchableOpacity>
-       ))}
+        <TouchableOpacity
+          key={star}
+          testID={`rating-star-${star}`}
+          accessibilityRole="button"
+          accessibilityLabel={`${star} out of 5 stars${star === activeRating ? ', selected' : ''}`}
+          accessible={true}
+          onPress={() => onRatingChange?.(star)}
+        >
+          <Text>{star <= activeRating ? '★' : '☆'}</Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 };
 
 const MockFeedbackCollector = ({ onSubmit, hasError, ...props }: any) => (
   <View testID="feedback-collector" {...props}>
-    <Text 
-      accessibilityRole="header"
-    >
-      Feedback Form
-    </Text>
-    <Text 
+    <Text accessibilityRole="header">Feedback Form</Text>
+    <Text
       testID="confidence-question"
       accessibilityLabel="How confident did you feel in this outfit?"
     >
       How confident did you feel?
     </Text>
-    <Text 
-      testID="feeling-question"
-      accessibilityLabel="How did this outfit make you feel?"
-    >
+    <Text testID="feeling-question" accessibilityLabel="How did this outfit make you feel?">
       How did this outfit make you feel?
     </Text>
     {hasError && (
-      <Text 
-        accessibilityRole="alert"
-        accessibilityLiveRegion="assertive"
-      >
+      <Text accessibilityRole="alert" accessibilityLiveRegion="assertive">
         Unable to submit feedback. Please try again.
       </Text>
     )}
@@ -128,25 +132,25 @@ const MockFeedbackCollector = ({ onSubmit, hasError, ...props }: any) => (
         <Text>Try Again</Text>
       </TouchableOpacity>
     )}
-    <TouchableOpacity 
-       testID="close-button"
-       accessibilityRole="button"
-       accessibilityLabel="Close feedback form"
-       accessible={true}
-     >
-       <Text>Close</Text>
-     </TouchableOpacity>
+    <TouchableOpacity
+      testID="close-button"
+      accessibilityRole="button"
+      accessibilityLabel="Close feedback form"
+      accessible={true}
+    >
+      <Text>Close</Text>
+    </TouchableOpacity>
   </View>
 );
 
 const MockAynaMirrorScreen = (props: any) => (
-  <View 
-    testID="ayna-mirror-screen" 
+  <View
+    testID="ayna-mirror-screen"
     accessibilityLabel="Ayna Mirror - Virtual try-on interface"
     {...props}
   >
     <Text>Ayna Mirror Screen</Text>
-    <TouchableOpacity 
+    <TouchableOpacity
       testID="capture-button"
       accessibilityLabel="Capture photo"
       accessibilityRole="button"
@@ -154,7 +158,7 @@ const MockAynaMirrorScreen = (props: any) => (
     >
       <Text>Capture</Text>
     </TouchableOpacity>
-    <TouchableOpacity 
+    <TouchableOpacity
       testID="settings-button"
       accessibilityLabel="Open settings"
       accessibilityRole="button"
@@ -299,7 +303,7 @@ describe('Erişilebilirlik - Kapsayıcı Tasarım Testleri', () => {
       // All interactive elements should be focusable
       const captureButton = getByTestId('capture-button');
       const settingsButton = getByTestId('settings-button');
-      
+
       expect(captureButton.props.accessible).toBe(true);
       expect(captureButton.props.accessibilityRole).toBe('button');
       expect(settingsButton.props.accessible).toBe(true);
@@ -393,7 +397,7 @@ describe('Erişilebilirlik - Kapsayıcı Tasarım Testleri', () => {
       expect(wearButton.props.style.minWidth).toBeGreaterThanOrEqual(44);
       expect(saveButton.props.style.minHeight).toBeGreaterThanOrEqual(44);
       expect(saveButton.props.style.minWidth).toBeGreaterThanOrEqual(44);
-      
+
       // Check hitSlop is properly configured
       expect(wearButton.props.hitSlop).toBeTruthy();
       expect(saveButton.props.hitSlop).toBeTruthy();
@@ -587,15 +591,15 @@ describe('Erişilebilirlik - Kapsayıcı Tasarım Testleri', () => {
           recommendation={mockRecommendation}
           onAction={jest.fn()}
           reduceMotion={true}
-        />
+        />,
       );
 
       // Animations should be disabled or reduced
       const animatedElement = getByTestId('outfit-card-animation');
       const style = animatedElement.props.style;
       // Check that transform is not present in the style object
-      const hasTransform = Array.isArray(style) 
-        ? style.some(s => s && typeof s === 'object' && 'transform' in s)
+      const hasTransform = Array.isArray(style)
+        ? style.some((s) => s && typeof s === 'object' && 'transform' in s)
         : style && typeof style === 'object' && 'transform' in style;
       expect(hasTransform).toBe(false);
     });

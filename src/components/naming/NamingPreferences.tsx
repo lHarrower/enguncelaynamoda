@@ -136,49 +136,46 @@ export const NamingPreferences: React.FC<NamingPreferencesProps> = ({ onPreferen
     }
   };
 
+  const getDescriptivePreview = (
+    includeBrand: boolean,
+    includeColor: boolean,
+    includeStyle: boolean,
+  ): string => {
+    if (includeBrand && includeColor) return 'Blue Nike T-Shirt';
+    if (includeColor && includeStyle) return 'Casual Blue T-Shirt';
+    if (includeColor) return 'Blue T-Shirt';
+    return 'T-Shirt';
+  };
+
+  const getCreativePreview = (includeBrand: boolean, includeColor: boolean): string => {
+    if (includeBrand && includeColor) return 'My Blue Nike Favorite';
+    if (includeColor) return 'My Blue Essential';
+    return 'Favorite T-Shirt';
+  };
+
+  const getMinimalPreview = (includeColor: boolean): string => {
+    return includeColor ? 'Blue T-Shirt' : 'T-Shirt';
+  };
+
+  const getBrandFocusedPreview = (includeBrand: boolean, includeColor: boolean): string => {
+    if (includeBrand && includeColor) return 'Nike Blue T-Shirt';
+    if (includeBrand) return 'Nike T-Shirt';
+    if (includeColor) return 'Blue T-Shirt';
+    return 'T-Shirt';
+  };
+
   const getPreviewName = () => {
     const { namingStyle, includeBrand, includeColor, includeStyle } = localPreferences;
 
     switch (namingStyle) {
       case 'descriptive':
-        if (includeBrand && includeColor) {
-          return 'Blue Nike T-Shirt';
-        }
-        if (includeColor && includeStyle) {
-          return 'Casual Blue T-Shirt';
-        }
-        if (includeColor) {
-          return 'Blue T-Shirt';
-        }
-        return 'T-Shirt';
-
+        return getDescriptivePreview(includeBrand, includeColor, includeStyle);
       case 'creative':
-        if (includeBrand && includeColor) {
-          return 'My Blue Nike Favorite';
-        }
-        if (includeColor) {
-          return 'My Blue Essential';
-        }
-        return 'Favorite T-Shirt';
-
+        return getCreativePreview(includeBrand, includeColor);
       case 'minimal':
-        if (includeColor) {
-          return 'Blue T-Shirt';
-        }
-        return 'T-Shirt';
-
+        return getMinimalPreview(includeColor);
       case 'brand_focused':
-        if (includeBrand && includeColor) {
-          return 'Nike Blue T-Shirt';
-        }
-        if (includeBrand) {
-          return 'Nike T-Shirt';
-        }
-        if (includeColor) {
-          return 'Blue T-Shirt';
-        }
-        return 'T-Shirt';
-
+        return getBrandFocusedPreview(includeBrand, includeColor);
       default:
         return 'Blue T-Shirt';
     }

@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-08-26T14:31:47.998Z",
+  "migrations": [
+    "001_ayna_mirror_schema.sql",
+    "002_wardrobe_functions.sql",
+    "003_user_preferences.sql",
+    "004_anti_consumption_features.sql",
+    "005_performance_optimizations.sql",
+    "20241201_add_item_naming.sql",
+    "20241202_create_efficiency_scores.sql",
+    "20241203_create_style_dna_profiles.sql",
+    "20241204_add_item_naming.sql",
+    "20250809_add_ai_columns.sql",
+    "20250810075624_add_daily_recommendation_id_column.sql",
+    "20250810075928_fix_daily_recommendation_id.sql",
+    "20250810081557_add_daily_recommendation_id_column_and_policy.sql",
+    "20250810125013_fix_core_reset.sql",
+    "20250811_fix_calculate_item_compatibility.sql",
+    "20250811_rls_hardening.sql",
+    "create_user_profiles_table.sql"
+  ],
+  "tables": [
+    "wardrobe_items",
+    "daily_recommendations",
+    "outfit_recommendations",
+    "outfit_feedback",
+    "user_preferences"
+  ],
+  "functions": [
+    "track_item_usage",
+    "get_wardrobe_utilization_stats",
+    "update_item_confidence_score",
+    "get_neglected_items",
+    "calculate_item_compatibility"
+  ]
+}

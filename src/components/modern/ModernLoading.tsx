@@ -16,7 +16,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { ModernDesignSystem } from '../../theme/ModernDesignSystem';
+import { ModernDesignSystem } from '@/theme/ModernDesignSystem';
 
 interface ModernLoadingProps {
   variant?: 'spinner' | 'dots' | 'pulse' | 'skeleton' | 'wave';

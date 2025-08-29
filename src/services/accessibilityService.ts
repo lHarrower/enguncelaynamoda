@@ -152,7 +152,7 @@ class AccessibilityService {
     let score = 100;
 
     // 1. Color Contrast (WCAG 1.4.3)
-    const contrastResults = this.validateColorContrast();
+    const contrastResults = this.validateColorContrast() as ColorContrastResult[];
     contrastResults.forEach((result) => {
       if (!result.passesAA) {
         issues.push({
@@ -183,7 +183,7 @@ class AccessibilityService {
     });
 
     // 3. Screen Reader Support (WCAG 4.1.2)
-    const screenReaderIssues = this.validateScreenReaderSupport();
+    const screenReaderIssues = this.validateScreenReaderSupportInternal();
     screenReaderIssues.forEach((issue) => {
       issues.push({
         severity: 'critical',
@@ -198,7 +198,7 @@ class AccessibilityService {
     });
 
     // 4. Keyboard Navigation (WCAG 2.1.1)
-    const keyboardIssues = this.validateKeyboardNavigation();
+    const keyboardIssues = this.validateKeyboardNavigationInternal();
     keyboardIssues.forEach((issue) => {
       issues.push({
         severity: 'major',
@@ -213,7 +213,7 @@ class AccessibilityService {
     });
 
     // 5. Focus Management (WCAG 2.4.3)
-    const focusIssues = this.validateFocusManagement();
+    const focusIssues = this.validateFocusManagementInternal();
     focusIssues.forEach((issue) => {
       issues.push({
         severity: 'major',
@@ -247,63 +247,6 @@ class AccessibilityService {
       issues,
       recommendations,
     };
-  }
-
-  /**
-   * Validate color contrast ratios
-   */
-  public validateColorContrast(): ColorContrastResult[] {
-    const results: ColorContrastResult[] = [];
-
-    // Common color combinations to test
-    const C: typeof DEFAULT_COLORS = UNIFIED_COLORS;
-    const colorCombinations = [
-      {
-        fg: (C?.text?.primary as string) ?? '#000000',
-        bg: (C?.background?.primary as string) ?? '#FFFFFF',
-      },
-      {
-        fg: (C?.text?.secondary as string) ?? '#666666',
-        bg: (C?.background?.primary as string) ?? '#FFFFFF',
-      },
-      {
-        fg: (C?.text?.primary as string) ?? '#000000',
-        bg: (C?.sage?.[100] as string) ?? (C?.sage?.light as string) ?? '#E8F0E8',
-      },
-      {
-        fg: (C?.text?.primary as string) ?? '#000000',
-        bg: (C?.gold?.[100] as string) ?? (C?.gold?.light as string) ?? '#FFF9E6',
-      },
-      {
-        fg: (C?.background as string) ?? '#FFFFFF',
-        bg: '#C08A6B',
-      },
-      {
-        fg: (C?.background as string) ?? '#FFFFFF',
-        bg: '#5C8A5C',
-      },
-      {
-        fg: (C?.background as string) ?? '#FFFFFF',
-        bg: '#D4AF37',
-      },
-      {
-        fg: (C?.background as string) ?? '#FFFFFF',
-        bg: '#E57373',
-      },
-    ];
-
-    colorCombinations.forEach(({ fg, bg }) => {
-      const ratio = this.calculateContrastRatio(fg, bg);
-      results.push({
-        ratio,
-        passesAA: ratio >= 4.5,
-        passesAAA: ratio >= 7,
-        foreground: fg,
-        background: bg,
-      });
-    });
-
-    return results;
   }
 
   /**
@@ -366,9 +309,9 @@ class AccessibilityService {
   }
 
   /**
-   * Validate screen reader support
+   * Validate screen reader support (internal)
    */
-  private validateScreenReaderSupport(): Array<{
+  private validateScreenReaderSupportInternal(): Array<{
     description: string;
     element?: string;
     fix: string;
@@ -382,9 +325,9 @@ class AccessibilityService {
   }
 
   /**
-   * Validate keyboard navigation
+   * Validate keyboard navigation (internal)
    */
-  private validateKeyboardNavigation(): Array<{
+  private validateKeyboardNavigationInternal(): Array<{
     description: string;
     element?: string;
     fix: string;
@@ -398,9 +341,9 @@ class AccessibilityService {
   }
 
   /**
-   * Validate focus management
+   * Validate focus management (internal)
    */
-  private validateFocusManagement(): Array<{ description: string; fix: string }> {
+  private validateFocusManagementInternal(): Array<{ description: string; fix: string }> {
     const issues: Array<{ description: string; fix: string }> = [];
 
     // Check for focus management issues
@@ -493,6 +436,121 @@ class AccessibilityService {
       // Android implementation
       AccessibilityInfo.announceForAccessibility(message);
     }
+  }
+
+  /**
+   * Validate color contrast for specific colors (used in tests)
+   */
+  public validateColorContrast(
+    foreground?: string,
+    background?: string,
+  ): boolean | ColorContrastResult[] {
+    if (!foreground || !background) {
+      // If no colors provided, return all default combinations
+      const results: ColorContrastResult[] = [];
+
+      // Common color combinations to test
+      const C: typeof DEFAULT_COLORS = UNIFIED_COLORS;
+      const colorCombinations = [
+        {
+          fg: (C?.text?.primary ?? '#000000') as string,
+          bg: (C?.background?.primary ?? '#FFFFFF') as string,
+        },
+        {
+          fg: (C?.text?.secondary ?? '#666666') as string,
+          bg: (C?.background?.primary ?? '#FFFFFF') as string,
+        },
+        {
+          fg: (C?.text?.primary ?? '#000000') as string,
+          bg: (C?.sage?.[100] ?? '#E8F0E8') as string,
+        },
+        {
+          fg: (C?.text?.primary ?? '#000000') as string,
+          bg: (C?.gold?.[100] ?? '#FFF9E6') as string,
+        },
+        {
+          fg: (C?.background?.primary as string) ?? '#FFFFFF',
+          bg: '#C08A6B',
+        },
+        {
+          fg: (C?.background?.primary as string) ?? '#FFFFFF',
+          bg: '#5C8A5C',
+        },
+        {
+          fg: (C?.background?.primary as string) ?? '#FFFFFF',
+          bg: '#D4AF37',
+        },
+        {
+          fg: (C?.background?.primary as string) ?? '#FFFFFF',
+          bg: '#E57373',
+        },
+      ];
+
+      colorCombinations.forEach(({ fg, bg }) => {
+        const ratio = this.calculateContrastRatio(fg, bg);
+        results.push({
+          ratio,
+          passesAA: ratio >= 4.5,
+          passesAAA: ratio >= 7,
+          foreground: fg,
+          background: bg,
+        });
+      });
+
+      return results;
+    }
+
+    const ratio = this.calculateContrastRatio(foreground, background);
+    return ratio >= 4.5; // WCAG AA standard
+  }
+
+  /**
+   * Validate touch target size (used in tests)
+   */
+  public validateTouchTargetSize(width: number, height: number): boolean {
+    const MINIMUM_SIZE = 44; // 44pt minimum as per WCAG
+    return width >= MINIMUM_SIZE && height >= MINIMUM_SIZE;
+  }
+
+  /**
+   * Validate screen reader support for an element (used in tests)
+   */
+  public validateScreenReaderSupport(element: any): boolean {
+    if (!element) return false;
+
+    return !!(
+      element.accessibilityLabel &&
+      element.accessibilityRole &&
+      element.accessible !== false
+    );
+  }
+
+  /**
+   * Validate keyboard navigation for an element (used in tests)
+   */
+  public validateKeyboardNavigation(element: any): boolean {
+    if (!element) return false;
+
+    // Interactive elements should be focusable
+    const interactiveRoles = ['button', 'link', 'textbox', 'searchbox', 'tab'];
+    const isInteractive = interactiveRoles.includes(element.accessibilityRole);
+
+    if (isInteractive) {
+      // Interactive elements must be accessible and focusable
+      return element.accessible !== false && element.focusable !== false;
+    }
+
+    // Non-interactive elements should not be focusable if explicitly set
+    if (element.focusable === false) {
+      return true;
+    }
+
+    // If focusable is explicitly true for non-interactive, that's wrong
+    if (element.focusable === true) {
+      return false;
+    }
+
+    return true; // Non-interactive elements without explicit focusable setting are fine
   }
 
   /**

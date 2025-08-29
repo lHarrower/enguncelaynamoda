@@ -11,8 +11,7 @@ import {
 } from 'react-native';
 
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { AppError, ErrorCategory, RecoveryAction } from '../../utils/ErrorHandler';
+import { AppError, ErrorCategory, RecoveryAction } from '@/utils/ErrorHandler';
 
 const { width: screenWidth } = Dimensions.get('window');
 

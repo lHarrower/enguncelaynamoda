@@ -42,7 +42,7 @@ class DatabasePerformanceService {
   private metrics: PerformanceMetric[] = [];
   private readonly MAX_METRICS = 1000;
   private readonly ANALYSIS_INTERVAL = 5 * 60 * 1000; // 5 minutes
-  private analysisTimer: ReturnType<typeof setInterval> | null = null;
+  private analysisTimer: ReturnType<typeof setInterval> | null = null; // OPERASYON DİSİPLİN: Memory leak önleme
   private indexRecommendations: IndexRecommendation[] = [];
 
   constructor() {
@@ -135,7 +135,7 @@ class DatabasePerformanceService {
     });
 
     // Calculate averages and rates
-    Object.values(tableStats).forEach((stats) => {
+    Object.values(tableStats).forEach((stats: TableStatistics) => {
       stats.averageDuration = stats.totalDuration / stats.operations;
       stats.slowOperationRate = (stats.slowOperations / stats.operations) * 100;
       stats.cacheHitRate = (stats.cacheHits / stats.operations) * 100;
@@ -165,7 +165,7 @@ class DatabasePerformanceService {
     });
 
     // Calculate averages
-    Object.values(operationStats).forEach((stats) => {
+    Object.values(operationStats).forEach((stats: OperationStatistics) => {
       stats.averageDuration = stats.totalDuration / stats.count;
       stats.slowRate = (stats.slowCount / stats.count) * 100;
     });
@@ -351,6 +351,7 @@ class DatabasePerformanceService {
   }
 
   // Destroy service and cleanup
+  // OPERASYON DİSİPLİN: Memory leak önleme - tüm interval'ları temizle
   destroy(): void {
     if (this.analysisTimer) {
       clearInterval(this.analysisTimer);
@@ -358,6 +359,14 @@ class DatabasePerformanceService {
     }
     this.metrics = [];
     this.indexRecommendations = [];
+  }
+
+  /**
+   * OPERASYON DİSİPLİN: Component unmount'ta çağrılması gereken cleanup metodu
+   * React component'lerde useEffect cleanup function'ında kullanılmalı
+   */
+  cleanup(): void {
+    this.destroy();
   }
 }
 
@@ -435,8 +444,9 @@ export class WardrobeOptimizedQueries {
           .from('wardrobe_items')
           .select('*')
           .eq('user_id', userId)
-          .order(sortBy, { ascending: false })
-          .range(offset, offset + limit - 1);
+          .order(sortBy, { ascending: false });
+
+        query = query.range(offset, offset + limit - 1);
 
         if (category) {
           query = query.eq('category', category);
@@ -470,14 +480,12 @@ export class WardrobeOptimizedQueries {
       'SEARCH',
       'wardrobe_items',
       async () => {
-        let query = supabase
-          .from('wardrobe_items')
-          .select('*')
-          .eq('user_id', userId)
-          .or(
-            `name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,tags.cs.{"${searchTerm}"}`,
-          )
-          .limit(limit);
+        let query = supabase.from('wardrobe_items').select('*').eq('user_id', userId);
+
+        query = query.or(
+          `name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,tags.cs.{"${searchTerm}"}`,
+        );
+        query = query.limit(limit);
 
         if (categories && categories.length > 0) {
           query = query.in('category', categories);

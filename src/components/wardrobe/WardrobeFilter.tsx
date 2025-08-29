@@ -3,6 +3,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { WardrobeCategory, WardrobeColor } from '@/types';
 
 export interface FilterOptions {
@@ -39,7 +40,10 @@ const WardrobeFilter: React.FC<WardrobeFilterProps> = ({
 }) => {
   const { triggerSelection } = useHapticFeedback();
 
-  const toggleFilter = (filterType: keyof ActiveFilters, value: any) => {
+  const toggleFilter = (
+    filterType: keyof ActiveFilters,
+    value: WardrobeCategory | WardrobeColor | string | boolean,
+  ) => {
     triggerSelection();
 
     if (filterType === 'isFavorite') {
@@ -55,7 +59,7 @@ const WardrobeFilter: React.FC<WardrobeFilterProps> = ({
       | WardrobeColor
       | string
     )[];
-    const isSelected = currentValues.includes(value);
+    const isSelected = (currentValues as any).includes(value);
 
     const newValues = isSelected
       ? currentValues.filter((item) => item !== value)
@@ -71,7 +75,7 @@ const WardrobeFilter: React.FC<WardrobeFilterProps> = ({
     Array.isArray(filter) ? filter.length > 0 : filter,
   );
 
-  const renderFilterSection = <T,>(
+  const renderFilterSection = <T extends string | boolean>(
     title: string,
     items: T[],
     activeItems: T[],
@@ -210,92 +214,92 @@ const WardrobeFilter: React.FC<WardrobeFilterProps> = ({
 
 const styles = StyleSheet.create({
   activeFavoriteFilter: {
-    backgroundColor: '#FEF2F2',
-    borderColor: '#EF4444',
+    backgroundColor: DesignSystem.colors.error[50],
+    borderColor: DesignSystem.colors.error[500],
   },
   activeFavoriteFilterText: {
-    color: '#EF4444',
+    color: DesignSystem.colors.error[500],
   },
   activeFilterItem: {
-    backgroundColor: '#EBF4FF',
-    borderColor: '#3B82F6',
+    backgroundColor: DesignSystem.colors.sage[50],
+    borderColor: DesignSystem.colors.sage[500],
   },
   activeFilterItemText: {
-    color: '#3B82F6',
+    color: DesignSystem.colors.sage[500],
   },
   clearButton: {
-    color: '#3B82F6',
-    fontSize: 14,
+    color: DesignSystem.colors.sage[500],
+    fontSize: DesignSystem.typography.fontSize.sm,
     fontWeight: '500',
   },
   colorFilterItem: {
-    paddingLeft: 8,
+    paddingLeft: DesignSystem.spacing.xs,
   },
   colorIndicator: {
-    borderColor: '#E5E7EB',
-    borderRadius: 6,
+    borderColor: DesignSystem.colors.border.secondary,
+    borderRadius: DesignSystem.radius.sm,
     borderWidth: 1,
-    height: 12,
-    marginRight: 6,
-    width: 12,
+    height: DesignSystem.spacing.sm,
+    marginRight: DesignSystem.spacing.xs,
+    width: DesignSystem.spacing.sm,
   },
   container: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginBottom: 16,
-    padding: 16,
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderRadius: DesignSystem.radius.sm,
+    marginBottom: DesignSystem.spacing.md,
+    padding: DesignSystem.spacing.md,
   },
   favoriteFilter: {
     alignSelf: 'flex-start',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: DesignSystem.colors.background.secondary,
     borderColor: 'transparent',
-    borderRadius: 20,
+    borderRadius: DesignSystem.radius.lg,
     borderWidth: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: DesignSystem.spacing.md,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   favoriteFilterText: {
-    color: '#6B7280',
-    fontSize: 14,
+    color: DesignSystem.colors.text.secondary,
+    fontSize: DesignSystem.typography.fontSize.sm,
     fontWeight: '500',
   },
   filterItem: {
     alignItems: 'center',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: DesignSystem.colors.background.secondary,
     borderColor: 'transparent',
-    borderRadius: 16,
+    borderRadius: DesignSystem.radius.md,
     borderWidth: 1,
     flexDirection: 'row',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
   },
   filterItemText: {
-    color: '#6B7280',
-    fontSize: 12,
+    color: DesignSystem.colors.text.secondary,
+    fontSize: DesignSystem.typography.fontSize.sm,
     fontWeight: '500',
   },
   filterItems: {
     flexDirection: 'row',
-    gap: 8,
+    gap: DesignSystem.spacing.xs,
   },
   filterSection: {
-    marginBottom: 16,
+    marginBottom: DesignSystem.spacing.md,
   },
   header: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: DesignSystem.spacing.md,
   },
   sectionTitle: {
-    color: '#374151',
-    fontSize: 14,
+    color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.fontSize.sm,
     fontWeight: '500',
-    marginBottom: 8,
+    marginBottom: DesignSystem.spacing.xs,
   },
   title: {
-    color: '#1F2937',
-    fontSize: 18,
+    color: DesignSystem.colors.text.primary,
+    fontSize: DesignSystem.typography.fontSize.lg,
     fontWeight: '600',
   },
 });

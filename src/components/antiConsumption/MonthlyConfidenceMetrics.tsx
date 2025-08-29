@@ -3,13 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { useSafeTheme } from '@/hooks/useSafeTheme';
-import { errorInDev } from '@/utils/consoleSuppress';
-
 import {
   antiConsumptionService,
   MonthlyConfidenceMetrics as MonthlyConfidenceMetricsType,
-} from '../../services/antiConsumptionService';
-import { DesignSystem } from '../../theme/DesignSystem';
+} from '@/services/antiConsumptionService';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 const { width: _screenWidth } = Dimensions.get('window');
 
@@ -28,7 +27,7 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
 }) => {
   const theme = useSafeTheme();
   const { colors } = theme;
-  const styles = createStyles(colors);
+  const styles = createStyles(DesignSystem.colors);
   const [metrics, setMetrics] = useState<MonthlyConfidenceMetricsType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -324,8 +323,8 @@ export const MonthlyConfidenceMetrics: React.FC<MonthlyConfidenceMetricsProps> =
             <View style={styles.insightItem}>
               <Ionicons name="trending-up" size={16} color={DesignSystem.colors.success[500]} />
               <Text style={styles.insightText}>
-                Your confidence is trending up! You&apos;re getting better at choosing outfits that make
-                you feel great.
+                Your confidence is trending up! You&apos;re getting better at choosing outfits that
+                make you feel great.
               </Text>
             </View>
           )}

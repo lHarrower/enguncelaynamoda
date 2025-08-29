@@ -7,11 +7,13 @@
 Required device sizes and resolutions:
 
 #### iPhone Screenshots
+
 - **6.7" Display (iPhone 14 Pro Max, 15 Pro Max)**: 1290 x 2796 pixels
-- **6.1" Display (iPhone 14 Pro, 15 Pro)**: 1179 x 2556 pixels  
+- **6.1" Display (iPhone 14 Pro, 15 Pro)**: 1179 x 2556 pixels
 - **5.5" Display (iPhone 8 Plus)**: 1242 x 2208 pixels
 
 #### iPad Screenshots
+
 - **12.9" Display (iPad Pro 12.9")**: 2048 x 2732 pixels
 - **11" Display (iPad Pro 11")**: 1668 x 2388 pixels
 
@@ -20,11 +22,13 @@ Required device sizes and resolutions:
 Required device categories:
 
 #### Phone Screenshots
+
 - **Phone**: 1080 x 1920 pixels (minimum)
 - **7" Tablet**: 1200 x 1920 pixels
 - **10" Tablet**: 1800 x 2560 pixels
 
 #### Feature Graphic
+
 - **Feature Graphic**: 1024 x 500 pixels
 
 ## Screenshot Content Guidelines
@@ -64,6 +68,7 @@ Required device categories:
 ### Design Guidelines
 
 #### Visual Requirements
+
 - Use high-quality, crisp images
 - Ensure text is readable at all sizes
 - Show diverse user representation
@@ -71,6 +76,7 @@ Required device categories:
 - Avoid cluttered interfaces
 
 #### Content Requirements
+
 - Use realistic, relatable content
 - Show actual app functionality
 - Avoid placeholder text
@@ -78,6 +84,7 @@ Required device categories:
 - Demonstrate key value propositions
 
 #### Technical Requirements
+
 - Save as PNG format
 - Use RGB color space
 - Maintain exact pixel dimensions
@@ -87,6 +94,7 @@ Required device categories:
 ## Screenshot Naming Convention
 
 ### iOS
+
 ```
 ios/
 ├── 6.7-inch/
@@ -106,6 +114,7 @@ ios/
 ```
 
 ### Android
+
 ```
 android/
 ├── phone/
@@ -124,12 +133,14 @@ android/
 ## App Preview Videos (Optional but Recommended)
 
 ### iOS App Previews
+
 - **Duration**: 15-30 seconds
 - **Format**: .mov or .mp4
 - **Resolution**: Match screenshot dimensions
 - **Content**: Show app in action, highlight key features
 
 ### Android Promotional Video
+
 - **Duration**: Up to 30 seconds
 - **Format**: .mp4
 - **Resolution**: 1920 x 1080 pixels minimum
@@ -138,6 +149,7 @@ android/
 ## Localization
 
 Screenshots should be created for each supported language:
+
 - English (en-US) - Primary
 - Turkish (tr-TR) - Secondary
 - Additional languages as needed
@@ -145,6 +157,7 @@ Screenshots should be created for each supported language:
 ## Quality Checklist
 
 ### Before Submission
+
 - [ ] All required device sizes covered
 - [ ] Screenshots show actual app content (no mockups)
 - [ ] Text is legible and properly localized
@@ -159,6 +172,7 @@ Screenshots should be created for each supported language:
 ## Tools and Resources
 
 ### Recommended Tools
+
 - **Figma**: For creating mockups and layouts
 - **Sketch**: For iOS-specific designs
 - **Adobe Photoshop**: For image editing and optimization
@@ -166,6 +180,7 @@ Screenshots should be created for each supported language:
 - **Device Farm**: For testing on real devices
 
 ### Design Resources
+
 - Apple Human Interface Guidelines
 - Google Material Design Guidelines
 - App Store Screenshot Guidelines

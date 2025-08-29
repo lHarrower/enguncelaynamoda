@@ -1,7 +1,7 @@
 // Onboarding Service - Handles user onboarding flow and data persistence
-import { supabase } from '../config/supabaseClient';
-import { safeParse } from '../utils/safeJSON';
-import { secureStorage } from '../utils/secureStorage';
+import { supabase } from '@/config/supabaseClient';
+import { safeParse } from '@/utils/safeJSON';
+import { secureStorage } from '@/utils/secureStorage';
 // OnboardingFlow doesn't export types; define a local shape for persisted data
 export interface OnboardingData {
   notificationPermissionGranted: boolean;
@@ -9,10 +9,11 @@ export interface OnboardingData {
   stylePreferences?: StylePreferences;
   completedAt: Date;
 }
-import { StylePreferences } from '../components/onboarding/StylePreferenceQuestionnaire';
-import { isConfidenceNoteStyle } from '../types/aynaMirror';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
+import { StylePreferences } from '@/components/onboarding/StylePreferenceQuestionnaire';
+import { isConfidenceNoteStyle } from '@/types/aynaMirror';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
+
 import notificationService from './notificationService';
 
 const ONBOARDING_STORAGE_KEY = 'ayna_onboarding_completed';

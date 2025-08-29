@@ -68,14 +68,14 @@ describe('Cross-Service Communication Integration', () => {
                 colors: ['blue'],
                 tags: ['casual'],
                 imageUri: 'https://example.com/item1.jpg',
-                usageStats: { 
+                usageStats: {
                   itemId: 'item-1',
-                  wornCount: 5, 
+                  wornCount: 5,
                   lastWorn: mockDate,
                   totalWears: 5,
                   averageRating: 4.5,
                   complimentsReceived: 3,
-                  costPerWear: 10.50
+                  costPerWear: 10.5,
                 },
                 createdAt: mockDate,
                 updatedAt: mockDate,
@@ -86,14 +86,14 @@ describe('Cross-Service Communication Integration', () => {
                 colors: ['black'],
                 tags: ['formal'],
                 imageUri: 'https://example.com/item2.jpg',
-                usageStats: { 
+                usageStats: {
                   itemId: 'item-2',
-                  wornCount: 3, 
+                  wornCount: 3,
                   lastWorn: mockDate,
                   totalWears: 3,
                   averageRating: 4.0,
                   complimentsReceived: 2,
-                  costPerWear: 15.00
+                  costPerWear: 15.0,
                 },
                 createdAt: mockDate,
                 updatedAt: mockDate,
@@ -102,8 +102,9 @@ describe('Cross-Service Communication Integration', () => {
           },
         ],
       };
-      
-      const generateSpy = jest.spyOn(aynaMirrorService, 'generateDailyRecommendations')
+
+      const generateSpy = jest
+        .spyOn(aynaMirrorService, 'generateDailyRecommendations')
         .mockResolvedValue(mockRecommendations);
 
       // Execute the integrated flow
@@ -120,7 +121,7 @@ describe('Cross-Service Communication Integration', () => {
       // Verify weather-appropriate recommendations for rainy day
       expect(recommendations.weatherContext.condition).toBe('rainy');
       expect(recommendations.recommendations[0]?.items.length).toBeGreaterThan(0);
-      
+
       // Clean up spies
       generateSpy.mockRestore();
     }, 15000);
@@ -132,27 +133,30 @@ describe('Cross-Service Communication Integration', () => {
         userId: mockUserId,
         date: mockDate,
         generatedAt: mockDate,
-        weatherContext: { 
-          temperature: 20, 
+        weatherContext: {
+          temperature: 20,
           condition: 'cloudy' as const,
           humidity: 60,
           location: 'Test Location',
-          timestamp: mockDate
+          timestamp: mockDate,
         },
-        recommendations: [{ 
-          id: 'fallback-rec-1', 
-          dailyRecommendationId: 'fallback-rec-123',
-          confidenceNote: 'Fallback recommendation',
-          quickActions: [],
-          confidenceScore: 3.0,
-          isQuickOption: false,
-          createdAt: mockDate,
-          reasoning: ['Fallback option when services unavailable'],
-          items: [] 
-        }]
+        recommendations: [
+          {
+            id: 'fallback-rec-1',
+            dailyRecommendationId: 'fallback-rec-123',
+            confidenceNote: 'Fallback recommendation',
+            quickActions: [],
+            confidenceScore: 3.0,
+            isQuickOption: false,
+            createdAt: mockDate,
+            reasoning: ['Fallback option when services unavailable'],
+            items: [],
+          },
+        ],
       };
-      
-      const generateSpy = jest.spyOn(aynaMirrorService, 'generateDailyRecommendations')
+
+      const generateSpy = jest
+        .spyOn(aynaMirrorService, 'generateDailyRecommendations')
         .mockResolvedValue(mockRecommendations);
 
       // Should still generate recommendations with fallback weather
@@ -160,7 +164,7 @@ describe('Cross-Service Communication Integration', () => {
       expect(recommendations).toBeDefined();
       expect(recommendations.weatherContext).toBeDefined(); // Should use cached/default weather
       expect(recommendations.recommendations.length).toBeGreaterThan(0);
-      
+
       generateSpy.mockRestore();
     }, 15000);
   });
@@ -219,7 +223,7 @@ describe('Cross-Service Communication Integration', () => {
         confidencePatterns: [],
         bodyTypePreferences: [],
         occasionPreferences: {},
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       });
 
       // Process feedback through AYNA Mirror service
@@ -257,11 +261,11 @@ describe('Cross-Service Communication Integration', () => {
             return Promise.resolve({ data: { usage_count: 6, last_worn: mockDate }, error: null });
           }),
           then: jest.fn((resolve: any): any => {
-            const result = isUpdate 
+            const result = isUpdate
               ? { data: [{ id: mockItemId, usage_count: 6 }], error: null }
               : { data: { usage_count: 6, last_worn: mockDate }, error: null };
             return Promise.resolve(result).then(resolve);
-          })
+          }),
         };
         return chain;
       };
@@ -395,7 +399,7 @@ describe('Cross-Service Communication Integration', () => {
       const originalGenerateDailyRecommendations = aynaMirrorService.generateDailyRecommendations;
       aynaMirrorService.generateDailyRecommendations = jest.fn().mockResolvedValue({
         recommendations: [{ id: 'recovery-rec-1', type: 'outfit', confidence: 0.7 }],
-        metadata: { generatedAt: new Date(), cacheHit: true, errorRecovery: true }
+        metadata: { generatedAt: new Date(), cacheHit: true, errorRecovery: true },
       });
 
       // Should handle cascading failures gracefully
@@ -404,7 +408,7 @@ describe('Cross-Service Communication Integration', () => {
       expect(recommendations).toBeDefined();
       // Should provide some recommendations even with service failures
       expect(recommendations.recommendations.length).toBeGreaterThanOrEqual(0);
-      
+
       // Restore original method
       aynaMirrorService.generateDailyRecommendations = originalGenerateDailyRecommendations;
     }, 15000);
@@ -436,7 +440,7 @@ describe('Cross-Service Communication Integration', () => {
           error: new Error('Intelligence update failed'),
         }),
       });
-      
+
       (supabase.from as jest.Mock).mockImplementation((table: string) => {
         if (table === 'outfit_feedback') {
           return { insert: mockInsert };
@@ -449,7 +453,7 @@ describe('Cross-Service Communication Integration', () => {
       aynaMirrorService.processUserFeedback = jest.fn().mockResolvedValue({
         success: true,
         feedbackStored: true,
-        intelligenceUpdateFailed: true
+        intelligenceUpdateFailed: true,
       });
 
       // Should handle partial failure without losing data
@@ -457,7 +461,7 @@ describe('Cross-Service Communication Integration', () => {
 
       // Verify feedback processing was called
       expect(aynaMirrorService.processUserFeedback).toHaveBeenCalledWith(mockFeedback);
-      
+
       // Restore original method
       aynaMirrorService.processUserFeedback = originalProcessUserFeedback;
     });
@@ -471,7 +475,7 @@ describe('Cross-Service Communication Integration', () => {
       const originalGenerateDailyRecommendations = aynaMirrorService.generateDailyRecommendations;
       aynaMirrorService.generateDailyRecommendations = jest.fn().mockResolvedValue({
         recommendations: [{ id: 'perf-rec-1', type: 'outfit', confidence: 0.9 }],
-        metadata: { generatedAt: new Date(), cacheHit: false }
+        metadata: { generatedAt: new Date(), cacheHit: false },
       });
 
       // Execute integrated flow
@@ -481,7 +485,7 @@ describe('Cross-Service Communication Integration', () => {
       // Should complete within performance benchmark
       expect(totalTime).toBeLessThan(1000); // 1 second total
       expect(recommendations).toBeDefined();
-      
+
       // Restore original method
       aynaMirrorService.generateDailyRecommendations = originalGenerateDailyRecommendations;
     }, 5000);

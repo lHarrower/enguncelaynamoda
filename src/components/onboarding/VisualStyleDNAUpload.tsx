@@ -9,16 +9,18 @@ import {
   Animated,
   Dimensions,
   Image,
+  ImageStyle,
   ScrollView,
   StyleSheet,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { errorInDev, warnInDev } from '../../utils/consoleSuppress';
+import { errorInDev, warnInDev } from '@/utils/consoleSuppress';
 
 const { width, height } = Dimensions.get('window');
 
@@ -176,7 +178,7 @@ export default function VisualStyleDNAUpload({
       <View style={styles.photoGrid}>
         {uploadedPhotos.map((photo, index) => (
           <View key={photo.id} style={styles.photoContainer}>
-            <Image source={{ uri: photo.uri }} style={styles.uploadedPhoto} />
+            <Image source={{ uri: photo.uri }} style={styles.uploadedPhoto as any} />
             <TouchableOpacity
               style={styles.removeButton}
               onPress={() => removePhoto(photo.id)}
@@ -235,8 +237,8 @@ export default function VisualStyleDNAUpload({
         <View style={styles.header}>
           <Text style={styles.title}>Discover Your Style DNA</Text>
           <Text style={styles.subtitle}>
-            Every outfit tells a story. Share yours with us and we&apos;ll create a personalized style
-            profile that understands your unique aesthetic.
+            Every outfit tells a story. Share yours with us and we&apos;ll create a personalized
+            style profile that understands your unique aesthetic.
           </Text>
         </View>
 
@@ -323,7 +325,7 @@ export default function VisualStyleDNAUpload({
   );
 }
 
-const createStyles = (styleObj: Record<string, any>) => {
+const createStyles = (styleObj: Record<string, ViewStyle | TextStyle | ImageStyle>) => {
   try {
     return StyleSheet.create(styleObj);
   } catch (error) {

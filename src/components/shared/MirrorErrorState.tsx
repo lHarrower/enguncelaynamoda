@@ -2,18 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-// AYNAMODA Color Palette
-const COLORS = {
-  primary: '#8B6F47',
-  secondary: '#B8A082',
-  background: '#F5F1E8',
-  surface: '#FFFFFF',
-  text: '#2C2C2C',
-  textLight: '#B8A082',
-  border: '#E8DCC6',
-  accent: '#D4AF37',
-  error: '#E74C3C',
-};
+
+import { DesignSystem } from '@/theme/DesignSystem';
 
 interface MirrorErrorStateProps {
   errorMessage: string;
@@ -30,7 +20,7 @@ export const MirrorErrorState: React.FC<MirrorErrorStateProps> = ({
     <View style={styles.errorContainer}>
       <BlurView intensity={20} style={styles.errorBlur}>
         <View style={styles.errorContent}>
-          <Ionicons name="alert-circle-outline" size={48} color={COLORS.error} />
+          <Ionicons name="alert-circle-outline" size={48} color={DesignSystem.colors.coral[500]} />
           <Text style={styles.errorText}>{errorMessage}</Text>
           <TouchableOpacity
             style={styles.retryButton}
@@ -57,31 +47,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    padding: 24,
+    padding: DesignSystem.spacing.xl,
   },
   errorContent: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 32,
+    backgroundColor: DesignSystem.colors.background.elevated + '1A',
+    padding: DesignSystem.spacing.xxl,
   },
   errorText: {
-    color: COLORS.text,
-    fontFamily: 'Inter',
-    fontSize: 16,
-    fontWeight: '500',
-    marginVertical: 20,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    fontSize: DesignSystem.typography.fontSize.md,
+    fontWeight: DesignSystem.typography.fontWeight.medium,
+    marginVertical: DesignSystem.spacing.lg,
     textAlign: 'center',
   },
   retryButton: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 16,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    backgroundColor: DesignSystem.colors.sage[500],
+    borderRadius: DesignSystem.radius.md,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingVertical: DesignSystem.spacing.sm,
   },
   retryButtonText: {
-    color: COLORS.surface,
-    fontFamily: 'Inter',
-    fontSize: 16,
-    fontWeight: '600',
+    color: DesignSystem.colors.text.inverse,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    fontSize: DesignSystem.typography.fontSize.md,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
   },
 });

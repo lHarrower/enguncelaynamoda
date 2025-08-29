@@ -11,6 +11,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
+import { errorInDev } from '@/utils/consoleSuppress';
+
 import {
   ConsentType,
   DataProcessingPurpose,
@@ -67,6 +69,8 @@ const REQUIRED_CONSENTS: Record<ConsentType, { weight: number; required: boolean
   [ConsentType.NOTIFICATIONS]: { weight: 10, required: false },
   [ConsentType.LOCATION]: { weight: 15, required: false },
   [ConsentType.MARKETING]: { weight: 10, required: false },
+  [ConsentType.PERSONALIZATION]: { weight: 15, required: false },
+  [ConsentType.DATA_SHARING]: { weight: 5, required: false },
 };
 
 export const useKVKK = (): UseKVKKReturn => {
@@ -97,7 +101,7 @@ export const useKVKK = (): UseKVKKReturn => {
       setConsents(userConsents);
       setSettings(userSettings);
     } catch (err) {
-      console.error('KVKK verileri yüklenirken hata:', err);
+      errorInDev('KVKK verileri yüklenirken hata:', err);
       setError('KVKK verileri yüklenirken bir hata oluştu.');
     } finally {
       setLoading(false);
@@ -133,7 +137,7 @@ export const useKVKK = (): UseKVKKReturn => {
         await kvkkConsentService.grantConsent(user.id, type, purpose, legalBasis, validityDays);
         await loadConsents(); // Güncel verileri yükle
       } catch (err) {
-        console.error('Rıza verme hatası:', err);
+        errorInDev('Rıza verme hatası:', err);
         setError('Rıza verilirken bir hata oluştu.');
         throw err;
       }
@@ -151,7 +155,7 @@ export const useKVKK = (): UseKVKKReturn => {
         await kvkkConsentService.withdrawConsent(user.id, type);
         await loadConsents(); // Güncel verileri yükle
       } catch (err) {
-        console.error('Rıza geri çekme hatası:', err);
+        errorInDev('Rıza geri çekme hatası:', err);
         setError('Rıza geri çekilirken bir hata oluştu.');
         throw err;
       }
@@ -225,7 +229,7 @@ export const useKVKK = (): UseKVKKReturn => {
         [{ text: 'Tamam' }],
       );
     } catch (err) {
-      console.error('Veri dışa aktarma hatası:', err);
+      errorInDev('Veri dışa aktarma hatası:', err);
       setError('Veri dışa aktarılırken bir hata oluştu.');
       throw err;
     }
@@ -254,7 +258,7 @@ export const useKVKK = (): UseKVKKReturn => {
                 await kvkkConsentService.deleteUserData(user.id);
                 resolve();
               } catch (err) {
-                console.error('Veri silme hatası:', err);
+                errorInDev('Veri silme hatası:', err);
                 setError('Veri silinirken bir hata oluştu.');
                 reject(err);
               }
@@ -276,7 +280,7 @@ export const useKVKK = (): UseKVKKReturn => {
         await kvkkConsentService.updateKVKKSettings(user.id, updatedSettings);
         setSettings(updatedSettings);
       } catch (err) {
-        console.error('KVKK ayarları güncelleme hatası:', err);
+        errorInDev('KVKK ayarları güncelleme hatası:', err);
         setError('Ayarlar güncellenirken bir hata oluştu.');
         throw err;
       }

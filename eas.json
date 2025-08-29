@@ -32,12 +32,10 @@
     "production": {
       "channel": "production",
       "android": {
-        "buildType": "app-bundle",
-        "resourceClass": "large",
-        "autoIncrement": true
+        "buildType": "apk",
+        "resourceClass": "medium"
       },
       "ios": {
-        "autoIncrement": true,
         "buildConfiguration": "Release",
         "resourceClass": "m-medium"
       },

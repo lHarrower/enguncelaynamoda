@@ -1,7 +1,9 @@
 # Denetim Özeti
+
 Oluşturulma: 2025-08-23T16:39:07.451Z
 
 ## Toplamlar
+
 ```json
 {
   "medium": 231,
@@ -10,12 +12,14 @@ Oluşturulma: 2025-08-23T16:39:07.451Z
 ```
 
 ## Kapılar
+
 - [BAŞARISIZ] coverage statements 84.22% < 85.0%
 - [BAŞARISIZ] coverage branches 61.73% < 70.0%
 - [BAŞARISIZ] coverage lines 84.22% < 85.0%
 - [BAŞARISIZ] coverage functions 69.96% < 80.0%
 
 ## Kalite Metrikleri
+
 ```json
 {
   "eslintErrors": 231,
@@ -27,15 +31,19 @@ Oluşturulma: 2025-08-23T16:39:07.451Z
 ```
 
 ## Lisans Politikası
+
 Reddedilen lisanslar: 0
 
 ## Gizli Bilgi Taraması
+
 Tespit edilen gizli bilgiler: 0
 
 ## Risk Kabulü
+
 Kabul edilen bulgular: 0
 
 ## Değişimler
+
 ```json
 {
   "coverageStatementsPct": 0
@@ -43,11 +51,13 @@ Kabul edilen bulgular: 0
 ```
 
 ## Güvenlik Paketleri (kabul edilmemiş)
+
 ```json
 {}
 ```
 
 ## Performans Metrikleri
+
 ```json
 {
   "startup": {
@@ -71,6 +81,7 @@ Kabul edilen bulgular: 0
 ```
 
 ## Erişilebilirlik Metrikleri
+
 ```json
 {
   "contrastIssues": 0
@@ -79,28 +90,29 @@ Kabul edilen bulgular: 0
 
 ## En Önemli 20 Bulgu
 
-| Önem Derecesi | Kategori | Açıklama | Dosya |
-|---------|----------|-------------|------|
-| medium | quality | prettier/prettier - Delete `··` | app\(app)\_layout.tsx |
-| medium | quality | prettier/prettier - Replace `·name="language-outline"·size={22}·color={DesignSystem.colors.text.primary}` with `⏎··················name="language-outline"⏎··················size={22}⏎··················color={DesignSystem.colors.text.primary}⏎···············` | app\(app)\settings.tsx |
-| medium | quality | prettier/prettier - Delete `····` | app\_layout.tsx |
-| medium | quality | prettier/prettier - Replace `error` with `(error)` | app\_layout.tsx |
-| medium | quality | prettier/prettier - Insert `,` | lighthouserc.js |
-| medium | quality | prettier/prettier - Insert `,` | lighthouserc.js |
-| medium | quality | prettier/prettier - Insert `,` | lighthouserc.js |
-| medium | quality | prettier/prettier - Delete `········` | lighthouserc.js |
-| medium | quality | prettier/prettier - Replace `'interactive'` with `interactive` | lighthouserc.js |
-| medium | quality | prettier/prettier - Delete `········` | lighthouserc.js |
-| medium | quality | prettier/prettier - Delete `········` | lighthouserc.js |
-| medium | quality | prettier/prettier - Insert `,` | lighthouserc.js |
-| medium | quality | prettier/prettier - Insert `,` | lighthouserc.js |
-| medium | quality | prettier/prettier - Insert `,` | lighthouserc.js |
-| medium | quality | prettier/prettier - Insert `,` | lighthouserc.js |
-| medium | quality | prettier/prettier - Insert `,` | lighthouserc.js |
-| medium | quality | prettier/prettier - Insert `⏎` | lighthouserc.js |
-| medium | quality | simple-import-sort/imports - Run autofix to sort these imports! | src\components\animated\AnimatedComponents.tsx |
-| medium | quality | prettier/prettier - Replace `·{·translateX:·Animated.AnimatedAddition·}` with `⏎····/·{·translateX:·Animated.AnimatedAddition·}⏎···` | src\components\animated\PageTransitions.tsx |
-| medium | quality | simple-import-sort/imports - Run autofix to sort these imports! | src\components\debug\PerformanceOverlay.tsx |
+| Önem Derecesi | Kategori | Açıklama                                                                                                                                                                                                                                                           | Dosya                                          |
+| ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| medium        | quality  | prettier/prettier - Delete `··`                                                                                                                                                                                                                                    | app\(app)\_layout.tsx                          |
+| medium        | quality  | prettier/prettier - Replace `·name="language-outline"·size={22}·color={DesignSystem.colors.text.primary}` with `⏎··················name="language-outline"⏎··················size={22}⏎··················color={DesignSystem.colors.text.primary}⏎···············` | app\(app)\settings.tsx                         |
+| medium        | quality  | prettier/prettier - Delete `····`                                                                                                                                                                                                                                  | app_layout.tsx                                 |
+| medium        | quality  | prettier/prettier - Replace `error` with `(error)`                                                                                                                                                                                                                 | app_layout.tsx                                 |
+| medium        | quality  | prettier/prettier - Insert `,`                                                                                                                                                                                                                                     | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Insert `,`                                                                                                                                                                                                                                     | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Insert `,`                                                                                                                                                                                                                                     | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Delete `········`                                                                                                                                                                                                                              | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Replace `'interactive'` with `interactive`                                                                                                                                                                                                     | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Delete `········`                                                                                                                                                                                                                              | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Delete `········`                                                                                                                                                                                                                              | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Insert `,`                                                                                                                                                                                                                                     | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Insert `,`                                                                                                                                                                                                                                     | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Insert `,`                                                                                                                                                                                                                                     | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Insert `,`                                                                                                                                                                                                                                     | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Insert `,`                                                                                                                                                                                                                                     | lighthouserc.js                                |
+| medium        | quality  | prettier/prettier - Insert `⏎`                                                                                                                                                                                                                                     | lighthouserc.js                                |
+| medium        | quality  | simple-import-sort/imports - Run autofix to sort these imports!                                                                                                                                                                                                    | src\components\animated\AnimatedComponents.tsx |
+| medium        | quality  | prettier/prettier - Replace `·{·translateX:·Animated.AnimatedAddition·}` with `⏎····/·{·translateX:·Animated.AnimatedAddition·}⏎···`                                                                                                                               | src\components\animated\PageTransitions.tsx    |
+| medium        | quality  | simple-import-sort/imports - Run autofix to sort these imports!                                                                                                                                                                                                    | src\components\debug\PerformanceOverlay.tsx    |
 
 ---
+
 Tüm bulgular: master-report.json dosyasına bakın

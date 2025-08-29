@@ -4,10 +4,10 @@
 import * as Haptics from 'expo-haptics';
 import { Animated, Easing } from 'react-native';
 
-import { fireAndForget } from '../utils/asyncUtils';
+import { fireAndForget } from '@/utils/asyncUtils';
 // import { DesignSystem } from '../theme/DesignSystem';
 // import { logInDev, errorInDev } from '../utils/consoleSuppress';
-import { errorInDev } from '../utils/consoleSuppress';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 export interface TransitionConfig {
   duration: number;

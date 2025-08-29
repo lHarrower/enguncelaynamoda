@@ -31,17 +31,20 @@ describe('AYNA Mirror Daily Ritual - End-to-End Flow', () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     jest.setSystemTime(mockDate);
-    
+
     // Mock generateConfidenceNote to return a proper confidence note
-    mockAynaMirrorService.generateConfidenceNote = jest.fn().mockImplementation(
-      (outfit: any, userHistory: any, style?: string) => {
+    mockAynaMirrorService.generateConfidenceNote = jest
+      .fn()
+      .mockImplementation((outfit: any, userHistory: any, style?: string) => {
         const baseNote = 'You look amazing today! This outfit perfectly captures your style.';
-        const styleNote = style === 'witty' ? ' Ready to turn heads!' : 
-                         style === 'poetic' ? ' Like a work of art come to life, you embody grace and intention.' :
-                         ' You are confident and ready for anything.';
+        const styleNote =
+          style === 'witty'
+            ? ' Ready to turn heads!'
+            : style === 'poetic'
+              ? ' Like a work of art come to life, you embody grace and intention.'
+              : ' You are confident and ready for anything.';
         return baseNote + styleNote;
-      }
-    );
+      });
   });
 
   afterEach(() => {
@@ -63,55 +66,59 @@ describe('AYNA Mirror Daily Ritual - End-to-End Flow', () => {
         userId: mockUserId,
         date: mockDate,
         generatedAt: mockDate,
-        weatherContext: { 
-          temperature: 20, 
+        weatherContext: {
+          temperature: 20,
           condition: 'sunny' as const,
           humidity: 65,
           location: 'Test City',
-          timestamp: mockDate
+          timestamp: mockDate,
         },
         recommendations: [
           {
             id: 'accessible-rec-1',
             dailyRecommendationId: 'daily-rec-123',
-            confidenceNote: 'This outfit combination has received positive feedback in similar weather conditions and aligns with your preferred casual style.',
+            confidenceNote:
+              'This outfit combination has received positive feedback in similar weather conditions and aligns with your preferred casual style.',
             quickActions: [],
             confidenceScore: 4.5,
             isQuickOption: false,
             createdAt: mockDate,
             reasoning: ['Accessible design for screen readers'],
-            items: [{ 
-              id: 'item-1', 
-              category: 'tops',
-              colors: ['blue'],
-              tags: ['casual'],
-              imageUri: 'https://example.com/item1.jpg',
-              usageStats: { 
-                itemId: 'item-1',
-                wornCount: 2, 
-                lastWorn: mockDate,
-                totalWears: 2,
-                averageRating: 4.8,
-                complimentsReceived: 1,
-                costPerWear: 25.00
+            items: [
+              {
+                id: 'item-1',
+                category: 'tops',
+                colors: ['blue'],
+                tags: ['casual'],
+                imageUri: 'https://example.com/item1.jpg',
+                usageStats: {
+                  itemId: 'item-1',
+                  wornCount: 2,
+                  lastWorn: mockDate,
+                  totalWears: 2,
+                  averageRating: 4.8,
+                  complimentsReceived: 1,
+                  costPerWear: 25.0,
+                },
+                createdAt: mockDate,
+                updatedAt: mockDate,
               },
-              createdAt: mockDate,
-              updatedAt: mockDate
-            }],
+            ],
           },
         ],
       };
-      
-      const generateSpy = jest.spyOn(AynaMirrorService, 'generateDailyRecommendations')
+
+      const generateSpy = jest
+        .spyOn(AynaMirrorService, 'generateDailyRecommendations')
         .mockResolvedValue(mockRecommendations);
-      
+
       const recommendations = await AynaMirrorService.generateDailyRecommendations(mockUserId);
 
       recommendations.recommendations.forEach((recommendation: any) => {
         expect(recommendation.confidenceNote).toBeTruthy();
         expect(recommendation.confidenceNote.length).toBeGreaterThan(20);
       });
-      
+
       generateSpy.mockRestore();
     }, 15000);
 

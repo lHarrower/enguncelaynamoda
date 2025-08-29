@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 import { useHapticFeedback } from '@/hooks/useHapticFeedback';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 export interface AddItemButtonProps {
   onPress: () => void;
@@ -98,16 +99,16 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   disabledButton: {
-    backgroundColor: '#9CA3AF',
+    backgroundColor: DesignSystem.colors.neutral[400],
     elevation: 0,
     shadowOpacity: 0,
   },
   disabledText: {
-    color: '#D1D5DB',
+    color: DesignSystem.colors.neutral[300],
   },
   floatingButton: {
     alignItems: 'center',
-    backgroundColor: '#3B82F6',
+    backgroundColor: DesignSystem.colors.primary[500],
     borderRadius: 28,
     bottom: 24,
     elevation: 8,
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     right: 24,
-    shadowColor: '#000',
+    shadowColor: DesignSystem.colors.neutral[900],
     shadowOffset: {
       width: 0,
       height: 4,
@@ -125,19 +126,19 @@ const styles = StyleSheet.create({
     width: 56,
   },
   floatingButtonIcon: {
-    color: '#FFFFFF',
+    color: DesignSystem.colors.text.inverse,
     fontSize: 24,
     fontWeight: 'bold',
   },
   primaryButton: {
     alignItems: 'center',
-    backgroundColor: '#3B82F6',
+    backgroundColor: DesignSystem.colors.primary[500],
     borderRadius: 12,
     elevation: 8,
     justifyContent: 'center',
     paddingHorizontal: 24,
     paddingVertical: 16,
-    shadowColor: '#3B82F6',
+    shadowColor: DesignSystem.colors.primary[500],
     shadowOffset: {
       width: 0,
       height: 4,
@@ -146,14 +147,14 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: DesignSystem.colors.text.inverse,
     fontSize: 16,
     fontWeight: '600',
   },
   secondaryButton: {
     alignItems: 'center',
     backgroundColor: 'transparent',
-    borderColor: '#3B82F6',
+    borderColor: DesignSystem.colors.primary[500],
     borderRadius: 12,
     borderWidth: 2,
     justifyContent: 'center',
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   secondaryButtonText: {
-    color: '#3B82F6',
+    color: DesignSystem.colors.primary[500],
     fontSize: 16,
     fontWeight: '600',
   },

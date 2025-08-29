@@ -10,6 +10,7 @@ By downloading, installing, or using the AYNA MODA mobile application ("App"), y
 ## 2. Description of Service
 
 AYNA MODA is a personal styling and wardrobe management application that provides:
+
 - AI-powered outfit recommendations
 - Personal wardrobe organization
 - Weather-based styling suggestions
@@ -19,11 +20,13 @@ AYNA MODA is a personal styling and wardrobe management application that provide
 ## 3. User Accounts
 
 ### 3.1 Account Creation
+
 - You must provide accurate and complete information when creating an account
 - You are responsible for maintaining the confidentiality of your account credentials
 - You must be at least 13 years old to use the App
 
 ### 3.2 Account Security
+
 - You are responsible for all activities that occur under your account
 - Notify us immediately of any unauthorized use of your account
 - We reserve the right to suspend or terminate accounts that violate these Terms
@@ -31,11 +34,13 @@ AYNA MODA is a personal styling and wardrobe management application that provide
 ## 4. User Content
 
 ### 4.1 Your Content
+
 - You retain ownership of photos and content you upload to the App
 - By uploading content, you grant us a license to use, store, and process it to provide our services
 - You represent that you have the right to upload and share your content
 
 ### 4.2 Content Guidelines
+
 - Do not upload inappropriate, offensive, or illegal content
 - Do not upload content that infringes on others' intellectual property rights
 - We reserve the right to remove content that violates these guidelines
@@ -43,11 +48,13 @@ AYNA MODA is a personal styling and wardrobe management application that provide
 ## 5. Subscription Services
 
 ### 5.1 Premium Features
+
 - Certain features require a paid subscription
 - Subscription fees are charged in advance on a recurring basis
 - Prices are subject to change with 30 days' notice
 
 ### 5.2 Billing and Cancellation
+
 - Subscriptions automatically renew unless cancelled
 - You may cancel your subscription at any time through your device's app store
 - Refunds are subject to the app store's refund policy
@@ -55,11 +62,13 @@ AYNA MODA is a personal styling and wardrobe management application that provide
 ## 6. Intellectual Property
 
 ### 6.1 Our Rights
+
 - The App and its content are protected by copyright, trademark, and other laws
 - We retain all rights to our proprietary technology and algorithms
 - You may not copy, modify, or distribute our intellectual property
 
 ### 6.2 Third-Party Content
+
 - The App may include content from third parties
 - Third-party content is subject to their respective terms and conditions
 
@@ -72,6 +81,7 @@ AYNA MODA is a personal styling and wardrobe management application that provide
 ## 8. Prohibited Uses
 
 You may not:
+
 - Use the App for any illegal or unauthorized purpose
 - Attempt to gain unauthorized access to our systems
 - Interfere with or disrupt the App's functionality
@@ -81,11 +91,13 @@ You may not:
 ## 9. Disclaimers
 
 ### 9.1 Service Availability
+
 - The App is provided "as is" without warranties of any kind
 - We do not guarantee uninterrupted or error-free service
 - We may modify or discontinue features at any time
 
 ### 9.2 Style Recommendations
+
 - AI recommendations are for entertainment and inspiration purposes
 - We do not guarantee the accuracy or suitability of style suggestions
 - Fashion choices are personal and subjective
@@ -104,10 +116,12 @@ You may not:
 ## 12. Termination
 
 ### 12.1 By You
+
 - You may stop using the App at any time
 - You may delete your account through the App settings
 
 ### 12.2 By Us
+
 - We may suspend or terminate your access for violations of these Terms
 - We may discontinue the App with reasonable notice
 
@@ -131,22 +145,26 @@ You may not:
 ## 16. Contact Information
 
 For questions about these Terms, contact us at:
+
 - **Email:** legal@aynamoda.app
 - **Address:** [Company Address - To be updated before launch]
 
 ## 17. Additional Terms for Specific Regions
 
 ### 17.1 European Union Users
+
 - You have additional rights under EU consumer protection laws
 - You may withdraw from purchases within 14 days (subject to exceptions)
 - We comply with GDPR requirements for data protection
 
 ### 17.2 California Users
+
 - You have rights under the California Consumer Privacy Act (CCPA)
 - You may request information about data collection and sharing
 - You may request deletion of personal information
 
 ### 17.3 Turkish Users
+
 - We comply with the Personal Data Protection Law (KVKK)
 - You have rights regarding your personal data processing
 - Data processing is based on explicit consent or legitimate interests

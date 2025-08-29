@@ -39,7 +39,7 @@ function buildMarkdown(): string {
 function run() {
   const readmePath = 'README.md';
   if (!existsSync(readmePath)) {
-    console.error('README.md bulunamadı');
+    
     process.exit(0);
   }
   const raw = readFileSync(readmePath, 'utf8');
@@ -50,7 +50,7 @@ function run() {
   if (raw.includes(startMarker) && raw.includes(endMarker)) {
     const updated = raw.replace(new RegExp(`${startMarker}[\s\S]*?${endMarker}`), blockContent);
     writeFileSync(readmePath, updated, 'utf8');
-    console.log('README.md dosyasındaki denetim rozetleri bloğu güncellendi');
+    
   } else {
     // Insert after H1 title (first blank line after # ...)
     const lines = raw.split(/\r?\n/);
@@ -67,7 +67,7 @@ function run() {
     }
     lines.splice(insertIndex, 0, '', blockContent, '');
     writeFileSync(readmePath, lines.join('\n'), 'utf8');
-    console.log('README.md dosyasına denetim rozetleri bloğu eklendi');
+    
   }
 }
 

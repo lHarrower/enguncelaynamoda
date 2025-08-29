@@ -6,8 +6,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Dimensions, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { DesignSystem } from '../../theme/DesignSystem';
-import { logInDev } from '../../utils/consoleSuppress';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { logInDev } from '@/utils/consoleSuppress';
+
 import EditorialBentoGallery, { type BentoItem } from './EditorialBentoGallery';
 import InteractiveTotem, { type TotemFacet } from './InteractiveTotem';
 import InvisibleNavigation from './InvisibleNavigation';

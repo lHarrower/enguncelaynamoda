@@ -5,6 +5,7 @@ import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'rea
 
 const { width } = Dimensions.get('window');
 
+import { DesignSystem } from '@/theme/DesignSystem';
 import { WardrobeItem } from '@/types/aynaMirror';
 
 interface WardrobeItemCardProps {
@@ -105,7 +106,7 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
           <View style={styles.brandSection}>
             <Text style={styles.sanctuaryBrandText}>{brandName}</Text>
             <View style={styles.mindfulBadge}>
-              <Ionicons name="leaf-outline" size={10} color="#8B7355" />
+              <Ionicons name="leaf-outline" size={10} color={DesignSystem.colors.primary[700]} />
             </View>
           </View>
 
@@ -126,7 +127,9 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
               <Ionicons
                 name={isFavorite ? 'heart' : 'heart-outline'}
                 size={16}
-                color={isFavorite ? '#A67C52' : '#8B7355'}
+                color={
+                  isFavorite ? DesignSystem.colors.primary[600] : DesignSystem.colors.primary[700]
+                }
               />
             </TouchableOpacity>
           )}
@@ -144,7 +147,7 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
           {/* AI Analysis Indicator */}
           {showAIAnalysis && item.aiAnalysisData && (
             <View style={styles.aiAnalysisIndicator}>
-              <Ionicons name="sparkles" size={12} color="#A67C52" />
+              <Ionicons name="sparkles" size={12} color={DesignSystem.colors.primary[600]} />
               <Text style={styles.aiConfidenceText}>
                 {Math.round((item.aiAnalysisData.confidence || 0) * 100)}%
               </Text>
@@ -162,10 +165,10 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
             {/* AI Analysis Data */}
             {showAIAnalysis && item.aiAnalysisData && (
               <View style={styles.aiAnalysisContainer}>
-                {(item.aiAnalysisData as any)?.style && (
+                {(item.aiAnalysisData as any).style && (
                   <Text style={styles.aiAnalysisText}>{(item.aiAnalysisData as any).style}</Text>
                 )}
-                {(item.aiAnalysisData as any)?.occasion && (
+                {(item.aiAnalysisData as any).occasion && (
                   <Text style={styles.aiOccasionText}>{(item.aiAnalysisData as any).occasion}</Text>
                 )}
               </View>
@@ -174,7 +177,7 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
             {/* Mindful Color Palette */}
             {item.colors && item.colors.length > 0 && (
               <View style={styles.sanctuaryColorsContainer}>
-                {item.colors.slice(0, 3).map((color, index) => (
+                {item.colors.slice(0, 3).map((color: string, index: number) => (
                   <View
                     key={index}
                     style={[styles.sanctuaryColorDot, { backgroundColor: color.toLowerCase() }]}
@@ -199,11 +202,11 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
         {showUsageStats && item.usageStats && (
           <View style={styles.usageStatsSection}>
             <View style={styles.usageStatItem}>
-              <Ionicons name="refresh-outline" size={12} color="#8B7355" />
+              <Ionicons name="refresh-outline" size={12} color={DesignSystem.colors.primary[700]} />
               <Text style={styles.usageStatText}>{item.usageStats.totalWears} times</Text>
             </View>
             <View style={styles.usageStatItem}>
-              <Ionicons name="time-outline" size={12} color="#8B7355" />
+              <Ionicons name="time-outline" size={12} color={DesignSystem.colors.primary[700]} />
               <Text style={styles.usageStatText}>
                 {formatLastWorn(item.lastWorn || item.usageStats.lastWorn)}
               </Text>
@@ -215,7 +218,11 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
         {isSelected && (
           <View style={styles.sanctuarySelectionOverlay}>
             <View style={styles.sanctuarySelectionIndicator}>
-              <Ionicons name="checkmark-circle" size={20} color="#A67C52" />
+              <Ionicons
+                name="checkmark-circle"
+                size={20}
+                color={DesignSystem.colors.primary[600]}
+              />
             </View>
           </View>
         )}
@@ -241,20 +248,20 @@ const styles = StyleSheet.create({
     top: 10,
   },
   aiAnalysisText: {
-    color: '#8B7355',
-    fontSize: 9,
+    color: DesignSystem.colors.primary[700],
+    fontSize: DesignSystem.typography.sizes.xs,
     fontStyle: 'italic',
-    fontWeight: '500',
+    fontWeight: DesignSystem.typography.weights.medium,
   },
   aiConfidenceText: {
-    color: '#A67C52',
-    fontSize: 8,
-    fontWeight: '600',
+    color: DesignSystem.colors.primary[600],
+    fontSize: DesignSystem.typography.sizes.xs,
+    fontWeight: DesignSystem.typography.weights.semiBold,
   },
   aiOccasionText: {
-    color: '#A67C52',
-    fontSize: 8,
-    fontWeight: '400',
+    color: DesignSystem.colors.primary[600],
+    fontSize: DesignSystem.typography.sizes.xs,
+    fontWeight: DesignSystem.typography.weights.normal,
     marginTop: 1,
   },
   brandSection: {
@@ -270,52 +277,52 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   mindfulBadge: {
-    backgroundColor: 'rgba(139, 115, 85, 0.1)',
-    borderRadius: 8,
-    marginLeft: 5,
-    padding: 2,
+    backgroundColor: DesignSystem.colors.primary[100],
+    borderRadius: DesignSystem.borderRadius.sm,
+    marginLeft: DesignSystem.spacing.xs,
+    padding: DesignSystem.spacing.xs,
   },
   moreColorsText: {
-    color: '#8B7355',
-    fontSize: 8,
-    fontWeight: '500',
-    marginLeft: 2,
+    color: DesignSystem.colors.primary[700],
+    fontSize: DesignSystem.typography.sizes.xs,
+    fontWeight: DesignSystem.typography.weights.medium,
+    marginLeft: DesignSystem.spacing.xs,
   },
   sanctuaryBrandText: {
-    color: '#8B7355',
-    fontFamily: 'System',
-    fontSize: 10,
-    fontWeight: '700',
+    color: DesignSystem.colors.primary[700],
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.xs,
+    fontWeight: DesignSystem.typography.weights.bold,
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
   sanctuaryCard: {
     aspectRatio: 0.75,
-    backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(139, 115, 85, 0.1)',
-    borderRadius: 24,
+    backgroundColor: DesignSystem.colors.background.primary,
+    borderColor: DesignSystem.colors.primary[100],
+    borderRadius: DesignSystem.borderRadius.xl,
     borderWidth: 0.5,
     elevation: 8,
-    marginBottom: 16,
+    marginBottom: DesignSystem.spacing.md,
     overflow: 'hidden',
-    shadowColor: '#8B7355',
+    shadowColor: DesignSystem.colors.shadow.primary,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 16,
   },
   sanctuaryCategoryLabel: {
-    backgroundColor: 'rgba(139, 115, 85, 0.85)',
-    borderRadius: 12,
-    left: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: DesignSystem.colors.primary[700] + 'D9',
+    borderRadius: DesignSystem.borderRadius.md,
+    left: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.sm,
+    paddingVertical: DesignSystem.spacing.xs,
     position: 'absolute',
-    top: 10,
+    top: DesignSystem.spacing.sm,
   },
   sanctuaryCategoryText: {
-    color: '#FFFFFF',
-    fontSize: 9,
-    fontWeight: '600',
+    color: DesignSystem.colors.text.inverse,
+    fontSize: DesignSystem.typography.sizes.xs,
+    fontWeight: DesignSystem.typography.weights.semiBold,
     letterSpacing: 0.5,
     textTransform: 'capitalize',
   },
@@ -371,21 +378,21 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   sanctuaryItemName: {
-    color: '#2D2D2D',
-    fontFamily: 'System',
-    fontSize: 12,
-    fontWeight: '600',
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.sm,
+    fontWeight: DesignSystem.typography.weights.semiBold,
     lineHeight: 16,
-    marginBottom: 6,
+    marginBottom: DesignSystem.spacing.xs,
   },
   sanctuaryPriceContainer: {
     alignItems: 'flex-end',
   },
   sanctuaryPriceText: {
-    color: '#8B7355',
-    fontFamily: 'System',
-    fontSize: 14,
-    fontWeight: '700',
+    color: DesignSystem.colors.primary[700],
+    fontFamily: DesignSystem.typography.fontFamily.body,
+    fontSize: DesignSystem.typography.sizes.md,
+    fontWeight: DesignSystem.typography.weights.bold,
   },
   sanctuarySelectionIndicator: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -408,9 +415,9 @@ const styles = StyleSheet.create({
     top: 0,
   },
   selectedCard: {
-    borderColor: '#A67C52',
+    borderColor: DesignSystem.colors.primary[600],
     borderWidth: 2,
-    shadowColor: '#A67C52',
+    shadowColor: DesignSystem.colors.primary[600],
     shadowOpacity: 0.2,
     transform: [{ scale: 1.01 }],
   },
@@ -420,16 +427,16 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   usageStatText: {
-    color: '#8B7355',
-    fontSize: 9,
-    fontWeight: '500',
+    color: DesignSystem.colors.primary[700],
+    fontSize: DesignSystem.typography.sizes.xs,
+    fontWeight: DesignSystem.typography.weights.medium,
   },
   usageStatsSection: {
-    borderTopColor: 'rgba(139, 115, 85, 0.2)',
+    borderTopColor: DesignSystem.colors.primary[200],
     borderTopWidth: 0.5,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: 8,
+    paddingTop: DesignSystem.spacing.sm,
   },
 });
 

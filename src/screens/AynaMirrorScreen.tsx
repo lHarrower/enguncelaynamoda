@@ -20,7 +20,15 @@ import { MirrorHeader } from '@/components/shared/MirrorHeader';
 import { MirrorLoadingState } from '@/components/shared/MirrorLoadingState';
 import { QuickActionsSection } from '@/components/shared/QuickActionsSection';
 import { RecommendationsList } from '@/components/shared/RecommendationsList';
-import { AynaMirrorService } from '@/services/aynaMirrorService';
+// Lazy load heavy services for better startup performance
+let AynaMirrorService: any = null;
+const getAynaMirrorService = async () => {
+  if (!AynaMirrorService) {
+    const { AynaMirrorService: Service } = await import('@/services/aynaMirrorService');
+    AynaMirrorService = Service;
+  }
+  return AynaMirrorService;
+};
 import { AynamodaColors } from '@/theme/AynamodaColors';
 import { DailyRecommendations, OutfitRecommendation } from '@/types/aynaMirror';
 
@@ -109,7 +117,8 @@ export const AynaMirrorScreen: React.FC<AynaMirrorScreenProps> = ({ userId = 'te
       setLoading(true);
       setError(null);
 
-      const recommendations = await AynaMirrorService.generateDailyRecommendations(userId);
+      const service = await getAynaMirrorService();
+      const recommendations = await service.generateDailyRecommendations(userId);
 
       if (!isMountedRef.current) {
         return;
@@ -158,18 +167,18 @@ export const AynaMirrorScreen: React.FC<AynaMirrorScreenProps> = ({ userId = 'te
           [{ text: 'Got it!', style: 'default' }],
         );
         // Fire-and-forget logging
-        void AynaMirrorService.logOutfitAsWorn(recommendation).catch((e) =>
-          errorInDev('logOutfitAsWorn failed', e),
-        );
+        void getAynaMirrorService()
+          .then((service) => service.logOutfitAsWorn(recommendation))
+          .catch((e) => errorInDev('logOutfitAsWorn failed', e));
       } else if (action === 'save') {
         Alert.alert(
           'Saved! 💫',
           'This outfit has been added to your favorites for future inspiration.',
           [{ text: 'Perfect', style: 'default' }],
         );
-        void AynaMirrorService.saveOutfitToFavorites(recommendation).catch((e) =>
-          errorInDev('saveOutfitToFavorites failed', e),
-        );
+        void getAynaMirrorService()
+          .then((service) => service.saveOutfitToFavorites(recommendation))
+          .catch((e) => errorInDev('saveOutfitToFavorites failed', e));
       } else if (action === 'share') {
         Alert.alert(
           'Share Your Style! ✨',
@@ -177,7 +186,8 @@ export const AynaMirrorScreen: React.FC<AynaMirrorScreenProps> = ({ userId = 'te
           [{ text: "Can't wait!", style: 'default' }],
         );
         try {
-          AynaMirrorService.generateShareableOutfit(recommendation);
+          const service = await getAynaMirrorService();
+          service.generateShareableOutfit(recommendation);
         } catch (e: unknown) {
           errorInDev('generateShareableOutfit failed', e instanceof Error ? e : String(e));
         }
@@ -196,7 +206,8 @@ export const AynaMirrorScreen: React.FC<AynaMirrorScreenProps> = ({ userId = 'te
       return;
     }
     try {
-      await AynaMirrorService.logOutfitAsWorn(recommendation);
+      const service = await getAynaMirrorService();
+      await service.logOutfitAsWorn(recommendation);
       if (!isMountedRef.current) {
         return;
       }
@@ -220,7 +231,8 @@ export const AynaMirrorScreen: React.FC<AynaMirrorScreenProps> = ({ userId = 'te
       return;
     }
     try {
-      await AynaMirrorService.saveOutfitToFavorites(recommendation);
+      const service = await getAynaMirrorService();
+      await service.saveOutfitToFavorites(recommendation);
       if (!isMountedRef.current) {
         return;
       }
@@ -244,7 +256,8 @@ export const AynaMirrorScreen: React.FC<AynaMirrorScreenProps> = ({ userId = 'te
       return;
     }
     try {
-      await AynaMirrorService.generateShareableOutfit(recommendation);
+      const service = await getAynaMirrorService();
+      await service.generateShareableOutfit(recommendation);
       if (!isMountedRef.current) {
         return;
       }
@@ -308,7 +321,7 @@ export const AynaMirrorScreen: React.FC<AynaMirrorScreenProps> = ({ userId = 'te
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  const [cameraRef, setCameraRef] = useState<any>(null);
+  const [cameraRef, setCameraRef] = useState<CameraView | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [flashMode, setFlashMode] = useState<FlashMode>('auto');
 

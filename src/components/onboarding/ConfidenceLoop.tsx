@@ -5,11 +5,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Dimensions,
+  ImageStyle,
   Modal,
   StyleSheet,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 
 import { DesignSystem } from '@/theme/DesignSystem';
@@ -241,8 +244,8 @@ export default function ConfidenceLoop({
         <Text style={styles.promiseTitle}>Your Style Journey Begins</Text>
 
         <Text style={styles.promiseText}>
-          Every choice you make teaches us more about your unique style. Tomorrow&apos;s recommendations
-          will be even more perfectly tailored to you.
+          Every choice you make teaches us more about your unique style. Tomorrow&apos;s
+          recommendations will be even more perfectly tailored to you.
         </Text>
 
         <View style={styles.promiseFeatures}>

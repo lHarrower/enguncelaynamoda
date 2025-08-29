@@ -12,8 +12,7 @@ import Animated, {
 
 import { Outfit } from '@/data/sanctuaryModels';
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { errorInDev, warnInDev } from '../../utils/consoleSuppress';
+import { errorInDev, warnInDev } from '@/utils/consoleSuppress';
 
 // Animation configurations for React Native Reanimated
 const SPRING_CONFIG = {
@@ -35,10 +34,126 @@ interface AynaOutfitCardV2Props {
   showFavoriteButton?: boolean;
 }
 
+// Helper function to calculate responsive dimensions
+const calculateDimensions = (screenWidth: number, screenHeight: number) => {
+  const isTablet = screenWidth > 768;
+  const isLandscape = screenWidth > screenHeight;
+
+  // Adaptive card width with maximum constraints
+  const maxCardWidth = isTablet ? 400 : 350;
+  const cardWidth = Math.min(screenWidth - DesignSystem.spacing.xl * 2, maxCardWidth);
+
+  // Adaptive aspect ratio for different devices
+  const aspectRatio = isTablet ? (isLandscape ? 1.1 : 1.2) : 1.3;
+  const cardHeight = cardWidth * aspectRatio;
+
+  return {
+    cardWidth,
+    cardHeight,
+    isTablet,
+    isLandscape,
+  };
+};
+
+// Custom hook for image state management
+const useImageState = (
+  imageOpacity: Animated.SharedValue<number>,
+  overlayOpacity: Animated.SharedValue<number>,
+) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    setImageError(false);
+    imageOpacity.value = withTiming(1, { duration: 800 });
+    overlayOpacity.value = withTiming(1, { duration: 1000 });
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoaded(false);
+    // Still show overlay for fallback state
+    overlayOpacity.value = withTiming(1, { duration: 500 });
+  };
+
+  return {
+    imageLoaded,
+    imageError,
+    handleImageLoad,
+    handleImageError,
+  };
+};
+
+// Custom hook for press animations
+const usePressAnimations = (
+  pressScale: Animated.SharedValue<number>,
+  onPress: () => void,
+  onFavorite?: () => void,
+) => {
+  const handlePressIn = () => {
+    pressScale.value = withSpring(0.98, SPRING_CONFIG);
+  };
+
+  const handlePressOut = () => {
+    pressScale.value = withSpring(1, SPRING_CONFIG);
+  };
+
+  const handlePress = () => {
+    try {
+      pressScale.value = withSpring(0.95, LIQUID_SPRING_CONFIG);
+      setTimeout(() => {
+        pressScale.value = withSpring(1, LIQUID_SPRING_CONFIG);
+      }, 150);
+      onPress();
+    } catch (error) {
+      errorInDev('Error in outfit card press:', error instanceof Error ? error : String(error));
+    }
+  };
+
+  const handleFavoritePress = () => {
+    try {
+      onFavorite?.();
+    } catch (error) {
+      errorInDev('Error in favorite press:', error instanceof Error ? error : String(error));
+    }
+  };
+
+  return {
+    handlePressIn,
+    handlePressOut,
+    handlePress,
+    handleFavoritePress,
+  };
+};
+
+// Custom hook for animated styles
+const useAnimatedStyles = (
+  pressScale: Animated.SharedValue<number>,
+  imageOpacity: Animated.SharedValue<number>,
+  overlayOpacity: Animated.SharedValue<number>,
+) => {
+  const animatedCardStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pressScale.value }],
+  }));
+
+  const animatedImageStyle = useAnimatedStyle(() => ({
+    opacity: imageOpacity.value,
+  }));
+
+  const animatedOverlayStyle = useAnimatedStyle(() => ({
+    opacity: overlayOpacity.value,
+  }));
+
+  return {
+    animatedCardStyle,
+    animatedImageStyle,
+    animatedOverlayStyle,
+  };
+};
+
 export const AynaOutfitCardV2: React.FC<AynaOutfitCardV2Props> = React.memo(
   ({ outfit, onPress, onFavorite, showFavoriteButton = true }) => {
-    const [imageLoaded, setImageLoaded] = useState(false);
-    const [imageError, setImageError] = useState(false);
     const pressScale = useSharedValue(1);
     const imageOpacity = useSharedValue(0);
     const overlayOpacity = useSharedValue(0);
@@ -46,87 +161,31 @@ export const AynaOutfitCardV2: React.FC<AynaOutfitCardV2Props> = React.memo(
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
     // Responsive dimensions with breakpoints
-    const dimensions = useMemo(() => {
-      const isTablet = screenWidth > 768;
-      const isLandscape = screenWidth > screenHeight;
-
-      // Adaptive card width with maximum constraints
-      const maxCardWidth = isTablet ? 400 : 350;
-      const cardWidth = Math.min(screenWidth - DesignSystem.spacing.xl * 2, maxCardWidth);
-
-      // Adaptive aspect ratio for different devices
-      const aspectRatio = isTablet ? (isLandscape ? 1.1 : 1.2) : 1.3;
-      const cardHeight = cardWidth * aspectRatio;
-
-      return {
-        cardWidth,
-        cardHeight,
-        isTablet,
-        isLandscape,
-      };
-    }, [screenWidth, screenHeight]);
+    const dimensions = useMemo(
+      () => calculateDimensions(screenWidth, screenHeight),
+      [screenWidth, screenHeight],
+    );
 
     const mainImage = outfit.items[0]?.imageUrl;
 
     // Memoized styles for performance
     const styles = useMemo(() => createStyles(dimensions), [dimensions]);
 
-    // Animation for card press
-    const animatedCardStyle = useAnimatedStyle(() => ({
-      transform: [{ scale: pressScale.value }],
-    }));
-
-    // Animation for image fade-in
-    const animatedImageStyle = useAnimatedStyle(() => ({
-      opacity: imageOpacity.value,
-    }));
-
-    // Animation for overlay fade-in
-    const animatedOverlayStyle = useAnimatedStyle(() => ({
-      opacity: overlayOpacity.value,
-    }));
-
-    const handlePressIn = () => {
-      pressScale.value = withSpring(0.98, SPRING_CONFIG);
-    };
-
-    const handlePressOut = () => {
-      pressScale.value = withSpring(1, SPRING_CONFIG);
-    };
-
-    const handleImageLoad = () => {
-      setImageLoaded(true);
-      setImageError(false);
-      imageOpacity.value = withTiming(1, { duration: 800 });
-      overlayOpacity.value = withTiming(1, { duration: 1000 });
-    };
-
-    const handleImageError = () => {
-      setImageError(true);
-      setImageLoaded(false);
-      // Still show overlay for fallback state
-      overlayOpacity.value = withTiming(1, { duration: 500 });
-    };
-
-    const handlePress = () => {
-      try {
-        pressScale.value = withSpring(0.95, LIQUID_SPRING_CONFIG);
-        setTimeout(() => {
-          pressScale.value = withSpring(1, LIQUID_SPRING_CONFIG);
-        }, 150);
-        onPress();
-      } catch (error) {
-        errorInDev('Error in outfit card press:', error instanceof Error ? error : String(error));
-      }
-    };
-
-    const handleFavoritePress = () => {
-      try {
-        onFavorite?.();
-      } catch (error) {
-        errorInDev('Error in favorite press:', error instanceof Error ? error : String(error));
-      }
-    };
+    // Custom hooks for state and animations
+    const { imageLoaded, imageError, handleImageLoad, handleImageError } = useImageState(
+      imageOpacity,
+      overlayOpacity,
+    );
+    const { handlePressIn, handlePressOut, handlePress, handleFavoritePress } = usePressAnimations(
+      pressScale,
+      onPress,
+      onFavorite,
+    );
+    const { animatedCardStyle, animatedImageStyle, animatedOverlayStyle } = useAnimatedStyles(
+      pressScale,
+      imageOpacity,
+      overlayOpacity,
+    );
 
     return (
       <Animated.View style={[styles.cardContainer, animatedCardStyle]}>

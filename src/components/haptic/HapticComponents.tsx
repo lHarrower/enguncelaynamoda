@@ -27,8 +27,8 @@ import {
   useHaptic,
   useNavigationHaptic,
   useWardrobeHaptic,
-} from '../../hooks/useHaptic';
-import { HapticType } from '../../services/HapticService';
+} from '@/hooks/useHaptic';
+import { HapticType } from '@/services/HapticService';
 
 /**
  * Haptic Button Component

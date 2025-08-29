@@ -1,8 +1,8 @@
-import { supabase } from '../config/supabaseClient';
-import type { WardrobeItem } from '../services/wardrobeService';
-import * as WardrobeModule from '../services/wardrobeService';
-import { errorInDev } from '../utils/consoleSuppress';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
+import { supabase } from '@/config/supabaseClient';
+import type { WardrobeItem } from '@/services/wardrobeService';
+import * as WardrobeModule from '@/services/wardrobeService';
+import { errorInDev, warnInDev } from '@/utils/consoleSuppress';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
 
 export interface ShopYourClosetRecommendation {
   id: string;
@@ -156,8 +156,8 @@ class AntiConsumptionService {
    */
   async calculateCostPerWear(itemId: string): Promise<CostPerWearData> {
     try {
-      const itemQuery = supabase.from('wardrobe_items').select('*').eq('id', itemId) as any;
-      const itemRes = await wrap(async () => (await itemQuery.single()) as any);
+      const itemQuery = supabase.from('wardrobe_items').select('*').eq('id', itemId);
+      const itemRes = await wrap(async () => await itemQuery.single());
       if (!isSupabaseOk(itemRes)) {
         throw itemRes.error;
       }
@@ -166,8 +166,8 @@ class AntiConsumptionService {
       const usageQuery = supabase
         .from('outfit_feedback')
         .select('created_at')
-        .contains('item_ids', [itemId]) as any;
-      const usageRes = await wrap(async () => (await usageQuery) as any);
+        .contains('item_ids', [itemId]);
+      const usageRes = await wrap(async () => await usageQuery);
       if (!isSupabaseOk(usageRes)) {
         throw usageRes.error;
       }
@@ -224,7 +224,7 @@ class AntiConsumptionService {
       const challenge = this.generateChallenge(userId, challengeType, neglectedItems);
 
       // Store challenge in database
-      const { data, error } = (await supabase
+      const { data, error } = await supabase
         .from('rediscovery_challenges')
         .insert([
           {
@@ -237,19 +237,20 @@ class AntiConsumptionService {
             reward: challenge.reward,
             expires_at: challenge.expiresAt.toISOString(),
           },
-        ] as any)
+        ])
         .select()
-        .single()) as any;
+        .single();
 
       if (error) {
         throw error;
       }
 
+      const dataWithId = data as { id: string; created_at: string };
       return {
         ...challenge,
-        id: data.id,
+        id: dataWithId.id,
         progress: 0,
-        createdAt: new Date(data.created_at),
+        createdAt: new Date(dataWithId.created_at),
       };
     } catch (error) {
       errorInDev(
@@ -273,22 +274,23 @@ class AntiConsumptionService {
       const endDate = new Date(year, month, 0);
 
       // Get outfit feedback for the month
-      const { data: feedbackData, error: feedbackError } = (await supabase
+      const { data: feedbackData, error: feedbackError } = await supabase
         .from('outfit_feedback')
         .select('*')
         .eq('user_id', userId)
         .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString())) as any;
+        .lte('created_at', endDate.toISOString());
 
       if (feedbackError) {
         throw feedbackError;
       }
 
       // Calculate metrics
-      const totalOutfitsRated = feedbackData?.length || 0;
+      const feedbackArray = Array.isArray(feedbackData) ? feedbackData : [];
+      const totalOutfitsRated = feedbackArray.length || 0;
       const averageConfidenceRating =
         totalOutfitsRated > 0
-          ? feedbackData.reduce(
+          ? (feedbackArray as OutfitFeedback[]).reduce(
               (sum: number, feedback: OutfitFeedback) => sum + feedback.confidence_rating,
               0,
             ) / totalOutfitsRated
@@ -300,19 +302,20 @@ class AntiConsumptionService {
       const prevStartDate = new Date(prevYear, prevMonth - 1, 1);
       const prevEndDate = new Date(prevYear, prevMonth, 0);
 
-      const { data: prevFeedbackData } = (await supabase
+      const { data: prevFeedbackData } = await supabase
         .from('outfit_feedback')
         .select('confidence_rating')
         .eq('user_id', userId)
         .gte('created_at', prevStartDate.toISOString())
-        .lte('created_at', prevEndDate.toISOString())) as any;
+        .lte('created_at', prevEndDate.toISOString());
 
+      const prevFeedbackArray = Array.isArray(prevFeedbackData) ? prevFeedbackData : [];
       const prevAverageRating =
-        prevFeedbackData && prevFeedbackData.length > 0
-          ? prevFeedbackData.reduce(
+        prevFeedbackArray.length > 0
+          ? (prevFeedbackArray as OutfitFeedback[]).reduce(
               (sum: number, feedback: OutfitFeedback) => sum + feedback.confidence_rating,
               0,
-            ) / prevFeedbackData.length
+            ) / prevFeedbackArray.length
           : 0;
 
       const confidenceImprovement = averageConfidenceRating - prevAverageRating;
@@ -326,7 +329,7 @@ class AntiConsumptionService {
       const wardrobeItems: WardrobeItem[] = Array.isArray(fetchedItems) ? fetchedItems : [];
       const usedItems = new Set();
 
-      feedbackData?.forEach((feedback: OutfitFeedback) => {
+      (feedbackData as OutfitFeedback[])?.forEach((feedback: OutfitFeedback) => {
         if (feedback.item_ids) {
           feedback.item_ids.forEach((itemId: string) => usedItems.add(itemId));
         }
@@ -349,7 +352,7 @@ class AntiConsumptionService {
 
       // Get most and least confident items
       const itemConfidenceMap = new Map();
-      feedbackData?.forEach((feedback: OutfitFeedback) => {
+      (feedbackData as OutfitFeedback[])?.forEach((feedback: OutfitFeedback) => {
         if (feedback.item_ids) {
           feedback.item_ids.forEach((itemId: string) => {
             if (!itemConfidenceMap.has(itemId)) {
@@ -413,7 +416,7 @@ class AntiConsumptionService {
       const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;
 
       // Get purchase data from wardrobe items
-      const { data: currentMonthPurchases, error: currentError } = (await supabase
+      const { data: currentMonthPurchases, error: currentError } = await supabase
         .from('wardrobe_items')
         .select('purchase_date, purchase_price')
         .eq('user_id', userId)
@@ -421,28 +424,27 @@ class AntiConsumptionService {
           'purchase_date',
           new Date(currentYear, currentMonth - 1, 1).toISOString().split('T')[0],
         )
-        .lte(
-          'purchase_date',
-          new Date(currentYear, currentMonth, 0).toISOString().split('T')[0],
-        )) as any;
+        .lte('purchase_date', new Date(currentYear, currentMonth, 0).toISOString().split('T')[0]);
 
       if (currentError) {
         throw currentError;
       }
 
-      const { data: prevMonthPurchases, error: prevError } = (await supabase
+      const { data: prevMonthPurchases, error: prevError } = await supabase
         .from('wardrobe_items')
         .select('purchase_date, purchase_price')
         .eq('user_id', userId)
         .gte('purchase_date', new Date(prevYear, prevMonth - 1, 1).toISOString().split('T')[0])
-        .lte('purchase_date', new Date(prevYear, prevMonth, 0).toISOString().split('T')[0])) as any;
+        .lte('purchase_date', new Date(prevYear, prevMonth, 0).toISOString().split('T')[0]);
 
       if (prevError) {
         throw prevError;
       }
 
-      const monthlyPurchases = currentMonthPurchases?.length || 0;
-      const previousMonthPurchases = prevMonthPurchases?.length || 0;
+      const currentArray = Array.isArray(currentMonthPurchases) ? currentMonthPurchases : [];
+      const prevArray = Array.isArray(prevMonthPurchases) ? prevMonthPurchases : [];
+      const monthlyPurchases = currentArray.length || 0;
+      const previousMonthPurchases = prevArray.length || 0;
 
       const reductionPercentage =
         previousMonthPurchases > 0
@@ -450,13 +452,13 @@ class AntiConsumptionService {
           : 0;
 
       // Calculate streak days (days without purchases)
-      const { data: recentPurchases } = (await supabase
+      const { data: recentPurchases } = await supabase
         .from('wardrobe_items')
         .select('purchase_date')
         .eq('user_id', userId)
         .not('purchase_date', 'is', null)
         .order('purchase_date', { ascending: false })
-        .limit(1)) as any;
+        .limit(1);
 
       const lastPurchaseDate = recentPurchases?.[0]?.purchase_date
         ? new Date(recentPurchases[0].purchase_date)
@@ -467,11 +469,12 @@ class AntiConsumptionService {
         : 0;
 
       // Calculate total savings (estimated)
+      const prevMonthArray = Array.isArray(prevMonthPurchases) ? prevMonthPurchases : [];
       const avgPurchasePrice =
-        prevMonthPurchases?.reduce(
+        prevMonthArray.reduce(
           (sum: number, item: PurchaseItem) => sum + (item.purchase_price || 0),
           0,
-        ) / Math.max(1, prevMonthPurchases?.length || 1);
+        ) / Math.max(1, prevMonthArray.length || 1);
       const totalSavings = Math.max(
         0,
         (previousMonthPurchases - monthlyPurchases) * avgPurchasePrice,
@@ -613,13 +616,13 @@ class AntiConsumptionService {
         return;
       }
 
-      const { error } = (await supabase.from('shop_your_closet_recommendations').insert({
+      const { error } = await supabase.from('shop_your_closet_recommendations').insert({
         user_id: recommendation.userId,
         target_item: recommendation.targetItem,
         similar_item_ids: recommendation.similarOwnedItems.map((item) => item.id),
         confidence_score: recommendation.confidenceScore,
         reasoning: recommendation.reasoning,
-      })) as any;
+      });
 
       if (error) {
         errorInDev(
@@ -638,15 +641,15 @@ class AntiConsumptionService {
   private async getNeglectedItems(userId: string, daysSince: number): Promise<WardrobeItem[]> {
     const cutoffDate = new Date(Date.now() - daysSince * 24 * 60 * 60 * 1000);
     try {
-      const query = supabase.from('wardrobe_items').select('*').eq('user_id', userId) as any;
+      const query = supabase.from('wardrobe_items').select('*').eq('user_id', userId);
       // If .or exists, use it directly
-      const queryWithOr = query as typeof query & { or?: (condition: string) => typeof query };
+      const queryWithOr = query;
       if (typeof queryWithOr.or === 'function') {
         const rawRes = await wrap(
           async () =>
-            (await queryWithOr
+            await queryWithOr
               .or(`last_worn.is.null,last_worn.lt.${cutoffDate.toISOString()}`)
-              .select('*')) as any,
+              .select('*'),
         );
         if (!isSupabaseOk(rawRes)) {
           throw rawRes.error;
@@ -654,7 +657,7 @@ class AntiConsumptionService {
         return (rawRes.data as WardrobeItem[]) || [];
       }
       // Fallback: fetch and filter in-memory for mocked environments
-      const fallbackRes = await wrap(async () => (await query.select('*')) as any);
+      const fallbackRes = await wrap(async () => await query.select('*'));
       if (!isSupabaseOk(fallbackRes)) {
         throw fallbackRes.error;
       }
@@ -739,7 +742,7 @@ class AntiConsumptionService {
         100;
       return Math.max(0, improvement);
     } catch (error) {
-      console.warn('Error calculating cost-per-wear improvement:', error);
+      warnInDev('Error calculating cost-per-wear improvement:', error);
       return 0;
     }
   }
@@ -759,8 +762,80 @@ class AntiConsumptionService {
       const reduction = ((previousPurchases - currentPurchases) / previousPurchases) * 100;
       return Math.max(0, Math.min(100, reduction));
     } catch (error) {
-      console.warn('Error calculating shopping reduction:', error);
+      warnInDev('Error calculating shopping reduction:', error);
       return 0;
+    }
+  }
+
+  /**
+   * Get purchase count for a specific month and year
+   */
+  private async getPurchaseCount(userId: string, month: number, year: number): Promise<number> {
+    try {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
+
+      let query = supabase.from('wardrobe_items').select('id').eq('user_id', userId);
+
+      query = query.gte('created_at', startDate.toISOString());
+      query = query.lte('created_at', endDate.toISOString());
+
+      const { data, error } = await query;
+
+      if (error) {
+        warnInDev('Error fetching purchase count:', error);
+        return 0;
+      }
+
+      const dataArray = Array.isArray(data) ? data : [];
+      return dataArray.length || 0;
+    } catch (error) {
+      warnInDev('Error in getPurchaseCount:', error);
+      return 0;
+    }
+  }
+
+  private async getCostPerWearMetrics(
+    userId: string,
+    month: number,
+    year: number,
+  ): Promise<{ averageCostPerWear: number; totalItems: number }> {
+    try {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
+
+      let query = supabase.from('wardrobe_items').select('price, wear_count').eq('user_id', userId);
+
+      query = query.gte('created_at', startDate.toISOString());
+      query = query.lte('created_at', endDate.toISOString());
+
+      const { data, error } = await query;
+
+      if (error) {
+        errorInDev('Error fetching cost per wear metrics:', error);
+        return { averageCostPerWear: 0, totalItems: 0 };
+      }
+
+      const dataArray = Array.isArray(data) ? data : [];
+      if (dataArray.length === 0) {
+        return { averageCostPerWear: 0, totalItems: 0 };
+      }
+
+      const totalCostPerWear = dataArray.reduce((sum, item) => {
+        const wearCount = item.wear_count || 1;
+        const price = item.price || 0;
+        return sum + price / wearCount;
+      }, 0);
+
+      const averageCostPerWear = totalCostPerWear / dataArray.length;
+
+      return {
+        averageCostPerWear,
+        totalItems: dataArray.length,
+      };
+    } catch (error) {
+      errorInDev('Error calculating cost per wear metrics:', error);
+      return { averageCostPerWear: 0, totalItems: 0 };
     }
   }
 }

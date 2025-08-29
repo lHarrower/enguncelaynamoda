@@ -1,5 +1,7 @@
 import { LogBox } from 'react-native';
 
+import { errorInDev } from './utils/consoleSuppress';
+
 // Quiet noisy dev-time warnings.
 LogBox.ignoreLogs([
   /Require cycle:/,
@@ -10,12 +12,17 @@ LogBox.ignoreLogs([
 // Add development-only global error listeners on web to capture the real error message
 if (__DEV__ && typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
   // Avoid double registration in Fast Refresh
-  const anyWindow = window as any;
+  interface WindowWithConsole extends Window {
+    console: Console;
+    __AYNAMODA_GLOBAL_ERROR_LISTENERS__?: boolean;
+  }
+
+  const anyWindow = window as WindowWithConsole;
   if (!anyWindow.__AYNAMODA_GLOBAL_ERROR_LISTENERS__) {
     anyWindow.__AYNAMODA_GLOBAL_ERROR_LISTENERS__ = true;
 
     window.addEventListener('error', (event) => {
-      console.error('[GlobalError]', {
+      errorInDev('[GlobalError]', {
         message: event.message,
         file: event.filename,
         line: event.lineno,
@@ -27,14 +34,15 @@ if (__DEV__ && typeof window !== 'undefined' && typeof window.addEventListener =
     });
 
     window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
-      const reason: any = event.reason;
+      const reason: unknown = event.reason;
+      const errorReason = reason as Error;
 
-      console.error('[GlobalUnhandledRejection]', {
+      errorInDev('[GlobalUnhandledRejection]', {
         href: window.location?.href,
         type: typeof reason,
         reason,
-        message: reason?.message,
-        stack: reason?.stack,
+        message: errorReason?.message,
+        stack: errorReason?.stack,
       });
     });
   }

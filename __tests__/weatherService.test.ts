@@ -105,7 +105,7 @@ describe('HavaDurumuServisi', () => {
     (errorHandlingService.executeWithRetry as jest.Mock).mockImplementation(
       async (fn: () => Promise<any>) => {
         return await fn();
-      }
+      },
     );
     (errorHandlingService.cacheWeather as jest.Mock).mockResolvedValue(undefined);
     (errorHandlingService.handleWeatherServiceError as jest.Mock).mockResolvedValue({
@@ -129,17 +129,17 @@ describe('HavaDurumuServisi', () => {
     it('güncel hava durumu bağlamını getirmeli ve döndürmeli', async () => {
       // Test getUserLocation directly first
       const locationResult = await (WeatherService as any).getUserLocation();
-      
+
       expect(Location.getCurrentPositionAsync).toHaveBeenCalled();
       expect(locationResult).toEqual({
         latitude: mockLocation.latitude,
         longitude: mockLocation.longitude,
         city: 'New York',
       });
-      
+
       // Now test the full flow
       delete (WeatherService as any).getCurrentWeather;
-      
+
       const result = await WeatherService.getCurrentWeatherContext('user123');
 
       expect(result).toEqual({
@@ -673,7 +673,7 @@ describe('HavaDurumuServisi', () => {
         expect.stringContaining('weather_cache_'),
         expect.stringContaining('"temperature":72'),
       );
-      
+
       // errorHandlingService.cacheWeather should also be called
       expect(errorHandlingService.cacheWeather).toHaveBeenCalledWith(
         'user123',
@@ -688,7 +688,7 @@ describe('HavaDurumuServisi', () => {
         expect.stringContaining('weather_cache_'),
         expect.stringContaining('"temperature":72'),
       );
-      
+
       // errorHandlingService.cacheWeather should also be called
       expect(errorHandlingService.cacheWeather).toHaveBeenCalledWith(
         'user123',
@@ -715,7 +715,9 @@ describe('HavaDurumuServisi', () => {
       global.Date.now = jest.fn(() => mockDate.getTime());
 
       (global.fetch as jest.Mock).mockRejectedValue(new Error('API Error'));
-      (errorHandlingService.executeWithRetry as jest.Mock).mockRejectedValue(new Error('API Error'));
+      (errorHandlingService.executeWithRetry as jest.Mock).mockRejectedValue(
+        new Error('API Error'),
+      );
       (errorHandlingService.handleWeatherServiceError as jest.Mock).mockResolvedValue({
         temperature: 45,
         condition: 'cloudy',
@@ -741,7 +743,9 @@ describe('HavaDurumuServisi', () => {
       global.Date.now = jest.fn(() => mockDate.getTime());
 
       (global.fetch as jest.Mock).mockRejectedValue(new Error('API Error'));
-      (errorHandlingService.executeWithRetry as jest.Mock).mockRejectedValue(new Error('API Error'));
+      (errorHandlingService.executeWithRetry as jest.Mock).mockRejectedValue(
+        new Error('API Error'),
+      );
       (errorHandlingService.handleWeatherServiceError as jest.Mock).mockResolvedValue({
         temperature: 80,
         condition: 'sunny',

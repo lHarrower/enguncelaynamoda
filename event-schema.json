@@ -74,10 +74,10 @@
   "events": {
     "app_launch": {
       "allOf": [
-        {"$ref": "#/definitions/baseEvent"},
+        { "$ref": "#/definitions/baseEvent" },
         {
           "properties": {
-            "eventType": {"const": "app_launch"},
+            "eventType": { "const": "app_launch" },
             "launchType": {
               "type": "string",
               "enum": ["cold_start", "warm_start", "hot_start"]
@@ -93,10 +93,10 @@
     },
     "screen_view": {
       "allOf": [
-        {"$ref": "#/definitions/baseEvent"},
+        { "$ref": "#/definitions/baseEvent" },
         {
           "properties": {
-            "eventType": {"const": "screen_view"},
+            "eventType": { "const": "screen_view" },
             "screenName": {
               "type": "string",
               "enum": [
@@ -112,7 +112,7 @@
                 "auth_login"
               ]
             },
-            "previousScreen": {"type": "string"},
+            "previousScreen": { "type": "string" },
             "timeSpent": {
               "type": "number",
               "description": "Time spent on previous screen in seconds"
@@ -124,10 +124,10 @@
     },
     "user_interaction": {
       "allOf": [
-        {"$ref": "#/definitions/baseEvent"},
+        { "$ref": "#/definitions/baseEvent" },
         {
           "properties": {
-            "eventType": {"const": "user_interaction"},
+            "eventType": { "const": "user_interaction" },
             "interactionType": {
               "type": "string",
               "enum": [
@@ -141,13 +141,13 @@
                 "sort"
               ]
             },
-            "elementId": {"type": "string"},
-            "elementType": {"type": "string"},
+            "elementId": { "type": "string" },
+            "elementType": { "type": "string" },
             "coordinates": {
               "type": "object",
               "properties": {
-                "x": {"type": "number"},
-                "y": {"type": "number"}
+                "x": { "type": "number" },
+                "y": { "type": "number" }
               }
             }
           },
@@ -157,7 +157,7 @@
     },
     "product_interaction": {
       "allOf": [
-        {"$ref": "#/definitions/baseEvent"},
+        { "$ref": "#/definitions/baseEvent" },
         {
           "properties": {
             "eventType": {
@@ -213,10 +213,10 @@
     },
     "ayna_mirror_usage": {
       "allOf": [
-        {"$ref": "#/definitions/baseEvent"},
+        { "$ref": "#/definitions/baseEvent" },
         {
           "properties": {
-            "eventType": {"const": "ayna_mirror_usage"},
+            "eventType": { "const": "ayna_mirror_usage" },
             "action": {
               "type": "string",
               "enum": [
@@ -233,10 +233,10 @@
               "type": "number",
               "description": "Session duration in seconds"
             },
-            "productsTriedCount": {"type": "number"},
+            "productsTriedCount": { "type": "number" },
             "filtersUsed": {
               "type": "array",
-              "items": {"type": "string"}
+              "items": { "type": "string" }
             }
           },
           "required": ["eventType", "action"]
@@ -245,7 +245,7 @@
     },
     "search_interaction": {
       "allOf": [
-        {"$ref": "#/definitions/baseEvent"},
+        { "$ref": "#/definitions/baseEvent" },
         {
           "properties": {
             "eventType": {
@@ -326,7 +326,7 @@
     },
     "error_event": {
       "allOf": [
-        {"$ref": "#/definitions/baseEvent"},
+        { "$ref": "#/definitions/baseEvent" },
         {
           "properties": {
             "eventType": {
@@ -379,10 +379,10 @@
     },
     "performance_metric": {
       "allOf": [
-        {"$ref": "#/definitions/baseEvent"},
+        { "$ref": "#/definitions/baseEvent" },
         {
           "properties": {
-            "eventType": {"const": "performance_metric"},
+            "eventType": { "const": "performance_metric" },
             "metricType": {
               "type": "string",
               "enum": [
@@ -395,12 +395,12 @@
                 "network_usage"
               ]
             },
-            "value": {"type": "number"},
+            "value": { "type": "number" },
             "unit": {
               "type": "string",
               "enum": ["ms", "seconds", "mb", "kb", "percentage"]
             },
-            "context": {"type": "string"}
+            "context": { "type": "string" }
           },
           "required": ["eventType", "metricType", "value", "unit"]
         }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ImageStyle, StyleSheet, TextStyle, View, ViewStyle } from 'react-native';
 
 import NotificationPermissionRequest from '@/components/onboarding/NotificationPermissionRequest';
 import OnboardingWelcome from '@/components/onboarding/OnboardingWelcome';
@@ -50,7 +50,6 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             confidenceNoteStyle: stylePreferences.confidenceNoteStyle,
           }
         : undefined,
-      notifications: notificationPermissionGranted,
       onboardingDate: new Date(),
     };
     onComplete(data);

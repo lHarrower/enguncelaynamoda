@@ -20,6 +20,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 
 import { DesignSystem } from '@/theme/DesignSystem';
@@ -77,7 +78,7 @@ export interface ProductCardProps {
   onLike?: (product: ProductCardData) => void;
 
   /** Custom style */
-  style?: any;
+  style?: ViewStyle;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({

@@ -9,9 +9,9 @@ import React, {
 } from 'react';
 import { AppState, Platform } from 'react-native';
 
+import { ErrorReporting } from '@/services/ErrorReporting';
 import { errorInDev } from '@/utils/consoleSuppress';
 
-import { ErrorReporting } from '../services/ErrorReporting';
 import {
   AppError,
   ErrorCategory,

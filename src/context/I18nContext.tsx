@@ -1,12 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
-import i18n, { availableLocales, setLocale } from '../config/i18n';
+import i18n, { availableLocales, setLocale } from '@/config/i18n';
+import { errorInDev } from '@/utils/consoleSuppress';
+
+interface I18nOptions {
+  [key: string]: string | number | boolean;
+}
 
 interface I18nContextType {
   locale: string;
   setLocale: (locale: string) => Promise<void>;
-  t: (key: string, options?: any) => string;
+  t: (key: string, options?: I18nOptions) => string;
   availableLocales: typeof availableLocales;
   isRTL: boolean;
 }
@@ -36,7 +41,7 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         await changeLocale(localeToUse);
       }
     } catch (error) {
-      console.error('Error initializing locale:', error);
+      errorInDev('Error initializing locale:', error);
       await changeLocale('en'); // Fallback to English
     }
   };
@@ -54,14 +59,12 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       // Save to storage
       await AsyncStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
-
-      console.log(`Locale changed to: ${newLocale}`);
     } catch (error) {
-      console.error('Error changing locale:', error);
+      errorInDev('Error changing locale:', error);
     }
   };
 
-  const t = (key: string, options?: any) => {
+  const t = (key: string, options?: I18nOptions) => {
     return i18n.t(key, options);
   };
 

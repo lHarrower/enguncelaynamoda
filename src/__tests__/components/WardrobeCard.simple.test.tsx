@@ -29,9 +29,7 @@ describe('Simple Test', () => {
   });
 
   it('should render WardrobeCard with minimal props', () => {
-    const { getByTestId } = render(
-      <WardrobeCard item={mockItem} />
-    );
+    const { getByTestId } = render(<WardrobeCard item={mockItem} />);
     expect(getByTestId('wardrobe-card-1')).toBeTruthy();
   });
 });

@@ -5,8 +5,7 @@ import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { useSafeTheme } from '@/hooks/useSafeTheme';
 import { antiConsumptionService, ShoppingBehaviorData } from '@/services/antiConsumptionService';
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { errorInDev } from '../../utils/consoleSuppress';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface ShoppingBehaviorTrackerProps {
   userId: string;
@@ -18,8 +17,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
   onBehaviorTracked,
 }) => {
   const theme = useSafeTheme();
-  const { colors } = theme;
-  const styles = createStyles(colors);
+  const styles = createStyles(DesignSystem.colors);
   const [behaviorData, setBehaviorData] = useState<ShoppingBehaviorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -336,7 +334,8 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
                 color={DesignSystem.colors.primary[500]}
               />
               <Text style={styles.insightText}>
-                Consider using the &quot;Shop Your Closet First&quot; feature before making purchases.
+                Consider using the &quot;Shop Your Closet First&quot; feature before making
+                purchases.
               </Text>
             </View>
           )}
@@ -356,13 +355,7 @@ export const ShoppingBehaviorTracker: React.FC<ShoppingBehaviorTrackerProps> = (
   );
 };
 
-const createStyles = (colors: {
-  background: { primary: string; secondary: string };
-  text: { primary: string; secondary: string };
-  semantic: { error: string; success: string };
-  primary: { [key: number]: string };
-  border: { primary: string };
-}) =>
+const createStyles = (colors: typeof DesignSystem.colors) =>
   StyleSheet.create({
     achievementItem: {
       alignItems: 'center',

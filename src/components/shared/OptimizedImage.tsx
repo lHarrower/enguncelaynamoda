@@ -21,12 +21,11 @@ import {
   ViewStyle,
 } from 'react-native';
 
+import { useLazyLoading } from '@/hooks/useIntersectionObserver';
+import ImageCacheManager from '@/services/imageCacheManager';
+import { PerformanceOptimizationService } from '@/services/performanceOptimizationService';
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { useLazyLoading } from '../../hooks/useIntersectionObserver';
-import ImageCacheManager from '../../services/imageCacheManager';
-import { PerformanceOptimizationService } from '../../services/performanceOptimizationService';
-import { errorInDev, warnInDev } from '../../utils/consoleSuppress';
+import { errorInDev, warnInDev } from '@/utils/consoleSuppress';
 
 interface OptimizedImageProps {
   /** Image source */
@@ -147,6 +146,93 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     };
   }, []);
 
+  const loadLowQualityImage = useCallback(
+    async (sourceUri: string) => {
+      try {
+        const lowQualityCachedUri = await ImageCacheManager.getImage(sourceUri, {
+          priority: priority + 1,
+          quality: 20,
+          maxWidth: maxWidth ? Math.floor(maxWidth / 4) : undefined,
+          maxHeight: maxHeight ? Math.floor(maxHeight / 4) : undefined,
+          format: 'jpg',
+        });
+
+        if (mountedRef.current) {
+          setLowQualityUri(`file://${lowQualityCachedUri}`);
+          setLoadProgress(25);
+
+          Animated.timing(lowQualityFadeAnim, {
+            toValue: 1,
+            duration: 200,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }).start();
+        }
+      } catch (lowQualityError) {
+        warnInDev('Failed to load low quality version:', String(lowQualityError));
+      }
+    },
+    [priority, maxWidth, maxHeight, lowQualityFadeAnim],
+  );
+
+  const loadWithCaching = useCallback(
+    async (sourceUri: string) => {
+      const cachedUri = await ImageCacheManager.getImage(sourceUri, {
+        priority,
+        quality,
+        maxWidth,
+        maxHeight,
+        format: Platform.OS === 'android' ? format : 'jpg',
+      });
+
+      if (mountedRef.current) {
+        setImageUri(`file://${cachedUri}`);
+        setLoadProgress(50);
+      }
+
+      if (enableProgressiveLoading) {
+        await loadLowQualityImage(sourceUri);
+      }
+    },
+    [priority, quality, maxWidth, maxHeight, format, enableProgressiveLoading, loadLowQualityImage],
+  );
+
+  const loadWithoutCaching = useCallback(
+    async (sourceUri: string) => {
+      const optimizedUri = await PerformanceOptimizationService.optimizeImageLoading(sourceUri);
+
+      if (enableProgressiveLoading) {
+        const lowQualityUrl = await PerformanceOptimizationService.optimizeImageLoading(sourceUri);
+        if (mountedRef.current) {
+          setLowQualityUri(lowQualityUrl);
+          setLoadProgress(25);
+        }
+      }
+
+      if (mountedRef.current) {
+        setImageUri(optimizedUri);
+        setLoadProgress(50);
+      }
+    },
+    [enableProgressiveLoading],
+  );
+
+  const handleLoadError = useCallback(
+    (error: unknown) => {
+      errorInDev('Failed to load optimized image:', String(error));
+      if (mountedRef.current) {
+        setHasError(true);
+        setIsLoading(false);
+        onError?.({
+          nativeEvent: {
+            error: error as Error,
+          },
+        } as NativeSyntheticEvent<ImageErrorEventData>);
+      }
+    },
+    [onError],
+  );
+
   // Load optimized image with caching
   const loadImage = useCallback(async () => {
     const sourceUri = getSourceUri(source);
@@ -161,90 +247,21 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       onLoadStart?.();
 
       if (enableCaching) {
-        // Use cache manager for optimized loading
-        const cachedUri = await ImageCacheManager.getImage(sourceUri, {
-          priority,
-          quality,
-          maxWidth,
-          maxHeight,
-          format: Platform.OS === 'android' ? format : 'jpg',
-        });
-
-        if (mountedRef.current) {
-          setImageUri(`file://${cachedUri}`);
-          setLoadProgress(50);
-        }
-
-        if (enableProgressiveLoading) {
-          // Load low quality version from cache
-          try {
-            const lowQualityCachedUri = await ImageCacheManager.getImage(sourceUri, {
-              priority: priority + 1,
-              quality: 20,
-              maxWidth: maxWidth ? Math.floor(maxWidth / 4) : undefined,
-              maxHeight: maxHeight ? Math.floor(maxHeight / 4) : undefined,
-              format: 'jpg',
-            });
-
-            if (mountedRef.current) {
-              setLowQualityUri(`file://${lowQualityCachedUri}`);
-              setLoadProgress(25);
-
-              // Animate low quality image in
-              Animated.timing(lowQualityFadeAnim, {
-                toValue: 1,
-                duration: 200,
-                easing: Easing.out(Easing.quad),
-                useNativeDriver: true,
-              }).start();
-            }
-          } catch (lowQualityError) {
-            warnInDev('Failed to load low quality version:', String(lowQualityError));
-          }
-        }
+        await loadWithCaching(sourceUri);
       } else {
-        // Fallback to direct URL optimization
-        const optimizedUri = await PerformanceOptimizationService.optimizeImageLoading(sourceUri);
-
-        if (enableProgressiveLoading) {
-          const lowQualityUrl =
-            await PerformanceOptimizationService.optimizeImageLoading(sourceUri);
-
-          if (mountedRef.current) {
-            setLowQualityUri(lowQualityUrl);
-            setLoadProgress(25);
-          }
-        }
-
-        if (mountedRef.current) {
-          setImageUri(optimizedUri);
-          setLoadProgress(50);
-        }
+        await loadWithoutCaching(sourceUri);
       }
     } catch (error) {
-      errorInDev('Failed to load optimized image:', String(error));
-      if (mountedRef.current) {
-        setHasError(true);
-        setIsLoading(false);
-        onError?.({
-          nativeEvent: {
-            error: error as Error,
-          },
-        } as NativeSyntheticEvent<ImageErrorEventData>);
-      }
+      handleLoadError(error);
     }
   }, [
     shouldLoad,
     getSourceUri(source),
-    quality,
-    maxWidth,
-    maxHeight,
-    format,
-    enableProgressiveLoading,
     enableCaching,
-    priority,
+    loadWithCaching,
+    loadWithoutCaching,
+    handleLoadError,
     onLoadStart,
-    onError,
   ]);
 
   // Load image when conditions are met

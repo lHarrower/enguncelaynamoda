@@ -1,6 +1,7 @@
 # GERÇEK DURUM RAPORU
 
 <!-- AUTO-SUMMARY:START -->
+
 Durum Özeti (otomatik) — 2025-08-23T16:39:08.924Z
 
 Karar: NO-GO
@@ -13,6 +14,7 @@ Nedenler: Coverage eşikleri aşağıda (Statements>=85, Lines>=85, Functions>=8
 - Performans Örnekleri: 0
 
 Kanıtlar:
+
 - Özet: audit/out/SUMMARY.md
 - Trend: audit/out/trend.json
 - Jest: ops/reports/jest.json

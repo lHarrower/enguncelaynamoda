@@ -94,7 +94,7 @@ class PlaceholderReplacer {
    * Main execution function
    */
   async run() {
-    console.log('🔧 AYNAMODA Placeholder Replacement Tool\n');
+    
 
     this.processDirectory(PROJECT_ROOT);
     this.generateReport();
@@ -153,7 +153,7 @@ class PlaceholderReplacer {
           content = content.replace(pattern, replacement);
           fileReplacements += matches.length;
           modified = true;
-          console.log(`   ✓ ${relativePath}: ${description} (${matches.length} replacements)`);
+          
         }
       });
 
@@ -171,29 +171,29 @@ class PlaceholderReplacer {
    * Generate and display report
    */
   generateReport() {
-    console.log('\n📊 Placeholder Replacement Report\n');
+    
 
-    console.log(`✅ Files modified: ${this.filesModified}`);
-    console.log(`🔄 Total replacements: ${this.replacements}`);
+    
+    
 
     if (this.errors.length > 0) {
-      console.log('\n❌ ERRORS:');
+      
       this.errors.forEach((error) => {
-        console.log(`   🔸 ${error}`);
+        
       });
     }
 
     if (this.filesModified > 0) {
-      console.log('\n🎉 Placeholder replacement completed successfully!');
-      console.log('\n📋 NEXT STEPS:');
-      console.log('   1. Review the changes made to ensure they are correct');
-      console.log('   2. Test the application to ensure functionality is preserved');
+      
+      
+      
+      
       console.log(
         '   3. Run the production configuration checker: node scripts/production-config.js',
       );
-      console.log('   4. Commit the changes to version control');
+      
     } else {
-      console.log('\n✨ No placeholders found that need replacement.');
+      
     }
   }
 }

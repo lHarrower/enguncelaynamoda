@@ -2,7 +2,7 @@
 import * as Haptics from 'expo-haptics';
 import { useCallback } from 'react';
 
-import { logInDev } from '../utils/consoleSuppress';
+import { logInDev } from '@/utils/consoleSuppress';
 
 export type HapticFeedbackType =
   | 'light'

@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useI18n } from '../../context/I18nContext';
-import { DesignSystem } from '../../theme/DesignSystem';
+import { useI18n } from '@/context/I18nContext';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface Language {
   code: string;
@@ -62,7 +63,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         [{ text: t('common.done') }],
       );
     } catch (error) {
-      console.error('Error changing language:', error);
+      errorInDev('Error changing language:', error);
       Alert.alert(t('common.error'), t('errors.serverError'), [{ text: t('common.retry') }]);
     } finally {
       setIsChangingLanguage(false);

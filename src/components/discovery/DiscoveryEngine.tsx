@@ -307,7 +307,8 @@ const DiscoveryEngine: React.FC<DiscoveryEngineProps> = ({
         <View style={styles.notificationContainer}>
           <View style={styles.notification}>
             <Text style={styles.notificationText}>
-              You&apos;ve loved {boutiqueNotification.count} pieces from {boutiqueNotification.boutique}
+              You&apos;ve loved {boutiqueNotification.count} pieces from{' '}
+              {boutiqueNotification.boutique}
             </Text>
             <View style={styles.notificationActions}>
               <TouchableOpacity

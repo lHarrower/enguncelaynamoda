@@ -179,7 +179,7 @@ const VisionDiscoverScreen: React.FC = () => {
 const styles = StyleSheet.create({
   actionButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: DesignSystem.colors.background.elevated + 'E6',
     borderRadius: 28,
     height: 56,
     justifyContent: 'center',
@@ -234,11 +234,11 @@ const styles = StyleSheet.create({
   },
 
   loveButton: {
-    backgroundColor: 'rgba(104, 211, 145, 0.1)',
+    backgroundColor: DesignSystem.colors.sage[500] + '1A',
   },
 
   passButton: {
-    backgroundColor: 'rgba(245, 101, 101, 0.1)',
+    backgroundColor: DesignSystem.colors.coral[500] + '1A',
   },
 
   viewStatsButton: {
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   },
 
   viewStatsText: {
-    color: 'white',
+    color: DesignSystem.colors.text.inverse,
     fontWeight: '600',
   },
 });

@@ -1,6 +1,6 @@
 // Database Performance Optimizations
-import { supabase } from '@/config/supabaseClient';
-import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { supabase } from '../config/supabaseClient';
+import { errorInDev, logInDev } from './consoleSuppress';
 
 // Query performance monitoring
 interface QueryMetrics {

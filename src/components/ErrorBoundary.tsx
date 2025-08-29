@@ -11,11 +11,10 @@ import {
   ViewStyle,
 } from 'react-native';
 
+import { BORDER_RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from '@/constants/AppConstants';
 import { DesignSystem } from '@/theme/DesignSystem';
-
-import { BORDER_RADIUS, SHADOWS, SPACING, TYPOGRAPHY } from '../constants/AppConstants';
-import { BaseComponentProps } from '../types/componentProps';
-import { errorInDev } from '../utils/consoleSuppress';
+import { BaseComponentProps } from '@/types/componentProps';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface ErrorBoundaryProps extends BaseComponentProps {
   children: React.ReactNode;
@@ -83,7 +82,9 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
             </View>
 
             <Text style={styles.title}>Oops!</Text>
-            <Text style={styles.message}>Don&apos;t worry, {fallbackMessage} We&apos;re here to help.</Text>
+            <Text style={styles.message}>
+              Don&apos;t worry, {fallbackMessage} We&apos;re here to help.
+            </Text>
 
             {showErrorDetails && this.state.error && (
               <View style={styles.errorDetails}>

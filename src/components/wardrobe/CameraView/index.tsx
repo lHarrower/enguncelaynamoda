@@ -4,7 +4,8 @@ import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { errorInDev } from '../../../utils/consoleSuppress';
+import { DesignSystem } from '@/theme/DesignSystem';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -26,7 +27,7 @@ const CameraView: React.FC<CameraViewProps> = ({
   const [cameraType, setCameraType] = useState<CameraType>('back');
   const [flashMode, setFlashMode] = useState<FlashMode>('off');
   const [isCapturing, setIsCapturing] = useState(false);
-  const cameraRef = useRef<any>(null);
+  const cameraRef = useRef<ExpoCamera | null>(null);
 
   const requestPermissions = useCallback(async () => {
     try {
@@ -169,7 +170,7 @@ const CameraView: React.FC<CameraViewProps> = ({
     return (
       <View style={styles.container}>
         <View style={styles.permissionContainer}>
-          <Ionicons name="camera-outline" size={64} color="#B8918F" />
+          <Ionicons name="camera-outline" size={64} color={DesignSystem.colors.terracotta[400]} />
           <Text style={styles.permissionTitle}>Camera Access Required</Text>
           <Text style={styles.permissionText}>
             To add items to your wardrobe, AYNAMODA needs access to your camera.
@@ -209,7 +210,7 @@ const CameraView: React.FC<CameraViewProps> = ({
             accessibilityLabel="Close camera"
             accessibilityHint="Tap to close camera view"
           >
-            <Ionicons name="close" size={28} color="#FFFFFF" />
+            <Ionicons name="close" size={28} color={DesignSystem.colors.text.inverse} />
           </TouchableOpacity>
 
           <View style={styles.headerTitle}>
@@ -224,7 +225,7 @@ const CameraView: React.FC<CameraViewProps> = ({
             accessibilityLabel={`Flash ${flashMode === 'off' ? 'off' : flashMode === 'on' ? 'on' : 'auto'}`}
             accessibilityHint="Tap to toggle camera flash mode"
           >
-            <Ionicons name={getFlashIcon()} size={24} color="#FFFFFF" />
+            <Ionicons name={getFlashIcon()} size={24} color={DesignSystem.colors.text.inverse} />
           </TouchableOpacity>
         </View>
 
@@ -242,7 +243,7 @@ const CameraView: React.FC<CameraViewProps> = ({
             accessibilityLabel="Select from gallery"
             accessibilityHint="Tap to choose a photo from your gallery"
           >
-            <Ionicons name="images" size={24} color="#FFFFFF" />
+            <Ionicons name="images" size={24} color={DesignSystem.colors.text.inverse} />
             <Text style={styles.controlText}>Gallery</Text>
           </TouchableOpacity>
 
@@ -257,7 +258,7 @@ const CameraView: React.FC<CameraViewProps> = ({
           >
             <View style={styles.captureButtonInner}>
               {isCapturing ? (
-                <Ionicons name="hourglass" size={32} color="#FFFFFF" />
+                <Ionicons name="hourglass" size={32} color={DesignSystem.colors.text.inverse} />
               ) : (
                 <View style={styles.captureButtonDot} />
               )}
@@ -271,7 +272,7 @@ const CameraView: React.FC<CameraViewProps> = ({
             accessibilityLabel="Flip camera"
             accessibilityHint="Tap to switch between front and back camera"
           >
-            <Ionicons name="camera-reverse" size={24} color="#FFFFFF" />
+            <Ionicons name="camera-reverse" size={24} color={DesignSystem.colors.text.inverse} />
             <Text style={styles.controlText}>Flip</Text>
           </TouchableOpacity>
         </View>
@@ -294,8 +295,8 @@ const styles = StyleSheet.create({
   },
   captureButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderColor: '#FFFFFF',
+    backgroundColor: DesignSystem.colors.background.primary + '33',
+    borderColor: DesignSystem.colors.text.inverse,
     borderRadius: 40,
     borderWidth: 4,
     height: 80,
@@ -306,14 +307,14 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   captureButtonDot: {
-    backgroundColor: '#B8918F',
+    backgroundColor: DesignSystem.colors.terracotta[400],
     borderRadius: 12,
     height: 24,
     width: 24,
   },
   captureButtonInner: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: DesignSystem.colors.background.primary,
     borderRadius: 30,
     height: 60,
     justifyContent: 'center',
@@ -324,26 +325,26 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   closeButtonText: {
-    color: '#B8918F',
+    color: DesignSystem.colors.terracotta[400],
     fontSize: 16,
   },
   container: {
-    backgroundColor: '#000000',
+    backgroundColor: DesignSystem.colors.neutral[900],
     flex: 1,
   },
   controlButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: DesignSystem.colors.neutral[900] + '4D',
     borderRadius: 22,
     height: 44,
     justifyContent: 'center',
     width: 44,
   },
   controlText: {
-    color: '#FFFFFF',
+    color: DesignSystem.colors.text.inverse,
     fontSize: 12,
     marginTop: 4,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowColor: DesignSystem.colors.neutral[900] + '80',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
@@ -358,7 +359,7 @@ const styles = StyleSheet.create({
     width: 70,
   },
   guideline: {
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderColor: DesignSystem.colors.text.inverse + '80',
     borderRadius: 16,
     borderStyle: 'dashed',
     borderWidth: 2,
@@ -382,33 +383,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   permissionButton: {
-    backgroundColor: '#B8918F',
+    backgroundColor: DesignSystem.colors.terracotta[400],
     borderRadius: 12,
     marginBottom: 16,
     paddingHorizontal: 32,
     paddingVertical: 16,
   },
   permissionButtonText: {
-    color: '#FFFFFF',
+    color: DesignSystem.colors.text.inverse,
     fontSize: 16,
     fontWeight: 'bold',
   },
   permissionContainer: {
     alignItems: 'center',
-    backgroundColor: '#F2EFE9',
+    backgroundColor: DesignSystem.colors.background.secondary,
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 40,
   },
   permissionText: {
-    color: '#B8918F',
+    color: DesignSystem.colors.terracotta[400],
     fontSize: 16,
     lineHeight: 24,
     marginBottom: 30,
     textAlign: 'center',
   },
   permissionTitle: {
-    color: '#7A6B56',
+    color: DesignSystem.colors.text.primary,
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 12,
@@ -416,19 +417,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subtitleText: {
-    color: '#FFFFFF',
+    color: DesignSystem.colors.text.inverse,
     fontSize: 14,
     marginTop: 4,
     opacity: 0.8,
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowColor: DesignSystem.colors.neutral[900] + '80',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
   titleText: {
-    color: '#FFFFFF',
+    color: DesignSystem.colors.text.inverse,
     fontSize: 18,
     fontWeight: 'bold',
-    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowColor: DesignSystem.colors.neutral[900] + '80',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },

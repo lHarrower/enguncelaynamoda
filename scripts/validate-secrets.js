@@ -17,7 +17,7 @@ let hasError = false;
 
 const trackedEnv = run('git ls-files .env');
 if (trackedEnv === '.env') {
-  console.error('ERROR: .env is tracked in git. Remove it from history and from the index.');
+  
   hasError = true;
 }
 

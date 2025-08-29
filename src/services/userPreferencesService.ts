@@ -1,7 +1,11 @@
 // User Preferences Service - AYNA Mirror Settings Management
 import * as Location from 'expo-location';
 
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { ensureSupabaseOk } from '@/utils/supabaseErrorMapping';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
+
 import {
   EngagementHistory,
   isConfidenceNoteStyle,
@@ -11,9 +15,6 @@ import {
   UserPreferences,
   UserPreferencesRecord,
 } from '../types/aynaMirror';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
-import { ensureSupabaseOk } from '../utils/supabaseErrorMapping';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
 
 /**
  * UserPreferencesService - Manages user settings and preferences for AYNA Mirror
@@ -39,11 +40,7 @@ export class UserPreferencesService {
 
       const res = await wrap(
         async () =>
-          await (supabase as any)
-            .from('user_preferences')
-            .select('*')
-            .eq('user_id', userId)
-            .single(),
+          await supabase.from('user_preferences').select('*').eq('user_id', userId).single(),
       );
 
       if (!isSupabaseOk(res) && (res.error as { code?: string })?.code !== 'PGRST116') {
@@ -100,7 +97,7 @@ export class UserPreferencesService {
       // Upsert to database
       const res = await wrap(
         async () =>
-          await (supabase as any)
+          await supabase
             .from('user_preferences')
             .upsert(record, { onConflict: 'user_id' })
             .select()
@@ -452,11 +449,7 @@ export class UserPreferencesService {
       // Force fetch from database (bypass any caching)
       const res = await wrap(
         async () =>
-          await (supabase as any)
-            .from('user_preferences')
-            .select('*')
-            .eq('user_id', userId)
-            .single(),
+          await supabase.from('user_preferences').select('*').eq('user_id', userId).single(),
       );
 
       if (!isSupabaseOk(res) && (res.error as { code?: string })?.code !== 'PGRST116') {
@@ -498,8 +491,7 @@ export class UserPreferencesService {
       const record = this.convertPreferencesToRecord(defaultPreferences);
 
       const res = await wrap(
-        async () =>
-          await (supabase as any).from('user_preferences').insert(record).select().single(),
+        async () => await supabase.from('user_preferences').insert(record).select().single(),
       );
       const data = ensureSupabaseOk(res, {
         action: 'createDefaultPreferences',
@@ -565,6 +557,67 @@ export class UserPreferencesService {
     const privacyRaw = safeObj(record.privacy_settings);
     const engagementRaw = safeObj(record.engagement_history);
 
+    return {
+      userId: record.user_id,
+      notificationTime: this.parseTimeString(record.notification_time),
+      timezone: typeof record.timezone === 'string' && record.timezone ? record.timezone : 'UTC',
+      stylePreferences: this.convertStylePreferences(record.user_id, styleRaw, record.updated_at),
+      privacySettings: this.convertPrivacySettings(privacyRaw),
+      engagementHistory: this.convertEngagementHistory(engagementRaw),
+      createdAt: new Date(record.created_at),
+      updatedAt: new Date(record.updated_at),
+    };
+  }
+
+  /**
+   * Convert style preferences from database record
+   */
+  private static convertStylePreferences(
+    userId: string,
+    styleRaw: Record<string, unknown>,
+    updatedAt: string,
+  ) {
+    return {
+      userId,
+      preferredColors: this.extractStringArray(styleRaw.preferredColors),
+      preferredStyles: this.extractStringArray(styleRaw.preferredStyles),
+      bodyTypePreferences: this.extractStringArray(styleRaw.bodyTypePreferences),
+      occasionPreferences:
+        typeof styleRaw.occasionPreferences === 'object' && styleRaw.occasionPreferences
+          ? (styleRaw.occasionPreferences as Record<string, number>)
+          : {},
+      confidencePatterns: this.convertConfidencePatterns(styleRaw.confidencePatterns),
+      confidenceNoteStyle: isConfidenceNoteStyle(styleRaw.confidenceNoteStyle)
+        ? styleRaw.confidenceNoteStyle
+        : 'encouraging',
+      lastUpdated: new Date(updatedAt),
+    };
+  }
+
+  /**
+   * Convert privacy settings from database record
+   */
+  private static convertPrivacySettings(privacyRaw: Record<string, unknown>) {
+    return {
+      shareUsageData:
+        typeof privacyRaw.shareUsageData === 'boolean' ? privacyRaw.shareUsageData : false,
+      allowLocationTracking:
+        typeof privacyRaw.allowLocationTracking === 'boolean'
+          ? privacyRaw.allowLocationTracking
+          : true,
+      enableSocialFeatures:
+        typeof privacyRaw.enableSocialFeatures === 'boolean'
+          ? privacyRaw.enableSocialFeatures
+          : true,
+      dataRetentionDays:
+        typeof privacyRaw.dataRetentionDays === 'number' ? privacyRaw.dataRetentionDays : 365,
+    };
+  }
+
+  /**
+   * Convert engagement history from database record
+   */
+  private static convertEngagementHistory(engagementRaw: Record<string, unknown>) {
     const preferredInteractionTimes = Array.isArray(engagementRaw.preferredInteractionTimes)
       ? (engagementRaw.preferredInteractionTimes as unknown[])
           .filter((t): t is string => typeof t === 'string')
@@ -572,100 +625,63 @@ export class UserPreferencesService {
       : [];
 
     return {
-      userId: record.user_id,
-      notificationTime: this.parseTimeString(record.notification_time),
-      timezone: typeof record.timezone === 'string' && record.timezone ? record.timezone : 'UTC',
-      stylePreferences: {
-        userId: record.user_id,
-        preferredColors: Array.isArray(styleRaw.preferredColors)
-          ? (styleRaw.preferredColors as unknown[]).filter(
-              (c): c is string => typeof c === 'string',
-            )
-          : [],
-        preferredStyles: Array.isArray(styleRaw.preferredStyles)
-          ? (styleRaw.preferredStyles as unknown[]).filter(
-              (c): c is string => typeof c === 'string',
-            )
-          : [],
-        bodyTypePreferences: Array.isArray(styleRaw.bodyTypePreferences)
-          ? (styleRaw.bodyTypePreferences as unknown[]).filter(
-              (c): c is string => typeof c === 'string',
-            )
-          : [],
-        occasionPreferences:
-          typeof styleRaw.occasionPreferences === 'object' && styleRaw.occasionPreferences
-            ? (styleRaw.occasionPreferences as Record<string, number>)
-            : {},
-        // Legacy JSON may have stored confidencePatterns as string[]; normalise to ConfidencePattern[] with defaults
-        confidencePatterns: Array.isArray(styleRaw.confidencePatterns)
-          ? (styleRaw.confidencePatterns as unknown[])
-              .filter(
-                (c): c is string | Record<string, unknown> =>
-                  typeof c === 'string' || (c !== null && typeof c === 'object'),
-              )
-              .map((c) => {
-                if (typeof c === 'string') {
-                  return {
-                    itemCombination: [],
-                    averageRating: 0,
-                    contextFactors: [],
-                    emotionalResponse: [c],
-                  };
-                }
-                const obj = c;
-                return {
-                  itemCombination: Array.isArray(obj.itemCombination)
-                    ? (obj.itemCombination as unknown[]).filter(
-                        (v): v is string => typeof v === 'string',
-                      )
-                    : [],
-                  averageRating: typeof obj.averageRating === 'number' ? obj.averageRating : 0,
-                  contextFactors: Array.isArray(obj.contextFactors)
-                    ? (obj.contextFactors as unknown[]).filter(
-                        (v): v is string => typeof v === 'string',
-                      )
-                    : [],
-                  emotionalResponse: Array.isArray(obj.emotionalResponse)
-                    ? (obj.emotionalResponse as unknown[]).filter(
-                        (v): v is string => typeof v === 'string',
-                      )
-                    : [],
-                };
-              })
-          : [],
-        confidenceNoteStyle: isConfidenceNoteStyle(styleRaw.confidenceNoteStyle)
-          ? styleRaw.confidenceNoteStyle
-          : 'encouraging',
-        lastUpdated: new Date(record.updated_at),
-      },
-      privacySettings: {
-        shareUsageData:
-          typeof privacyRaw.shareUsageData === 'boolean' ? privacyRaw.shareUsageData : false,
-        allowLocationTracking:
-          typeof privacyRaw.allowLocationTracking === 'boolean'
-            ? privacyRaw.allowLocationTracking
-            : true,
-        enableSocialFeatures:
-          typeof privacyRaw.enableSocialFeatures === 'boolean'
-            ? privacyRaw.enableSocialFeatures
-            : true,
-        dataRetentionDays:
-          typeof privacyRaw.dataRetentionDays === 'number' ? privacyRaw.dataRetentionDays : 365,
-      },
-      engagementHistory: {
-        totalDaysActive:
-          typeof engagementRaw.totalDaysActive === 'number' ? engagementRaw.totalDaysActive : 0,
-        streakDays: typeof engagementRaw.streakDays === 'number' ? engagementRaw.streakDays : 0,
-        averageRating:
-          typeof engagementRaw.averageRating === 'number' ? engagementRaw.averageRating : 0,
-        lastActiveDate:
-          typeof engagementRaw.lastActiveDate === 'string'
-            ? new Date(engagementRaw.lastActiveDate)
-            : new Date(),
-        preferredInteractionTimes,
-      },
-      createdAt: new Date(record.created_at),
-      updatedAt: new Date(record.updated_at),
+      totalDaysActive:
+        typeof engagementRaw.totalDaysActive === 'number' ? engagementRaw.totalDaysActive : 0,
+      streakDays: typeof engagementRaw.streakDays === 'number' ? engagementRaw.streakDays : 0,
+      averageRating:
+        typeof engagementRaw.averageRating === 'number' ? engagementRaw.averageRating : 0,
+      lastActiveDate:
+        typeof engagementRaw.lastActiveDate === 'string'
+          ? new Date(engagementRaw.lastActiveDate)
+          : new Date(),
+      preferredInteractionTimes,
+    };
+  }
+
+  /**
+   * Extract string array from unknown value
+   */
+  private static extractStringArray(value: unknown): string[] {
+    return Array.isArray(value)
+      ? (value as unknown[]).filter((c): c is string => typeof c === 'string')
+      : [];
+  }
+
+  /**
+   * Convert confidence patterns from database record
+   */
+  private static convertConfidencePatterns(patterns: unknown) {
+    if (!Array.isArray(patterns)) {
+      return [];
+    }
+
+    return (patterns as unknown[])
+      .filter(
+        (c): c is string | Record<string, unknown> =>
+          typeof c === 'string' || (c !== null && typeof c === 'object'),
+      )
+      .map((c) => this.normalizeConfidencePattern(c));
+  }
+
+  /**
+   * Normalize confidence pattern from string or object
+   */
+  private static normalizeConfidencePattern(pattern: string | Record<string, unknown>) {
+    if (typeof pattern === 'string') {
+      return {
+        itemCombination: [],
+        averageRating: 0,
+        contextFactors: [],
+        emotionalResponse: [pattern],
+      };
+    }
+
+    const obj = pattern;
+    return {
+      itemCombination: this.extractStringArray(obj.itemCombination),
+      averageRating: typeof obj.averageRating === 'number' ? obj.averageRating : 0,
+      contextFactors: this.extractStringArray(obj.contextFactors),
+      emotionalResponse: this.extractStringArray(obj.emotionalResponse),
     };
   }
 

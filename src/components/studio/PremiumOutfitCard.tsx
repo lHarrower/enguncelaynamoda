@@ -5,7 +5,15 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 import { DesignSystem } from '@/theme/DesignSystem';
@@ -29,7 +37,7 @@ interface PremiumOutfitCardProps {
   onPress?: () => void;
   onLike?: () => void;
   isLiked?: boolean;
-  style?: any;
+  style?: ViewStyle;
 }
 
 const PremiumOutfitCard: React.FC<PremiumOutfitCardProps> = ({
@@ -238,24 +246,24 @@ const styles = StyleSheet.create({
   },
   likeButton: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 16,
+    backgroundColor: DesignSystem.colors.background.elevated + 'E6',
+    borderRadius: DesignSystem.radius.md,
     height: 32,
     justifyContent: 'center',
     position: 'absolute',
-    right: 12,
-    top: 12,
+    right: DesignSystem.spacing.sm,
+    top: DesignSystem.spacing.sm,
     width: 32,
     ...DesignSystem.elevation.soft,
   },
   confidenceBadge: {
     backgroundColor: DesignSystem.colors.sage[500],
-    borderRadius: 12,
-    left: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    borderRadius: DesignSystem.spacing.sm,
+    left: DesignSystem.spacing.sm,
+    paddingHorizontal: DesignSystem.spacing.xs,
+    paddingVertical: DesignSystem.spacing.xs,
     position: 'absolute',
-    top: 12,
+    top: DesignSystem.spacing.sm,
     ...DesignSystem.elevation.soft,
   },
   confidenceText: {
@@ -272,7 +280,7 @@ const styles = StyleSheet.create({
     padding: DesignSystem.spacing.md,
   },
   titleSection: {
-    marginBottom: 8,
+    marginBottom: DesignSystem.spacing.xs,
   },
   outfitTitle: {
     ...DesignSystem.typography.body.medium,
@@ -287,13 +295,13 @@ const styles = StyleSheet.create({
   // Tags
   tagsContainer: {
     flexDirection: 'row',
-    gap: 6,
-    marginBottom: 8,
+    gap: DesignSystem.spacing.xs,
+    marginBottom: DesignSystem.spacing.xs,
   },
   tag: {
     backgroundColor: DesignSystem.colors.sage[100],
-    borderRadius: 8,
-    paddingHorizontal: 8,
+    borderRadius: DesignSystem.spacing.xs,
+    paddingHorizontal: DesignSystem.spacing.xs,
     paddingVertical: 3,
   },
   tagText: {
@@ -304,13 +312,13 @@ const styles = StyleSheet.create({
 
   // Confidence Bar
   confidenceContainer: {
-    marginBottom: 8,
+    marginBottom: DesignSystem.spacing.xs,
   },
   confidenceBar: {
     backgroundColor: DesignSystem.colors.background.tertiary,
     borderRadius: 2,
     height: 4,
-    marginBottom: 4,
+    marginBottom: DesignSystem.spacing.xs,
     overflow: 'hidden',
   },
   confidenceFill: {
@@ -326,12 +334,12 @@ const styles = StyleSheet.create({
   // Meta Information
   metaContainer: {
     flexDirection: 'row',
-    gap: 12,
+    gap: DesignSystem.spacing.sm,
   },
   metaItem: {
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 4,
+    gap: DesignSystem.spacing.xs,
   },
   metaText: {
     ...DesignSystem.typography.scale.caption,

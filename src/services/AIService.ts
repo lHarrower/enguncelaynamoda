@@ -1,13 +1,14 @@
 // AI Service - Core AI functionality for wardrobe analysis
 
-import { aiProxyChatCompletion, shouldUseAiProxy } from '../config/aiProxy';
-import { visionClient } from '../config/googleVision';
-import { openaiClient } from '../config/openai';
-import { WardrobeCategory, WardrobeColor } from '../types';
-import type { UserProfile } from '../types/user';
-import { errorInDev } from '../utils/consoleSuppress';
-import { isObject, safeParse } from '../utils/safeJSON';
-import { secureStorage } from '../utils/secureStorage';
+import { aiProxyChatCompletion, shouldUseAiProxy } from '@/config/aiProxy';
+import { visionClient } from '@/config/googleVision';
+import { openaiClient } from '@/config/openai';
+import { WardrobeCategory, WardrobeColor } from '@/types';
+import type { UserProfile } from '@/types/user';
+import { errorInDev } from '@/utils/consoleSuppress';
+import { isObject, safeParse } from '@/utils/safeJSON';
+import { secureStorage } from '@/utils/secureStorage';
+
 import type { WardrobeItem } from './wardrobeService';
 
 export interface ImageAnalysis {
@@ -90,7 +91,7 @@ export interface StyleAdvice {
  * ```typescript
  * const aiService = new AIService();
  * const analysis = await aiService.analyzeImage('path/to/image.jpg');
- * console.log(analysis.styleAnalysis.style); // 'casual', 'formal', etc.
+ * // Example: analysis.styleAnalysis.style // 'casual', 'formal', etc.
  * ```
  */
 export class AIService {
@@ -118,9 +119,9 @@ export class AIService {
    * @example
    * ```typescript
    * const analysis = await aiService.analyzeImage('file:///path/to/shirt.jpg');
-   * console.log(analysis.detectedItems); // ['shirt', 'button-up']
-   * console.log(analysis.colorAnalysis.dominantColors); // ['blue', 'white']
-   * console.log(analysis.styleAnalysis.formality); // 'business-casual'
+   * // Example: analysis.detectedItems // ['shirt', 'button-up']
+   * // Example: analysis.colorAnalysis.dominantColors // ['blue', 'white']
+   * // Example: analysis.styleAnalysis.formality // 'business-casual'
    * ```
    */
   async analyzeImage(imageUri: string): Promise<ImageAnalysis> {
@@ -258,9 +259,9 @@ export class AIService {
    * @example
    * ```typescript
    * const detection = await aiService.detectClothingItems('path/to/dress.jpg');
-   * console.log(detection.items[0].name); // 'dress'
-   * console.log(detection.colors); // ['red', 'black']
-   * console.log(detection.text); // ['Nike', 'Size M']
+   * // Example: detection.items[0].name // 'dress'
+   * // Example: detection.colors // ['red', 'black']
+   * // Example: detection.text // ['Nike', 'Size M']
    * ```
    */
   async detectClothingItems(imageUri: string): Promise<ClothingDetection> {
@@ -323,8 +324,8 @@ export class AIService {
    * @example
    * ```typescript
    * const result = await aiService.categorizeItem('blue denim jeans');
-   * console.log(result.category); // 'BOTTOMS'
-   * console.log(result.confidence); // 0.95
+   * // Example: result.category // 'BOTTOMS'
+   * // Example: result.confidence // 0.95
    * ```
    */
   async categorizeItem(itemDescription: string): Promise<CategoryResult> {

@@ -14,7 +14,7 @@ import * as Linking from 'expo-linking';
 import { router } from 'expo-router';
 import { Platform } from 'react-native';
 
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
 
 // Shared discriminated union for notification payload types
 type NotificationType = 'daily_mirror' | 'feedback_prompt' | 're_engagement';

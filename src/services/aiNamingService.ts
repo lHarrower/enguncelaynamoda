@@ -1,5 +1,8 @@
 // AI Naming Service - Automatic wardrobe item naming
-import { supabase } from '../config/supabaseClient';
+import { supabase } from '@/config/supabaseClient';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
+
 import {
   AIAnalysisData,
   ItemCategory,
@@ -14,8 +17,6 @@ import {
   CloudinaryUploadResult,
   isCloudinaryResult,
 } from '../types/external/cloudinary';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
 
 export class AINameingService {
   private static readonly DEFAULT_PREFERENCES: Partial<NamingPreferences> = {
@@ -26,6 +27,9 @@ export class AINameingService {
     includeStyle: true,
     preferredLanguage: 'en',
     autoAcceptAINames: false,
+    userId: '',
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   private static readonly STYLE_TEMPLATES = {
@@ -453,17 +457,30 @@ export class AINameingService {
       }
 
       if (data) {
+        const typedData = data as {
+          user_id: string;
+          naming_style: string;
+          include_brand: boolean;
+          include_color: boolean;
+          include_material: boolean;
+          include_style: boolean;
+          preferred_language: string;
+          auto_accept_ai_names: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+
         return {
-          userId: data.user_id,
-          namingStyle: data.naming_style,
-          includeBrand: data.include_brand,
-          includeColor: data.include_color,
-          includeMaterial: data.include_material,
-          includeStyle: data.include_style,
-          preferredLanguage: data.preferred_language,
-          autoAcceptAINames: data.auto_accept_ai_names,
-          createdAt: new Date(data.created_at),
-          updatedAt: new Date(data.updated_at),
+          userId: typedData.user_id,
+          namingStyle: typedData.naming_style as NamingStyle,
+          includeBrand: typedData.include_brand,
+          includeColor: typedData.include_color,
+          includeMaterial: typedData.include_material,
+          includeStyle: typedData.include_style,
+          preferredLanguage: typedData.preferred_language,
+          autoAcceptAINames: typedData.auto_accept_ai_names,
+          createdAt: new Date(typedData.created_at),
+          updatedAt: new Date(typedData.updated_at),
         };
       }
 
@@ -475,8 +492,8 @@ export class AINameingService {
         error instanceof Error ? error : String(error),
       );
       return {
-        userId,
         ...this.DEFAULT_PREFERENCES,
+        userId,
         createdAt: new Date(),
         updatedAt: new Date(),
       } as NamingPreferences;
@@ -501,17 +518,30 @@ export class AINameingService {
         throw error;
       }
 
+      const typedData = data as {
+        user_id: string;
+        naming_style: string;
+        include_brand: boolean;
+        include_color: boolean;
+        include_material: boolean;
+        include_style: boolean;
+        preferred_language: string;
+        auto_accept_ai_names: boolean;
+        created_at: string;
+        updated_at: string;
+      };
+
       return {
-        userId: data.user_id,
-        namingStyle: data.naming_style,
-        includeBrand: data.include_brand,
-        includeColor: data.include_color,
-        includeMaterial: data.include_material,
-        includeStyle: data.include_style,
-        preferredLanguage: data.preferred_language,
-        autoAcceptAINames: data.auto_accept_ai_names,
-        createdAt: new Date(data.created_at),
-        updatedAt: new Date(data.updated_at),
+        userId: typedData.user_id,
+        namingStyle: typedData.naming_style as NamingStyle,
+        includeBrand: typedData.include_brand,
+        includeColor: typedData.include_color,
+        includeMaterial: typedData.include_material,
+        includeStyle: typedData.include_style,
+        preferredLanguage: typedData.preferred_language,
+        autoAcceptAINames: typedData.auto_accept_ai_names,
+        createdAt: new Date(typedData.created_at),
+        updatedAt: new Date(typedData.updated_at),
       };
     } catch (error) {
       errorInDev(
@@ -554,17 +584,30 @@ export class AINameingService {
         throw error;
       }
 
+      const typedData = data as {
+        user_id: string;
+        naming_style: string;
+        include_brand: boolean;
+        include_color: boolean;
+        include_material: boolean;
+        include_style: boolean;
+        preferred_language: string;
+        auto_accept_ai_names: boolean;
+        created_at: string;
+        updated_at: string;
+      };
+
       return {
-        userId: data.user_id,
-        namingStyle: data.naming_style,
-        includeBrand: data.include_brand,
-        includeColor: data.include_color,
-        includeMaterial: data.include_material,
-        includeStyle: data.include_style,
-        preferredLanguage: data.preferred_language,
-        autoAcceptAINames: data.auto_accept_ai_names,
-        createdAt: new Date(data.created_at),
-        updatedAt: new Date(data.updated_at),
+        userId: typedData.user_id,
+        namingStyle: typedData.naming_style as NamingStyle,
+        includeBrand: typedData.include_brand,
+        includeColor: typedData.include_color,
+        includeMaterial: typedData.include_material,
+        includeStyle: typedData.include_style,
+        preferredLanguage: typedData.preferred_language,
+        autoAcceptAINames: typedData.auto_accept_ai_names,
+        createdAt: new Date(typedData.created_at),
+        updatedAt: new Date(typedData.updated_at),
       };
     } catch (error) {
       errorInDev(

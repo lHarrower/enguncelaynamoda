@@ -1,0 +1,13 @@
+{
+  "targetMigration": "create_user_profiles_table.sql",
+  "rollbackSteps": [
+    "Create backup of current state",
+    "Identify dependent objects",
+    "Generate reverse migration SQL",
+    "Execute rollback in transaction",
+    "Verify data integrity",
+    "Update migration history"
+  ],
+  "riskAssessment": "Medium - affects recent schema changes",
+  "estimatedDowntime": "5-10 minutes"
+}

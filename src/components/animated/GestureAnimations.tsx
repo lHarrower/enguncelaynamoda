@@ -65,6 +65,69 @@ export const Draggable: React.FC<DraggableProps> = ({
     { useNativeDriver: true },
   );
 
+  const handleDragStart = useCallback(() => {
+    if (onDragStart) {
+      onDragStart();
+    }
+    Animated.spring(scale, {
+      toValue: 1.05,
+      ...SPRING.gentle,
+      useNativeDriver: true,
+    }).start();
+  }, [onDragStart, scale]);
+
+  const calculateFinalPosition = useCallback(
+    (translationX: number, translationY: number) => {
+      let finalX = lastOffset.current.x + translationX;
+      let finalY = lastOffset.current.y + translationY;
+
+      if (bounds) {
+        if (bounds.left !== undefined) finalX = Math.max(bounds.left, finalX);
+        if (bounds.right !== undefined) finalX = Math.min(bounds.right, finalX);
+        if (bounds.top !== undefined) finalY = Math.max(bounds.top, finalY);
+        if (bounds.bottom !== undefined) finalY = Math.min(bounds.bottom, finalY);
+      }
+
+      if (snapToGrid) {
+        finalX = Math.round(finalX / gridSize) * gridSize;
+        finalY = Math.round(finalY / gridSize) * gridSize;
+      }
+
+      return { finalX, finalY };
+    },
+    [bounds, snapToGrid, gridSize],
+  );
+
+  const handleDragEnd = useCallback(
+    (translationX: number, translationY: number) => {
+      const { finalX, finalY } = calculateFinalPosition(translationX, translationY);
+      lastOffset.current = { x: finalX, y: finalY };
+
+      Animated.parallel([
+        Animated.spring(translateX, {
+          toValue: finalX,
+          ...SPRING.gentle,
+          useNativeDriver: true,
+        }),
+        Animated.spring(translateY, {
+          toValue: finalY,
+          ...SPRING.gentle,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scale, {
+          toValue: 1,
+          ...SPRING.gentle,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      if (onDragEnd) {
+        onDragEnd(finalX, finalY);
+      }
+    },
+    [calculateFinalPosition, translateX, translateY, scale, onDragEnd],
+  );
+
   const onHandlerStateChange = useCallback(
     (event: PanGestureHandlerGestureEvent) => {
       if (disabled || isReducedMotionEnabled) {
@@ -75,86 +138,15 @@ export const Draggable: React.FC<DraggableProps> = ({
 
       switch (state) {
         case State.BEGAN:
-          if (onDragStart) {
-            onDragStart();
-          }
-
-          // Scale up slightly to indicate drag start
-          Animated.spring(scale, {
-            toValue: 1.05,
-            ...SPRING.gentle,
-            useNativeDriver: true,
-          }).start();
+          handleDragStart();
           break;
-
         case State.END:
         case State.CANCELLED:
-          // Calculate final position
-          let finalX = lastOffset.current.x + translationX;
-          let finalY = lastOffset.current.y + translationY;
-
-          // Apply bounds
-          if (bounds) {
-            if (bounds.left !== undefined) {
-              finalX = Math.max(bounds.left, finalX);
-            }
-            if (bounds.right !== undefined) {
-              finalX = Math.min(bounds.right, finalX);
-            }
-            if (bounds.top !== undefined) {
-              finalY = Math.max(bounds.top, finalY);
-            }
-            if (bounds.bottom !== undefined) {
-              finalY = Math.min(bounds.bottom, finalY);
-            }
-          }
-
-          // Snap to grid if enabled
-          if (snapToGrid) {
-            finalX = Math.round(finalX / gridSize) * gridSize;
-            finalY = Math.round(finalY / gridSize) * gridSize;
-          }
-
-          // Update last offset
-          lastOffset.current = { x: finalX, y: finalY };
-
-          // Animate to final position
-          Animated.parallel([
-            Animated.spring(translateX, {
-              toValue: finalX,
-              ...SPRING.gentle,
-              useNativeDriver: true,
-            }),
-            Animated.spring(translateY, {
-              toValue: finalY,
-              ...SPRING.gentle,
-              useNativeDriver: true,
-            }),
-            Animated.spring(scale, {
-              toValue: 1,
-              ...SPRING.gentle,
-              useNativeDriver: true,
-            }),
-          ]).start();
-
-          if (onDragEnd) {
-            onDragEnd(finalX, finalY);
-          }
+          handleDragEnd(translationX, translationY);
           break;
       }
     },
-    [
-      disabled,
-      isReducedMotionEnabled,
-      onDragStart,
-      onDragEnd,
-      bounds,
-      snapToGrid,
-      gridSize,
-      scale,
-      translateX,
-      translateY,
-    ],
+    [disabled, isReducedMotionEnabled, handleDragStart, handleDragEnd],
   );
 
   if (disabled || isReducedMotionEnabled) {
@@ -220,69 +212,64 @@ export const Swipeable: React.FC<SwipeableProps> = ({
     { useNativeDriver: true },
   );
 
+  const handleHorizontalSwipe = useCallback(
+    (translationX: number) => {
+      if (translationX > 0 && onSwipeRight) {
+        onSwipeRight();
+      } else if (translationX < 0 && onSwipeLeft) {
+        onSwipeLeft();
+      }
+    },
+    [onSwipeRight, onSwipeLeft],
+  );
+
+  const handleVerticalSwipe = useCallback(
+    (translationY: number) => {
+      if (translationY > 0 && onSwipeDown) {
+        onSwipeDown();
+      } else if (translationY < 0 && onSwipeUp) {
+        onSwipeUp();
+      }
+    },
+    [onSwipeDown, onSwipeUp],
+  );
+
+  const resetPosition = useCallback(() => {
+    if (!isReducedMotionEnabled) {
+      Animated.parallel([
+        Animated.spring(translateX, {
+          toValue: 0,
+          ...SPRING.gentle,
+          useNativeDriver: true,
+        }),
+        Animated.spring(translateY, {
+          toValue: 0,
+          ...SPRING.gentle,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [isReducedMotionEnabled, translateX, translateY]);
+
   const onHandlerStateChange = useCallback(
     (event: PanGestureHandlerGestureEvent) => {
-      if (disabled) {
+      if (disabled || event.nativeEvent.state !== State.END) {
         return;
       }
 
-      const {
-        state,
-        translationX,
-        translationY,
-        velocityX: _velocityX,
-        velocityY: _velocityY,
-      } = event.nativeEvent;
+      const { translationX, translationY } = event.nativeEvent;
+      const absX = Math.abs(translationX);
+      const absY = Math.abs(translationY);
 
-      if (state === State.END) {
-        const absX = Math.abs(translationX);
-        const absY = Math.abs(translationY);
-
-        // Determine swipe direction
-        if (absX > absY && absX > threshold) {
-          // Horizontal swipe
-          if (translationX > 0 && onSwipeRight) {
-            onSwipeRight();
-          } else if (translationX < 0 && onSwipeLeft) {
-            onSwipeLeft();
-          }
-        } else if (absY > threshold) {
-          // Vertical swipe
-          if (translationY > 0 && onSwipeDown) {
-            onSwipeDown();
-          } else if (translationY < 0 && onSwipeUp) {
-            onSwipeUp();
-          }
-        }
-
-        // Reset position
-        if (!isReducedMotionEnabled) {
-          Animated.parallel([
-            Animated.spring(translateX, {
-              toValue: 0,
-              ...SPRING.gentle,
-              useNativeDriver: true,
-            }),
-            Animated.spring(translateY, {
-              toValue: 0,
-              ...SPRING.gentle,
-              useNativeDriver: true,
-            }),
-          ]).start();
-        }
+      if (absX > absY && absX > threshold) {
+        handleHorizontalSwipe(translationX);
+      } else if (absY > threshold) {
+        handleVerticalSwipe(translationY);
       }
+
+      resetPosition();
     },
-    [
-      disabled,
-      isReducedMotionEnabled,
-      onSwipeLeft,
-      onSwipeRight,
-      onSwipeUp,
-      onSwipeDown,
-      threshold,
-      translateX,
-      translateY,
-    ],
+    [disabled, threshold, handleHorizontalSwipe, handleVerticalSwipe, resetPosition],
   );
 
   if (disabled || isReducedMotionEnabled) {

@@ -1,13 +1,14 @@
 // Type imports
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { isArrayOf, isObject, safeParse } from '@/utils/safeJSON';
+import { secureStorage } from '@/utils/secureStorage';
+
 import {
   DailyRecommendations,
   OutfitRecommendation,
   WardrobeItem,
   WeatherContext,
 } from '../types/aynaMirror';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
-import { isArrayOf, isObject, safeParse } from '../utils/safeJSON';
-import { secureStorage } from '../utils/secureStorage';
 import { PerformanceOptimizationService } from './performanceOptimizationService';
 
 // Local narrow guard to validate cached wardrobe items without broad any casting

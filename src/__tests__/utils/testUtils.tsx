@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { ThemeProvider } from '@/theme/ThemeProvider';
 import { AnimationProvider } from '@/providers/AnimationProvider';
 import { HapticProvider } from '@/providers/HapticProvider';
-import { ErrorProvider } from '@/providers/ErrorProvider';
+// import { ErrorProvider } from '@/providers/ErrorProvider'; // Mock edilecek
 import { WardrobeProvider } from '@/providers/WardrobeProvider';
 import { AIProvider } from '@/providers/AIProvider';
 import { AppError, ErrorSeverity, ErrorCategory, RecoveryStrategy } from '@/utils/ErrorHandler';
@@ -37,30 +37,33 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   };
 }
 
+// Simple mock provider that just renders children
+const MockProvider = ({ children }: { children: React.ReactNode }) => {
+  return <>{children}</>;
+};
+
+// Mock ErrorProvider for testing
+const MockErrorProvider = MockProvider;
+
 function AllTheProviders({
   children,
   ...props
 }: { children: React.ReactNode } & CustomRenderOptions) {
   const { initialState = {}, navigationOptions = {}, providerProps = {} } = props;
 
-  // Mock provider setup for testing - use simple wrappers that just render children
-  const MockProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-  
   return (
     <NavigationContainer>
-      <MockProvider>
+      <MockErrorProvider>
         <MockProvider>
           <MockProvider>
             <MockProvider>
               <MockProvider>
-                <MockProvider>
-                  {children}
-                </MockProvider>
+                <MockProvider>{children}</MockProvider>
               </MockProvider>
             </MockProvider>
           </MockProvider>
         </MockProvider>
-      </MockProvider>
+      </MockErrorProvider>
     </NavigationContainer>
   );
 }
@@ -121,6 +124,7 @@ export function createMockWardrobeItem(overrides: Partial<TestWardrobeItem> = {}
     styleCompatibility: {},
     confidenceHistory: [],
     nameOverride: false,
+    aiGeneratedName: 'AI Generated Name',
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date('2024-01-01'),
     isFavorite: false,
@@ -162,7 +166,8 @@ export function createMockUser(overrides: Partial<User> = {}): User {
     id: 'test-user-1',
     email: 'test@aynamoda.app',
     name: 'Test User',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    avatar:
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     preferences: {
       theme: 'light',
       notifications: true,
@@ -287,7 +292,10 @@ export const mockApiResponses = {
 /**
  * Mock fetch function
  */
-export function mockFetch(response: any, options: { delay?: number; shouldReject?: boolean } = {}) {
+export function mockFetch(
+  response: Record<string, unknown>,
+  options: { delay?: number; shouldReject?: boolean } = {},
+) {
   const { delay = 0, shouldReject = false } = options;
 
   return jest.fn(

@@ -53,7 +53,7 @@ const utils = {
         ...options,
       }).trim();
     } catch (error) {
-      console.warn(`Command failed: ${command}`);
+      
       return null;
     }
   },
@@ -61,7 +61,7 @@ const utils = {
   writeReport: (filename, data) => {
     const filePath = path.join(CONFIG.outputDir, filename);
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-    console.log(`📊 Report saved: ${filePath}`);
+    
   },
 };
 
@@ -69,11 +69,11 @@ const utils = {
  * Analyze package.json dependencies
  */
 function analyzeDependencies() {
-  console.log('🔍 Analyzing dependencies...');
+  
 
   const packageJsonPath = path.join(CONFIG.projectRoot, 'package.json');
   if (!fs.existsSync(packageJsonPath)) {
-    console.error('❌ package.json not found');
+    
     return null;
   }
 
@@ -207,11 +207,11 @@ function generateDependencyRecommendations(dependencies, packageSizes) {
  * Analyze source code structure
  */
 function analyzeSourceCode() {
-  console.log('📁 Analyzing source code structure...');
+  
 
   const srcPath = path.join(CONFIG.projectRoot, 'src');
   if (!fs.existsSync(srcPath)) {
-    console.warn('⚠️ src directory not found');
+    
     return null;
   }
 
@@ -267,11 +267,11 @@ function analyzeSourceCode() {
  * Analyze Metro bundle
  */
 function analyzeMetroBundle() {
-  console.log('📦 Analyzing Metro bundle...');
+  
 
   try {
     // Use Expo export to generate production bundle
-    console.log('Building production bundle with Expo...');
+    
     const exportCommand = 'npx expo export --platform all --dev false --clear';
 
     utils.runCommand(exportCommand, { cwd: CONFIG.projectRoot });
@@ -305,15 +305,15 @@ function analyzeMetroBundle() {
         distPath,
       };
 
-      console.log(`✅ Total bundle size: ${utils.formatBytes(bundleSize)}`);
+      
 
       utils.writeReport('metro-bundle-analysis.json', analysis);
       return analysis;
     } else {
-      console.warn('⚠️ Dist folder not found after export');
+      
     }
   } catch (error) {
-    console.warn('⚠️ Could not analyze Metro bundle:', error.message);
+    
 
     // Fallback: estimate bundle size from node_modules and src
     try {
@@ -329,11 +329,11 @@ function analyzeMetroBundle() {
         timestamp: new Date().toISOString(),
       };
 
-      console.log(`📊 Estimated bundle size: ${utils.formatBytes(estimatedSize)}`);
+      
       utils.writeReport('metro-bundle-analysis.json', analysis);
       return analysis;
     } catch (fallbackError) {
-      console.error('❌ Failed to estimate bundle size:', fallbackError.message);
+      
     }
   }
 
@@ -498,14 +498,14 @@ For detailed analysis data, check the JSON files in the bundle-analysis director
 `;
 
   fs.writeFileSync(path.join(CONFIG.outputDir, 'SUMMARY.md'), summary);
-  console.log('📋 Summary report saved: bundle-analysis/SUMMARY.md');
+  
 }
 
 /**
  * Main execution
  */
 async function main() {
-  console.log('🚀 Starting bundle analysis...\n');
+  
 
   const analyses = {
     dependencies: analyzeDependencies(),
@@ -513,29 +513,29 @@ async function main() {
     metroBundle: analyzeMetroBundle(),
   };
 
-  console.log('\n📊 Generating comprehensive report...');
+  
   const report = generateReport(analyses);
 
-  console.log('\n✅ Bundle analysis complete!');
-  console.log(`📁 Results saved in: ${CONFIG.outputDir}`);
+  
+  
 
   // Print quick summary
-  console.log('\n📋 Quick Summary:');
-  console.log(`Bundle Size: ${report.summary.bundleSize}`);
-  console.log(`Status: ${report.summary.bundleStatus.level.toUpperCase()}`);
-  console.log(`Recommendations: ${report.recommendations.length}`);
+  
+  
+  
+  
 
   if (report.recommendations.length > 0) {
-    console.log('\n🎯 Top Recommendations:');
+    
     report.recommendations
       .filter((rec) => rec.priority === 'high')
       .slice(0, 3)
       .forEach((rec) => {
-        console.log(`- ${rec.title}`);
+        
       });
   }
 
-  console.log('\n📖 Read the full report: bundle-analysis/SUMMARY.md');
+  
 }
 
 // Run the analysis

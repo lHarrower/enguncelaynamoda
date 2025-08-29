@@ -4,9 +4,9 @@ import 'react-native-url-polyfill/auto';
 
 import { createClient, PostgrestSingleResponse } from '@supabase/supabase-js';
 
-import { errorInDev, warnInDev } from '@/utils/consoleSuppress';
+import { ERROR_MESSAGES } from '@/constants/AppConstants';
 
-import { ERROR_MESSAGES } from '../constants/AppConstants';
+import { errorInDev, warnInDev } from '../utils/consoleSuppress';
 import { secureStorage } from '../utils/secureStorage';
 
 // Environment variables
@@ -79,7 +79,7 @@ try {
 function createSupabaseStub() {
   interface QueryStub {
     select: (columns?: string) => QueryStub;
-    insert: (data?: Record<string, unknown>) => QueryStub;
+    insert: (data?: Record<string, unknown> | Record<string, unknown>[]) => QueryStub;
     upsert: (data?: Record<string, unknown>) => QueryStub;
     update: (data?: Record<string, unknown>) => QueryStub;
     delete: () => QueryStub;
@@ -87,15 +87,32 @@ function createSupabaseStub() {
     order: (column?: string, options?: Record<string, unknown>) => QueryStub;
     limit: (count?: number) => QueryStub;
     lt: (column?: string, value?: unknown) => QueryStub;
-    single: () => Promise<PostgrestSingleResponse<any>>;
+    gte: (column?: string, value?: unknown) => QueryStub;
+    lte: (column?: string, value?: unknown) => QueryStub;
+    range: (from?: number, to?: number) => QueryStub;
+    or: (query?: string) => QueryStub;
+    in: (column?: string, values?: unknown[]) => QueryStub;
+    not: (column?: string, operator?: string, value?: unknown) => QueryStub;
+    contains: (column?: string, value?: unknown) => QueryStub;
+    single: <T = unknown>() => Promise<PostgrestSingleResponse<T>>;
+    then: <T = unknown, TResult1 = PostgrestSingleResponse<T>, TResult2 = never>(
+      onfulfilled?:
+        | ((value: PostgrestSingleResponse<T>) => TResult1 | PromiseLike<TResult1>)
+        | undefined
+        | null,
+      onrejected?: ((reason: Error) => TResult2 | PromiseLike<TResult2>) | undefined | null,
+    ) => Promise<TResult1 | TResult2>;
     data: null;
     error: { message: string; code: string } | null;
+    count: null;
+    status: number;
+    statusText: string;
   }
 
   const buildQueryStub = (): QueryStub => {
     const result: QueryStub = {
       select: (_?: string) => result,
-      insert: (_?: Record<string, unknown>) => result,
+      insert: (_?: Record<string, unknown> | Record<string, unknown>[]) => result,
       upsert: (_?: Record<string, unknown>) => result,
       update: (_?: Record<string, unknown>) => result,
       delete: () => result,
@@ -103,14 +120,42 @@ function createSupabaseStub() {
       order: (_column?: string, _options?: Record<string, unknown>) => result,
       limit: (_count?: number) => result,
       lt: (_column?: string, _value?: unknown) => result,
-      single: async (): Promise<PostgrestSingleResponse<any>> => ({
-        data: null,
-        error: { message: 'Supabase not configured', code: 'CONFIG' },
-        status: 500,
-        statusText: 'Internal Server Error'
-      } as PostgrestSingleResponse<any>),
+      gte: (_column?: string, _value?: unknown) => result,
+      lte: (_column?: string, _value?: unknown) => result,
+      range: (_from?: number, _to?: number) => result,
+      or: (_query?: string) => result,
+      in: (_column?: string, _values?: unknown[]) => result,
+      not: (_column?: string, _operator?: string, _value?: unknown) => result,
+      contains: (_column?: string, _value?: unknown) => result,
+      single: async <T = unknown>(): Promise<PostgrestSingleResponse<T>> =>
+        ({
+          data: null,
+          error: { message: 'Supabase not configured', code: 'CONFIG' },
+          status: 500,
+          statusText: 'Internal Server Error',
+          count: null,
+        }) as PostgrestSingleResponse<T>,
+      then: async <T = unknown, TResult1 = PostgrestSingleResponse<T>, TResult2 = never>(
+        onfulfilled?:
+          | ((value: PostgrestSingleResponse<T>) => TResult1 | PromiseLike<TResult1>)
+          | undefined
+          | null,
+        _onrejected?: ((reason: Error) => TResult2 | PromiseLike<TResult2>) | undefined | null,
+      ): Promise<TResult1 | TResult2> => {
+        const response = {
+          data: null,
+          error: { message: 'Supabase not configured', code: 'CONFIG' },
+          status: 500,
+          statusText: 'Internal Server Error',
+          count: null,
+        } as PostgrestSingleResponse<T>;
+        return onfulfilled ? onfulfilled(response) : (response as unknown as TResult1 | TResult2);
+      },
       data: null,
       error: { message: 'Supabase not configured', code: 'CONFIG' },
+      count: null,
+      status: 500,
+      statusText: 'Internal Server Error',
     };
     return result;
   };
@@ -129,6 +174,9 @@ function createSupabaseStub() {
       signInWithIdToken: async () => {
         throw new Error('Supabase not configured');
       },
+      resetPasswordForEmail: async () => {
+        throw new Error('Supabase not configured');
+      },
       getSession: async () => ({ data: { session: null }, error: null }),
       getUser: async () => ({ data: { user: null }, error: null }),
       onAuthStateChange: (_cb?: (event: string, session: unknown) => void) => ({
@@ -145,6 +193,12 @@ function createSupabaseStub() {
       data: null,
       error: { message: 'Supabase not configured', code: 'CONFIG' },
     }),
+    functions: {
+      invoke: async (_functionName: string, _options?: Record<string, unknown>) => ({
+        data: null,
+        error: { message: 'Supabase not configured', code: 'CONFIG' },
+      }),
+    },
     from: (_table: string) => buildQueryStub(),
   };
 }

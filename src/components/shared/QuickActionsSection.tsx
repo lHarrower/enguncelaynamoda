@@ -1,17 +1,8 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-// AYNAMODA Color Palette
-const COLORS = {
-  primary: '#8B6F47',
-  secondary: '#B8A082',
-  background: '#F5F1E8',
-  surface: '#FFFFFF',
-  text: '#2C2C2C',
-  textLight: '#B8A082',
-  border: '#E8DCC6',
-  accent: '#D4AF37',
-};
+
 import { QuickActionButton } from '@/components/aynaMirror/QuickActionButton';
+import { DesignSystem } from '@/theme/DesignSystem';
 import { OutfitRecommendation } from '@/types/aynaMirror';
 import { IoniconsName } from '@/types/icons';
 
@@ -55,18 +46,18 @@ export const QuickActionsSection: React.FC<QuickActionsSectionProps> = ({
 const styles = StyleSheet.create({
   quickActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: DesignSystem.spacing.sm,
     justifyContent: 'space-around',
   },
   quickActionsContainer: {
     marginTop: 24,
   },
   quickActionsTitle: {
-    color: COLORS.text,
-    fontFamily: 'Inter',
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 20,
+    color: DesignSystem.colors.text.primary,
+    fontFamily: DesignSystem.typography.fontFamily.primary,
+    fontSize: DesignSystem.typography.fontSize.lg,
+    fontWeight: DesignSystem.typography.fontWeight.semibold,
+    marginBottom: DesignSystem.spacing.lg,
     textAlign: 'center',
   },
 });
