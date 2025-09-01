@@ -1,12 +1,3 @@
-{
-  "compilerOptions": {
-    "module": "NodeNext",
-    "target": "esnext",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
-  },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:931b73ef64203c3ae683c6da5220d3b6a0cc9a4b8f26a20b593551a68d1fc2e8
+size 285

@@ -1,1 +1,3 @@
-﻿compact=1 stylish=1 json=1
+version https://git-lfs.github.com/spec/v1
+oid sha256:be58e6eb50bbb05a3518b49b18d29f891c50fe5068473e20b92bf7d3c260c49a
+size 31

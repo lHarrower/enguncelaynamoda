@@ -1,1 +1,3 @@
-Daily personalized outfit recommendations, smarter notifications, wardrobe capture, and confidence feedback—plus performance + stability improvements.
+version https://git-lfs.github.com/spec/v1
+oid sha256:3ef306f1950150b3203d084f4ab26f82d73d84ffa4aeeebfefb35f26fa573f53
+size 154
