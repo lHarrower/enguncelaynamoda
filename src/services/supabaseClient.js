@@ -5,7 +5,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { logger } from '../lib/logger';
+import { logger } from '@/lib/logger';
 
 // Supabase yapılandırması
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;

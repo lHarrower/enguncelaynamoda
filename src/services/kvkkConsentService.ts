@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { supabase } from '@/lib/supa';
 import { errorInDev } from '@/utils/consoleSuppress';
-('../config/supabaseClient');
+('@/config/supabaseClient');
 
 export interface KVKKConsent {
   id: string;

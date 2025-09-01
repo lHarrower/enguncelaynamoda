@@ -5,10 +5,10 @@ import * as Application from 'expo-application';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
-import { EngagementHistory, NotificationPreferences } from '../types/aynaMirror';
-import { warnInDev } from '../utils/consoleSuppress';
-import { safeParse } from '../utils/safeJSON';
-import { secureStorage } from '../utils/secureStorage';
+import { EngagementHistory, NotificationPreferences } from '@/types/aynaMirror';
+import { warnInDev } from '@/utils/consoleSuppress';
+import { safeParse } from '@/utils/safeJSON';
+import { secureStorage } from '@/utils/secureStorage';
 import { errorHandlingService } from './errorHandlingService';
 
 // Import jest for test environment

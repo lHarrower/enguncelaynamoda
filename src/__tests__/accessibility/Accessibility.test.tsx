@@ -267,7 +267,7 @@ describe('Erişilebilirlik Testleri', () => {
     });
 
     it('AI analiz ilerlemesini duyurmalı', async () => {
-      // const mockAIService = require('../../services/AIService').AIService;
+      // const mockAIService = require('@/services/AIService').AIService;
       // mockAIService.prototype.analyzeImage = jest.fn().mockImplementation(
       //   () =>
       //     new Promise((resolve) =>

@@ -5,8 +5,8 @@ import { Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import WardrobeScreen from '@/screens/WardrobeScreen';
-// import { AddItemScreen } from '../../screens/AddItemScreen'; // TODO: Create AddItemScreen
-// import { ItemDetailScreen } from '../../screens/ItemDetailScreen'; // TODO: Create ItemDetailScreen
+// import { AddItemScreen } from '@/screens/AddItemScreen'; // TODO: Create AddItemScreen
+// import { ItemDetailScreen } from '@/screens/ItemDetailScreen'; // TODO: Create ItemDetailScreen
 import {
   renderWithProviders,
   createMockWardrobeItem,
@@ -15,7 +15,7 @@ import {
 import { WardrobeCategory, WardrobeColor } from '@/types/wardrobe';
 import { mocks } from '@/__tests__/mocks';
 
-jest.mock('../../services/wardrobeService', () => {
+jest.mock('@/services/wardrobeService', () => {
   const mockWardrobeService = {
     getAllItems: jest.fn(),
     getItemById: jest.fn(),
@@ -32,7 +32,7 @@ jest.mock('../../services/wardrobeService', () => {
     default: jest.fn().mockImplementation(() => mockWardrobeService),
   };
 });
-jest.mock('../../services/AIService');
+jest.mock('@/services/AIService');
 jest.mock('@/services/enhancedWardrobeService', () => ({
   enhancedWardrobeService: {
     getUserWardrobe: jest.fn().mockResolvedValue([
@@ -259,7 +259,7 @@ jest.mock('react-native', () => {
     },
   };
 });
-jest.mock('../../services/databasePerformanceService', () => ({
+jest.mock('@/services/databasePerformanceService', () => ({
   databasePerformanceService: {
     recordMetric: jest.fn(),
     destroy: jest.fn(),
@@ -267,7 +267,7 @@ jest.mock('../../services/databasePerformanceService', () => ({
   },
   executeOptimizedQuery: jest.fn((operation, table, queryFn) => queryFn()),
 }));
-jest.mock('../../utils/databaseOptimizations', () => ({
+jest.mock('@/utils/databaseOptimizations', () => ({
   dbOptimizer: {
     monitorQuery: jest.fn((name, queryFn) => queryFn()),
     destroy: jest.fn(),
@@ -278,7 +278,7 @@ jest.mock('../../utils/databaseOptimizations', () => ({
     clearCacheByPattern: jest.fn(),
   },
 }));
-jest.mock('../../services/performanceOptimizationService', () => ({
+jest.mock('@/services/performanceOptimizationService', () => ({
   PerformanceOptimizationService: {
     performCleanup: jest.fn().mockResolvedValue(undefined),
     getPerformanceMetrics: jest.fn().mockReturnValue({}),
@@ -326,8 +326,8 @@ mocks.netInfo = {
 };
 
 describe('Gardırop Yönetimi E2E', () => {
-  const { wardrobeService: mockWardrobeService } = require('../../services/wardrobeService');
-  const mockAIService = require('../../services/AIService').AIService;
+  const { wardrobeService: mockWardrobeService } = require('@/services/wardrobeService');
+  const mockAIService = require('@/services/AIService').AIService;
 
   const mockItems = [
     createMockWardrobeItem({
@@ -374,7 +374,7 @@ describe('Gardırop Yönetimi E2E', () => {
     // Setup enhancedWardrobeService mocks using the correct method names
 
     // Setup enhancedWardrobeService mocks (both relative and @ path imports)
-    const { enhancedWardrobeService } = require('../../services/enhancedWardrobeService');
+    const { enhancedWardrobeService } = require('@/services/enhancedWardrobeService');
     const {
       enhancedWardrobeService: aliasEnhancedWardrobeService,
     } = require('@/services/enhancedWardrobeService');

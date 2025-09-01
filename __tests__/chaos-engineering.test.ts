@@ -8,16 +8,16 @@ import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
 
 // Mock dependencies
-jest.mock('../src/config/supabaseClient');
-jest.mock('../src/services/WardrobeService');
-jest.mock('../src/services/aynaMirrorService');
-jest.mock('../src/services/intelligenceService');
-jest.mock('../src/services/errorHandlingService');
+jest.mock('@/src/config/supabaseClient');
+jest.mock('@/src/services/WardrobeService');
+jest.mock('@/src/services/aynaMirrorService');
+jest.mock('@/src/services/intelligenceService');
+jest.mock('@/src/services/errorHandlingService');
 jest.mock('@react-native-async-storage/async-storage');
-jest.mock('../src/services/accessibilityService');
-jest.mock('../src/components/error/ErrorStates');
-jest.mock('../src/components/UndoNotification');
-jest.mock('../src/components/common/UndoNotification');
+jest.mock('@/src/services/accessibilityService');
+jest.mock('@/src/components/error/ErrorStates');
+jest.mock('@/src/components/UndoNotification');
+jest.mock('@/src/components/common/UndoNotification');
 
 // Import services after mocking
 import { supabase } from '@/config/supabaseClient';

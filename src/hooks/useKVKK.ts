@@ -20,7 +20,7 @@ import {
   kvkkConsentService,
   KVKKSettings,
   LegalBasis,
-} from '../services/kvkkConsentService';
+} from '@/services/kvkkConsentService';
 import { useAuth } from './useAuth';
 
 interface UseKVKKReturn {

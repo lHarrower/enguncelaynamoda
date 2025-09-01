@@ -13,7 +13,7 @@ import {
   OutfitFeedback,
   UsageStats,
   WardrobeItem,
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 
 // NOTE: Intentionally avoid static import of AynaMirrorService to break circular dependency:
 // aynaMirrorService -> performanceOptimizationService -> aynaMirrorService.

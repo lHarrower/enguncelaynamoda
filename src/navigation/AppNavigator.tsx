@@ -7,12 +7,12 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 import { RootStackParamList } from './types';
 import { rootStackConfig } from './config';
 import AuthNavigator from './AuthNavigator';
 import TabNavigator from './TabNavigator';
-import OnboardingScreen from '../screens/OnboardingScreen';
+import OnboardingScreen from '@/screens/OnboardingScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 

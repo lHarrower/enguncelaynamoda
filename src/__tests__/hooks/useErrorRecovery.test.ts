@@ -8,16 +8,16 @@ import {
   useCircuitBreaker,
   useAppStateRecovery,
   useBatchRecovery,
-} from '../../hooks/useErrorRecovery';
+} from '@/hooks/useErrorRecovery';
 import { ErrorHandler, AppError, ErrorCategory, ErrorSeverity } from '@/utils/ErrorHandler';
 
 // Mock dependencies
 // Mock ErrorHandler
-jest.mock('../../utils/ErrorHandler', () => {
+jest.mock('@/utils/ErrorHandler', () => ({
   const mockCategorizeError = jest.fn();
   const mockHandleError = jest.fn();
   const mockGetRecoveryStrategy = jest.fn();
-  const originalModule = jest.requireActual('../../utils/ErrorHandler');
+  const originalModule = jest.requireActual('@/utils/ErrorHandler');
 
   // Create a mock errorHandler instance
   const mockErrorHandlerInstance = {
@@ -56,8 +56,8 @@ jest.mock('../../utils/ErrorHandler', () => {
 });
 
 // Get the mocked errorHandler to configure it in tests
-const { errorHandler: mockedErrorHandler } = jest.requireMock('../../utils/ErrorHandler');
-jest.mock('../../services/ErrorReporting', () => ({
+const { errorHandler: mockedErrorHandler } = jest.requireMock('@/utils/ErrorHandler');
+jest.mock('@/services/ErrorReporting', () => ({
   ErrorReporting: {
     reportError: jest.fn(),
     addBreadcrumb: jest.fn(),
@@ -104,7 +104,7 @@ describe('useErrorRecovery', () => {
   const mockErrorHandler = ErrorHandler.getInstance as jest.MockedFunction<
     typeof ErrorHandler.getInstance
   >;
-  const { errorHandler } = jest.requireMock('../../utils/ErrorHandler');
+  const { errorHandler } = jest.requireMock('@/utils/ErrorHandler');
   const mockHandleError = errorHandler.handleError;
   const mockGetRecoveryStrategy = errorHandler.getRecoveryStrategy;
   const mockCategorizeError = errorHandler.categorizeError;

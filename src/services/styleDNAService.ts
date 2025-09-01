@@ -2,7 +2,7 @@
 // Analyzes uploaded photos to generate personalized style profiles
 
 import { supabase } from '@/config/supabaseClient';
-// import { ErrorHandler } from '../utils/ErrorHandler';
+// import { ErrorHandler } from '@/utils/ErrorHandler';
 // import { intelligenceService } from './intelligenceService';
 import { errorInDev, logInDev } from '@/utils/consoleSuppress';
 import { ensureSupabaseOk } from '@/utils/supabaseErrorMapping';
@@ -12,7 +12,7 @@ import {
   CloudinaryUploadResult,
   isCloudinaryResult,
   // CloudinaryColorEntry,
-} from '../types/external/cloudinary';
+} from '@/types/external/cloudinary';
 
 export interface UploadedPhoto {
   id: string;

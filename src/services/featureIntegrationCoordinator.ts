@@ -840,7 +840,7 @@ class FeatureIntegrationCoordinator {
       typeof row === 'object' &&
       'user_id' in row &&
       typeof (row as Record<string, unknown>).user_id === 'string';
-    const { fetchSingle } = await import('../utils/supabaseQueryHelpers');
+    const { fetchSingle } = await import('@/utils/supabaseQueryHelpers');
     const result = await fetchSingle<RawUserProfile>(
       'user_profiles',
       (q) => q.eq('user_id', userId),

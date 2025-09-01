@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { logInDev, warnInDev } from '@/utils/consoleSuppress';
 import { apiClient, LoginRequest, RegisterRequest, UserProfile as ApiUserProfile } from '@/services/api/apiClient';
 
-import { User, UserAppPreferences, UserProfile, UserSubscription } from '../types/user';
-import { isObject, safeParse } from '../utils/safeJSON';
-import { secureStorage } from '../utils/secureStorage';
+import { User, UserAppPreferences, UserProfile, UserSubscription } from '@/types/user';
+import { isObject, safeParse } from '@/utils/safeJSON';
+import { secureStorage } from '@/utils/secureStorage';
 
 export interface AuthState {
   user: User | null;

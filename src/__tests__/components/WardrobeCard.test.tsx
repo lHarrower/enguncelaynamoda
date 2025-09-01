@@ -18,7 +18,7 @@ jest.mock('expo-haptics', () => ({
 }));
 
 // Mock useHapticFeedback hook
-jest.mock('../../hooks/useHapticFeedback', () => ({
+jest.mock('@/hooks/useHapticFeedback', () => ({
   useHapticFeedback: () => ({
     trigger: mocks.hapticFeedback.trigger,
     triggerLight: jest.fn(),

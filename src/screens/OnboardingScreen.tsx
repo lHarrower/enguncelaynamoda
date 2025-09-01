@@ -5,8 +5,8 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { RootStackScreenProps } from '../navigation/types';
-import { UNIFIED_COLORS } from '../theme/DesignSystem';
+import { RootStackScreenProps } from '@/navigation/types';
+import { UNIFIED_COLORS } from '@/theme/DesignSystem';
 
 type Props = RootStackScreenProps<'Onboarding'>;
 

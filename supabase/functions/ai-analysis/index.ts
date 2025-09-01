@@ -137,7 +137,7 @@ Deno.serve(async (req: Request) => {
 
     const cdnUrl = upJson.secure_url as string | undefined;
 
-    // ---- MOCK ANALYSIS (örnek)
+    // ---- MOCK ANALYSIS (ï¿½rnek)
     const analysis = {
       mainCategory: 'tops',
       subCategory: 't-shirt',

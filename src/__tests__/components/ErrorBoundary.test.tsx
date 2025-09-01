@@ -7,7 +7,7 @@ import { ErrorHandler, AppError } from '@/utils/ErrorHandler';
 import { renderWithProviders } from '@/__tests__/utils/testUtils';
 
 // Mock dependencies
-jest.mock('../../utils/ErrorHandler', () => ({
+jest.mock('@/utils/ErrorHandler', () => ({
   ErrorHandler: {
     getInstance: jest.fn(() => ({
       handleError: jest.fn(),

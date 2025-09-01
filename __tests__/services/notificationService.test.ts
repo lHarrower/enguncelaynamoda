@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import notificationService, {
   getPushTokenSafely,
   loadNotifications,
-} from '../../src/services/notificationService';
+} from '@/services/notificationService';
 import { secureStorage } from '@/utils/secureStorage';
 import { errorHandlingService } from '@/services/errorHandlingService';
 import { NotificationPreferences, EngagementHistory } from '@/types/aynaMirror';
@@ -42,9 +42,9 @@ jest.mock('react-native', () => ({
   },
 }));
 
-jest.mock('../../src/utils/secureStorage');
-jest.mock('../../src/services/errorHandlingService');
-jest.mock('../../src/utils/consoleSuppress');
+jest.mock('@/utils/secureStorage');
+jest.mock('@/services/errorHandlingService');
+jest.mock('@/utils/consoleSuppress');
 
 const mockSecureStorage = secureStorage as jest.Mocked<typeof secureStorage>;
 const mockErrorHandlingService = errorHandlingService as jest.Mocked<typeof errorHandlingService>;
@@ -444,7 +444,7 @@ describe('NotificationService', () => {
 
     it('should return false when notifications are not available', async () => {
       // Mock loadNotifications to return null
-      jest.doMock('../../src/services/notificationService', () => ({
+      jest.doMock('@/services/notificationService', () => ({
         loadNotifications: jest.fn().mockResolvedValue(null),
       }));
 

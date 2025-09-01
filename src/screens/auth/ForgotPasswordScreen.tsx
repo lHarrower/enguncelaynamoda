@@ -5,8 +5,8 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { AuthStackScreenProps } from '../../navigation/types';
-import { UNIFIED_COLORS } from '../../theme/DesignSystem';
+import { AuthStackScreenProps } from '@/navigation/types';
+import { UNIFIED_COLORS } from '@/theme/DesignSystem';
 
 type Props = AuthStackScreenProps<'ForgotPassword'>;
 

@@ -15,9 +15,9 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { AuthStackScreenProps } from '../../navigation/types';
-import { UNIFIED_COLORS, TYPOGRAPHY, SPACING, ELEVATION } from '../../theme/DesignSystem';
-import { useAuth } from '../../hooks/useAuth';
+import { AuthStackScreenProps } from '@/navigation/types';
+import { UNIFIED_COLORS, TYPOGRAPHY, SPACING, ELEVATION } from '@/theme/DesignSystem';
+import { useAuth } from '@/hooks/useAuth';
 
 type Props = AuthStackScreenProps<'SignUp'>;
 

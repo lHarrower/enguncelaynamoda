@@ -12,9 +12,9 @@ import { AIService } from '@/services/AIService';
 import { supabase } from '@/config/supabaseClient';
 
 // Mock implementations
-jest.mock('../src/config/supabaseClient');
-jest.mock('../src/utils/consoleSuppress');
-jest.mock('../src/utils/secureStorage');
+jest.mock('@/src/config/supabaseClient');
+jest.mock('@/src/utils/consoleSuppress');
+jest.mock('@/src/utils/secureStorage');
 
 interface NetworkCondition {
   name: string;

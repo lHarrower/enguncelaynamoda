@@ -3,8 +3,8 @@
  * Handles calendar integration for outfit recommendations based on events
  */
 
-import { CalendarContext } from '../types/aynaMirror';
-import { errorInDev, logInDev, warnInDev } from '../utils/consoleSuppress';
+import { CalendarContext } from '@/types/aynaMirror';
+import { errorInDev, logInDev, warnInDev } from '@/utils/consoleSuppress';
 import { analyticsService } from './analyticsService';
 
 interface CalendarEvent {

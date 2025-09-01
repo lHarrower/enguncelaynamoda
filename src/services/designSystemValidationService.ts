@@ -15,7 +15,7 @@ import {
   UNIFIED_COLORS,
 } from '@/theme/DesignSystem';
 
-import { errorInDev, warnInDev } from '../utils/consoleSuppress';
+import { errorInDev, warnInDev } from '@/utils/consoleSuppress';
 
 interface ValidationResult {
   isValid: boolean;

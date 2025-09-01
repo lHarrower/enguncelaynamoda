@@ -171,7 +171,7 @@ Add these scripts to your `package.json`:
 Provides comprehensive utilities for testing:
 
 ```typescript
-import { renderWithProviders, createMockWardrobeItem } from '../utils/testUtils';
+import { renderWithProviders, createMockWardrobeItem } from '@/__tests__/utils/testUtils';
 
 // Render component with all necessary providers
 const { getByText } = renderWithProviders(<YourComponent />);

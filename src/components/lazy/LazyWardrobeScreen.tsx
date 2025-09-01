@@ -5,7 +5,7 @@ import { DesignSystem } from '@/theme/DesignSystem';
 
 // Lazy load the WardrobeScreen component
 const WardrobeScreen = React.lazy(() =>
-  import('../../screens/WardrobeScreen').then((module) => ({
+  import('@/screens/WardrobeScreen').then((module) => ({
     default: module.WardrobeScreen,
   })),
 );

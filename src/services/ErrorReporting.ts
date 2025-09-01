@@ -1,6 +1,6 @@
 // Error Reporting Service - Analytics and crash reporting integration
-import { errorInDev, logInDev, warnInDev } from '../utils/consoleSuppress';
-import { AppError, ErrorSeverity } from '../utils/ErrorHandler';
+import { errorInDev, logInDev, warnInDev } from '@/utils/consoleSuppress';
+import { AppError, ErrorSeverity } from '@/utils/ErrorHandler';
 
 // Type declaration for __DEV__ global
 declare const __DEV__: boolean;

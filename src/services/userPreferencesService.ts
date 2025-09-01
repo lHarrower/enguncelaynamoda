@@ -14,7 +14,7 @@ import {
   StyleProfile,
   UserPreferences,
   UserPreferencesRecord,
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 
 /**
  * UserPreferencesService - Manages user settings and preferences for AYNA Mirror

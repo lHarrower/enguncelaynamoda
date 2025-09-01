@@ -6,7 +6,7 @@ import { createPostgrestBuilder } from '@/test/supabaseMockBuilder';
 import { mocks } from '@/__tests__/mocks';
 
 // Mock dependencies
-jest.mock('../../config/supabaseClient', () => ({
+jest.mock('@/config/supabaseClient', () => ({
   supabase: {
     from: jest.fn(() => ({
       select: jest.fn().mockResolvedValue({ data: [], error: null }),
@@ -25,8 +25,8 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 
 describe('WardrobeService Performance', () => {
   let wardrobeService: WardrobeService;
-  const mockSupabase = require('../../config/supabaseClient').supabase as jest.Mocked<
-    typeof import('../../config/supabaseClient').supabase
+  const mockSupabase = require('@/config/supabaseClient').supabase as jest.Mocked<
+    typeof import('@/config/supabaseClient').supabase
   >;
 
   beforeEach(() => {

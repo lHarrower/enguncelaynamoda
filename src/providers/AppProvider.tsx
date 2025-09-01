@@ -1,14 +1,16 @@
 // src/providers/AppProvider.tsx
+// Note: Now uses global Zustand store for app loading state
 
 import { ThemeProvider } from '@shopify/restyle';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 import { RestyleTheme } from '@/theme/DesignSystem';
 import { warnInDev } from '@/utils/consoleSuppress';
+import { useAppLoading, useAppActions } from '@/store/globalStore';
 
 // Create a safe theme that ensures compatibility with expo-router's ContextNavigator
 const safeTheme = {
@@ -46,7 +48,9 @@ interface AppProviderProps {
 }
 
 export function AppProvider({ children }: AppProviderProps) {
-  const [appIsReady, setAppIsReady] = useState(false);
+  const appLoading = useAppLoading();
+  const { setAppLoading } = useAppActions();
+  
   // Load fonts using the hook (must be called unconditionally at top level)
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
@@ -66,6 +70,7 @@ export function AppProvider({ children }: AppProviderProps) {
       try {
         // Keep the splash screen visible while we fetch resources
         await SplashScreen.preventAutoHideAsync();
+        setAppLoading(true);
 
         // Minimal delay for better startup performance
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -73,21 +78,21 @@ export function AppProvider({ children }: AppProviderProps) {
         // Warning suppressed
       } finally {
         // Tell the application to render
-        setAppIsReady(true);
+        setAppLoading(false);
       }
     }
 
     prepare();
-  }, []);
+  }, [setAppLoading]);
 
   useEffect(() => {
-    if (appIsReady && fontsLoaded) {
+    if (!appLoading && fontsLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [appIsReady, fontsLoaded]);
+  }, [appLoading, fontsLoaded]);
 
   // Always provide the theme, even during loading
-  const content = !appIsReady ? (
+  const content = appLoading ? (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       {/* Minimal loading state for better performance */}
     </View>

@@ -32,7 +32,7 @@ const getAynaMirrorService = async () => {
 import { AynamodaColors } from '@/theme/AynamodaColors';
 import { DailyRecommendations, OutfitRecommendation } from '@/types/aynaMirror';
 
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
 
 // Animation configurations
 const ORGANIC_SPRING = {

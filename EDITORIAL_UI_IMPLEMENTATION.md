@@ -112,7 +112,7 @@ The `EditorialTheme.ts` provides a comprehensive design system:
 ### Basic Implementation
 
 ```tsx
-import { EditorialHomeScreen } from '../components/editorial';
+import { EditorialHomeScreen } from '@/components/editorial';
 
 export default function MyScreen() {
   return <EditorialHomeScreen />;
@@ -122,7 +122,7 @@ export default function MyScreen() {
 ### With Demo Features
 
 ```tsx
-import { EditorialDemoWrapper } from '../components/editorial';
+import { EditorialDemoWrapper } from '@/components/editorial';
 
 export default function DemoScreen() {
   return <EditorialDemoWrapper />;
@@ -132,7 +132,7 @@ export default function DemoScreen() {
 ### Individual Components
 
 ```tsx
-import { WeeklyColorCard, StylePickCard, SwipeableCardStack } from '../components/editorial';
+import { WeeklyColorCard, StylePickCard, SwipeableCardStack } from '@/components/editorial';
 
 // Use individual components as needed
 ```

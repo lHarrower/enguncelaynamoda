@@ -23,7 +23,7 @@ jest.mock('react-native', () => ({
 }));
 
 // Mock console methods
-jest.mock('../../src/utils/consoleSuppress', () => ({
+jest.mock('@/utils/consoleSuppress', () => ({
   logInDev: jest.fn(),
   errorInDev: jest.fn(),
 }));
@@ -326,7 +326,7 @@ describe('AccessibilityService', () => {
 
       // Should not throw
       expect(() => {
-        const newService = require('../../src/services/accessibilityService').default;
+        const newService = require('@/services/accessibilityService').default;
       }).not.toThrow();
     });
 
@@ -345,8 +345,8 @@ describe('AccessibilityService', () => {
 
   describe('Singleton Pattern', () => {
     it('should return the same instance', () => {
-      const instance1 = require('../../src/services/accessibilityService').default;
-      const instance2 = require('../../src/services/accessibilityService').default;
+      const instance1 = require('@/services/accessibilityService').default;
+      const instance2 = require('@/services/accessibilityService').default;
 
       expect(instance1).toBe(instance2);
     });

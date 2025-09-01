@@ -16,7 +16,7 @@ import {
   UserPreferences,
   WardrobeItem,
   WeatherContext,
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 import { enhancedWardrobeService } from './enhancedWardrobeService';
 import { errorHandlingService } from './errorHandlingService';
 import { intelligenceService } from './intelligenceService';

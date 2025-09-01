@@ -33,13 +33,13 @@ const mockQueryBuilder = {
   mockRejectedValueOnce: jest.fn(),
 };
 
-jest.mock('../../lib/supa', () => ({
+jest.mock('@/lib/supa', () => ({
   supabase: {
     from: jest.fn(() => mockQueryBuilder),
   },
 }));
 
-const mockSupabase = require('../../lib/supa').supabase;
+const mockSupabase = require('@/lib/supa').supabase;
 
 describe('Gardırop Servisi', () => {
   let wardrobeService: WardrobeService;

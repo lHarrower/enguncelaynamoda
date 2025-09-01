@@ -12,7 +12,7 @@ import {
   VisualFeatures,
   WardrobeItem,
   WardrobeItemRecord,
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 import { AINameingService } from './aiNamingService';
 
 export interface NewClothingItem {

@@ -1,12 +1,12 @@
 // WardrobeService class wrapper to align with tests and imports
-import { supabase } from '../config/supabaseClient';
-import type { WardrobeItemRecord } from '../types/aynaMirror';
-import { logInDev } from '../utils/consoleSuppress';
-import { ConnectionMonitor, dbOptimizer, OptimizedQueries } from '../utils/databaseOptimizations';
-import { safeParse } from '../utils/safeJSON';
-import { secureStorage } from '../utils/secureStorage';
-import { ensureSupabaseOk } from '../utils/supabaseErrorMapping';
-import { isSupabaseOk, wrap } from '../utils/supabaseResult';
+import { supabase } from '@/config/supabaseClient';
+import type { WardrobeItemRecord } from '@/types/aynaMirror';
+import { logInDev } from '@/utils/consoleSuppress';
+import { ConnectionMonitor, dbOptimizer, OptimizedQueries } from '@/utils/databaseOptimizations';
+import { safeParse } from '@/utils/safeJSON';
+import { secureStorage } from '@/utils/secureStorage';
+import { ensureSupabaseOk } from '@/utils/supabaseErrorMapping';
+import { isSupabaseOk, wrap } from '@/utils/supabaseResult';
 import {
   databasePerformanceService,
   executeOptimizedQuery,

@@ -8,7 +8,7 @@ import {
   OutfitRecommendation,
   WardrobeItem,
   WeatherContext,
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 import { PerformanceOptimizationService } from './performanceOptimizationService';
 
 // Local narrow guard to validate cached wardrobe items without broad any casting

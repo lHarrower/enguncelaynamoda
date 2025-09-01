@@ -9,11 +9,11 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { MainTabParamList } from './types';
 import { mainTabConfig } from './config';
-import HomeScreen from '../screens/HomeScreen';
-import WardrobeScreen from '../screens/WardrobeScreen';
-import AynaMirrorScreen from '../screens/AynaMirrorScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import BagScreen from '../screens/BagScreen';
+import HomeScreen from '@/screens/HomeScreen';
+import WardrobeScreen from '@/screens/WardrobeScreen';
+import AynaMirrorScreen from '@/screens/AynaMirrorScreen';
+import ProfileScreen from '@/screens/ProfileScreen';
+import BagScreen from '@/screens/BagScreen';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 

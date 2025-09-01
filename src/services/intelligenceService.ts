@@ -22,7 +22,7 @@ import {
   StyleProfile,
   WardrobeItem,
   WeatherContext,
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 
 // Internal helper types to remove unsafe any usage
 interface UserHistoryLite {

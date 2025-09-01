@@ -1,12 +1,26 @@
-// Wardrobe Provider - Context for wardrobe management
-import React, { createContext, ReactNode, useContext, useEffect, useReducer } from 'react';
+// Wardrobe Provider - Wrapper for backward compatibility
+// Note: This provider now uses the global Zustand store for state management
+import React, { ReactNode, useEffect } from 'react';
 
 import { WardrobeItem } from '@/types/aynaMirror';
 import { warnInDev } from '@/utils/consoleSuppress';
+import { 
+  useWardrobeItems,
+  useWardrobeFavorites,
+  useWardrobeLoading,
+  useWardrobeError,
+  useWardrobeSearchQuery,
+  useWardrobeSelectedCategory,
+  useWardrobeSortBy,
+  useWardrobeActions,
+  useFilteredWardrobeItems,
+  useFavoriteWardrobeItems
+} from '@/store/globalStore';
 
-import { safeParse } from '../utils/safeJSON';
-import { secureStorage } from '../utils/secureStorage';
+import { safeParse } from '@/utils/safeJSON';
+import { secureStorage } from '@/utils/secureStorage';
 
+// Legacy interface for backward compatibility
 interface WardrobeState {
   items: WardrobeItem[];
   favorites: string[];
@@ -17,22 +31,10 @@ interface WardrobeState {
   sortBy: 'name' | 'date' | 'category';
 }
 
-type WardrobeAction =
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_ITEMS'; payload: WardrobeItem[] }
-  | { type: 'ADD_ITEM'; payload: WardrobeItem }
-  | { type: 'UPDATE_ITEM'; payload: WardrobeItem }
-  | { type: 'DELETE_ITEM'; payload: string }
-  | { type: 'TOGGLE_FAVORITE'; payload: string }
-  | { type: 'SET_SEARCH_QUERY'; payload: string }
-  | { type: 'SET_SELECTED_CATEGORY'; payload: string | null }
-  | { type: 'SET_SORT_BY'; payload: 'name' | 'date' | 'category' }
-  | { type: 'SET_FAVORITES'; payload: string[] };
-
+// Legacy context type for backward compatibility
 interface WardrobeContextType {
   state: WardrobeState;
-  dispatch: React.Dispatch<WardrobeAction>;
+  dispatch: React.Dispatch<any>; // Not used anymore, kept for compatibility
   addItem: (item: WardrobeItem) => void;
   updateItem: (item: WardrobeItem) => void;
   deleteItem: (id: string) => void;
@@ -44,74 +46,68 @@ interface WardrobeContextType {
   getFavoriteItems: () => WardrobeItem[];
 }
 
-const WardrobeContext = createContext<WardrobeContextType | undefined>(undefined);
+// Legacy context - kept for backward compatibility but uses global store
+const WardrobeContext = React.createContext<WardrobeContextType | undefined>(undefined);
 
-const initialState: WardrobeState = {
-  items: [],
-  favorites: [],
-  loading: false,
-  error: null,
-  searchQuery: '',
-  selectedCategory: null,
-  sortBy: 'date',
-};
-
-function wardrobeReducer(state: WardrobeState, action: WardrobeAction): WardrobeState {
-  switch (action.type) {
-    case 'SET_LOADING':
-      return { ...state, loading: action.payload };
-    case 'SET_ERROR':
-      return { ...state, error: action.payload, loading: false };
-    case 'SET_ITEMS':
-      return { ...state, items: action.payload, loading: false, error: null };
-    case 'ADD_ITEM':
-      return { ...state, items: [...state.items, action.payload] };
-    case 'UPDATE_ITEM':
-      return {
-        ...state,
-        items: state.items.map((item) => (item.id === action.payload.id ? action.payload : item)),
-      };
-    case 'DELETE_ITEM':
-      return {
-        ...state,
-        items: state.items.filter((item) => item.id !== action.payload),
-        favorites: state.favorites.filter((id) => id !== action.payload),
-      };
-    case 'TOGGLE_FAVORITE':
-      const isFavorite = state.favorites.includes(action.payload);
-      return {
-        ...state,
-        favorites: isFavorite
-          ? state.favorites.filter((id) => id !== action.payload)
-          : [...state.favorites, action.payload],
-      };
-    case 'SET_SEARCH_QUERY':
-      return { ...state, searchQuery: action.payload };
-    case 'SET_SELECTED_CATEGORY':
-      return { ...state, selectedCategory: action.payload };
-    case 'SET_SORT_BY':
-      return { ...state, sortBy: action.payload };
-    case 'SET_FAVORITES':
-      return { ...state, favorites: action.payload };
-    default:
-      return state;
-  }
+// Legacy hook that wraps the global store for backward compatibility
+function useWardrobeState(): WardrobeContextType {
+  const items = useWardrobeItems();
+  const favorites = useWardrobeFavorites();
+  const loading = useWardrobeLoading();
+  const error = useWardrobeError();
+  const searchQuery = useWardrobeSearchQuery();
+  const selectedCategory = useWardrobeSelectedCategory();
+  const sortBy = useWardrobeSortBy();
+  
+  const actions = useWardrobeActions();
+  const filteredItems = useFilteredWardrobeItems();
+  const favoriteItems = useFavoriteWardrobeItems();
+  
+  // Create legacy state object
+  const state: WardrobeState = {
+    items,
+    favorites,
+    loading,
+    error,
+    searchQuery,
+    selectedCategory,
+    sortBy,
+  };
+  
+  return {
+    state,
+    dispatch: () => {}, // Legacy dispatch - not used anymore
+    addItem: actions.addWardrobeItem,
+    updateItem: actions.updateWardrobeItem,
+    deleteItem: actions.removeWardrobeItem,
+    toggleFavorite: actions.toggleWardrobeFavorite,
+    setSearchQuery: actions.setWardrobeSearchQuery,
+    setSelectedCategory: actions.setWardrobeSelectedCategory,
+    setSortBy: actions.setWardrobeSortBy,
+    getFilteredItems: () => filteredItems,
+    getFavoriteItems: () => favoriteItems,
+  };
 }
 
 interface WardrobeProviderProps {
   children: ReactNode;
-  initialItems?: WardrobeItem[];
+  initialItems?: WardrobeItem[]; // Kept for backward compatibility but not used
 }
 
 export function WardrobeProvider({ children, initialItems = [] }: WardrobeProviderProps) {
-  const [state, dispatch] = useReducer(wardrobeReducer, {
-    ...initialState,
-    items: initialItems,
-  });
+  const wardrobeState = useWardrobeState();
+  const actions = useWardrobeActions();
 
-  // Load favorites from storage on mount
+  // Initialize wardrobe items if provided (backward compatibility)
   useEffect(() => {
-    const loadFavorites = async () => {
+    if (initialItems.length > 0) {
+      actions.setWardrobeItems(initialItems);
+    }
+  }, [initialItems, actions]);
+
+  // Load favorites from storage on mount (migration from old storage)
+  useEffect(() => {
+    const loadLegacyFavorites = async () => {
       try {
         await secureStorage.initialize();
         const stored = await secureStorage.getItem('wardrobe_favorites');
@@ -120,117 +116,47 @@ export function WardrobeProvider({ children, initialItems = [] }: WardrobeProvid
           const favs = Array.isArray(parsed)
             ? parsed.filter((v): v is string => typeof v === 'string')
             : [];
-          dispatch({ type: 'SET_FAVORITES', payload: favs });
+          
+          // Migrate to global store if we have legacy favorites
+          const currentFavorites = wardrobeState.state.favorites;
+          if (currentFavorites.length === 0 && favs.length > 0) {
+            // Migrate each favorite individually
+            favs.forEach(id => actions.toggleWardrobeFavorite(id));
+            // Clean up old storage
+            await secureStorage.removeItem('wardrobe_favorites');
+          }
         }
       } catch (error) {
-        warnInDev('Failed to load favorites:', error);
+        warnInDev('Failed to load legacy favorites:', error);
       }
     };
-    loadFavorites();
-  }, []);
+    loadLegacyFavorites();
+  }, [actions, wardrobeState.state.favorites]);
 
-  // Save favorites to storage when they change
-  useEffect(() => {
-    const saveFavorites = async () => {
-      try {
-        await secureStorage.initialize();
-        await secureStorage.setItem('wardrobe_favorites', JSON.stringify(state.favorites));
-      } catch (error) {
-        warnInDev('Failed to save favorites:', error);
-      }
-    };
-    saveFavorites();
-  }, [state.favorites]);
-
-  const addItem = (item: WardrobeItem) => {
-    dispatch({ type: 'ADD_ITEM', payload: item });
-  };
-
-  const updateItem = (item: WardrobeItem) => {
-    dispatch({ type: 'UPDATE_ITEM', payload: item });
-  };
-
-  const deleteItem = (id: string) => {
-    dispatch({ type: 'DELETE_ITEM', payload: id });
-  };
-
-  const toggleFavorite = (id: string) => {
-    dispatch({ type: 'TOGGLE_FAVORITE', payload: id });
-  };
-
-  const setSearchQuery = (query: string) => {
-    dispatch({ type: 'SET_SEARCH_QUERY', payload: query });
-  };
-
-  const setSelectedCategory = (category: string | null) => {
-    dispatch({ type: 'SET_SELECTED_CATEGORY', payload: category });
-  };
-
-  const setSortBy = (sortBy: 'name' | 'date' | 'category') => {
-    dispatch({ type: 'SET_SORT_BY', payload: sortBy });
-  };
-
-  const getFilteredItems = (): WardrobeItem[] => {
-    let filtered = [...state.items];
-
-    // Apply search filter
-    if (state.searchQuery) {
-      const query = state.searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (item) =>
-          item.name?.toLowerCase().includes(query) ||
-          item.tags?.some((tag) => tag.toLowerCase().includes(query)),
-      );
-    }
-
-    // Apply category filter
-    if (state.selectedCategory) {
-      filtered = filtered.filter((item) => item.category === state.selectedCategory);
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      switch (state.sortBy) {
-        case 'name':
-          return (a.name || '').localeCompare(b.name || '');
-        case 'category':
-          return (a.category || '').localeCompare(b.category || '');
-        case 'date':
-        default:
-          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-      }
-    });
-
-    return filtered;
-  };
-
-  const getFavoriteItems = (): WardrobeItem[] => {
-    return state.items.filter((item) => state.favorites.includes(item.id));
-  };
-
-  const value: WardrobeContextType = {
-    state,
-    dispatch,
-    addItem,
-    updateItem,
-    deleteItem,
-    toggleFavorite,
-    setSearchQuery,
-    setSelectedCategory,
-    setSortBy,
-    getFilteredItems,
-    getFavoriteItems,
-  };
-
-  return <WardrobeContext.Provider value={value}>{children}</WardrobeContext.Provider>;
+  return <WardrobeContext.Provider value={wardrobeState}>{children}</WardrobeContext.Provider>;
 }
 
+// Legacy hook for backward compatibility
 export function useWardrobe(): WardrobeContextType {
-  const context = useContext(WardrobeContext);
+  const context = React.useContext(WardrobeContext);
   if (context === undefined) {
     throw new Error('useWardrobe must be used within a WardrobeProvider');
   }
   return context;
 }
+
+// Export the new hooks for direct use (recommended)
+export {
+  useWardrobeItems,
+  useWardrobeFavorites,
+  useWardrobeLoading,
+  useWardrobeError,
+  useWardrobeSearchQuery,
+  useWardrobeSelectedCategory,
+  useWardrobeSortBy,
+  useWardrobeActions,
+  useFilteredWardrobeItems,
+  useFavoriteWardrobeItems
+} from '@/store/globalStore';
 
 export default WardrobeProvider;

@@ -137,7 +137,7 @@ src/
 // Good component structure
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { useTheme } from '../hooks/useTheme';
+import { useTheme } from '@/hooks/useTheme';
 
 interface Props {
   title: string;

@@ -10,7 +10,7 @@ import {
   EASING,
   SPRING,
   TIMING,
-} from '../theme/foundations/Animation';
+} from '@/theme/foundations/Animation';
 
 /**
  * Custom hook for managing animations with accessibility support

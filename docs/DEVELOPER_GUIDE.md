@@ -352,7 +352,7 @@ export const useWardrobe = () => {
 ```typescript
 // Component testing
 import { render, fireEvent } from '@testing-library/react-native';
-import { CustomButton } from '../CustomButton';
+import { CustomButton } from '@/CustomButton';
 
 describe('CustomButton', () => {
   it('renders correctly', () => {

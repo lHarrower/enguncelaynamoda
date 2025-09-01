@@ -12,12 +12,12 @@ This guide helps migrate from the legacy theme systems (`UnifiedTheme.ts`, `AppT
 
 ```typescript
 // OLD - Multiple conflicting systems
-import { ORGANIC_PALETTE } from '../constants/AppThemeV2';
-import { LuxuryColors } from '../constants/Colors';
+import { ORGANIC_PALETTE } from '@/constants/AppThemeV2';
+import { LuxuryColors } from '@/constants/Colors';
 import { UnifiedTheme } from './UnifiedTheme';
 
 // NEW - Single unified system
-import { useColors } from '../theme/ThemeProvider';
+import { useColors } from '@/theme/ThemeProvider';
 const colors = useColors();
 ```
 
@@ -36,11 +36,11 @@ UnifiedTheme.colors.background -> colors.background.primary
 
 ```typescript
 // OLD
-import { TYPOGRAPHY_V2 } from '../constants/AppThemeV2';
+import { TYPOGRAPHY_V2 } from '@/constants/AppThemeV2';
 import { EnhancedTypography } from './UnifiedTheme';
 
 // NEW
-import { useTypography } from '../theme/ThemeProvider';
+import { useTypography } from '@/theme/ThemeProvider';
 const typography = useTypography();
 
 // Usage
@@ -54,11 +54,11 @@ style={{
 
 ```typescript
 // OLD
-import { SPACING_V2 } from '../constants/AppThemeV2';
+import { SPACING_V2 } from '@/constants/AppThemeV2';
 import { UnifiedSpacing } from './UnifiedTheme';
 
 // NEW
-import { useSpacing, useLayout } from '../theme/ThemeProvider';
+import { useSpacing, useLayout } from '@/theme/ThemeProvider';
 const spacing = useSpacing();
 const layout = useLayout();
 
@@ -74,7 +74,7 @@ margin: layout.screenPadding; // For consistent screen margins
 import { UnifiedComponents } from './UnifiedTheme';
 
 // NEW
-import { useComponents } from '../theme/ThemeProvider';
+import { useComponents } from '@/theme/ThemeProvider';
 const components = useComponents();
 
 // Button styles
@@ -92,12 +92,12 @@ Replace all theme-related imports with the new unified system:
 
 ```typescript
 // Remove these imports
-// import { APP_THEME_V2 } from '../constants/AppThemeV2';
-// import { LuxuryColors } from '../constants/Colors';
-// import { UnifiedTheme } from '../theme/UnifiedTheme';
+// import { APP_THEME_V2 } from '@/constants/AppThemeV2';
+// import { LuxuryColors } from '@/constants/Colors';
+// import { UnifiedTheme } from '@/theme/UnifiedTheme';
 
 // Add this import
-import { useTheme, useColors, useTypography, useSpacing } from '../theme/ThemeProvider';
+import { useTheme, useColors, useTypography, useSpacing } from '@/theme/ThemeProvider';
 ```
 
 ### 2. Update Component Usage

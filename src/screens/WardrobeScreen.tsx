@@ -13,16 +13,16 @@ import {
   View,
 } from 'react-native';
 
-import { AINameGenerator } from '../components/naming/AINameGenerator';
-import { NamingPreferences } from '../components/naming/NamingPreferences';
-import { WardrobeItemCard } from '../components/sanctuary/WardrobeItemCard';
-import { WardrobeItemForm } from '../components/wardrobe/WardrobeItemForm';
-import { useAINaming } from '../hooks/useAINaming';
-import { enhancedWardrobeService } from '../services/enhancedWardrobeService';
-import { DesignSystem } from '../theme/DesignSystem';
-import theme from '../styles/theme';
-import { ItemCategory, WardrobeItem } from '../types/aynaMirror';
-import { errorInDev } from '../utils/consoleSuppress';
+import { AINameGenerator } from '@/components/naming/AINameGenerator';
+import { NamingPreferences } from '@/components/naming/NamingPreferences';
+import { WardrobeItemCard } from '@/components/sanctuary/WardrobeItemCard';
+import { WardrobeItemForm } from '@/components/wardrobe/WardrobeItemForm';
+import { useAINaming } from '@/hooks/useAINaming';
+import { enhancedWardrobeService } from '@/services/enhancedWardrobeService';
+import { DesignSystem } from '@/theme/DesignSystem';
+import theme from '@/styles/theme';
+import { ItemCategory, WardrobeItem } from '@/types/aynaMirror';
+import { errorInDev } from '@/utils/consoleSuppress';
 
 interface FilterOptions {
   category: ItemCategory | 'all';

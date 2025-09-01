@@ -5,7 +5,7 @@
 
 import { AccessibilityInfo, Platform } from 'react-native';
 
-import { errorInDev, logInDev, warnInDev } from '../utils/consoleSuppress';
+import { errorInDev, logInDev, warnInDev } from '@/utils/consoleSuppress';
 
 // Default color palette for testing
 const DEFAULT_COLORS = {
@@ -34,7 +34,7 @@ const DEFAULT_COLORS = {
 let UNIFIED_COLORS: typeof DEFAULT_COLORS;
 try {
   // Use static import with proper typing
-  const { UNIFIED_COLORS: ImportedColors } = require('../theme/DesignSystem') as {
+  const { UNIFIED_COLORS: ImportedColors } = require('@/theme/DesignSystem') as {
     UNIFIED_COLORS: typeof DEFAULT_COLORS;
   };
   UNIFIED_COLORS = ImportedColors || DEFAULT_COLORS;

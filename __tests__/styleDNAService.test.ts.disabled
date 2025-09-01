@@ -1,4 +1,4 @@
-import { styleDNAService } from '../src/services/styleDNAService';
+import { styleDNAService } from '@/services/styleDNAService';
 
 describe('StyleDNAService basic generation', () => {
   // Mock fetch & supabase simple behaviors

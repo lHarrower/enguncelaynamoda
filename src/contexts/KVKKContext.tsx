@@ -1,5 +1,6 @@
 /**
- * KVKK Context - Uygulama genelinde KVKK compliance yönetimi
+ * KVKK Context - Wrapper for backward compatibility
+ * Note: This context now uses the global Zustand store for state management
  *
  * Bu context:
  * - KVKK durumunu global olarak yönetir
@@ -14,6 +15,11 @@ import { KVKKBanner } from '@/components/privacy/KVKKBanner';
 import { KVKKConsentModal } from '@/components/privacy/KVKKConsentModal';
 import { useAuth } from '@/hooks/useAuth';
 import { useKVKK } from '@/hooks/useKVKK';
+import {
+  useKVKKConsents,
+  useKVKKModalVisible,
+  useKVKKActions
+} from '@/store/globalStore';
 import { ConsentType, DataProcessingPurpose, LegalBasis } from '@/services/kvkkConsentService';
 
 interface KVKKContextType {
@@ -56,9 +62,19 @@ interface KVKKProviderProps {
 export const KVKKProvider: React.FC<KVKKProviderProps> = ({ children, onNavigateToSettings }) => {
   const { user } = useAuth();
   const kvkk = useKVKK();
-  const [showModal, setShowModal] = useState(false);
-  const [modalRequiredConsents, setModalRequiredConsents] = useState<ConsentType[]>([]);
-  const [pendingConsentResolve, setPendingConsentResolve] = useState<
+  
+  // Use global store state
+  const kvkkConsents = useKVKKConsents();
+  const showModal = useKVKKModalVisible();
+  const {
+    setKVKKModalVisible,
+    grantKVKKConsent,
+    withdrawKVKKConsent
+  } = useKVKKActions();
+  
+  // Keep local state for modal-specific data
+  const [modalRequiredConsents, setModalRequiredConsents] = React.useState<ConsentType[]>([]);
+  const [pendingConsentResolve, setPendingConsentResolve] = React.useState<
     ((success: boolean) => void) | null
   >(null);
 
@@ -91,12 +107,12 @@ export const KVKKProvider: React.FC<KVKKProviderProps> = ({ children, onNavigate
   // Modal'ı göster
   const showConsentModal = (requiredConsents: ConsentType[] = []) => {
     setModalRequiredConsents(requiredConsents);
-    setShowModal(true);
+    setKVKKModalVisible(true);
   };
 
   // Modal'ı gizle
   const hideConsentModal = () => {
-    setShowModal(false);
+    setKVKKModalVisible(false);
     setModalRequiredConsents([]);
     if (pendingConsentResolve) {
       pendingConsentResolve(false);

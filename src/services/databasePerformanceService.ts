@@ -1,6 +1,6 @@
-import { supabase } from '../config/supabaseClient';
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
-import { dbOptimizer, OptimizedQueries } from '../utils/databaseOptimizations';
+import { supabase } from '@/config/supabaseClient';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
+import { dbOptimizer, OptimizedQueries } from '@/utils/databaseOptimizations';
 
 interface PerformanceMetric {
   operation: string;

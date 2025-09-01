@@ -27,11 +27,11 @@ import {
   ErrorSeverity,
   ErrorCategory,
   RecoveryStrategy,
-} from '../../utils/ErrorHandler';
+} from '@/utils/ErrorHandler';
 import { createMockError } from '@/__tests__/utils/testUtils';
 import { mocks } from '@/__tests__/mocks';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-jest.mock('../../services/ErrorReporting', () => ({
+jest.mock('@/services/ErrorReporting', () => ({
   ErrorReportingService: {
     getInstance: jest.fn(() => ({
       reportError: jest.fn(),

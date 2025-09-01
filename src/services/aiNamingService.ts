@@ -11,12 +11,12 @@ import {
   NamingResponse,
   NamingStyle,
   VisualFeatures,
-} from '../types/aynaMirror';
+} from '@/types/aynaMirror';
 import {
   CloudinaryColorEntry,
   CloudinaryUploadResult,
   isCloudinaryResult,
-} from '../types/external/cloudinary';
+} from '@/types/external/cloudinary';
 
 export class AINameingService {
   private static readonly DEFAULT_PREFERENCES: Partial<NamingPreferences> = {

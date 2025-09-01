@@ -84,11 +84,11 @@ import { I18n } from 'i18n-js';
 import * as Localization from 'expo-localization';
 
 const i18n = new I18n({
-  en: require('../locales/en.json'),
-  es: require('../locales/es.json'),
-  fr: require('../locales/fr.json'),
-  de: require('../locales/de.json'),
-  it: require('../locales/it.json'),
+  en: require('@/locales/en.json'),
+  es: require('@/locales/es.json'),
+  fr: require('@/locales/fr.json'),
+  de: require('@/locales/de.json'),
+  it: require('@/locales/it.json'),
 });
 
 i18n.locale = Localization.locale;
@@ -154,7 +154,7 @@ export default i18n;
 ```typescript
 // src/hooks/useTranslation.ts
 import { useCallback, useEffect, useState } from 'react';
-import i18n from '../utils/i18n';
+import i18n from '@/utils/i18n';
 import { useAuth } from './useAuth';
 
 export const useTranslation = () => {

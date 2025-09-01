@@ -16,13 +16,13 @@ import {
   kvkkComplianceChecker,
   KVKKComplianceReport,
   KVKKRiskAssessment,
-} from '../../utils/kvkkCompliance';
+} from '@/utils/kvkkCompliance';
 import {
   ConsentType,
   DataProcessingPurpose,
   LegalBasis,
   KVKKConsent,
-} from '../../services/kvkkConsentService';
+} from '@/services/kvkkConsentService';
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({

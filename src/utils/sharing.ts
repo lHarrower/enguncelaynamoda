@@ -150,7 +150,7 @@ Powered by AYNAMODA - Your AI Style Assistant ✨`;
 /**
  * EXAMPLE USAGE:
  *
- * import { onShare, shareOutfit, shareWardrobeItem } from '../utils/sharing';
+ * import { onShare, shareOutfit, shareWardrobeItem } from '@/utils/sharing';
  *
  * // Basic share
  * const handleBasicShare = async () => {

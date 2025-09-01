@@ -4,7 +4,7 @@ import { WardrobeCategory, WardrobeColor } from '@/types/wardrobe';
 import { createMockWardrobeItem } from '@/__tests__/utils/testUtils';
 
 // Mock dependencies
-jest.mock('../../config/openai', () => ({
+jest.mock('@/config/openai', () => ({
   openaiClient: {
     chat: {
       completions: {
@@ -39,7 +39,7 @@ const mockGoogleVision = {
   objectLocalization: jest.fn(),
 };
 
-jest.mock('../../config/googleVision', () => {
+jest.mock('@/config/googleVision', () => {
   const mockVision = {
     textDetection: jest.fn(),
     labelDetection: jest.fn(),
@@ -53,7 +53,7 @@ jest.mock('../../config/googleVision', () => {
 
 // Helper functions to get mocks
 const getMockOpenAI = () => {
-  const { openaiClient } = require('../../config/openai');
+  const { openaiClient } = require('@/config/openai');
   return openaiClient;
 };
 
@@ -63,7 +63,7 @@ const getMockSecureStorage = () => {
 };
 
 const getMockGoogleVision = () => {
-  const { visionClient } = require('../../config/googleVision');
+  const { visionClient } = require('@/config/googleVision');
   return visionClient;
 };
 

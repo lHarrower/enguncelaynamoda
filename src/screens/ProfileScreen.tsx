@@ -16,10 +16,10 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { MainTabScreenProps } from '../navigation/types';
-import { UNIFIED_COLORS, TYPOGRAPHY, SPACING, ELEVATION } from '../theme/DesignSystem';
-import { useAuth } from '../hooks/useAuth';
-import { apiClient } from '../services/api/apiClient';
+import { MainTabScreenProps } from '@/navigation/types';
+import { UNIFIED_COLORS, TYPOGRAPHY, SPACING, ELEVATION } from '@/theme/DesignSystem';
+import { useAuth } from '@/hooks/useAuth';
+import { apiClient } from '@/services/api/apiClient';
 
 type Props = MainTabScreenProps<'Profile'>;
 

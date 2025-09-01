@@ -5,7 +5,7 @@ import { DesignSystem } from '@/theme/DesignSystem';
 
 // Lazy load the AynaMirrorScreen component
 const AynaMirrorScreen = React.lazy(() =>
-  import('../../screens/AynaMirrorScreen').then((module) => ({
+  import('@/screens/AynaMirrorScreen').then((module) => ({
     default: module.AynaMirrorScreen,
   })),
 );

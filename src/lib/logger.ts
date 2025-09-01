@@ -109,7 +109,7 @@ async function sendToMonitoring(entry: LogEntry): Promise<void> {
   // Send to Sentry for production monitoring
   if (!__DEV__) {
     try {
-      const { Sentry } = await import('../config/sentry');
+      const { Sentry } = await import('@/config/sentry');
 
       if (entry.level === 'error') {
         Sentry.captureException(new Error(entry.message));

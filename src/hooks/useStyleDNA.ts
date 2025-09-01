@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { styleDNAService } from '@/services/styleDNAService';
 
-import { errorInDev, logInDev } from '../utils/consoleSuppress';
+import { errorInDev, logInDev } from '@/utils/consoleSuppress';
 
 interface UploadedPhoto {
   id: string;

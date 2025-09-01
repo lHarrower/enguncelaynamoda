@@ -1,9 +1,18 @@
-// PASTE THIS ENTIRE CODE BLOCK INTO YOUR AuthContext.tsx FILE
+// AuthContext - Wrapper for backward compatibility
+// Note: This context now uses the global Zustand store for state management
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 
-import { apiClient } from '../services/api/apiClient';
-import { supabase } from '../config/supabaseClient'; // Keep for backward compatibility
+import { apiClient } from '@/services/api/apiClient';
+import { supabase } from '@/config/supabaseClient'; // Keep for backward compatibility
+import {
+  useSession,
+  useUser,
+  useUserProfile,
+  useAuthLoading,
+  useNeedsOnboarding,
+  useAuthActions
+} from '@/store/globalStore';
 
 // Safe wrappers around expo-router hooks to maintain consistent hook order across renders
 // Import hooks directly to avoid conditional hook calls
@@ -59,7 +68,7 @@ import * as AuthSession from 'expo-auth-session';
 import Constants from 'expo-constants';
 import { Alert } from 'react-native';
 
-import { logger } from '../utils/logger';
+import { logger } from '@/utils/logger';
 
 // This is used to close the browser window after auth completes.
 WebBrowser.maybeCompleteAuthSession();
@@ -106,11 +115,20 @@ export function useAuth() {
 
 // The AuthProvider component that will wrap our app
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [needsOnboarding, setNeedsOnboarding] = useState(false);
-  const [userProfile, setUserProfile] = useState<AuthUserProfile | null>(null);
+  // Use global store state
+  const session = useSession();
+  const user = useUser();
+  const loading = useAuthLoading();
+  const needsOnboarding = useNeedsOnboarding();
+  const userProfile = useUserProfile();
+  const {
+    setSession,
+    setUser,
+    setAuthLoading,
+    setNeedsOnboarding,
+    setUserProfile
+  } = useAuthActions();
+  
   const router = useRouterSafe();
   const segments = useSegmentsSafe();
 

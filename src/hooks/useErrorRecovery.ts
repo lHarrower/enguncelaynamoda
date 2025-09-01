@@ -2,8 +2,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 
-import { ErrorReporting } from '../services/ErrorReporting';
-import { AppError, ErrorCategory, errorHandler, ErrorSeverity } from '../utils/ErrorHandler';
+import { ErrorReporting } from '@/services/ErrorReporting';
+import { AppError, ErrorCategory, errorHandler, ErrorSeverity } from '@/utils/ErrorHandler';
+import { useErrorContext } from '@/providers/ErrorProvider';
 
 /**
  * Retry Configuration
@@ -141,6 +142,7 @@ function _useErrorRecovery<T>(
   operation?: () => Promise<T>,
   config?: Partial<RetryConfig> & { maxRetries?: number },
 ) {
+  const { reportError } = useErrorContext();
   const [state, setState] = useState<RecoveryState>({
     isRetrying: false,
     attempt: 0,
@@ -259,8 +261,8 @@ function _useErrorRecovery<T>(
           canRetry,
         }));
 
-        // Report error
-        ErrorReporting.reportError(appError, {
+        // Report error through ErrorProvider
+        reportError(appError, {
           operation: 'useErrorRecovery',
           attempt: newAttempt,
           canRetry,

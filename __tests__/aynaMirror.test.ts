@@ -7,7 +7,7 @@ import {
   OutfitRecommendation,
   WeatherContext,
   ItemCategory,
-} from '../src/types/aynaMirror';
+} from '@/src/types/aynaMirror';
 import { EnhancedWardrobeService } from '@/services/enhancedWardrobeService';
 import { AynaMirrorService } from '@/services/aynaMirrorService';
 

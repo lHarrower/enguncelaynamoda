@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect } from 'react';
 
 import i18n, { availableLocales, setLocale } from '@/config/i18n';
+import { useLanguage, useUIActions } from '@/store/globalStore';
 import { errorInDev } from '@/utils/consoleSuppress';
 
 interface I18nOptions {
@@ -21,8 +22,12 @@ const I18nContext = createContext<I18nContextType | undefined>(undefined);
 const LOCALE_STORAGE_KEY = 'user_locale';
 
 export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [locale, setLocaleState] = useState<string>('en');
-  const [isRTL, setIsRTL] = useState<boolean>(false);
+  const locale = useLanguage();
+  const { setLanguage } = useUIActions();
+  
+  // Convert global store language to locale format
+  const currentLocale = locale === 'tr' ? 'tr' : 'en';
+  const isRTL = ['ar', 'he', 'fa'].includes(currentLocale);
 
   useEffect(() => {
     initializeLocale();
@@ -34,15 +39,17 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const savedLocale = await AsyncStorage.getItem(LOCALE_STORAGE_KEY);
 
       if (savedLocale && availableLocales.some((l) => l.code === savedLocale)) {
-        await changeLocale(savedLocale);
+        // Update i18n with saved locale
+        setLocale(savedLocale);
       } else {
-        // Use default locale as fallback
-        const localeToUse = 'en';
-        await changeLocale(localeToUse);
+        // Use current global store language or fallback to English
+        const fallbackLocale = currentLocale || 'en';
+        setLocale(fallbackLocale);
+        await AsyncStorage.setItem(LOCALE_STORAGE_KEY, fallbackLocale);
       }
     } catch (error) {
       errorInDev('Error initializing locale:', error);
-      await changeLocale('en'); // Fallback to English
+      setLocale('en'); // Fallback to English
     }
   };
 
@@ -51,11 +58,9 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       // Update i18n
       setLocale(newLocale);
 
-      // Update state
-      setLocaleState(newLocale);
-
-      // Update RTL status (add more RTL languages as needed)
-      setIsRTL(['ar', 'he', 'fa'].includes(newLocale));
+      // Convert locale to global store format and update
+      const globalLanguage = newLocale === 'tr' ? 'tr' : 'en';
+      setLanguage(globalLanguage);
 
       // Save to storage
       await AsyncStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
@@ -69,7 +74,7 @@ export const I18nProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const value: I18nContextType = {
-    locale,
+    locale: currentLocale,
     setLocale: changeLocale,
     t,
     availableLocales,
