@@ -1,6 +1,21 @@
-# AYNAMODA 👗✨
+# AYNAMODA - AI-Powered Wardrobe Management Platform 👗✨
 
-**AYNAMODA** is a revolutionary AI-powered fashion companion that transforms how you interact with your wardrobe. Combining cutting-edge technology with sustainable fashion practices, AYNAMODA helps you make smarter, more conscious fashion choices while maximizing your style potential.
+> "Sakin Teknoloji" ve "Dişil Zarafet" prensipleriyle tasarlanmış, kullanıcıların gardıroplarını akıllıca yönetmelerine yardımcı olan platform.
+
+## 🚀 Proje Durumu
+
+**Faz 1: "Çelik Çekirdek" Operasyonu** ✅ TAMAMLANDI
+- Go API Dockerize edildi
+- Terraform ile GCP altyapısı hazırlandı
+- GitHub Actions CI/CD pipeline'ı oluşturuldu
+- Kubernetes manifests'leri hazırlandı
+- Monitoring ve logging altyapısı kuruldu
+- **Canlı Geliştirme Endpoint'i:** `api.dev.aynamoda.com` hazır
+
+**Faz 2: "İlk Işık" Operasyonu** 🔄 BAŞLIYOR
+- React Native frontend entegrasyonu
+- Stil DNA testi ve manuel ürün ekleme akışı
+- 50 kişilik "Kurucu Ortak" kapalı beta
 
 ## 🌟 Features
 
@@ -31,6 +46,67 @@
 ## 🎯 Project Overview
 
 AynaModa is a hyper-personalized fashion app that saves users from discount noise and decision fatigue by recommending sales on items that complement their existing virtual wardrobe.
+
+## 🏗️ Mimari Genel Bakış
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React Native  │    │   Web Frontend  │    │   Admin Panel   │
+│   Mobile App    │    │   (Future)      │    │   (Future)      │
+└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+          │                      │                      │
+          └──────────────────────┼──────────────────────┘
+                                 │
+                    ┌─────────────┴─────────────┐
+                    │     Load Balancer         │
+                    │     (GCP Load Balancer)   │
+                    └─────────────┬─────────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    │     Kubernetes Cluster    │
+                    │     (Google GKE)          │
+                    │                           │
+                    │  ┌─────────────────────┐  │
+                    │  │   AYNAMODA API      │  │
+                    │  │   (Go + Gin)        │  │
+                    │  └─────────┬───────────┘  │
+                    │            │              │
+                    │  ┌─────────┴───────────┐  │
+                    │  │   PostgreSQL        │  │
+                    │  │   (Cloud SQL)       │  │
+                    │  └─────────────────────┘  │
+                    │                           │
+                    │  ┌─────────────────────┐  │
+                    │  │   Redis Cache       │  │
+                    │  │   (Memorystore)     │  │
+                    │  └─────────────────────┘  │
+                    └───────────────────────────┘
+```
+
+## 🛠️ Teknoloji Stack
+
+### Backend
+- **Go 1.21+** - Ana programlama dili
+- **Gin** - HTTP web framework
+- **GORM** - ORM kütüphanesi
+- **PostgreSQL** - Ana veritabanı (PGVector ile)
+- **Redis** - Cache ve session yönetimi
+- **JWT** - Authentication
+- **Docker** - Containerization
+
+### Infrastructure
+- **Google Cloud Platform (GCP)** - Cloud provider
+- **Google Kubernetes Engine (GKE)** - Container orchestration
+- **Cloud SQL** - Managed PostgreSQL
+- **Cloud Storage** - File storage
+- **Artifact Registry** - Container registry
+- **Terraform** - Infrastructure as Code
+- **GitHub Actions** - CI/CD
+
+### Monitoring & Observability
+- **Prometheus** - Metrics collection
+- **Grafana** - Metrics visualization
+- **AlertManager** - Alert management
 
 ## 📱 Mobile UI Skeleton (v1.0)
 
@@ -123,12 +199,174 @@ app/
 - `npm run ios` - Run on iOS (macOS only)
 - `npm run web` - Run on web
 
+## 🚀 Kurulum ve Deployment
+
+### Gereksinimler
+
+- Go 1.21+
+- Docker & Docker Compose
+- PostgreSQL 15+
+- Redis 7+
+- Terraform 1.6+
+- kubectl
+- gcloud CLI
+
+### Yerel Geliştirme Ortamı
+
+1. **Repository'yi klonlayın:**
+   ```bash
+   git clone https://github.com/your-org/aynamoda.git
+   cd aynamoda
+   ```
+
+2. **Environment dosyalarını ayarlayın:**
+   ```bash
+   cp .env.development .env
+   # .env dosyasını düzenleyin
+   ```
+
+3. **Docker Compose ile servisleri başlatın:**
+   ```bash
+   cd api
+   docker-compose up -d
+   ```
+
+4. **Veritabanı migration'larını çalıştırın:**
+   ```bash
+   cd scripts
+   chmod +x migrate.sh
+   ./migrate.sh --environment development --action up
+   ```
+
+5. **API'yi başlatın:**
+   ```bash
+   cd api
+   go mod download
+   go run main.go
+   ```
+
+API şu adreste çalışacak: `http://localhost:8080`
+
+### Production Deployment
+
+#### Ön Gereksinimler
+
+1. **GCP Projesi oluşturun:**
+   ```bash
+   gcloud projects create your-project-id
+   gcloud config set project your-project-id
+   
+   # Gerekli API'leri etkinleştir
+   gcloud services enable container.googleapis.com
+   gcloud services enable sqladmin.googleapis.com
+   gcloud services enable compute.googleapis.com
+   gcloud services enable storage.googleapis.com
+   ```
+
+2. **Service Account oluşturun:**
+   ```bash
+   gcloud iam service-accounts create aynamoda-terraform \
+     --display-name="AYNAMODA Terraform Service Account"
+   
+   gcloud projects add-iam-policy-binding your-project-id \
+     --member="serviceAccount:aynamoda-terraform@your-project-id.iam.gserviceaccount.com" \
+     --role="roles/editor"
+   
+   gcloud iam service-accounts keys create terraform-key.json \
+     --iam-account=aynamoda-terraform@your-project-id.iam.gserviceaccount.com
+   ```
+
+#### GitHub Secrets Ayarlama
+
+GitHub repository'nizde şu secrets'ları ayarlayın:
+
+```
+GCP_PROJECT_ID=your-project-id
+GCP_SA_KEY=<terraform-key.json içeriği>
+TF_STATE_BUCKET=your-project-id-terraform-state
+DB_PASSWORD=<güçlü-veritabanı-şifresi>
+JWT_SECRET=<güçlü-jwt-secret>
+```
+
+#### Infrastructure Deployment
+
+1. **Terraform değişkenlerini ayarlayın:**
+   ```bash
+   cd infrastructure/terraform
+   cp terraform.tfvars.example terraform.tfvars
+   # terraform.tfvars dosyasını düzenleyin
+   ```
+
+2. **Terraform ile altyapıyı oluşturun:**
+   ```bash
+   terraform init
+   terraform plan
+   terraform apply
+   ```
+
+3. **Kubernetes cluster'a bağlanın:**
+   ```bash
+   gcloud container clusters get-credentials aynamoda-cluster \
+     --region europe-west1 --project your-project-id
+   ```
+
+#### Otomatik Deployment
+
+GitHub Actions otomatik deployment için:
+
+1. `main` branch'ine push yapın
+2. GitHub Actions otomatik olarak:
+   - Testleri çalıştırır
+   - Docker image'ını build eder
+   - GKE'ye deploy eder
+   - Health check yapar
+
+## 📚 API Dokümantasyonu
+
+### Ana Endpoint'ler
+
+#### Authentication
+- `POST /api/v1/auth/register` - Kullanıcı kaydı
+- `POST /api/v1/auth/login` - Kullanıcı girişi
+- `POST /api/v1/auth/refresh` - Token yenileme
+- `POST /api/v1/auth/logout` - Çıkış
+
+#### Users
+- `GET /api/v1/users/profile` - Profil bilgileri
+- `PUT /api/v1/users/profile` - Profil güncelleme
+- `POST /api/v1/users/style-dna` - Stil DNA testi
+- `POST /api/v1/users/reset-password` - Şifre sıfırlama
+
+#### Products
+- `GET /api/v1/products` - Ürün listesi
+- `POST /api/v1/products` - Ürün ekleme
+- `GET /api/v1/products/:id` - Ürün detayı
+- `PUT /api/v1/products/:id` - Ürün güncelleme
+- `DELETE /api/v1/products/:id` - Ürün silme
+- `POST /api/v1/products/:id/images` - Ürün resmi yükleme
+
+#### Categories
+- `GET /api/v1/categories` - Kategori listesi
+- `POST /api/v1/categories` - Kategori ekleme (Admin)
+- `GET /api/v1/categories/:id/products` - Kategoriye göre ürünler
+
+#### Outfits
+- `GET /api/v1/outfits` - Kombin listesi
+- `POST /api/v1/outfits` - Kombin oluşturma
+- `GET /api/v1/outfits/:id` - Kombin detayı
+- `PUT /api/v1/outfits/:id` - Kombin güncelleme
+- `DELETE /api/v1/outfits/:id` - Kombin silme
+
+### Health Check
+- `GET /health` - Sistem durumu
+- `GET /metrics` - Prometheus metrikleri
+
 ---
 
-**Current Status**: ✅ Mobile UI Skeleton Complete + Colorful Design ✨  
-**Latest Update**: Enhanced with vibrant mid-tone color palette and fixed navigation spacing  
-**Next Phase**: Backend Foundation  
-**Version**: 1.1.0
+**Current Status**: ✅ Faz 1 "Çelik Çekirdek" Operasyonu Tamamlandı  
+**Latest Update**: Production-ready infrastructure ve CI/CD pipeline hazır  
+**Next Phase**: Faz 2 "İlk Işık" - Frontend entegrasyonu  
+**Version**: 2.0.0
 
 ---
 

@@ -1,0 +1,42 @@
+# AYNAMODA Kubernetes Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aynamoda
+  labels:
+    name: aynamoda
+    project: aynamoda
+    managed-by: terraform
+---
+# Development Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aynamoda-dev
+  labels:
+    name: aynamoda-dev
+    project: aynamoda
+    environment: development
+    managed-by: terraform
+---
+# Staging Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aynamoda-staging
+  labels:
+    name: aynamoda-staging
+    project: aynamoda
+    environment: staging
+    managed-by: terraform
+---
+# Production Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aynamoda-prod
+  labels:
+    name: aynamoda-prod
+    project: aynamoda
+    environment: production
+    managed-by: terraform

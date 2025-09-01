@@ -1,0 +1,126 @@
+# AYNAMODA API Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aynamoda-api
+  namespace: aynamoda-dev
+  labels:
+    app: aynamoda-api
+    version: v1
+    component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aynamoda-api
+  template:
+    metadata:
+      labels:
+        app: aynamoda-api
+        version: v1
+        component: backend
+    spec:
+      serviceAccountName: aynamoda-api-sa
+      containers:
+      - name: api
+        image: europe-west1-docker.pkg.dev/PROJECT_ID/aynamoda/api:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: ENV
+          value: "development"
+        - name: PORT
+          value: "8080"
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: aynamoda-secrets
+              key: db-host
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: aynamoda-secrets
+              key: db-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: aynamoda-secrets
+              key: db-password
+        - name: DB_NAME
+          value: "aynamoda"
+        - name: DB_SSL_MODE
+          value: "require"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: aynamoda-secrets
+              key: jwt-secret
+        - name: JWT_REFRESH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: aynamoda-secrets
+              key: jwt-refresh-secret
+        - name: CORS_ALLOWED_ORIGINS
+          value: "https://dev.aynamoda.com,https://staging.aynamoda.com,https://aynamoda.com"
+        - name: RATE_LIMIT_REQUESTS_PER_MINUTE
+          value: "100"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: GCS_BUCKET_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: aynamoda-config
+              key: gcs-bucket-name
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+      securityContext:
+        fsGroup: 1001
+---
+# API Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: aynamoda-api-service
+  namespace: aynamoda-dev
+  labels:
+    app: aynamoda-api
+spec:
+  selector:
+    app: aynamoda-api
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP

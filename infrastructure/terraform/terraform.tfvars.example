@@ -1,0 +1,52 @@
+# AYNAMODA Infrastructure - Example Terraform Variables
+# Copy this file to terraform.tfvars and fill in your actual values
+
+# GCP Project Configuration
+project_id = "your-gcp-project-id"
+region     = "europe-west1"
+
+# Environment Configuration
+environment = "development"
+
+# GKE Configuration
+gke_num_nodes    = 2
+gke_machine_type = "e2-medium"
+gke_min_nodes    = 1
+gke_max_nodes    = 5
+
+# Database Configuration
+db_tier     = "db-f1-micro"  # Use db-custom-2-4096 for production
+db_user     = "aynamoda"
+db_password = "your-secure-database-password-change-this"
+
+# Domain Configuration
+domain_name    = "aynamoda.com"
+api_subdomain  = "api"
+
+# SSL Certificate Domains
+ssl_certificate_domains = [
+  "api.dev.aynamoda.com",
+  "api.staging.aynamoda.com",
+  "api.aynamoda.com"
+]
+
+# Monitoring Configuration
+enable_monitoring    = true
+log_retention_days   = 30
+
+# Backup Configuration
+backup_retention_days = 7
+
+# Network Configuration
+vpc_cidr      = "10.0.0.0/16"
+subnet_cidr   = "10.0.0.0/24"
+pods_cidr     = "10.1.0.0/16"
+services_cidr = "10.2.0.0/16"
+
+# Resource Labels
+labels = {
+  project    = "aynamoda"
+  managed_by = "terraform"
+  team       = "backend"
+  owner      = "cto"
+}

@@ -1,0 +1,215 @@
+# AYNAMODA API - CI/CD Pipeline
+# This workflow builds and deploys the Go API to GKE
+
+name: Deploy API to GKE
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'api/**'
+      - '.github/workflows/deploy-api.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'api/**'
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GKE_CLUSTER: aynamoda-cluster
+  GKE_ZONE: europe-west1
+  DEPLOYMENT_NAME: aynamoda-api
+  IMAGE: aynamoda-api
+  REGISTRY_HOSTNAME: europe-west1-docker.pkg.dev
+
+jobs:
+  # Test Job
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./api
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+    
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    
+    - name: Download dependencies
+      run: go mod download
+    
+    - name: Run tests
+      run: go test -v ./...
+    
+    - name: Run go vet
+      run: go vet ./...
+    
+    - name: Run staticcheck
+      uses: dominikh/staticcheck-action@v1.3.0
+      with:
+        version: "2023.1.6"
+        install-go: false
+        working-directory: ./api
+
+  # Build and Deploy Job
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
+    defaults:
+      run:
+        working-directory: ./api
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+    
+    - name: Configure Docker to use gcloud as a credential helper
+      run: |
+        gcloud auth configure-docker $REGISTRY_HOSTNAME
+    
+    - name: Set environment variables
+      run: |
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          echo "ENVIRONMENT=production" >> $GITHUB_ENV
+          echo "NAMESPACE=aynamoda-prod" >> $GITHUB_ENV
+          echo "IMAGE_TAG=prod-${{ github.sha }}" >> $GITHUB_ENV
+        else
+          echo "ENVIRONMENT=development" >> $GITHUB_ENV
+          echo "NAMESPACE=aynamoda-dev" >> $GITHUB_ENV
+          echo "IMAGE_TAG=dev-${{ github.sha }}" >> $GITHUB_ENV
+        fi
+    
+    - name: Build Docker image
+      run: |
+        docker build -t $REGISTRY_HOSTNAME/$PROJECT_ID/aynamoda/$IMAGE:$IMAGE_TAG .
+        docker build -t $REGISTRY_HOSTNAME/$PROJECT_ID/aynamoda/$IMAGE:latest .
+    
+    - name: Push Docker image
+      run: |
+        docker push $REGISTRY_HOSTNAME/$PROJECT_ID/aynamoda/$IMAGE:$IMAGE_TAG
+        docker push $REGISTRY_HOSTNAME/$PROJECT_ID/aynamoda/$IMAGE:latest
+    
+    - name: Get GKE credentials
+      run: |
+        gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $PROJECT_ID
+    
+    - name: Create namespace if not exists
+      run: |
+        kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+    
+    - name: Deploy to GKE
+      run: |
+        # Update the image in the deployment
+        kubectl set image deployment/$DEPLOYMENT_NAME api=$REGISTRY_HOSTNAME/$PROJECT_ID/aynamoda/$IMAGE:$IMAGE_TAG -n $NAMESPACE
+        
+        # Wait for rollout to complete
+        kubectl rollout status deployment/$DEPLOYMENT_NAME -n $NAMESPACE --timeout=300s
+        
+        # Verify deployment
+        kubectl get services -o wide -n $NAMESPACE
+    
+    - name: Update secrets (if needed)
+      run: |
+        # Update database connection string
+        kubectl create secret generic aynamoda-secrets \
+          --from-literal=db-host="${{ secrets.DB_HOST }}" \
+          --from-literal=db-user="${{ secrets.DB_USER }}" \
+          --from-literal=db-password="${{ secrets.DB_PASSWORD }}" \
+          --from-literal=jwt-secret="${{ secrets.JWT_SECRET }}" \
+          --from-literal=jwt-refresh-secret="${{ secrets.JWT_REFRESH_SECRET }}" \
+          --namespace=$NAMESPACE \
+          --dry-run=client -o yaml | kubectl apply -f -
+    
+    - name: Run database migrations
+      run: |
+        # Create a job to run database migrations
+        kubectl create job migrate-${{ github.sha }} \
+          --image=$REGISTRY_HOSTNAME/$PROJECT_ID/aynamoda/$IMAGE:$IMAGE_TAG \
+          --namespace=$NAMESPACE \
+          -- /bin/sh -c "./main migrate"
+        
+        # Wait for migration job to complete
+        kubectl wait --for=condition=complete job/migrate-${{ github.sha }} --timeout=300s -n $NAMESPACE
+    
+    - name: Health check
+      run: |
+        # Get the external IP
+        EXTERNAL_IP=$(kubectl get service aynamoda-api-service -n $NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        # Wait for external IP to be assigned
+        timeout=300
+        while [ -z "$EXTERNAL_IP" ] && [ $timeout -gt 0 ]; do
+          echo "Waiting for external IP..."
+          sleep 10
+          EXTERNAL_IP=$(kubectl get service aynamoda-api-service -n $NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          timeout=$((timeout-10))
+        done
+        
+        if [ -n "$EXTERNAL_IP" ]; then
+          echo "External IP: $EXTERNAL_IP"
+          # Test health endpoint
+          curl -f http://$EXTERNAL_IP/health || exit 1
+          echo "Health check passed!"
+        else
+          echo "External IP not assigned within timeout"
+          exit 1
+        fi
+    
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ Deployment successful to $ENVIRONMENT environment"
+        else
+          echo "❌ Deployment failed to $ENVIRONMENT environment"
+        fi
+
+  # Security scan
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './api'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
