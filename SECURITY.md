@@ -1,4 +1,39 @@
-# Security Guidelines for AYNAMODA
+# Security Policy
+
+## Supported Versions
+
+We release patches for security vulnerabilities. Which versions are eligible for receiving such patches depends on the CVSS v3.0 Rating:
+
+| Version | Supported          |
+| ------- | ------------------ |
+| 1.x.x   | :white_check_mark: |
+| < 1.0   | :x:                |
+
+## Reporting a Vulnerability
+
+We take the security of AYNAMODA seriously. If you believe you have found a security vulnerability, please report it to us as described below.
+
+### Where to Report
+
+**Please do NOT report security vulnerabilities through public GitHub issues.**
+
+Instead, please report them via email to: **security@aynamoda.com**
+
+### What to Include
+
+Please include the following information in your report:
+
+- **Type of issue** (e.g. buffer overflow, SQL injection, cross-site scripting, etc.)
+- **Full paths of source file(s)** related to the manifestation of the issue
+- **The location of the affected source code** (tag/branch/commit or direct URL)
+- **Any special configuration required** to reproduce the issue
+- **Step-by-step instructions to reproduce the issue**
+- **Proof-of-concept or exploit code** (if possible)
+- **Impact of the issue**, including how an attacker might exploit the issue
+
+### Response Timeline
+
+We will acknowledge receipt of your vulnerability report within 48 hours and will send you regular updates about our progress.
 
 ## Environment Variables
 
@@ -8,6 +43,7 @@
 2. Use `.env.example` as a template for required variables
 3. Use different API keys for development, staging, and production
 4. Rotate API keys regularly (every 90 days)
+5. Use secure secret management in production
 
 ### Required Environment Variables
 

@@ -20,6 +20,7 @@ import { WardrobeItemForm } from '../components/wardrobe/WardrobeItemForm';
 import { useAINaming } from '../hooks/useAINaming';
 import { enhancedWardrobeService } from '../services/enhancedWardrobeService';
 import { DesignSystem } from '../theme/DesignSystem';
+import theme from '../styles/theme';
 import { ItemCategory, WardrobeItem } from '../types/aynaMirror';
 import { errorInDev } from '../utils/consoleSuppress';
 
@@ -1211,7 +1212,7 @@ const styles = StyleSheet.create({
     fontWeight: DesignSystem.typography.weights.medium,
   },
   container: {
-    backgroundColor: DesignSystem.colors.background.primary,
+    backgroundColor: theme.colors.background.primary,
     flex: 1,
   },
   emptyContainer: {
