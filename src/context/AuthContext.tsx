@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-import { supabase } from '../config/supabaseClient'; // Make sure this path is correct
+import { apiClient } from '../services/api/apiClient';
+import { supabase } from '../config/supabaseClient'; // Keep for backward compatibility
 
 // Safe wrappers around expo-router hooks to maintain consistent hook order across renders
 // Import hooks directly to avoid conditional hook calls
@@ -234,40 +235,71 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set loading to true initially
     setLoading(true);
 
-    // Get the current session (async IIFE to avoid floating promise + clearer control flow)
+    // Check if user is authenticated with our API
     void (async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await checkOnboardingStatus(session.user.id);
+        // Check if we have a stored token
+        const token = await apiClient.getToken();
+        if (token) {
+          // Try to get user profile to verify token is valid
+          try {
+            const userProfile = await apiClient.getUserProfile();
+            
+            // Create a mock session for compatibility
+            const mockSession = {
+              access_token: token,
+              refresh_token: '',
+              expires_in: 3600,
+              token_type: 'bearer',
+              user: {
+                id: userProfile.user_id,
+                email: userProfile.email || '',
+                email_confirmed_at: new Date().toISOString(),
+                created_at: userProfile.created_at,
+                updated_at: userProfile.updated_at,
+              },
+            } as Session;
+            
+            setSession(mockSession);
+            setUser(mockSession.user);
+            setUserProfile(userProfile);
+            setNeedsOnboarding(!userProfile.onboarding_completed);
+          } catch (profileError) {
+            // Token is invalid, clear it
+            await apiClient.clearToken();
+            setSession(null);
+            setUser(null);
+            setUserProfile(null);
+            setNeedsOnboarding(false);
+          }
+        } else {
+          // No token, user is not authenticated
+          setSession(null);
+          setUser(null);
+          setUserProfile(null);
+          setNeedsOnboarding(false);
         }
       } catch (err) {
-        logger.error('Auth getSession failed:', err instanceof Error ? err : String(err));
+        logger.error('Auth initialization failed:', err instanceof Error ? err : String(err));
         setSession(null);
         setUser(null);
+        setUserProfile(null);
+        setNeedsOnboarding(false);
       } finally {
         setLoading(false);
       }
     })();
 
-    // Listen for changes in authentication state (signIn, signOut, etc.)
+    // Keep Supabase auth listener for backward compatibility with Google/Apple sign-in
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event: string, session: Session | null) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
+      // Only handle Supabase auth for social logins
+      if (session?.user && (session.user.app_metadata?.provider === 'google' || session.user.app_metadata?.provider === 'apple')) {
+        setSession(session);
+        setUser(session.user);
         await checkOnboardingStatus(session.user.id);
-      } else {
-        setNeedsOnboarding(false);
-        setUserProfile(null);
       }
-
       setLoading(false);
     });
 
@@ -344,37 +376,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Email/Password Sign Up
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-        },
-        emailRedirectTo: `${process.env.EXPO_PUBLIC_SUPABASE_URL}/auth/callback`,
-      },
-    });
-    if (error) {
-      throw error;
+    try {
+      const response = await apiClient.register({
+        email,
+        password,
+        firstName,
+        lastName,
+      });
+      
+      // Store the token if registration is successful
+      if (response.token) {
+        await apiClient.setToken(response.token);
+      }
+    } catch (error: any) {
+      throw new Error(error.message || 'Registration failed');
     }
   };
 
   // Email/Password Sign In
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      throw error;
-    }
-
-    // Check if email is verified
-    if (data.user && !data.user.email_confirmed_at) {
-      throw new Error(
-        'E-posta adresinizi doğrulamanız gerekiyor. Lütfen e-postanızı kontrol edin.',
-      );
+    try {
+      const response = await apiClient.login({ email, password });
+      
+      // Store the token if login is successful
+      if (response.token) {
+        await apiClient.setToken(response.token);
+        
+        // Get user profile after successful login
+        const userProfile = await apiClient.getUserProfile();
+        setUserProfile(userProfile);
+        
+        // Check onboarding status
+        setNeedsOnboarding(!userProfile.onboarding_completed);
+      }
+    } catch (error: any) {
+      throw new Error(error.message || 'Login failed');
     }
   };
 
@@ -417,25 +453,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       logger.info('Attempting to sign out...');
 
-      // Attempt a global sign-out first so that refresh tokens are revoked server-side.
-      const { error: globalError } = await supabase.auth.signOut();
+      // Sign out from our API
+      try {
+        await apiClient.logout();
+      } catch (apiError) {
+        logger.error('API logout failed:', apiError);
+      }
 
-      if (globalError) {
-        /*
-         * supabase may return errors such as:
-         *   "AuthApiError: Invalid Refresh Token: Refresh Token Not Found"
-         * when the client no longer has (or never had) a valid refresh token.
-         * In these situations we still want to make sure the local session is
-         * cleared so the user is effectively signed out. Therefore, on *any*
-         * error we fall back to a local sign-out instead of blocking the flow.
-         */
-        logger.error(
-          'Global sign out failed – falling back to local sign out. Details:',
-          globalError,
-        );
+      // Clear the stored token
+      await apiClient.clearToken();
 
-        // Best-effort local sign-out; ignore any resulting error.
-        await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+      // Clear local state
+      setSession(null);
+      setUser(null);
+      setUserProfile(null);
+      setNeedsOnboarding(false);
+
+      // Also attempt Supabase sign-out for backward compatibility
+      try {
+        await supabase.auth.signOut();
+      } catch (supabaseError) {
+        logger.error('Supabase sign out failed:', supabaseError);
       }
 
       logger.info('Sign out successful');

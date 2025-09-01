@@ -1,10 +1,9 @@
 // Authentication Hook
-import type { Session } from '@supabase/supabase-js';
 import { useCallback, useEffect, useState } from 'react';
 
 import { logInDev, warnInDev } from '@/utils/consoleSuppress';
+import { apiClient, LoginRequest, RegisterRequest, UserProfile as ApiUserProfile } from '@/services/api/apiClient';
 
-import { supabase } from '../config/supabaseClient';
 import { User, UserAppPreferences, UserProfile, UserSubscription } from '../types/user';
 import { isObject, safeParse } from '../utils/safeJSON';
 import { secureStorage } from '../utils/secureStorage';
@@ -21,7 +20,7 @@ export interface UseAuthReturn extends AuthState {
   signUp: (
     email: string,
     password: string,
-    userData?: Partial<User>,
+    name?: string,
   ) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<{ success: boolean; error?: string }>;
@@ -174,106 +173,188 @@ export function useAuth(): UseAuthReturn {
     void loadStoredUser(); // eslint-disable-line no-void
   }, []);
 
-  // Listen for auth state changes
+  // Check authentication status on mount
   useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event: string, session: Session | null) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        // User signed in, state will be updated automatically
-        logInDev('User signed in');
-      } else if (event === 'SIGNED_OUT') {
-        setState({
-          user: null,
-          loading: false,
-          error: null,
-          isAuthenticated: false,
-        });
-        await secureStorage.removeItem('ayna_auth_user');
+    const checkAuthStatus = async () => {
+      try {
+        const isAuth = await apiClient.isAuthenticated();
+        if (isAuth) {
+          const profileResponse = await apiClient.getUserProfile();
+          if (profileResponse.success && profileResponse.data) {
+            // Convert API user profile to local User type
+            const apiUser = profileResponse.data;
+            const user: User = {
+              id: apiUser.id,
+              email: apiUser.email,
+              name: apiUser.name || '',
+              avatar: apiUser.avatar_url,
+              preferences: {
+                theme: 'light',
+                notifications: true,
+                hapticFeedback: true,
+                autoBackup: true,
+                aiSuggestions: true,
+                privacyMode: false,
+              },
+              profile: {
+                style: 'casual',
+                favoriteColors: [],
+                bodyType: 'average',
+                lifestyle: 'casual',
+                budget: 'medium',
+                sustainabilityGoals: [],
+              },
+              subscription: {
+                plan: 'free',
+                status: 'active',
+                expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+              },
+              createdAt: new Date(apiUser.created_at),
+              updatedAt: new Date(apiUser.updated_at),
+            };
+            
+            setState(prev => ({
+              ...prev,
+              user,
+              isAuthenticated: true,
+              loading: false,
+            }));
+            
+            await secureStorage.setItem('ayna_auth_user', JSON.stringify(user));
+          } else {
+            setState(prev => ({ ...prev, loading: false }));
+          }
+        } else {
+          setState(prev => ({ ...prev, loading: false }));
+        }
+      } catch (error) {
+        warnInDev('Auth check failed:', error);
+        setState(prev => ({ ...prev, loading: false }));
       }
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    void checkAuthStatus();
   }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const loginRequest: LoginRequest = { email, password };
+      const response = await apiClient.login(loginRequest);
 
-      if (error) {
-        setState((prev) => ({ ...prev, loading: false, error: error.message }));
-        return { success: false, error: error.message };
-      }
+      if (response.success && response.data) {
+        const apiUser = response.data.user;
+        const user: User = {
+          id: apiUser.id,
+          email: apiUser.email,
+          name: apiUser.name || '',
+          avatar: apiUser.avatar_url,
+          preferences: {
+            theme: 'light',
+            notifications: true,
+            hapticFeedback: true,
+            autoBackup: true,
+            aiSuggestions: true,
+            privacyMode: false,
+          },
+          profile: {
+            style: 'casual',
+            favoriteColors: [],
+            bodyType: 'average',
+            lifestyle: 'casual',
+            budget: 'medium',
+            sustainabilityGoals: [],
+          },
+          subscription: {
+            plan: 'free',
+            status: 'active',
+            expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          },
+          createdAt: new Date(apiUser.created_at),
+          updatedAt: new Date(apiUser.updated_at),
+        };
 
-      if (data.user) {
-        // Check if email is verified
-        if (!data.user.email_confirmed_at) {
-          setState((prev) => ({
-            ...prev,
-            loading: false,
-            error: 'E-posta adresinizi doğrulamanız gerekiyor. Lütfen e-postanızı kontrol edin.',
-          }));
-          return {
-            success: false,
-            error: 'E-posta adresinizi doğrulamanız gerekiyor. Lütfen e-postanızı kontrol edin.',
-          };
-        }
-
-        setState((prev) => ({ ...prev, loading: false, isAuthenticated: true }));
+        setState((prev) => ({ 
+          ...prev, 
+          user,
+          loading: false, 
+          isAuthenticated: true 
+        }));
+        
+        await secureStorage.setItem('ayna_auth_user', JSON.stringify(user));
         return { success: true };
+      } else {
+        const errorMessage = response.error || 'Giriş başarısız';
+        setState((prev) => ({ ...prev, loading: false, error: errorMessage }));
+        return { success: false, error: errorMessage };
       }
-
-      return { success: false, error: 'Sign in failed' };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Sign in failed';
+      const errorMessage = error instanceof Error ? error.message : 'Giriş başarısız';
       setState((prev) => ({ ...prev, loading: false, error: errorMessage }));
       return { success: false, error: errorMessage };
     }
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string, userData?: Partial<User>) => {
+  const signUp = useCallback(async (email: string, password: string, name?: string) => {
     try {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: userData,
-        },
-      });
+      const registerRequest: RegisterRequest = { 
+        email, 
+        password, 
+        name: name || '' 
+      };
+      const response = await apiClient.register(registerRequest);
 
-      if (error) {
-        setState((prev) => ({ ...prev, loading: false, error: error.message }));
-        return { success: false, error: error.message };
-      }
+      if (response.success && response.data) {
+        const apiUser = response.data.user;
+        const user: User = {
+          id: apiUser.id,
+          email: apiUser.email,
+          name: apiUser.name || '',
+          avatar: apiUser.avatar_url,
+          preferences: {
+            theme: 'light',
+            notifications: true,
+            hapticFeedback: true,
+            autoBackup: true,
+            aiSuggestions: true,
+            privacyMode: false,
+          },
+          profile: {
+            style: 'casual',
+            favoriteColors: [],
+            bodyType: 'average',
+            lifestyle: 'casual',
+            budget: 'medium',
+            sustainabilityGoals: [],
+          },
+          subscription: {
+            plan: 'free',
+            status: 'active',
+            expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          },
+          createdAt: new Date(apiUser.created_at),
+          updatedAt: new Date(apiUser.updated_at),
+        };
 
-      if (data.user) {
-        // Create user profile in database
-        const { error: profileError } = await supabase.from('user_profiles').insert({
-          id: data.user.id,
-          email: data.user.email,
-          ...userData,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-
-        if (profileError) {
-          warnInDev('Failed to create user profile:', profileError);
-        }
-
-        setState((prev) => ({ ...prev, loading: false, isAuthenticated: true }));
+        setState((prev) => ({ 
+          ...prev, 
+          user,
+          loading: false, 
+          isAuthenticated: true 
+        }));
+        
+        await secureStorage.setItem('ayna_auth_user', JSON.stringify(user));
         return { success: true };
+      } else {
+        const errorMessage = response.error || 'Kayıt başarısız';
+        setState((prev) => ({ ...prev, loading: false, error: errorMessage }));
+        return { success: false, error: errorMessage };
       }
-
-      return { success: false, error: 'Sign up failed' };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Sign up failed';
+      const errorMessage = error instanceof Error ? error.message : 'Kayıt başarısız';
       setState((prev) => ({ ...prev, loading: false, error: errorMessage }));
       return { success: false, error: errorMessage };
     }
@@ -283,11 +364,7 @@ export function useAuth(): UseAuthReturn {
     try {
       setState((prev) => ({ ...prev, loading: true }));
 
-      const { error } = await supabase.auth.signOut();
-
-      if (error) {
-        warnInDev('Sign out error:', error);
-      }
+      await apiClient.logout();
 
       setState({
         user: null,
@@ -299,7 +376,13 @@ export function useAuth(): UseAuthReturn {
       await secureStorage.removeItem('ayna_auth_user');
     } catch (error) {
       warnInDev('Sign out failed:', error);
-      setState((prev) => ({ ...prev, loading: false }));
+      setState({
+        user: null,
+        loading: false,
+        error: null,
+        isAuthenticated: false,
+      });
+      await secureStorage.removeItem('ayna_auth_user');
     }
   }, []);
 
@@ -307,36 +390,36 @@ export function useAuth(): UseAuthReturn {
     async (updates: Partial<User>) => {
       try {
         if (!state.user) {
-          return { success: false, error: 'No user logged in' };
+          return { success: false, error: 'Kullanıcı girişi yapılmamış' };
         }
 
         setState((prev) => ({ ...prev, loading: true, error: null }));
 
-        const { error } = await supabase
-          .from('user_profiles')
-          .update({
-            ...updates,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', state.user.id);
+        // Map local User updates to API format
+        const apiUpdates: Partial<ApiUserProfile> = {
+          name: updates.name,
+          avatar_url: updates.avatar,
+        };
 
-        if (error) {
-          setState((prev) => ({ ...prev, loading: false, error: error.message }));
-          return { success: false, error: error.message };
+        const response = await apiClient.updateUserProfile(apiUpdates);
+
+        if (response.success && response.data) {
+          const updatedUser = { ...state.user, ...updates, updatedAt: new Date() };
+          setState((prev) => ({
+            ...prev,
+            user: updatedUser,
+            loading: false,
+          }));
+
+          await secureStorage.setItem('ayna_auth_user', JSON.stringify(updatedUser));
+          return { success: true };
+        } else {
+          const errorMessage = response.error || 'Profil güncellenemedi';
+          setState((prev) => ({ ...prev, loading: false, error: errorMessage }));
+          return { success: false, error: errorMessage };
         }
-
-        const updatedUser = { ...state.user, ...updates };
-        setState((prev) => ({
-          ...prev,
-          user: updatedUser,
-          loading: false,
-        }));
-
-        await secureStorage.setItem('ayna_auth_user', JSON.stringify(updatedUser));
-
-        return { success: true };
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Update failed';
+        const errorMessage = error instanceof Error ? error.message : 'Profil güncellenemedi';
         setState((prev) => ({ ...prev, loading: false, error: errorMessage }));
         return { success: false, error: errorMessage };
       }
