@@ -6,8 +6,8 @@ import { createClient, PostgrestSingleResponse } from '@supabase/supabase-js';
 
 import { ERROR_MESSAGES } from '@/constants/AppConstants';
 
-import { errorInDev, warnInDev } from '../utils/consoleSuppress';
-import { secureStorage } from '../utils/secureStorage';
+import { errorInDev, warnInDev } from '@/utils/consoleSuppress';
+import { secureStorage } from '@/utils/secureStorage';
 
 // Environment variables
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;

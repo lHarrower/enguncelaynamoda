@@ -8,7 +8,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { logger } from '@/lib/logger';
 
-import { DesignSystem } from '../theme/DesignSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 // Loading component for lazy-loaded components
 const LoadingFallback: React.FC<{ message?: string }> = ({ message = 'Loading...' }) => (

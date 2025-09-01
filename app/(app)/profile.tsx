@@ -32,7 +32,7 @@ import {
   isTablet,
   responsiveFontSize,
   responsiveSpacing,
-} from '../../src/utils/responsiveUtils';
+} from '@/utils/responsiveUtils';
 
 const AnimatedScrollView = Animated.createAnimatedComponent(ScrollView);
 

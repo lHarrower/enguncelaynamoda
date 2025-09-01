@@ -12,7 +12,7 @@ import {
 import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { DesignSystem } from '../constants/DesignSystem';
+import { DesignSystem } from '@/theme/DesignSystem';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const IMAGE_CONTAINER_HEIGHT = SCREEN_HEIGHT * 0.6;

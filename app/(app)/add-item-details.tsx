@@ -23,8 +23,8 @@ import Animated, {
   interpolate,
   runOnJS,
 } from 'react-native-reanimated';
-import { DesignSystem } from '../../constants/DesignSystem';
-import WardrobeService from '../../services/wardrobeService';
+import { DesignSystem } from '@/theme/DesignSystem';
+import WardrobeService from '@/services/wardrobeService';
 import { useWardrobeActions } from '@/store/wardrobeStore';
 import SuccessFeedback from '@/components/SuccessFeedback';
 

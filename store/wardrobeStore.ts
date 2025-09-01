@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { WardrobeItem } from '../types/wardrobe';
-import { WardrobeService } from '../services/wardrobeService';
+import { WardrobeItem } from '@/types/wardrobe';
+import { WardrobeService } from '@/services/wardrobeService';
 
 interface WardrobeState {
   items: WardrobeItem[];

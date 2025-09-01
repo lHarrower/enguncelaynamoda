@@ -14,8 +14,8 @@ import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { DesignSystem } from '../../constants/DesignSystem';
-import ImageEditor from '../../components/ImageEditor';
+import { DesignSystem } from '@/theme/DesignSystem';
+import ImageEditor from '@/components/ImageEditor';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_PADDING = DesignSystem.spacing.lg;

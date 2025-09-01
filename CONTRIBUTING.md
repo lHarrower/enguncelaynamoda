@@ -416,6 +416,67 @@ We are committed to making participation in our project a harassment-free experi
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project team at conduct@aynamoda.com. All complaints will be reviewed and investigated promptly and fairly.
 
+## ✅ Definition of Done (Tamamlanma Tanımı)
+
+AYNAMODA projesinde bir görevin "tamamlandı" sayılabilmesi için aşağıdaki kriterlerin **tamamının** karşılanması gerekmektedir:
+
+### Zorunlu Kriterler
+
+1. **Kod Derleme Başarısı**
+   - Kod geliştirici makinesinde hatasız derlenmelidir
+   - `npm start` veya `expo start` komutu başarıyla çalışmalıdır
+   - TypeScript hataları bulunmamalıdır
+
+2. **GitHub Entegrasyonu**
+   - Kod GitHub'a push edilmelidir
+   - Pull Request oluşturulmalıdır
+   - PR açıklaması değişiklikleri net şekilde açıklamalıdır
+
+3. **CI/CD Kontrolü**
+   - GitHub Actions'daki tüm kontroller başarıyla geçmelidir
+   - Lint kontrolleri geçmelidir
+   - Build işlemi başarıyla tamamlanmalıdır
+
+4. **Code Review**
+   - En az bir takım üyesi tarafından kod incelenmelidir
+   - Tüm review yorumları çözülmelidir
+
+### Path Aliasing Standartları
+
+**FAANG Standardı**: Proje genelinde `@/` prefix'i ile path aliasing kullanılmalıdır:
+
+```typescript
+// ✅ Doğru
+import { DesignSystem } from '@/theme/DesignSystem';
+import { WardrobeService } from '@/services/wardrobeService';
+import { WardrobeItem } from '@/types/wardrobe';
+
+// ❌ Yanlış
+import { DesignSystem } from '../../src/theme/DesignSystem';
+import { WardrobeService } from '../services/wardrobeService';
+```
+
+**Mevcut Path Alias Konfigürasyonu:**
+```json
+{
+  "@/*": ["./src/*"],
+  "@/components/*": ["./src/components/*"],
+  "@/hooks/*": ["./src/hooks/*"],
+  "@/services/*": ["./src/services/*"],
+  "@/theme/*": ["./src/theme/*"],
+  "@/types/*": ["./src/types/*"],
+  "@/utils/*": ["./src/utils/*"]
+}
+```
+
+### Performans ve Kalite Standartları
+
+- **React Native Animasyonları**: `react-native-reanimated` ile native thread'de çalışmalıdır
+- **State Management**: Zustand kullanılmalıdır
+- **TypeScript**: Strict mode aktif olmalı, `any` tipi kullanımından kaçınılmalıdır
+- **UI/UX**: DesignSystem'den değerler kullanılmalıdır
+- **Test Coverage**: %80'in üzerinde olmalıdır
+
 ## 📄 License
 
 By contributing to AYNAMODA, you agree that your contributions will be licensed under the same license as the project (MIT License).
