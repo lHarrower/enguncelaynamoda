@@ -17,21 +17,15 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DesignSystem } from '@/theme/DesignSystem';
-// Lazy load heavy services for better startup performance
-let enhancedWardrobeService: any = null;
-const getEnhancedWardrobeService = async () => {
-  if (!enhancedWardrobeService) {
-    const { enhancedWardrobeService: Service } = await import(
-      '../../src/services/enhancedWardrobeService'
-    );
-    enhancedWardrobeService = Service;
-  }
-  return enhancedWardrobeService;
-};
 import { WardrobeItem } from '@/types/aynaMirror';
+import { useWardrobeStore, useWardrobeItems, useWardrobeLoading, useWardrobeError, useWardrobeActions } from '@/store/wardrobeStore';
+import SuccessFeedback from '@/components/SuccessFeedback';
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 48) / 2; // 2 columns with margins
+const CARD_MARGIN = DesignSystem.spacing.lg; // 16px
+const GRID_PADDING = DesignSystem.spacing.xl; // 24px
+const CARD_GAP = DesignSystem.spacing.md; // 12px
+const CARD_WIDTH = (width - (GRID_PADDING * 2) - CARD_GAP) / 2; // 2 columns with proper spacing
 
 // Premium Wardrobe Item Card Component
 interface WardrobeItemCardProps {
@@ -218,31 +212,43 @@ const WardrobeItemCard: React.FC<WardrobeItemCardProps> = ({
 
 // Main Wardrobe Screen Component
 export default function WardrobeScreen() {
-  const [wardrobeItems, setWardrobeItems] = useState<WardrobeItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Zustand store hooks
+  const wardrobeItems = useWardrobeItems();
+  const loading = useWardrobeLoading();
+  const error = useWardrobeError();
+  const { fetchItems, clearError } = useWardrobeActions();
+  
+  // Local state for UI interactions
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [favoriteItems, setFavoriteItems] = useState<Set<string>>(new Set());
   const [selectionMode, setSelectionMode] = useState(false);
+  const [showFavoriteFeedback, setShowFavoriteFeedback] = useState(false);
+  const [favoriteAction, setFavoriteAction] = useState<'added' | 'removed'>('added');
 
   const loadWardrobeItems = useCallback(async () => {
     try {
-      setLoading(true);
-      const service = await getEnhancedWardrobeService();
-      const items = await service.getUserWardrobe('user-id');
-      setWardrobeItems(items);
+      await fetchItems();
     } catch (error) {
-      Alert.alert('Error', 'Failed to load wardrobe items');
-    } finally {
-      setLoading(false);
+      // Error is already handled in the store
+      console.error('Failed to load wardrobe items:', error);
     }
-  }, []);
+  }, [fetchItems]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await loadWardrobeItems();
     setRefreshing(false);
   }, [loadWardrobeItems]);
+
+  // Clear error when component unmounts or error changes
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Hata', error, [
+        { text: 'Tamam', onPress: clearError }
+      ]);
+    }
+  }, [error, clearError]);
 
   const handleItemPress = useCallback(
     (item: WardrobeItem) => {
@@ -264,15 +270,25 @@ export default function WardrobeScreen() {
   const handleFavoriteToggle = useCallback(
     (itemId: string) => {
       const newFavorites = new Set(favoriteItems);
-      if (newFavorites.has(itemId)) {
+      const wasAlreadyFavorite = newFavorites.has(itemId);
+      
+      if (wasAlreadyFavorite) {
         newFavorites.delete(itemId);
+        setFavoriteAction('removed');
       } else {
         newFavorites.add(itemId);
+        setFavoriteAction('added');
       }
+      
       setFavoriteItems(newFavorites);
+      setShowFavoriteFeedback(true);
     },
     [favoriteItems],
   );
+
+  const handleFavoriteFeedbackComplete = useCallback(() => {
+    setShowFavoriteFeedback(false);
+  }, []);
 
   const renderWardrobeItem = useCallback(
     ({ item }: { item: WardrobeItem }) => (
@@ -292,6 +308,35 @@ export default function WardrobeScreen() {
   useEffect(() => {
     loadWardrobeItems();
   }, [loadWardrobeItems]);
+
+  // Show error state if there's an error and no items
+  if (error && wardrobeItems.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <LinearGradient
+          colors={[
+            DesignSystem.colors.background.primary,
+            DesignSystem.colors.background.secondary,
+            DesignSystem.colors.background.tertiary,
+          ]}
+          style={styles.backgroundGradient}
+        >
+          <View style={styles.loadingContainer}>
+            <Ionicons name="warning-outline" size={48} color={DesignSystem.colors.gold[500]} />
+            <Text style={styles.loadingText}>Gardırop yüklenirken hata oluştu</Text>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={loadWardrobeItems}
+              accessibilityRole="button"
+              accessibilityLabel="Tekrar dene"
+            >
+              <Ionicons name="refresh" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </SafeAreaView>
+    );
+  }
 
   if (loading) {
     return (
@@ -339,6 +384,16 @@ export default function WardrobeScreen() {
           contentContainerStyle={styles.gridContainer}
           columnWrapperStyle={styles.gridRow}
           showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+          getItemLayout={(data, index) => ({
+            length: CARD_WIDTH * 1.25 + CARD_MARGIN, // Approximate item height
+            offset: (CARD_WIDTH * 1.25 + CARD_MARGIN) * Math.floor(index / 2),
+            index,
+          })}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={6}
+          windowSize={10}
+          initialNumToRender={4}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -349,13 +404,92 @@ export default function WardrobeScreen() {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons name="shirt-outline" size={64} color={DesignSystem.colors.gold[500]} />
-              <Text style={styles.emptyTitle}>Your wardrobe awaits</Text>
-              <Text style={styles.emptySubtitle}>Add your first premium piece to get started</Text>
+              {/* İlham Veren Tuval */}
+              <LinearGradient
+                colors={[
+                  DesignSystem.colors.sage[50] + '40',
+                  DesignSystem.colors.gold[50] + '60',
+                  DesignSystem.colors.sage[100] + '30',
+                ]}
+                style={styles.emptyCanvas}
+              >
+                <View style={styles.emptyIconContainer}>
+                  <Ionicons 
+                    name="diamond-outline" 
+                    size={48} 
+                    color={DesignSystem.colors.gold[400]} 
+                  />
+                  <View style={styles.sparkleContainer}>
+                    <Ionicons 
+                      name="sparkles" 
+                      size={16} 
+                      color={DesignSystem.colors.sage[400]} 
+                      style={styles.sparkle1} 
+                    />
+                    <Ionicons 
+                      name="sparkles" 
+                      size={12} 
+                      color={DesignSystem.colors.gold[300]} 
+                      style={styles.sparkle2} 
+                    />
+                  </View>
+                </View>
+                
+                <Text style={styles.emptyTitle}>Koleksiyonunuz Sizi Bekliyor</Text>
+                <Text style={styles.emptySubtitle}>
+                  Her parça bir hikaye, her seçim bir sanat eseri.
+                  {"\n"}İlk hazinenizi keşfetmeye başlayın.
+                </Text>
+                
+                {/* Zarif "İlk Parçanı Ekle" Butonu */}
+                <TouchableOpacity
+                  style={styles.addFirstItemButton}
+                  onPress={() => router.push('/add-item')}
+                  activeOpacity={0.8}
+                >
+                  <LinearGradient
+                    colors={[
+                      DesignSystem.colors.gold[400],
+                      DesignSystem.colors.gold[500],
+                      DesignSystem.colors.gold[600],
+                    ]}
+                    style={styles.addFirstItemGradient}
+                  >
+                    <Ionicons name="add" size={20} color="#FFFFFF" />
+                    <Text style={styles.addFirstItemText}>İlk Parçanı Ekle</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+                
+                {/* Yönlendirici İpuçları */}
+                <View style={styles.hintContainer}>
+                  <View style={styles.hintItem}>
+                    <Ionicons name="camera" size={16} color={DesignSystem.colors.sage[500]} />
+                    <Text style={styles.hintText}>Fotoğraf çek</Text>
+                  </View>
+                  <View style={styles.hintDivider} />
+                  <View style={styles.hintItem}>
+                    <Ionicons name="images" size={16} color={DesignSystem.colors.sage[500]} />
+                    <Text style={styles.hintText}>Galeriden seç</Text>
+                  </View>
+                  <View style={styles.hintDivider} />
+                  <View style={styles.hintItem}>
+                    <Ionicons name="heart" size={16} color={DesignSystem.colors.sage[500]} />
+                    <Text style={styles.hintText}>Kürasyon yap</Text>
+                  </View>
+                </View>
+              </LinearGradient>
             </View>
           }
         />
       </LinearGradient>
+      
+      {/* Success Feedback */}
+      <SuccessFeedback
+        visible={showFavoriteFeedback}
+        title={favoriteAction === 'added' ? 'Favorilere Eklendi!' : 'Favorilerden Çıkarıldı!'}
+        message={favoriteAction === 'added' ? 'Parça favorilerinize başarıyla eklendi.' : 'Parça favorilerinizden çıkarıldı.'}
+        onComplete={handleFavoriteFeedbackComplete}
+      />
     </SafeAreaView>
   );
 }
@@ -462,20 +596,98 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
-    paddingVertical: 80,
+    paddingVertical: 60,
+    paddingHorizontal: DesignSystem.spacing.lg,
+  },
+  emptyCanvas: {
+    alignItems: 'center',
+    borderRadius: DesignSystem.borderRadius.xxl,
+    paddingVertical: DesignSystem.spacing.xxl,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    width: '100%',
+    maxWidth: 320,
+  },
+  emptyIconContainer: {
+    position: 'relative',
+    marginBottom: DesignSystem.spacing.lg,
+  },
+  sparkleContainer: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    left: -8,
+    bottom: -8,
+  },
+  sparkle1: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+  },
+  sparkle2: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
   },
   emptySubtitle: {
-    color: DesignSystem.colors.sage[700],
+    color: DesignSystem.colors.sage[600],
     fontSize: DesignSystem.typography.sizes.sm,
-    lineHeight: 20,
+    lineHeight: 22,
     textAlign: 'center',
+    marginBottom: DesignSystem.spacing.xl,
+    fontWeight: DesignSystem.typography.weights.medium,
   },
   emptyTitle: {
     color: DesignSystem.colors.text.primary,
-    fontSize: DesignSystem.typography.sizes.lg,
+    fontSize: DesignSystem.typography.sizes.xl,
     fontWeight: DesignSystem.typography.weights.bold,
-    marginBottom: DesignSystem.spacing.xs,
-    marginTop: DesignSystem.spacing.md,
+    marginBottom: DesignSystem.spacing.md,
+    textAlign: 'center',
+    fontFamily: DesignSystem.typography.fontFamily.heading,
+  },
+  addFirstItemButton: {
+    marginBottom: DesignSystem.spacing.lg,
+    borderRadius: DesignSystem.borderRadius.xl,
+    elevation: 8,
+    shadowColor: DesignSystem.colors.gold[500],
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+  },
+  addFirstItemGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: DesignSystem.spacing.md,
+    paddingHorizontal: DesignSystem.spacing.xl,
+    borderRadius: DesignSystem.borderRadius.xl,
+    gap: DesignSystem.spacing.sm,
+  },
+  addFirstItemText: {
+    color: '#FFFFFF',
+    fontSize: DesignSystem.typography.sizes.md,
+    fontWeight: DesignSystem.typography.weights.semiBold,
+    fontFamily: DesignSystem.typography.fontFamily.body,
+  },
+  hintContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: DesignSystem.spacing.sm,
+  },
+  hintItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: DesignSystem.spacing.xs,
+  },
+  hintText: {
+    color: DesignSystem.colors.sage[500],
+    fontSize: DesignSystem.typography.sizes.xs,
+    fontWeight: DesignSystem.typography.weights.medium,
+  },
+  hintDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: DesignSystem.colors.sage[300],
+    opacity: 0.5,
   },
   favoriteButton: {
     backgroundColor: DesignSystem.colors.overlay.light,
@@ -488,11 +700,16 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   gridContainer: {
-    paddingBottom: DesignSystem.spacing.xl,
-    paddingHorizontal: DesignSystem.spacing.xl,
+    paddingBottom: DesignSystem.spacing.xxl,
+    paddingHorizontal: GRID_PADDING,
+    paddingTop: DesignSystem.spacing.md,
   },
   gridRow: {
     justifyContent: 'space-between',
+    marginBottom: CARD_MARGIN,
+  },
+  itemSeparator: {
+    height: CARD_MARGIN,
   },
   header: {
     alignItems: 'center',
@@ -562,19 +779,21 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   premiumCard: {
-    aspectRatio: 0.75,
+    aspectRatio: 0.8, // Slightly taller for better proportions
     backgroundColor: DesignSystem.colors.background.primary,
     borderColor: DesignSystem.colors.border.light,
     borderRadius: DesignSystem.borderRadius.xl,
     borderWidth: 1,
-    elevation: 8,
-    marginBottom: DesignSystem.spacing.md,
+    elevation: 12,
+    marginBottom: 0, // Remove margin as we handle spacing in gridRow
     overflow: 'hidden',
     shadowColor: DesignSystem.colors.shadow.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.08,
+    shadowRadius: 24,
     width: CARD_WIDTH,
+    // Add subtle breathing room
+    transform: [{ scale: 0.98 }],
   },
   priceSection: {
     alignItems: 'flex-end',
